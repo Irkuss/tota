@@ -84,9 +84,11 @@ li a:hover {
 
 .col{
 	display:inline-block;
-	border:1px solid black;
 	border-radius:25px;
 	overflow:hidden;
+	box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
+	margin:20px;
+	
 }
 
 .tab{
@@ -96,13 +98,24 @@ li a:hover {
 }
 
 .mySlides{
-	width:800px;
+	width:900px;
 	margin:auto;
+	margin-bottom:20px;
+	box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
+	padding:40px;
+}
+
+.mySlides > h1{
+	color:#900C3F;
+}
+
+.mySlides > h2{
+	color:#900C3F;
 }
 
 hr{
 	margin-top:0px;	
-	border-top:1px dotted lightgrey;
+	border-top:1px dotted #900C3F;
 	width:50%;
 }
 
