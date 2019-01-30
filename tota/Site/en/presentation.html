@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html>
+<head>
+<link rel="icon" type="image/png" href="../images/icon.png" />
+<link rel="stylesheet" href="site.css"/>
+<meta charset="utf-8"/>
+<title>FIG</title>
+</head>
+<body>
+
+<div id="logo">
+<img src="../images/logo2.png" width="25%"/>
+</div>
+
+<div id="menu">
+<div class="icon"><a href="home.html"><img src="../images/icon.png" id="icon"></a></div>
+<ul>
+  	<li><a href="presentation.html">Presentation</a></li>
+	<li><a href="profils.html">Profils</a></li>
+	<li><a href="calendar.html">Calendar</a></li>
+	<li><a href="problems.html">Problems</a></li>
+	<li><a href="download.html">Download</a></li>
+	<li><a href="annexes.html">Annexes</a></li>
+	<li><a href="../presentation.html">FR</a></li>
+</ul>
+</div>
+
+<div class="content">
+<header>
+<h1>Présentation du projet</h1>
+<hr/>
+</header>
+
+<h2>Filiga Inspiration Games</h2>
+<hr/>
+
+<p>Filiga Inspiration Games (ou FIG) est un groupe formé de quatre étudiants de l'EPITA: Tanguy Desgouttes, Yanis Chaabane, Marc-emmanuel Raiffe et Jordan Failloux. FIG est spécialisé dans la création de jeux vidéos, nous travaillons actuellement exclusivement sur le jeu vidéo "Tales of the Apocalypse" (abrégé TotA). Nous espérons combler notre manque d'expérience dans le domaine par notre détermination au travail et nos connaissances dans le domaine du jeu vidéo. La création de notre groupe se repose sur un mélange harmonieux entre une bonne entente déjà existante, un mélange de différentes compétences et expériences dans le domaine du jeu vidéo et un intérêt partagé pour le concept de TotA.</p>
+<p>Le nom de notre groupe, Filiga Inspiration Games, provient d'une réflexion sur nos forces potentielles: la diligence au travail ("Filiga" signifie "diligent" en Samoan) et nos connaissances de différents jeux dont nous allons nous inspirer ("Inspiration"). Enfin, "Games" représente simplement le domaine dans lequel notre groupe a décidé de se spécialiser.</p>
+<p>Le logo de notre groupe est la représentation abstraite d'une figue, provenant de l'abréviation FIG du nom de notre groupe. La figue apparaît comme étant pixelisé reflétant la direction artistique de TotA tournée alors vers un style cubique.</p>
+
+<h2>Tales Of The Apocalypse</h2>
+<hr/>
+
+<p>Tales of the Apocalyps eest un jeu vidéo en 3D visant à recréer une expérience d’un groupe de survivants lors d’une apocalypse. Le joueur aura alors le contrôle total de l’ensemble des membres du groupe et aura pour tâche de les faire survivre. Chaque survivant est unique et possède des traits, des compétences et des caractéristiques propre à lui représentant ses forces et ses faiblesses. TotA n’est ni un jeu de stratégie compétitif ni un simulateur, mais est avant tout un générateur d’histoire, ainsi l’intérêt premier du jeu n’est pas de gagner mais d’assister aux différents événements, qu’ils soient épiques, comiques, tragiques ou dramatiques, vécus par le groupe de survivants.</p>
+<p>Tales of the Apocalypse} se présente donc comme un projet ambitieux mélangeant différents éléments de jeux populaires. Il se démarque par une génération procédurale du monde en 3D, des personnages distincts et la présence d'événement afin de produire une histoire marquante chez le joueur.</p>
+
+<h3>Fonctionnalités jouables</h3>
+
+<h4>Les survivants</h4>
+
+<p>Pour permettre l'attachement du joueur à ses survivants, chaque survivant se doit d'être unique. Ainsi, il a un nom, un âge, un sexe et surtout, des attributs et des compétences.</p>
+
+<ul class="liste">
+	<li>
+	Attribut: Un attribut est une valeur comprise entre 1 et 100 utilisé passivement ou activement. Pour l'instant, nous avons décidé d'implémenter 5 attributs: Force, Perception, Social, Mental et Intelligence. Un exemple d'utilisation passive d'un attribut serait l'attribut Force pour déterminer le poids maximum qu'un survivant peut transporter sur lui.
+	</li>
+	<li>
+	Compétence: Une compétence peut être comparé à un attribut plus spécifique, elle peut être un bonus à un attribut dans certaines conditions (par exemple Mêlée donne un bonus de Force pour l'action Frapper) mais aussi une valeur reflétant un niveau d'expertise dans un domaine d'un survivant (par exemple, Soin et Bricolage influent sur les actions "Soigner" et "Construire une table" et ne donnent pas de bonus à un attribut).
+	</li>
+	<li>
+	Trait et création d'un survivant: Par défaut, les attributs d'un survivant sont tous égaux à 50 et ses compétences à 0 mais lors de sa création, il lui est attribué des traits, soit aléatoirement soit par le joueur. Ces traits influent sur ses statistiques et ses compétences, par exemple, le trait "fort" donne +10 à l'attribut Force, le trait "médecin" donne +20 à l'attribut Intelligence et +2 à la Compétence Soin. Il existera un très grand nombre de trait afin de permettre l'unicité de chaque survivant.
+	</li>
+	<li>
+	Action: Une action est une interaction entre un survivant et ce qui l'entoure (dont lui). La réussite d'une action dépend de la valeur de l'attribut associé à l'action du survivant qui réalise l'action. Un nombre aléatoire compris 1 et 100 est comparé à la somme entre la valeur dudit attribut et le facteur de difficulté de l'action (positif ou négatif), si le nombre aléatoire est inférieur ou égal à cette somme, l'action est une réussite, sinon c'est un échec.
+	</li>
+	<li>
+	Besoins: Chaque survivant a besoin de nourriture. La nourriture se trouve soit dans les bâtiments à explorer, soit en tuant des animaux, soit en la faisant pousser (à noter que la soif ne sera pas implémenté car rajoutant de la complexité inutile).
+	<br/>
+	Chaque survivant a aussi une jauge de moral et une jauge de stress, chacune augmente et diminue en fonction de ce qui arrive au survivant et à son entourage.
+	<br/>
+	L'état du survivant est représenté par l'état de ses organes et de ses parties du corps.
+	<br/>
+	La température à un impact sur la santé mental et physique du survivant.
+	<br/>
+	L'ensemble de ses besoins sont implémentés comme ceux du jeu Rimworld présenté plus haut.
+	</li>
+	<li>
+	Inventaire, fouille et objet: Les survivants, tout comme les meubles, ont des espaces de stockage représentés par un tableau. Un objet occupe toujours un emplacement du tableau. Un inventaire est aussi limité par le poids maximum que peut porter un survivant. Les meubles ou d'autre objets trop lourds ne peuvent pas être rangés dans l'inventaire.
+	</li>
+</ul>
+
+<h4>Un monde vivant :</h4>
+
+<p>Un monde vivant et interactif est vital pour une bonne histoire de survie.</p>
+
+<ul class="liste">
+	<li>
+	Biomes: Le monde de TotA est un monde généré aléatoirement, il sera composé de différents biomes plus ou moins remplis de bâtiments préfabriqués. La ville possédera quelques bâtiments différents comme des immeubles, un supermarché. Le joueur pourra se déplacer librement entre les différents endroits. L'objectif du générateur est de pouvoir ajouter des nouveaux biomes et des nouveaux bâtiments facilement.
+	</li>
+	<li>
+	Faune et la flore: En terme de faune, notre objectif est d'implémenter un rat en tant que preuve de concept. De même, seuls un arbre, un buisson à  baie et un plant à tomate seront implémentés pour montrer certaines actions possibles comme couper un arbre, récolter et planter.
+	</li>
+</ul>
+
+<h4>Rythme et dramaturgie</h4>
+
+<p>Le maintien d'un rythme est crucial. Il existe de nombreuse façons d'empêcher un jeu répétitif et monotone (cf. Project Zomboid).</p>
+
+<ul class="liste">
+	<li>
+	Evénement: A la manière des événements dans <i>Rimworld</i>, les événements dans TotA seront à intervalle plus ou moins régulier et peuvent être positif comme négatif, par exemple une vague de froid, une attaque de bandit ou même l'apparition d'une horde de zombie.
+	</li>
+	<li>
+	PNJ (Personnage non-jouable): Les survivants contrôlés par le joueur ne sont pas les seuls humains restants dans l'univers de TotA. D'autres groupes de survivants se maintiennent aussi en vie à leur façon, certains voudront rejoindre le groupe ou faire du troc mais d'autre l'attaquer.
+	</li>
+	<li>
+	Progression et évolution: Au fur à mesure du jeu, les connaissances du groupe s'enrichiront à l'aide d'autre survivants ou grâce à des livres. La recherche de ces technologies du passé permettent une avancée progressive du joueur dans le monde de TotA, la complexité du jeu augmente donc au fil de la partie. Individuellement, chaque survivant peut changer au fil du temps, et ce que ce soit en bien (apprentissage dans un certain domaine) ou en mal (traumatisme et blessure).
+	</li>
+</ul>
+
+<h4>Les apocalypses</h4>
+
+<p>Nous souhaitons offrir au joueur une expérience optimale, ainsi le joueur avant de commencer une partie pourra choisir entre différents scénarios possibles. Le premier scénario que nous souhaitons implémenté est "Seul", le joueur contrôle un seul survivant face à un monde sans animaux ni humains. Deux autres scénarios que nous souhaitons fortement ajouter est "Grand Froid" (température glaciale, peu de vie, pas de zombie) et "Romero" (présence de zombie).</p>
+</div>
+<!--?php include("footer.php"); ?!-->
+</body>
+</html>

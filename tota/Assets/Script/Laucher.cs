@@ -93,6 +93,16 @@ public class Laucher : Photon.PunBehaviour {
         //Lorsqu'un joueur rejoint une salle
 
         Debug.Log("WE IN BOIS");
+
+        if (PhotonNetwork.room.PlayerCount == 1)
+        {
+            Debug.Log("We load the 'Room for 1' ");
+
+
+            // #Critical
+            // Load the Room Level.
+            PhotonNetwork.LoadLevel("Room for 1");
+        }
     }
 
     public override void OnDisconnectedFromPhoton()
