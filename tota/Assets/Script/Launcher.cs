@@ -17,6 +17,8 @@ public class Launcher : Photon.PunBehaviour
 
     string _gameVersion = "1";
 
+    bool isConnecting;
+
     #endregion
 
 
@@ -34,12 +36,6 @@ public class Launcher : Photon.PunBehaviour
         PhotonNetwork.logLevel = Loglevel;
     }
 
-    void Start()
-    {
-        //Pas d'appel a Connect car appele par le bouton Play
-        //Connect();
-    }
-
     #endregion
 
     #region Photon.PunBehaviour CallBacks
@@ -49,7 +45,8 @@ public class Launcher : Photon.PunBehaviour
     {
         Debug.Log("DemoAnimator/Launcher: OnConnectedToMaster() was called by PUN");
 
-        PhotonNetwork.JoinRandomRoom();
+        // #Critical: The first we try to do is to join a potential existing room. If there is, good, else, we'll be called back with OnPhotonRandomJoinFailed()
+        //PhotonNetwork.JoinRandomRoom();
     }
 
 
@@ -68,6 +65,9 @@ public class Launcher : Photon.PunBehaviour
     public override void OnJoinedRoom()
     {
         Debug.Log("DemoAnimator/Launcher: OnJoinedRoom() called by PUN. Now this client is in a room.");
+
+
+        PhotonNetwork.LoadLevel("Playground");
     }
 
     #endregion
@@ -79,10 +79,14 @@ public class Launcher : Photon.PunBehaviour
     /// - if not yet connected, Connect this application instance to Photon Cloud Network
     public void Connect()
     {
+        isConnecting = true;
         if (PhotonNetwork.connected)
         {
-            // we need at this point to attempt joining a Random Room. If it fails, we'll get notified in OnPhotonRandomJoinFailed() and we'll create one.
-            PhotonNetwork.JoinRandomRoom();
+            if (isConnecting)
+            { 
+                // we need at this point to attempt joining a Random Room. If it fails, we'll get notified in OnPhotonRandomJoinFailed() and we'll create one.
+                PhotonNetwork.JoinRandomRoom();
+            }
         }
         else
         {
@@ -93,5 +97,7 @@ public class Launcher : Photon.PunBehaviour
 
 
     #endregion
+
+    
 
 }
