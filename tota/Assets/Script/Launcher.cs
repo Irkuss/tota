@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
+using UnityEngine.UI;
 
 public class Launcher : MonoBehaviour
 {
@@ -13,10 +14,13 @@ public class Launcher : MonoBehaviour
     public GameObject searchButton;
     public GameObject createButton;
     public GameObject inputField;
+    public Dropdown roomDropdown;
 
+        
     private string _gameVersion = "1";
     private bool isConnecting;
 
+    
     private string roomName = "";
 
     //Unity Callback
@@ -26,6 +30,12 @@ public class Launcher : MonoBehaviour
         searchButton.SetActive(false);
         createButton.SetActive(false);
         inputField.SetActive(false);
+
+        // Dropdown room 
+        roomDropdown.ClearOptions();
+
+        List<string> names = new List<string>();
+
     }
 
     private void Awake()
@@ -50,7 +60,7 @@ public class Launcher : MonoBehaviour
 
         searchButton.SetActive(true);
         createButton.SetActive(true);
-        inputField.SetActive(true);
+        inputField.SetActive(true);        
 
         Debug.Log("Connected to Master");
     }
@@ -120,5 +130,11 @@ public class Launcher : MonoBehaviour
 
         Debug.Log("Changed room name to " + name);
         roomName = name;
+    }
+
+    public void BackToMenu()
+    {
+        SceneManager.LoadScene(0);
+        if (PhotonNetwork.connected) PhotonNetwork.Disconnect();
     }
 }

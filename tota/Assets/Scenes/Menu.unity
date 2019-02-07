@@ -568,7 +568,7 @@ MonoBehaviour:
         m_CallState: 2
     m_TypeName: UnityEngine.UI.Toggle+ToggleEvent, UnityEngine.UI, Version=1.0.0.0,
       Culture=neutral, PublicKeyToken=null
-  m_IsOn: 0
+  m_IsOn: 1
 --- !u!1 &182019145
 GameObject:
   m_ObjectHideFlags: 0
@@ -721,7 +721,7 @@ MonoBehaviour:
     m_HorizontalOverflow: 0
     m_VerticalOverflow: 0
     m_LineSpacing: 1
-  m_Text: PLEIN ECRAN
+  m_Text: FULLSCREEN
 --- !u!222 &220345050
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -980,7 +980,7 @@ MonoBehaviour:
     m_HorizontalOverflow: 0
     m_VerticalOverflow: 0
     m_LineSpacing: 1
-  m_Text: RETOUR
+  m_Text: BACK
 --- !u!222 &251788815
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -2159,7 +2159,7 @@ MonoBehaviour:
     m_HorizontalOverflow: 0
     m_VerticalOverflow: 0
     m_LineSpacing: 1
-  m_Text: MULTIJOUEUR
+  m_Text: MULTIPLAYER
 --- !u!222 &761477793
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -2255,11 +2255,11 @@ MonoBehaviour:
   m_Value: 0
   m_Options:
     m_Options:
-    - m_Text: FAIBLE
+    - m_Text: LOW
       m_Image: {fileID: 0}
-    - m_Text: MOYEN
+    - m_Text: MEDIUM
       m_Image: {fileID: 0}
-    - m_Text: HAUT
+    - m_Text: HIGH
       m_Image: {fileID: 0}
     - m_Text: ULTRA
       m_Image: {fileID: 0}
@@ -3719,7 +3719,7 @@ MonoBehaviour:
     m_HorizontalOverflow: 0
     m_VerticalOverflow: 0
     m_LineSpacing: 1
-  m_Text: GRAPHIQUES
+  m_Text: GRAPHICS
 --- !u!222 &1450738053
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -4319,7 +4319,7 @@ MonoBehaviour:
     m_HorizontalOverflow: 0
     m_VerticalOverflow: 0
     m_LineSpacing: 1
-  m_Text: QUITTER
+  m_Text: QUIT
 --- !u!222 &1871833171
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -4980,6 +4980,41 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 248253568}
     m_Modifications:
+    - target: {fileID: 6283239060150303598, guid: 5ac81362c07a2ed4a8f62abaad4e9794,
+        type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.size
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 6283239060150303598, guid: 5ac81362c07a2ed4a8f62abaad4e9794,
+        type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_MethodName
+      value: QuitGame
+      objectReference: {fileID: 0}
+    - target: {fileID: 6283239060150303598, guid: 5ac81362c07a2ed4a8f62abaad4e9794,
+        type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_Arguments.m_ObjectArgumentAssemblyTypeName
+      value: UnityEngine.Object, UnityEngine
+      objectReference: {fileID: 0}
+    - target: {fileID: 6283239060308341425, guid: 5ac81362c07a2ed4a8f62abaad4e9794,
+        type: 3}
+      propertyPath: m_Text
+      value: MULTIPLAYER
+      objectReference: {fileID: 0}
+    - target: {fileID: 6283239060698973454, guid: 5ac81362c07a2ed4a8f62abaad4e9794,
+        type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.size
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 6283239060698973454, guid: 5ac81362c07a2ed4a8f62abaad4e9794,
+        type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_MethodName
+      value: MultGame
+      objectReference: {fileID: 0}
+    - target: {fileID: 6283239060698973454, guid: 5ac81362c07a2ed4a8f62abaad4e9794,
+        type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_Arguments.m_ObjectArgumentAssemblyTypeName
+      value: UnityEngine.Object, UnityEngine
+      objectReference: {fileID: 0}
     - target: {fileID: 6283239060576360169, guid: 5ac81362c07a2ed4a8f62abaad4e9794,
         type: 3}
       propertyPath: m_Name
@@ -5095,56 +5130,6 @@ PrefabInstance:
       propertyPath: m_Pivot.y
       value: 0.5
       objectReference: {fileID: 0}
-    - target: {fileID: 6283239060150303598, guid: 5ac81362c07a2ed4a8f62abaad4e9794,
-        type: 3}
-      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.size
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 6283239060150303598, guid: 5ac81362c07a2ed4a8f62abaad4e9794,
-        type: 3}
-      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_MethodName
-      value: QuitGame
-      objectReference: {fileID: 0}
-    - target: {fileID: 6283239060150303598, guid: 5ac81362c07a2ed4a8f62abaad4e9794,
-        type: 3}
-      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_Arguments.m_ObjectArgumentAssemblyTypeName
-      value: UnityEngine.Object, UnityEngine
-      objectReference: {fileID: 0}
-    - target: {fileID: 6283239061414699075, guid: 5ac81362c07a2ed4a8f62abaad4e9794,
-        type: 3}
-      propertyPath: m_Text
-      value: QUITTER
-      objectReference: {fileID: 0}
-    - target: {fileID: 6283239061826821173, guid: 5ac81362c07a2ed4a8f62abaad4e9794,
-        type: 3}
-      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.size
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 6283239061826821173, guid: 5ac81362c07a2ed4a8f62abaad4e9794,
-        type: 3}
-      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_MethodName
-      value: SoloGame
-      objectReference: {fileID: 0}
-    - target: {fileID: 6283239061826821173, guid: 5ac81362c07a2ed4a8f62abaad4e9794,
-        type: 3}
-      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_Arguments.m_ObjectArgumentAssemblyTypeName
-      value: UnityEngine.Object, UnityEngine
-      objectReference: {fileID: 0}
-    - target: {fileID: 6283239060698973454, guid: 5ac81362c07a2ed4a8f62abaad4e9794,
-        type: 3}
-      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.size
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 6283239060698973454, guid: 5ac81362c07a2ed4a8f62abaad4e9794,
-        type: 3}
-      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_MethodName
-      value: MultGame
-      objectReference: {fileID: 0}
-    - target: {fileID: 6283239060698973454, guid: 5ac81362c07a2ed4a8f62abaad4e9794,
-        type: 3}
-      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_Arguments.m_ObjectArgumentAssemblyTypeName
-      value: UnityEngine.Object, UnityEngine
-      objectReference: {fileID: 0}
     - target: {fileID: 6283239061301855607, guid: 5ac81362c07a2ed4a8f62abaad4e9794,
         type: 3}
       propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.size
@@ -5184,6 +5169,26 @@ PrefabInstance:
         type: 3}
       propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[1].m_Arguments.m_BoolArgument
       value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 6283239061414699075, guid: 5ac81362c07a2ed4a8f62abaad4e9794,
+        type: 3}
+      propertyPath: m_Text
+      value: QUIT
+      objectReference: {fileID: 0}
+    - target: {fileID: 6283239061826821173, guid: 5ac81362c07a2ed4a8f62abaad4e9794,
+        type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.size
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 6283239061826821173, guid: 5ac81362c07a2ed4a8f62abaad4e9794,
+        type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_MethodName
+      value: SoloGame
+      objectReference: {fileID: 0}
+    - target: {fileID: 6283239061826821173, guid: 5ac81362c07a2ed4a8f62abaad4e9794,
+        type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_Arguments.m_ObjectArgumentAssemblyTypeName
+      value: UnityEngine.Object, UnityEngine
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 5ac81362c07a2ed4a8f62abaad4e9794, type: 3}
