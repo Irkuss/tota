@@ -4,69 +4,55 @@ using UnityEngine;
 
 using UnityEngine.SceneManagement;
 
-public class PlaygroundManager : Photon.PunBehaviour
+public class PlaygroundManager : MonoBehaviour
 {
-    #region Photon Messages
-    
-    public override void OnLeftRoom()
+    public Transform spawnPoint;
+    public GameObject joinButton;
+
+    //Unity Callback
+
+    //Photon Callback
+
+    public virtual void OnLeftRoom()
     {
+        //Origin: LeaveRoom()
+
         SceneManager.LoadScene(0);
     }
 
-    public override void OnPhotonPlayerConnected(PhotonPlayer other)
+    public virtual void OnPhotonPlayerConnected(PhotonPlayer other)
     {
         Debug.Log("OnPhotonPlayerConnected() " + other.NickName); // not seen if you're the player connecting
-
 
         if (PhotonNetwork.isMasterClient)
         {
             Debug.Log("OnPhotonPlayerConnected isMasterClient " + PhotonNetwork.isMasterClient); // called before OnPhotonPlayerDisconnected
 
-
-            LoadLvl();
+            PhotonNetwork.LoadLevel("Playground");
         }
     }
 
-
-    public override void OnPhotonPlayerDisconnected(PhotonPlayer other)
+    public virtual void OnPhotonPlayerDisconnected(PhotonPlayer other)
     {
         Debug.Log("OnPhotonPlayerDisconnected() " + other.NickName); // seen when other disconnects
-
-
-        if (PhotonNetwork.isMasterClient)
-        {
-            Debug.Log("Master left the room, ending"); // called before OnPhotonPlayerDisconnected
-
-
-            LoadLvl();
-        }
     }
 
-    #endregion
-
-
-    #region Public Methods
+    //Public methods
 
     public void LeaveRoom()
     {
+        //Origin: Leave button
+
         PhotonNetwork.LeaveRoom();
+
+        //Callback suivant: OnLeftRoom()
     }
 
-    #endregion
-
-    #region Private Methods
-
-
-    void LoadLvl()
+    public void JoinGame()
     {
-        if (!PhotonNetwork.isMasterClient)
-        {
-            Debug.LogError("PhotonNetwork : Trying to Load a level but we are not the master Client");
-        }
-        Debug.Log("PhotonNetwork : Loading Playground");
-        PhotonNetwork.LoadLevel("Playground");
+        Debug.Log("Instantiation en cours");
+        PhotonNetwork.Instantiate("PlayerTest", spawnPoint.position, spawnPoint.rotation, 0);
+
+        joinButton.SetActive(false);
     }
-
-
-    #endregion
 }
