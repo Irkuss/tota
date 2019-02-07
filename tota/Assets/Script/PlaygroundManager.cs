@@ -20,23 +20,6 @@ public class PlaygroundManager : MonoBehaviour
         SceneManager.LoadScene(0); // Quand on aura mélangé le menu principal et ces scènes là il faudra mettre SceneManager.LoadScene(2);
     }
 
-    public virtual void OnPhotonPlayerConnected(PhotonPlayer other)
-    {
-        Debug.Log("OnPhotonPlayerConnected() " + other.NickName); // not seen if you're the player connecting
-
-        if (PhotonNetwork.isMasterClient)
-        {
-            Debug.Log("OnPhotonPlayerConnected isMasterClient " + PhotonNetwork.isMasterClient); // called before OnPhotonPlayerDisconnected
-
-            PhotonNetwork.LoadLevel("Playground");
-        }
-    }
-
-    public virtual void OnPhotonPlayerDisconnected(PhotonPlayer other)
-    {
-        Debug.Log("OnPhotonPlayerDisconnected() " + other.NickName); // seen when other disconnects
-    }
-
     //Public methods
 
     public void LeaveRoom()
@@ -52,11 +35,7 @@ public class PlaygroundManager : MonoBehaviour
     {
         Debug.Log("Instantiation en cours");
 
-
-
         PhotonNetwork.Instantiate("PlayerTest", spawnPoint.position, spawnPoint.rotation, 0);
-
-
 
         joinButton.SetActive(false);
     }
