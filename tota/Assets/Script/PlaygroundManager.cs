@@ -1,15 +1,32 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-
+using UnityEngine.UI;
 using UnityEngine.SceneManagement;
 
 public class PlaygroundManager : MonoBehaviour
 {
     public Transform spawnPoint;
     public GameObject joinButton;
+    public GameObject background;
+
+    public Text playerNames;
+
+    PhotonPlayer[] names;
 
     //Unity Callback
+
+    public void Start()
+    {
+        playerNames.text = "Players : ";
+        names = PhotonNetwork.playerList;
+        List<string> listName = new List<string>();
+
+        for(int i = 0; i < names.Length; i++)
+        {
+            playerNames.text += '\n' + names[i].NickName;
+        }
+    }
 
     //Photon Callback
 
@@ -17,7 +34,7 @@ public class PlaygroundManager : MonoBehaviour
     {
         //Origin: LeaveRoom()
 
-        SceneManager.LoadScene(0); // Quand on aura mélangé le menu principal et ces scènes là il faudra mettre SceneManager.LoadScene(2);
+        SceneManager.LoadScene(2);        
     }
 
     public virtual void OnPhotonPlayerConnected(PhotonPlayer other)
@@ -43,7 +60,8 @@ public class PlaygroundManager : MonoBehaviour
     {
         //Origin: Leave button
 
-        PhotonNetwork.LeaveRoom();
+        PhotonNetwork.LeaveRoom();        
+        
 
         //Callback suivant: OnLeftRoom()
     }
@@ -59,5 +77,6 @@ public class PlaygroundManager : MonoBehaviour
 
 
         joinButton.SetActive(false);
+        background.SetActive(false);
     }
 }
