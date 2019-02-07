@@ -51,7 +51,12 @@ public class PlaygroundManager : MonoBehaviour
     public void JoinGame()
     {
         Debug.Log("Instantiation en cours");
+
+
+
         PhotonNetwork.Instantiate("PlayerTest", spawnPoint.position, spawnPoint.rotation, 0);
+
+
 
         joinButton.SetActive(false);
     }
