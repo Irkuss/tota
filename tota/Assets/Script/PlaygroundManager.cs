@@ -17,7 +17,7 @@ public class PlaygroundManager : MonoBehaviour
     {
         //Origin: LeaveRoom()
 
-        SceneManager.LoadScene(0);
+        SceneManager.LoadScene(0); // Quand on aura mélangé le menu principal et ces scènes là il faudra mettre SceneManager.LoadScene(2);
     }
 
     public virtual void OnPhotonPlayerConnected(PhotonPlayer other)
