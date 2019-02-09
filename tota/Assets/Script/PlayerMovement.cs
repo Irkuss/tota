@@ -5,12 +5,27 @@ using UnityEngine.AI;
 
 public class PlayerMovement : Photon.MonoBehaviour
 {
-    private Camera camera;
+    //public GameObject cameraGO;
     public NavMeshAgent navMeshAgent;
+
+    private Camera _playerCamera;
+    
 
     private void Start()
     {
-        camera = Camera.main;
+        /*
+        if (photonView.isMine)
+        {
+            cameraGO.SetActive(true);
+            _playerCamera = cameraGO.GetComponent<Camera>();
+        }
+        else
+        {
+            cameraGO.SetActive(false);
+        }
+        */
+        _playerCamera = Camera.main;
+
     }
 
     // Update is called once per frame
@@ -20,7 +35,7 @@ public class PlayerMovement : Photon.MonoBehaviour
         {
             if (Input.GetMouseButtonDown(0))
             {
-                Ray ray = camera.ScreenPointToRay(Input.mousePosition);
+                Ray ray = _playerCamera.ScreenPointToRay(Input.mousePosition);
                 RaycastHit hit;
                 if (Physics.Raycast(ray, out hit))
                 {
