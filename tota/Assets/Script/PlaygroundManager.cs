@@ -11,7 +11,6 @@ public class PlaygroundManager : MonoBehaviour
     public GameObject background;
 
     public Text playerNames;
-
     PhotonPlayer[] names;
 
     //Unity Callback
@@ -19,12 +18,24 @@ public class PlaygroundManager : MonoBehaviour
     public void Start()
     {
         playerNames.text = "Players : ";
-        names = PhotonNetwork.playerList;
-        List<string> listName = new List<string>();
-
+        names = PhotonNetwork.otherPlayers;
+            
         for(int i = 0; i < names.Length; i++)
         {
-            playerNames.text += '\n' + names[i].NickName;
+
+            playerNames.text += "\n\n" + names[i].NickName;
+        }
+    }
+
+    public void Update()
+    {
+        playerNames.text = "Players : ";
+        names = PhotonNetwork.otherPlayers;
+
+        for (int i = 0; i < names.Length; i++)
+        {
+
+            playerNames.text += "\n\n" + names[i].NickName;
         }
     }
 
@@ -33,25 +44,11 @@ public class PlaygroundManager : MonoBehaviour
     public virtual void OnLeftRoom()
     {
         //Origin: LeaveRoom()
-
+        // si il reste au moins un jour dans la room dont on vient 
+        // on peut repartir dans cette room 
+        //if (names.Length > 0) SceneManager.LoadScene(3);
+        //else
         SceneManager.LoadScene(2);        
-    }
-
-    public virtual void OnPhotonPlayerConnected(PhotonPlayer other)
-    {
-        Debug.Log("OnPhotonPlayerConnected() " + other.NickName); // not seen if you're the player connecting
-
-        if (PhotonNetwork.isMasterClient)
-        {
-            Debug.Log("OnPhotonPlayerConnected isMasterClient " + PhotonNetwork.isMasterClient); // called before OnPhotonPlayerDisconnected
-
-            PhotonNetwork.LoadLevel("Playground");
-        }
-    }
-
-    public virtual void OnPhotonPlayerDisconnected(PhotonPlayer other)
-    {
-        Debug.Log("OnPhotonPlayerDisconnected() " + other.NickName); // seen when other disconnects
     }
 
     //Public methods

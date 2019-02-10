@@ -13,15 +13,20 @@ public class Launcher : MonoBehaviour
     public GameObject photonConnectButton;
     public GameObject searchButton;
     public GameObject createButton;
+    public GameObject nameField;
+    public Text namefield;
     public GameObject inputField;
+    public GameObject roomDrop;
     public Dropdown roomDropdown;
 
+    RoomInfo[] rooms;
         
     private string _gameVersion = "1";
     private bool isConnecting;
 
     
     private string roomName = "";
+    private string playerName = "";
 
     //Unity Callback
 
@@ -30,11 +35,24 @@ public class Launcher : MonoBehaviour
         searchButton.SetActive(false);
         createButton.SetActive(false);
         inputField.SetActive(false);
+        roomDrop.SetActive(false);
 
         // Dropdown room 
+        rooms = PhotonNetwork.GetRoomList();
         roomDropdown.ClearOptions();
 
-        List<string> names = new List<string>();
+        List<string> names = new List<string>();        
+
+        foreach (RoomInfo roomx in rooms)
+        {
+            if (roomx.MaxPlayers != roomx.PlayerCount)
+            {
+                names.Add(roomx.Name + " : " + roomx.PlayerCount + " players in");
+            }
+        }
+
+        roomDropdown.AddOptions(names);
+        roomDropdown.RefreshShownValue();
 
     }
 
@@ -57,10 +75,11 @@ public class Launcher : MonoBehaviour
         //Origin: ConnectPhoton()
 
         photonConnectButton.SetActive(false);
-
+        nameField.SetActive(false);
         searchButton.SetActive(true);
         createButton.SetActive(true);
-        inputField.SetActive(true);        
+        inputField.SetActive(true);
+        roomDrop.SetActive(true);
 
         Debug.Log("Connected to Master");
     }
@@ -88,15 +107,17 @@ public class Launcher : MonoBehaviour
     public void ConnectPhoton()
     {
         //Origin: photonConnectButton
-
-        //On vérifie qu'on est pas conecté
-        if (!PhotonNetwork.connected)
+        if (namefield.text != "")
         {
-            //On se connecte
-            PhotonNetwork.ConnectUsingSettings(_gameVersion);
-
-            //Callback suivant: OnConnectedToMaster()
-        }
+            //On vérifie qu'on est pas conecté
+            if (!PhotonNetwork.connected)
+            {
+                //On se connecte
+                PhotonNetwork.ConnectUsingSettings(_gameVersion);
+                PhotonNetwork.playerName = namefield.text;
+                //Callback suivant: OnConnectedToMaster()
+            }
+        }       
     }
 
     public void SearchRoom()
@@ -105,7 +126,7 @@ public class Launcher : MonoBehaviour
 
         if (roomName != "")
         {
-            PhotonNetwork.JoinRoom(roomName);
+            PhotonNetwork.JoinRoom(roomName);            
 
             //Callback suivant: OnJoinedRoom()
             //Callback suivant: OnPhotonJoinedRoomFailed(object[] codeAndMsg)
@@ -118,8 +139,7 @@ public class Launcher : MonoBehaviour
         Debug.Log("Trying to Create");
         if (roomName != "")
         {
-            PhotonNetwork.CreateRoom(roomName, new RoomOptions() { MaxPlayers = MaxPlayersPerRoom }, null);
-
+            PhotonNetwork.CreateRoom(roomName, new RoomOptions() { MaxPlayers = MaxPlayersPerRoom }, null);            
             Debug.Log("Created room " + roomName);
         }
     }
