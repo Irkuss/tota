@@ -7,7 +7,10 @@ using UnityEngine.SceneManagement;
 public class PlaygroundManager : MonoBehaviour
 {
     public Transform spawnPoint;
-    public GameObject joinButton;
+    [SerializeField]
+    private GameObject joinButton;
+    [SerializeField]
+    private GameObject nameInputField;
 
     //Unity Callback
 
@@ -37,8 +40,9 @@ public class PlaygroundManager : MonoBehaviour
 
         Debug.Log("Instantiation en cours");
 
-        PhotonNetwork.Instantiate("PlayerTest", spawnPoint.position, spawnPoint.rotation, 0);
+        PhotonNetwork.Instantiate("Spirit", spawnPoint.position, spawnPoint.rotation, 0);
 
         joinButton.SetActive(false);
+        nameInputField.SetActive(false);
     }
 }

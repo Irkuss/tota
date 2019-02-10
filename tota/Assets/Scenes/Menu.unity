@@ -4980,6 +4980,36 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 248253568}
     m_Modifications:
+    - target: {fileID: 6283239060150303598, guid: 5ac81362c07a2ed4a8f62abaad4e9794,
+        type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.size
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 6283239060150303598, guid: 5ac81362c07a2ed4a8f62abaad4e9794,
+        type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_MethodName
+      value: QuitGame
+      objectReference: {fileID: 0}
+    - target: {fileID: 6283239060150303598, guid: 5ac81362c07a2ed4a8f62abaad4e9794,
+        type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_Arguments.m_ObjectArgumentAssemblyTypeName
+      value: UnityEngine.Object, UnityEngine
+      objectReference: {fileID: 0}
+    - target: {fileID: 6283239060698973454, guid: 5ac81362c07a2ed4a8f62abaad4e9794,
+        type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.size
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 6283239060698973454, guid: 5ac81362c07a2ed4a8f62abaad4e9794,
+        type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_MethodName
+      value: MultGame
+      objectReference: {fileID: 0}
+    - target: {fileID: 6283239060698973454, guid: 5ac81362c07a2ed4a8f62abaad4e9794,
+        type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_Arguments.m_ObjectArgumentAssemblyTypeName
+      value: UnityEngine.Object, UnityEngine
+      objectReference: {fileID: 0}
     - target: {fileID: 6283239060576360169, guid: 5ac81362c07a2ed4a8f62abaad4e9794,
         type: 3}
       propertyPath: m_Name
@@ -5095,56 +5125,6 @@ PrefabInstance:
       propertyPath: m_Pivot.y
       value: 0.5
       objectReference: {fileID: 0}
-    - target: {fileID: 6283239060150303598, guid: 5ac81362c07a2ed4a8f62abaad4e9794,
-        type: 3}
-      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.size
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 6283239060150303598, guid: 5ac81362c07a2ed4a8f62abaad4e9794,
-        type: 3}
-      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_MethodName
-      value: QuitGame
-      objectReference: {fileID: 0}
-    - target: {fileID: 6283239060150303598, guid: 5ac81362c07a2ed4a8f62abaad4e9794,
-        type: 3}
-      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_Arguments.m_ObjectArgumentAssemblyTypeName
-      value: UnityEngine.Object, UnityEngine
-      objectReference: {fileID: 0}
-    - target: {fileID: 6283239061414699075, guid: 5ac81362c07a2ed4a8f62abaad4e9794,
-        type: 3}
-      propertyPath: m_Text
-      value: QUITTER
-      objectReference: {fileID: 0}
-    - target: {fileID: 6283239061826821173, guid: 5ac81362c07a2ed4a8f62abaad4e9794,
-        type: 3}
-      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.size
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 6283239061826821173, guid: 5ac81362c07a2ed4a8f62abaad4e9794,
-        type: 3}
-      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_MethodName
-      value: SoloGame
-      objectReference: {fileID: 0}
-    - target: {fileID: 6283239061826821173, guid: 5ac81362c07a2ed4a8f62abaad4e9794,
-        type: 3}
-      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_Arguments.m_ObjectArgumentAssemblyTypeName
-      value: UnityEngine.Object, UnityEngine
-      objectReference: {fileID: 0}
-    - target: {fileID: 6283239060698973454, guid: 5ac81362c07a2ed4a8f62abaad4e9794,
-        type: 3}
-      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.size
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 6283239060698973454, guid: 5ac81362c07a2ed4a8f62abaad4e9794,
-        type: 3}
-      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_MethodName
-      value: MultGame
-      objectReference: {fileID: 0}
-    - target: {fileID: 6283239060698973454, guid: 5ac81362c07a2ed4a8f62abaad4e9794,
-        type: 3}
-      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_Arguments.m_ObjectArgumentAssemblyTypeName
-      value: UnityEngine.Object, UnityEngine
-      objectReference: {fileID: 0}
     - target: {fileID: 6283239061301855607, guid: 5ac81362c07a2ed4a8f62abaad4e9794,
         type: 3}
       propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.size
@@ -5184,6 +5164,26 @@ PrefabInstance:
         type: 3}
       propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[1].m_Arguments.m_BoolArgument
       value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 6283239061414699075, guid: 5ac81362c07a2ed4a8f62abaad4e9794,
+        type: 3}
+      propertyPath: m_Text
+      value: QUITTER
+      objectReference: {fileID: 0}
+    - target: {fileID: 6283239061826821173, guid: 5ac81362c07a2ed4a8f62abaad4e9794,
+        type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.size
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 6283239061826821173, guid: 5ac81362c07a2ed4a8f62abaad4e9794,
+        type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_MethodName
+      value: SoloGame
+      objectReference: {fileID: 0}
+    - target: {fileID: 6283239061826821173, guid: 5ac81362c07a2ed4a8f62abaad4e9794,
+        type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_Arguments.m_ObjectArgumentAssemblyTypeName
+      value: UnityEngine.Object, UnityEngine
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 5ac81362c07a2ed4a8f62abaad4e9794, type: 3}
