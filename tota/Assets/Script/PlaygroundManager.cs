@@ -33,6 +33,8 @@ public class PlaygroundManager : MonoBehaviour
 
     public void JoinGame()
     {
+        Debug.Log(PhotonNetwork.player.NickName + " has joined the room");
+
         Debug.Log("Instantiation en cours");
 
         PhotonNetwork.Instantiate("PlayerTest", spawnPoint.position, spawnPoint.rotation, 0);
