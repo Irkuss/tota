@@ -37,12 +37,12 @@ public class Launcher : MonoBehaviour
         inputField.SetActive(false);
         roomDrop.SetActive(false);
 
-        // Dropdown room 
+        // Dropdown for the room 
         rooms = PhotonNetwork.GetRoomList();
         roomDropdown.ClearOptions();
 
         List<string> names = new List<string>();        
-
+        
         foreach (RoomInfo roomx in rooms)
         {
             if (roomx.MaxPlayers != roomx.PlayerCount)

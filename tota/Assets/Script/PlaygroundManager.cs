@@ -4,7 +4,7 @@ using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.SceneManagement;
 
-public class PlaygroundManager : MonoBehaviour
+public class PlaygroundManager : Photon.PunBehaviour
 {
     public Transform spawnPoint;
     public GameObject joinButton;
@@ -17,31 +17,45 @@ public class PlaygroundManager : MonoBehaviour
 
     public void Start()
     {
-        playerNames.text = "Players : ";
-        names = PhotonNetwork.otherPlayers;
-            
-        for(int i = 0; i < names.Length; i++)
+        playerNames.text = "Players :";
+        names = PhotonNetwork.playerList;
+        
+        foreach(var name in names)
         {
-
-            playerNames.text += "\n\n" + names[i].NickName;
+            playerNames.text += "\n\n" + name.NickName;
         }
     }
 
     public void Update()
     {
-        playerNames.text = "Players : ";
-        names = PhotonNetwork.otherPlayers;
+        
+    }
 
-        for (int i = 0; i < names.Length; i++)
+    public override void OnPhotonPlayerConnected(PhotonPlayer newPlayer)
+    {
+        playerNames.text = "Players :";
+        names = PhotonNetwork.playerList;
+
+        foreach (var name in names)
         {
+            playerNames.text += "\n\n" + name.NickName;
+        }
+    }
 
-            playerNames.text += "\n\n" + names[i].NickName;
+    public override void OnPhotonPlayerDisconnected(PhotonPlayer otherPlayer)
+    {
+        playerNames.text = "Players :";
+        names = PhotonNetwork.playerList;
+
+        foreach (var name in names)
+        {
+            playerNames.text += "\n\n" + name.NickName;
         }
     }
 
     //Photon Callback
 
-    public virtual void OnLeftRoom()
+    public override void OnLeftRoom()
     {
         //Origin: LeaveRoom()
         // si il reste au moins un jour dans la room dont on vient 
