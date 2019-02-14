@@ -8,7 +8,7 @@ public class Launcher : MonoBehaviour
 {
     public PhotonLogLevel Loglevel = PhotonLogLevel.Informational;
     [Tooltip("The maximum number of players per room. When a room is full, it can't be joined by new players and so new room will be created")]
-    public byte MaxPlayersPerRoom = 4;
+    private byte MaxPlayersPerRoom = 4;
 
     public GameObject photonConnectButton;
     public GameObject searchButton;
@@ -26,7 +26,7 @@ public class Launcher : MonoBehaviour
 
     
     private string roomName = "";
-    private string playerName = "";
+    
 
     //Unity Callback
 
@@ -35,25 +35,7 @@ public class Launcher : MonoBehaviour
         searchButton.SetActive(false);
         createButton.SetActive(false);
         inputField.SetActive(false);
-        roomDrop.SetActive(false);
-
-        // Dropdown for the room 
-        rooms = PhotonNetwork.GetRoomList();
-        roomDropdown.ClearOptions();
-
-        List<string> names = new List<string>();        
-        
-        foreach (RoomInfo roomx in rooms)
-        {
-            if (roomx.MaxPlayers != roomx.PlayerCount)
-            {
-                names.Add(roomx.Name + " : " + roomx.PlayerCount + " players in");
-            }
-        }
-
-        roomDropdown.AddOptions(names);
-        roomDropdown.RefreshShownValue();
-
+        roomDrop.SetActive(false);        
     }
 
     private void Awake()
@@ -80,6 +62,21 @@ public class Launcher : MonoBehaviour
         createButton.SetActive(true);
         inputField.SetActive(true);
         roomDrop.SetActive(true);
+
+        // Dropdown for the room 
+        rooms = PhotonNetwork.GetRoomList();
+        roomDropdown.ClearOptions();
+        Debug.Log(rooms.Length);
+        List<string> names = new List<string>();
+
+        foreach (RoomInfo roomx in rooms)
+        {            
+            names.Add(roomx.Name + " : " + roomx.PlayerCount + " players in");                      
+        }
+        if (names.Count == 0) names.Add("No rooms");
+
+        roomDropdown.AddOptions(names);
+        roomDropdown.RefreshShownValue();
 
         Debug.Log("Connected to Master");
     }
@@ -114,7 +111,16 @@ public class Launcher : MonoBehaviour
             {
                 //On se connecte
                 PhotonNetwork.ConnectUsingSettings(_gameVersion);
-                PhotonNetwork.playerName = namefield.text;
+                if (!PlayerPrefs.HasKey("name"))
+                {
+                    PhotonNetwork.playerName = namefield.text;
+                    PlayerPrefs.SetString("name", namefield.text);
+                }
+                else
+                {
+                    PhotonNetwork.playerName = PlayerPrefs.GetString("name");
+                }
+                
                 //Callback suivant: OnConnectedToMaster()
             }
         }       
