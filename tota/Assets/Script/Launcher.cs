@@ -2,22 +2,31 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
+using UnityEngine.UI;
 
 public class Launcher : MonoBehaviour
 {
     public PhotonLogLevel Loglevel = PhotonLogLevel.Informational;
     [Tooltip("The maximum number of players per room. When a room is full, it can't be joined by new players and so new room will be created")]
-    public byte MaxPlayersPerRoom = 4;
+    private byte MaxPlayersPerRoom = 4;
 
     public GameObject photonConnectButton;
     public GameObject searchButton;
     public GameObject createButton;
+    public GameObject nameField;
+    public Text namefield;
     public GameObject inputField;
+    public GameObject roomDrop;
+    public Dropdown roomDropdown;
 
+    RoomInfo[] rooms;
+        
     private string _gameVersion = "1";
     private bool isConnecting;
 
+    
     private string roomName = "";
+    
 
     //Unity Callback
 
@@ -26,6 +35,7 @@ public class Launcher : MonoBehaviour
         searchButton.SetActive(false);
         createButton.SetActive(false);
         inputField.SetActive(false);
+        roomDrop.SetActive(false);        
     }
 
     private void Awake()
@@ -47,10 +57,26 @@ public class Launcher : MonoBehaviour
         //Origin: ConnectPhoton()
 
         photonConnectButton.SetActive(false);
-
+        nameField.SetActive(false);
         searchButton.SetActive(true);
         createButton.SetActive(true);
         inputField.SetActive(true);
+        roomDrop.SetActive(true);
+
+        // Dropdown for the room 
+        rooms = PhotonNetwork.GetRoomList();
+        roomDropdown.ClearOptions();
+        Debug.Log(rooms.Length);
+        List<string> names = new List<string>();
+
+        foreach (RoomInfo roomx in rooms)
+        {            
+            names.Add(roomx.Name + " : " + roomx.PlayerCount + " players in");                      
+        }
+        if (names.Count == 0) names.Add("No rooms");
+
+        roomDropdown.AddOptions(names);
+        roomDropdown.RefreshShownValue();
 
         Debug.Log("Connected to Master");
     }
@@ -78,15 +104,26 @@ public class Launcher : MonoBehaviour
     public void ConnectPhoton()
     {
         //Origin: photonConnectButton
-
-        //On vérifie qu'on est pas conecté
-        if (!PhotonNetwork.connected)
+        if (namefield.text != "")
         {
-            //On se connecte
-            PhotonNetwork.ConnectUsingSettings(_gameVersion);
-
-            //Callback suivant: OnConnectedToMaster()
-        }
+            //On vérifie qu'on est pas conecté
+            if (!PhotonNetwork.connected)
+            {
+                //On se connecte
+                PhotonNetwork.ConnectUsingSettings(_gameVersion);
+                if (!PlayerPrefs.HasKey("name"))
+                {
+                    PhotonNetwork.playerName = namefield.text;
+                    PlayerPrefs.SetString("name", namefield.text);
+                }
+                else
+                {
+                    PhotonNetwork.playerName = PlayerPrefs.GetString("name");
+                }
+                
+                //Callback suivant: OnConnectedToMaster()
+            }
+        }       
     }
 
     public void SearchRoom()
@@ -95,7 +132,7 @@ public class Launcher : MonoBehaviour
 
         if (roomName != "")
         {
-            PhotonNetwork.JoinRoom(roomName);
+            PhotonNetwork.JoinRoom(roomName);            
 
             //Callback suivant: OnJoinedRoom()
             //Callback suivant: OnPhotonJoinedRoomFailed(object[] codeAndMsg)
@@ -108,8 +145,7 @@ public class Launcher : MonoBehaviour
         Debug.Log("Trying to Create");
         if (roomName != "")
         {
-            PhotonNetwork.CreateRoom(roomName, new RoomOptions() { MaxPlayers = MaxPlayersPerRoom }, null);
-
+            PhotonNetwork.CreateRoom(roomName, new RoomOptions() { MaxPlayers = MaxPlayersPerRoom }, null);            
             Debug.Log("Created room " + roomName);
         }
     }
@@ -120,5 +156,11 @@ public class Launcher : MonoBehaviour
 
         Debug.Log("Changed room name to " + name);
         roomName = name;
+    }
+
+    public void BackToMenu()
+    {
+        SceneManager.LoadScene(0);
+        if (PhotonNetwork.connected) PhotonNetwork.Disconnect();
     }
 }

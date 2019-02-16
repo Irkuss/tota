@@ -13,7 +13,7 @@ public class MainMenu : MonoBehaviour
 
     public void MultGame()
     {
-        SceneManager.LoadScene(2);
+        SceneManager.LoadScene(2); // When solo will be done get the index to 2
     }
 
     public void QuitGame()
