@@ -4,54 +4,65 @@ using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.SceneManagement;
 
-public class PlaygroundManager : MonoBehaviour
+public class PlaygroundManager : Photon.PunBehaviour
 {
     public Transform spawnPoint;
     public GameObject joinButton;
     public GameObject background;
 
     public Text playerNames;
-
     PhotonPlayer[] names;
 
     //Unity Callback
 
     public void Start()
     {
-        playerNames.text = "Players : ";
+        playerNames.text = "Players :";
         names = PhotonNetwork.playerList;
-        List<string> listName = new List<string>();
-
-        for(int i = 0; i < names.Length; i++)
+        
+        foreach(var name in names)
         {
-            playerNames.text += '\n' + names[i].NickName;
+            playerNames.text += "\n\n" + name.NickName;
+        }
+    }
+
+    public void Update()
+    {
+        
+    }
+
+    public override void OnPhotonPlayerConnected(PhotonPlayer newPlayer)
+    {
+        playerNames.text = "Players :";
+        names = PhotonNetwork.playerList;
+
+        foreach (var name in names)
+        {
+            playerNames.text += "\n\n" + name.NickName;
+        }
+    }
+
+    public override void OnPhotonPlayerDisconnected(PhotonPlayer otherPlayer)
+    {
+        playerNames.text = "Players :";
+        names = PhotonNetwork.playerList;
+
+        foreach (var name in names)
+        {
+            playerNames.text += "\n\n" + name.NickName;
         }
     }
 
     //Photon Callback
 
-    public virtual void OnLeftRoom()
+    public override void OnLeftRoom()
     {
         //Origin: LeaveRoom()
-
+        // si il reste au moins un jour dans la room dont on vient 
+        // on peut repartir dans cette room 
+        //if (names.Length > 0) SceneManager.LoadScene(3);
+        //else
         SceneManager.LoadScene(2);        
-    }
-
-    public virtual void OnPhotonPlayerConnected(PhotonPlayer other)
-    {
-        Debug.Log("OnPhotonPlayerConnected() " + other.NickName); // not seen if you're the player connecting
-
-        if (PhotonNetwork.isMasterClient)
-        {
-            Debug.Log("OnPhotonPlayerConnected isMasterClient " + PhotonNetwork.isMasterClient); // called before OnPhotonPlayerDisconnected
-
-            PhotonNetwork.LoadLevel("Playground");
-        }
-    }
-
-    public virtual void OnPhotonPlayerDisconnected(PhotonPlayer other)
-    {
-        Debug.Log("OnPhotonPlayerDisconnected() " + other.NickName); // seen when other disconnects
     }
 
     //Public methods

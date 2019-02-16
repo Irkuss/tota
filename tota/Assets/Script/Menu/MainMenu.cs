@@ -8,12 +8,12 @@ public class MainMenu : MonoBehaviour
     
     public void SoloGame()
     {        
-        //SceneManager.LoadScene(1);
+        SceneManager.LoadScene(1);
     }
 
     public void MultGame()
     {
-        SceneManager.LoadScene(1); // When solo will be done get the index to 2
+        SceneManager.LoadScene(2); // When solo will be done get the index to 2
     }
 
     public void QuitGame()
