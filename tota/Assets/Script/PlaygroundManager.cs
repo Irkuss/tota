@@ -5,11 +5,13 @@ using UnityEngine.UI;
 using UnityEngine.SceneManagement;
 
 public class PlaygroundManager : Photon.PunBehaviour
+
 {    
     public GameObject joinButton;
     public GameObject leaveButton;
     public Text playerNames;
     PhotonPlayer[] names;
+
 
     //Unity Callback
 
@@ -24,10 +26,7 @@ public class PlaygroundManager : Photon.PunBehaviour
         }
     }
 
-    public void Update()
-    {
-        
-    }
+    //Photon Callback
 
     public override void OnPhotonPlayerConnected(PhotonPlayer newPlayer)
     {
@@ -51,8 +50,6 @@ public class PlaygroundManager : Photon.PunBehaviour
         }
     }
 
-    //Photon Callback
-
     public override void OnLeftRoom()
     {
         //Origin: LeaveRoom()
@@ -60,7 +57,7 @@ public class PlaygroundManager : Photon.PunBehaviour
         // on peut repartir dans cette room 
         //if (names.Length > 0) SceneManager.LoadScene(3);
         //else
-        SceneManager.LoadScene(2);        
+        SceneManager.LoadScene(2);
     }
 
     //Public methods
@@ -76,6 +73,7 @@ public class PlaygroundManager : Photon.PunBehaviour
 
     public void JoinGame()
     {
+
         Debug.Log("Instantiation en cours");
         SceneManager.LoadScene(3);
     }
