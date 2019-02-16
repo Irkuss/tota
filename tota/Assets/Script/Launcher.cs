@@ -18,6 +18,9 @@ public class Launcher : MonoBehaviour
     public GameObject inputField;
     public GameObject roomDrop;
     public Dropdown roomDropdown;
+    public GameObject joinButton;
+    public GameObject leaveButton;
+    public GameObject playerField;
 
     RoomInfo[] rooms;
         
@@ -35,7 +38,10 @@ public class Launcher : MonoBehaviour
         searchButton.SetActive(false);
         createButton.SetActive(false);
         inputField.SetActive(false);
-        roomDrop.SetActive(false);        
+        roomDrop.SetActive(false);
+        playerField.SetActive(false);
+        joinButton.SetActive(false);
+        leaveButton.SetActive(false);
     }
 
     private void Awake()
@@ -96,7 +102,15 @@ public class Launcher : MonoBehaviour
     public virtual void OnJoinedRoom()
     {
         //Debug.Log("DemoAnimator/Launcher: OnJoinedRoom() called by PUN. Now this client is in a room.");
-        PhotonNetwork.LoadLevel("Playground");
+        //PhotonNetwork.LoadLevel("Playground");
+        searchButton.SetActive(false);
+        createButton.SetActive(false);
+        inputField.SetActive(false);
+        roomDrop.SetActive(false);
+
+        playerField.SetActive(true);
+        joinButton.SetActive(true);
+        leaveButton.SetActive(true);
     }
 
     //Public methods

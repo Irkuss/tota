@@ -5,11 +5,9 @@ using UnityEngine.UI;
 using UnityEngine.SceneManagement;
 
 public class PlaygroundManager : Photon.PunBehaviour
-{
-    public Transform spawnPoint;
+{    
     public GameObject joinButton;
-    public GameObject background;
-
+    public GameObject leaveButton;
     public Text playerNames;
     PhotonPlayer[] names;
 
@@ -71,23 +69,14 @@ public class PlaygroundManager : Photon.PunBehaviour
     {
         //Origin: Leave button
 
-        PhotonNetwork.LeaveRoom();        
+        PhotonNetwork.LeaveRoom();    
         
-
         //Callback suivant: OnLeftRoom()
     }
 
     public void JoinGame()
     {
         Debug.Log("Instantiation en cours");
-
-
-
-        PhotonNetwork.Instantiate("PlayerTest", spawnPoint.position, spawnPoint.rotation, 0);
-
-
-
-        joinButton.SetActive(false);
-        background.SetActive(false);
+        SceneManager.LoadScene(3);
     }
 }
