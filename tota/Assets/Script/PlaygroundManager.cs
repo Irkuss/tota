@@ -5,16 +5,10 @@ using UnityEngine.UI;
 using UnityEngine.SceneManagement;
 
 public class PlaygroundManager : Photon.PunBehaviour
-{
-    public Transform spawnPoint;
-    [SerializeField]
-    private GameObject joinButton;
-    [SerializeField]
-    private GameObject nameInputField;
 
-    public PermissionsManager permissions;
-    public GameObject background;
-
+{    
+    public GameObject joinButton;
+    public GameObject leaveButton;
     public Text playerNames;
     PhotonPlayer[] names;
 
@@ -72,35 +66,15 @@ public class PlaygroundManager : Photon.PunBehaviour
     {
         //Origin: Leave button
 
-        PhotonNetwork.LeaveRoom();        
+        PhotonNetwork.LeaveRoom();    
         
-
         //Callback suivant: OnLeftRoom()
     }
 
     public void JoinGame()
     {
-        Debug.Log(PhotonNetwork.player.NickName + " has joined the room");
 
         Debug.Log("Instantiation en cours");
-
-        InstantiateSpirit();
-
-        joinButton.SetActive(false);
-        nameInputField.SetActive(false);
-
-        background.SetActive(false);
-    }
-
-    //Private methods
-
-    private void InstantiateSpirit()
-    {
-        GameObject spirit = PhotonNetwork.Instantiate("Spirit", spawnPoint.position, spawnPoint.rotation, 0);
-        SpiritHead init = spirit.GetComponent<SpiritHead>();
-        init.spiritName = PhotonNetwork.playerName;
-        
-        //TODO pour l'instant chaque joueur joue tout seul
-        permissions.AddTeamWithPlayer(PhotonNetwork.playerName);
+        SceneManager.LoadScene(3);
     }
 }
