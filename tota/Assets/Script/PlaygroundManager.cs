@@ -12,7 +12,13 @@ public class PlaygroundManager : MonoBehaviour
     [SerializeField]
     private GameObject nameInputField;
 
+    public PermissionsManager permissions;
+
     //Unity Callback
+
+    private void Start()
+    {
+    }
 
     //Photon Callback
 
@@ -40,9 +46,21 @@ public class PlaygroundManager : MonoBehaviour
 
         Debug.Log("Instantiation en cours");
 
-        PhotonNetwork.Instantiate("Spirit", spawnPoint.position, spawnPoint.rotation, 0);
+        InstantiateSpirit();
 
         joinButton.SetActive(false);
         nameInputField.SetActive(false);
+    }
+
+    //Private methods
+
+    private void InstantiateSpirit()
+    {
+        GameObject spirit = PhotonNetwork.Instantiate("Spirit", spawnPoint.position, spawnPoint.rotation, 0);
+        SpiritHead init = spirit.GetComponent<SpiritHead>();
+        init.spiritName = PhotonNetwork.playerName;
+
+        //TODO pour l'instant chaque joueur joue tout seul
+        permissions.AddTeamWithPlayer(PhotonNetwork.playerName);
     }
 }
