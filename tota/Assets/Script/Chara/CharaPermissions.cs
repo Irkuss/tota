@@ -17,6 +17,7 @@ public class CharaPermissions : MonoBehaviour
         //Getters
     public int GetGroupMasterIndex()
     {
+        Debug.Log("CharaPermissions: Getting index: " + groupMasterIndex);
         return groupMasterIndex;
     }
 
@@ -36,15 +37,17 @@ public class CharaPermissions : MonoBehaviour
     }
 
         //Setters
-
+    [PunRPC]
     public void SetGroupMaster(int index) //
     {
+        Debug.Log("CharaPermissions: Setting group master to: " + index);
         if (index >= 0)
         {
+            Debug.Log("CharaPermissions: Successfully changed index");
             groupMasterIndex = index;
         }
     }
-
+    [PunRPC]
     public void SetGroupMasterNull() //Probably useless
     {
         if (groupMasterIndex >= 0)
@@ -52,7 +55,7 @@ public class CharaPermissions : MonoBehaviour
             groupMasterIndex = -1;
         }
     }
-
+    [PunRPC]
     public void SetSpiritMasterNull()
     {
         if (spiritMasterName != null)
@@ -60,7 +63,7 @@ public class CharaPermissions : MonoBehaviour
             spiritMasterName = null;
         }
     }
-
+    [PunRPC]
     public void SetSpiritMaster(string spiritName)
     {
         //Change la personne qui a le controle de Chara

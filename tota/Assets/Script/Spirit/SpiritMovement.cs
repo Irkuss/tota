@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class SpiritMovement : MonoBehaviour
+public class SpiritMovement : Photon.MonoBehaviour
 {
     public float cameraSpeed;
     [SerializeField]
@@ -11,6 +11,11 @@ public class SpiritMovement : MonoBehaviour
 
     void Start()
     {
+        if (!photonView.isMine)
+        {
+            this.enabled = false;
+        }
+
         rb = GetComponent<Rigidbody>();
     }
 
