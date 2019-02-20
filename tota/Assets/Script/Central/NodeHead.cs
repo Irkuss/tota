@@ -9,11 +9,43 @@ public class NodeHead : Photon.MonoBehaviour
     private int east = 0;
     private int west = 0;
 
+    public int x = 0;
+    public int y = 0;
+
     private Random rng;
 
-    void Start()
+    public void SetCoord(int xNew, int yNew)
     {
+        x = xNew;
+        y = yNew;
+    }
 
+    public void OpenTo(NodeHead node)
+    {
+        if (x > node.x) //on est à l'est de node
+        {
+            west = 1;
+            node.east = 1;
+        }
+        else if (x < node.x) //on est à l'ouest de node
+        {
+            east = 1;
+            node.west = 1;
+        }
+        else if (y > node.y) //on est au nord de node
+        {
+            south = 1;
+            node.north = 1;
+        }
+        else if (y < node.y) //on est au sud de node
+        {
+            north = 1;
+            node.south = 1;
+        }
+        else
+        {
+            Debug.Log("NodeHead: OpenTo: Compared same node coord");
+        }
     }
 
     public void OpenNorth()
@@ -35,7 +67,7 @@ public class NodeHead : Photon.MonoBehaviour
 
     public void Generate()
     {
-        Randomize();
+        //Randomize();
 
         InstantiateRoad();
     }
@@ -70,7 +102,6 @@ public class NodeHead : Photon.MonoBehaviour
         path += south;
         path += east;
         path += west;
-
         PhotonNetwork.Instantiate(path, this.transform.position, this.transform.rotation, 0);
     }
 }
