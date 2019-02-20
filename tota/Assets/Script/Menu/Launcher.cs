@@ -19,6 +19,8 @@ public class Launcher : Photon.PunBehaviour
     public GameObject nameField;
     public Text namefield;
 
+    public GameObject sliderObject;
+
     [SerializeField]
     private GameObject _playerLayoutGroup;
     private GameObject PlayerLayoutGroup
@@ -46,12 +48,6 @@ public class Launcher : Photon.PunBehaviour
     
 
     //Unity Callback
-
-    private void Start()
-    {
-        waitingRoom.SetActive(false);
-        currentRoom.SetActive(false);
-    }
 
     private void Awake()
     {
@@ -236,8 +232,9 @@ public class Launcher : Photon.PunBehaviour
 
     public void JoinGame()
     {
-
-        Debug.Log("Instantiation en cours");
-        SceneManager.LoadScene(3);
+        sliderObject.SetActive(true);
+        currentRoom.SetActive(false);
+        GameObject menu = GameObject.FindGameObjectWithTag("MenuButton");
+        menu.transform.position = new Vector3(menu.transform.position.x + 40, menu.transform.position.y, menu.transform.position.z);
     }
 }
