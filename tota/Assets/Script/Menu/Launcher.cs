@@ -97,7 +97,7 @@ public class Launcher : Photon.PunBehaviour
         GameObject menu = GameObject.FindGameObjectWithTag("MenuButton");
         menu.transform.position = new Vector3(menu.transform.position.x - 40, menu.transform.position.y, menu.transform.position.z);
 
-        /*foreach (Transform child in transform)
+        /*foreach (Transform child in PlayerLayoutGroup.transform)
         {
             Destroy(child.gameObject);
         }*/

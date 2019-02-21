@@ -47,6 +47,7 @@ public class LoadingControl : MonoBehaviour
 
     private void Loadscene()
     {
+        // might have to do : PhotonNetwork.LoadLevel(3);
         SceneManager.LoadScene(3);
     }
 }
