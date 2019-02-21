@@ -6,46 +6,48 @@ using UnityEngine.UI;
 
 public class Launcher : Photon.PunBehaviour
 {
-    public PhotonLogLevel Loglevel = PhotonLogLevel.Informational;
+    [SerializeField]
+    private PhotonLogLevel Loglevel = PhotonLogLevel.Informational;
     [Tooltip("The maximum number of players per room. When a room is full, it can't be joined by new players and so new room will be created")]
     private byte MaxPlayersPerRoom = 4;
 
     public GameObject photonConnectButton;
-    public GameObject searchButton;
-    public GameObject createButton;
+
+    public GameObject currentRoom;
+    public GameObject waitingRoom;
+    
     public GameObject nameField;
     public Text namefield;
-    public GameObject inputField;
-    public GameObject roomDrop;
-    public Dropdown roomDropdown;
-    public GameObject joinRoomButton;
-    public GameObject leaveButton;
-    public GameObject playerField;
 
-    public Text playerNames;
-    PhotonPlayer[] playerList;
+    public GameObject sliderObject;
 
-    RoomInfo[] rooms;
-        
+    [SerializeField]
+    private GameObject _playerLayoutGroup;
+    private GameObject PlayerLayoutGroup
+    {
+        get { return _playerLayoutGroup; }
+    }
+
+    [SerializeField]
+    private GameObject _playerListingPrefab;
+    private GameObject PlayerListingPrefab
+    {
+        get { return _playerListingPrefab; }
+    }
+
+    private List<PlayerListing> _playerListings = new List<PlayerListing>();
+    private List<PlayerListing> PlayerListings
+    {
+        get { return _playerListings; }
+    }
+
     private string _gameVersion = "1";
     private bool isConnecting;
-
     
     private string roomName = "";
     
 
     //Unity Callback
-
-    private void Start()
-    {
-        searchButton.SetActive(false);
-        createButton.SetActive(false);
-        inputField.SetActive(false);
-        roomDrop.SetActive(false);
-        playerField.SetActive(false);
-        joinRoomButton.SetActive(false);
-        leaveButton.SetActive(false);
-    }
 
     private void Awake()
     {
@@ -66,29 +68,14 @@ public class Launcher : Photon.PunBehaviour
         //Origin: ConnectPhoton()
 
         photonConnectButton.SetActive(false);
-        nameField.SetActive(false);
-        searchButton.SetActive(true);
-        createButton.SetActive(true);
-        inputField.SetActive(true);
-        roomDrop.SetActive(true);
 
-        // Dropdown for the room 
-        rooms = PhotonNetwork.GetRoomList();
-        roomDropdown.ClearOptions();
-        Debug.Log(rooms.Length);
-        List<string> names = new List<string>();
+        waitingRoom.SetActive(true);
 
-        foreach (RoomInfo roomx in rooms)
-        {            
-            names.Add(roomx.Name + " : " + roomx.PlayerCount + " players in");                      
-        }
-        if (names.Count == 0) names.Add("No rooms");
-
-        roomDropdown.AddOptions(names);
-        roomDropdown.RefreshShownValue();        
+        nameField.SetActive(false);             
 
         Debug.Log("Connected to Master");
     }
+
 
     public override void OnDisconnectedFromPhoton()
     {
@@ -102,49 +89,62 @@ public class Launcher : Photon.PunBehaviour
         Debug.Log("Failed to joined " + roomName);
     }
 
-    public override void OnPhotonPlayerConnected(PhotonPlayer newPlayer)
-    {
-        playerNames.text = "Players :";
-        playerList = PhotonNetwork.playerList;
-
-        foreach (var name in playerList)
-        {
-            playerNames.text += "\n\n" + name.NickName;
-        }
-    }
-
-    public override void OnPhotonPlayerDisconnected(PhotonPlayer otherPlayer)
-    {
-        playerNames.text = "Players :";
-        playerList = PhotonNetwork.playerList;
-
-        foreach (var name in playerList)
-        {
-            playerNames.text += "\n\n" + name.NickName;
-        }
-    }
 
     public override void OnJoinedRoom()
-    {
-        //Debug.Log("DemoAnimator/Launcher: OnJoinedRoom() called by PUN. Now this client is in a room.");
-        //PhotonNetwork.LoadLevel("Playground");
-        searchButton.SetActive(false);
-        createButton.SetActive(false);
-        inputField.SetActive(false);
-        roomDrop.SetActive(false);
+    {        
+        waitingRoom.SetActive(false);
+        currentRoom.SetActive(true);
+        GameObject menu = GameObject.FindGameObjectWithTag("MenuButton");
+        menu.transform.position = new Vector3(menu.transform.position.x - 40, menu.transform.position.y, menu.transform.position.z);
 
-        playerField.SetActive(true);
-        joinRoomButton.SetActive(true);
-        leaveButton.SetActive(true);
-
-
-        // Player field où sont écrits le nom des joueurs
-        playerNames.text = "Players :";
-        playerList = PhotonNetwork.playerList;
-
-        foreach (var name in playerList)
+        /*foreach (Transform child in transform)
         {
-            playerNames.text += "\n\n" + name.NickName;
+            Destroy(child.gameObject);
+        }*/
+
+        PhotonPlayer[] photonPlayers = PhotonNetwork.playerList;
+        for (int i = 0; i < photonPlayers.Length; i++)
+        {
+            PlayerJoinedRoom(photonPlayers[i]);
+        }
+
+    }
+
+    //Called by photon when a player joins the room.
+    public override void OnPhotonPlayerConnected(PhotonPlayer photonPlayer)
+    {
+        PlayerJoinedRoom(photonPlayer);
+    }
+
+    //Called by photon when a player leaves the room.
+    public override void OnPhotonPlayerDisconnected(PhotonPlayer photonPlayer)
+    {
+        PlayerLeftRoom(photonPlayer);
+    }
+
+    private void PlayerJoinedRoom(PhotonPlayer photonPlayer)
+    {
+        if (photonPlayer == null)
+            return;
+
+        PlayerLeftRoom(photonPlayer);
+
+        GameObject playerListingObj = Instantiate(PlayerListingPrefab);
+        playerListingObj.transform.SetParent(PlayerLayoutGroup.transform, false);
+
+        PlayerListing playerListing = playerListingObj.GetComponent<PlayerListing>();
+        playerListing.ApplyPhotonPlayer(photonPlayer);
+
+        PlayerListings.Add(playerListing);
+    }
+
+    private void PlayerLeftRoom(PhotonPlayer photonPlayer)
+    {
+        int index = PlayerListings.FindIndex(x => x.PhotonPlayer == photonPlayer);
+        if (index != -1)
+        {
+            Destroy(PlayerListings[index].gameObject);
+            PlayerListings.RemoveAt(index);
         }
     }
 
@@ -174,7 +174,14 @@ public class Launcher : Photon.PunBehaviour
 
         if (roomName != "")
         {
-            PhotonNetwork.JoinRoom(roomName);
+            if (PhotonNetwork.JoinRoom(roomName))
+            {
+
+            }
+            else
+            {
+                Debug.Log("On doit renvoyer un message d'erreur");
+            }
             
             //Callback suivant: OnJoinedRoom()
             //Callback suivant: OnPhotonJoinedRoomFailed(object[] codeAndMsg)
@@ -187,7 +194,7 @@ public class Launcher : Photon.PunBehaviour
         Debug.Log("Trying to Create");
         if (roomName != "")
         {
-            PhotonNetwork.CreateRoom(roomName, new RoomOptions() { MaxPlayers = MaxPlayersPerRoom }, null);            
+            PhotonNetwork.CreateRoom(roomName, new RoomOptions() { MaxPlayers = MaxPlayersPerRoom },null);            
             Debug.Log("Created room " + roomName);
         }
     }
@@ -209,10 +216,6 @@ public class Launcher : Photon.PunBehaviour
     public override void OnLeftRoom()
     {
         //Origin: LeaveRoom()
-        // si il reste au moins un jour dans la room dont on vient 
-        // on peut repartir dans cette room 
-        //if (names.Length > 0) SceneManager.LoadScene(3);
-        //else
         SceneManager.LoadScene(2);
     }
 
@@ -229,8 +232,9 @@ public class Launcher : Photon.PunBehaviour
 
     public void JoinGame()
     {
-
-        Debug.Log("Instantiation en cours");
-        SceneManager.LoadScene(3);
+        sliderObject.SetActive(true);
+        currentRoom.SetActive(false);
+        GameObject menu = GameObject.FindGameObjectWithTag("MenuButton");
+        menu.transform.position = new Vector3(menu.transform.position.x + 40, menu.transform.position.y, menu.transform.position.z);
     }
 }
