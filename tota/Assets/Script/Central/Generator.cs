@@ -8,8 +8,8 @@ public class Generator : MonoBehaviour
     public NavMeshSurface surface;
     private float tunkLength = 12.6f; //magic number with MagicaVoxel, tunk = technical chunk
     private float nTunkInDistrict = 5.0f;
-    public int cityX = 4;
-    public int cityY = 5;
+    private int cityX = 15;
+    private int cityY = 15;
 
     //Matrix où l'on stocke des Nodes
     private GameObject[,] nodeMatrix;
