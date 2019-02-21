@@ -45,16 +45,18 @@ public class PermissionsManager : MonoBehaviour
         return false;
     }
 
+    //Setters RPC
+    [PunRPC]
     public void AddTeam()
     {
         allTeams.Add(new List<string>());
     }
-
+    [PunRPC]
     public void AddTeamWithPlayer(string playerName)
     {
         allTeams.Add(new List<string>() { playerName });
     }
-
+    [PunRPC]
     public void AddPlayerToTeam(int index, string playerName)
     {
         allTeams[index].Add(playerName);
