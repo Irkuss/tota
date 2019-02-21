@@ -6,15 +6,20 @@ public class SpiritHead : Photon.MonoBehaviour
 {
     [SerializeField]
     private GameObject spiritCamera;
+
     public string spiritName ="ERROR"; //Inititialisé lors de l'instantiation de Spirit
+    public int groupIndex = -1; //Inititialisé lors de l'instantiation de Spirit
 
     private List<GameObject> selectedList;
 
     //Unity Callback
     void Start()
     {
-
-        getRightCamera();
+        if (!photonView.isMine)
+        {
+            
+            this.enabled = false;
+        }
 
         selectedList = new List<GameObject>();
     }
@@ -24,8 +29,8 @@ public class SpiritHead : Photon.MonoBehaviour
         ClickUpdate();
 
         TestBtw();
-        
     }
+
     private void TestBtw()
     {
         if (Input.GetKeyUp("space"))
@@ -38,9 +43,10 @@ public class SpiritHead : Photon.MonoBehaviour
                 Quaternion.identity, 
                 0);
 
-            Debug.Log("Instantiaton WOW de: " + go);
+            Debug.Log("Instantiatoion de: " + go);
 
-            go.GetComponent<CharaPermissions>().SetGroupMaster(0);
+            //go.GetComponent<CharaPermissions>().SetGroupMaster(groupIndex)
+            go.GetComponent<CharaPermissions>().GetComponent<PhotonView>().RPC("SetGroupMaster",PhotonTargets.All,groupIndex);
         }
     }
 
@@ -52,14 +58,16 @@ public class SpiritHead : Photon.MonoBehaviour
         {
             LeftClickUpdate();
         }
-        //if (Input.GetMouseButtonDown(1))
-        //{
-        //    RightClickUpdate();
-        //}
+        if (Input.GetMouseButtonDown(1))
+        {
+            RightClickUpdate();
+        }
     }
 
     private void LeftClickUpdate()
     {
+        Debug.Log("SpiritHead: " + spiritName + " a fait un clic gauche");
+
         Ray ray = spiritCamera.GetComponent<Camera>().ScreenPointToRay(Input.mousePosition);
         RaycastHit hit;
             
@@ -72,48 +80,64 @@ public class SpiritHead : Photon.MonoBehaviour
                 {
                     DeselectAllExcept(hit.transform.gameObject);
                 }
-                SelectChara(hit.transform.gameObject);
+
+                ClickOnChara(hit.transform.gameObject);
             }
-            //
+            else
+            {
+                DeselectAll();
+            }
         }
     }
 
     private void RightClickUpdate()
     {
-        //TODO TEST
-        foreach(GameObject go in selectedList)
-        {
-            //go.GetComponent<CharaHead>().Deselect();
-        }
-        
+        Debug.Log("SpiritHead: " + spiritName + " a fait un clic droit");
+
         Ray ray = spiritCamera.GetComponent<Camera>().ScreenPointToRay(Input.mousePosition);
         RaycastHit hit;
 
         if (Physics.Raycast(ray, out hit))
         {
-            if (hit.transform.name == this.name)
+            if (hit.transform.CompareTag("Chara"))
             {
-                //
+                //Action si on clic droit sur un Chara
+            }
+            else
+            {
+                ActionMoveAllTo(hit.point);
             }
         }
-        
+
     }
 
     //Public methods
 
-    public void SelectChara(GameObject chara)
+    public void ClickOnChara(GameObject chara)
     {
-        Debug.Log("On selectionne chara");
-        chara.GetComponent<CharaHead>().LeftClickedOn(spiritName);
-        if (!(selectedList.Contains(chara)))
+        //Debug.Log("SpiritHead: On essaye de selectionné chara");
+        if (chara.GetComponent<CharaHead>().LeftClickedOn(spiritName))
         {
-            selectedList.Add(chara);
+            //Debug.Log("SpiritHead: On a réussi ");
+            if (!(selectedList.Contains(chara)))
+            {
+                selectedList.Add(chara);
+            }
         }
+        else
+        {
+            //Debug.Log("SpiritHead: On a échoué ");
+            if (selectedList.Contains(chara))
+            {
+                selectedList.Remove(chara);
+            } 
+        }
+        
     }
 
     public void DeselectChara(GameObject chara)
     {
-        //chara.GetComponent<CharaHead>().Deselect();
+        chara.GetComponent<CharaHead>().Deselect();
         selectedList.Remove(chara);
     }
 
@@ -123,6 +147,7 @@ public class SpiritHead : Photon.MonoBehaviour
         {
             chara.GetComponent<CharaHead>().Deselect();
         }
+        selectedList.Clear();
     }
 
     public void DeselectAllExcept(GameObject except)
@@ -134,25 +159,19 @@ public class SpiritHead : Photon.MonoBehaviour
                 chara.GetComponent<CharaHead>().Deselect();
             }
         }
+        selectedList.Clear();
+        selectedList.Add(except);
     }
 
     //Private methods
 
-    private void getRightCamera()
+    private void ActionMoveAllTo(Vector3 destination)
     {
-        if (photonView.isMine)
+        Debug.Log("SpiritHead: moving every chara to destination ("+selectedList.Count+")");
+        foreach (GameObject Chara in selectedList)
         {
-            spiritCamera.SetActive(true);
-            if (Camera.main != null)
-            {
-                Camera.main.enabled = false;
-            }
-        }
-        else
-        {
-            spiritCamera.SetActive(false);
+            Debug.Log("SpiritHead: moving one Chara");
+            Chara.GetComponent<CharaHead>().SetDestination(destination);
         }
     }
-    
-    
 }
