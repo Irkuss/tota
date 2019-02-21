@@ -22,7 +22,10 @@ public class Generator : MonoBehaviour
     private int midX;
     private int midY;
 
-    
+    public float nodeMiddleX;
+    public float nodeMiddleY;
+
+
     //Qd y augmente -> Nord
     //Qd x augmente -> Est
 
@@ -57,6 +60,10 @@ public class Generator : MonoBehaviour
         //Setup des nodes spécifiques
 
         NodeHead nodeMiddle = GetPoiMiddle();
+        nodeMiddleX = nodeMiddle.x * districtLength;
+        nodeMiddleY = nodeMiddle.y * districtLength;
+
+
         NodeHead nodePoiSW = GetPoiSouthWest();
         NodeHead nodePoiSE = GetPoiSouthEast();
         NodeHead nodePoiNW = GetPoiNorthWest();
