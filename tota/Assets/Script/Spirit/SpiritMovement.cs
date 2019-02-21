@@ -4,7 +4,9 @@ using UnityEngine;
 
 public class SpiritMovement : Photon.MonoBehaviour
 {
+    
     public float cameraSpeed;
+    private float cameraSpeedBaseValue = 20.0f;
     [SerializeField]
     private ForceMode fm;
     private Rigidbody rb;
@@ -17,6 +19,8 @@ public class SpiritMovement : Photon.MonoBehaviour
         }
 
         rb = GetComponent<Rigidbody>();
+
+        cameraSpeed = cameraSpeedBaseValue;
     }
 
     void FixedUpdate()

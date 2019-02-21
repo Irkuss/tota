@@ -10,7 +10,7 @@ public class CharaHead : MonoBehaviour
     private CharaPermissions permissions;
     [SerializeField]
     private CharaOutline outline;
-    [SerializeField]
+    
     private GameObject eManager;
     private PermissionsManager permManager;
 

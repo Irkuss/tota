@@ -6,6 +6,7 @@ public class SpiritHead : Photon.MonoBehaviour
 {
     [SerializeField]
     private GameObject spiritCamera;
+
     public string spiritName ="ERROR"; //Inititialisé lors de l'instantiation de Spirit
     public int groupIndex = -1; //Inititialisé lors de l'instantiation de Spirit
 
@@ -16,16 +17,8 @@ public class SpiritHead : Photon.MonoBehaviour
     {
         if (!photonView.isMine)
         {
-            spiritCamera.SetActive(false);
+            
             this.enabled = false;
-        }
-        else
-        {
-            spiritCamera.SetActive(true);
-            if (Camera.main != null)
-            {
-                Camera.main.enabled = false;
-            }
         }
 
         selectedList = new List<GameObject>();
