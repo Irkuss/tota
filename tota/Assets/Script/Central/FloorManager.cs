@@ -8,6 +8,19 @@ public class FloorManager : MonoBehaviour
 
     private int maxFloorLevel = 8; //A MODIFIER SI ON A DES BATIMENTS AVEC PLUS D'ETAGES
 
+    //Callback creation: when floorLevel is modified
+
+    public delegate void UpdateFloorLevel(int floorLv);
+    public static event UpdateFloorLevel onFloorLevelChanged;
+
+    private void UpdateCallback()
+    {
+        if (onFloorLevelChanged != null) //Si une personne nous écoute
+        {
+            onFloorLevelChanged(floorLevel); //Declenche le callback chez les spectateurs
+        }
+    }
+
     //Getters
 
     public int GetFloorLevel()
@@ -28,6 +41,9 @@ public class FloorManager : MonoBehaviour
         {
             floorLevel++;
             Debug.Log("FloorManager: downed to " + floorLevel);
+
+            //Call callbacks to everyone listening
+            UpdateCallback();
         }
     }
 
@@ -37,6 +53,9 @@ public class FloorManager : MonoBehaviour
         {
             floorLevel--;
             Debug.Log("FloorManager: upped to " + floorLevel);
+
+            //Call callbacks to everyone listening
+            UpdateCallback();
         }
     }
 
@@ -45,6 +64,7 @@ public class FloorManager : MonoBehaviour
         if (newLevel >= 0 && newLevel <= maxFloorLevel)
         {
             floorLevel = newLevel;
+            onFloorLevelChanged(floorLevel);
         }
     }
 }

@@ -9,25 +9,32 @@ public class SpiritZoom : Photon.MonoBehaviour
     [SerializeField]
     private SpiritMovement movement;
 
+    
     private Camera cameraComp;
+    private Transform transformer;
+
+    private float baseZoomValue = 60.0f;
 
     private float zoomSpeed = 10.0f;
-    private float zoomValue = 60.0f;
+    private float zoomValue; //= baseZoomValue at start
 
     private float zoomMin = 45.0f;
-    private float zoomMax = 110.0f;
+    private float zoomMax = 90.0f;
 
     private float movementModifier = 4.0f;
 
     //private GameObject eManager;
     private FloorManager floorManager;
-    
 
-    // Start is called before the first frame update
+    // Unity Callbacks
+
     void Start()
     {
+        //Cas Photon
+
         if (!photonView.isMine)
         {
+            //Si ce n'est pas au joueur, se désactive
             spiritCamera.SetActive(false);
             this.enabled = false;
         }
@@ -40,18 +47,30 @@ public class SpiritZoom : Photon.MonoBehaviour
             }
         }
 
+        //Initialisation
+
         floorManager = GameObject.Find("eCentralManager").GetComponent<FloorManager>();
-
+        transformer = GetComponent<Transform>();
         cameraComp = spiritCamera.GetComponent<Camera>();
+        zoomValue = baseZoomValue;
     }
+    
 
-    // Update is called once per frame
     void Update()
     {
         ScrollUpdate();
 
+        ScrollMiddle();
+
+
         cameraComp.fieldOfView = Mathf.Lerp(cameraComp.fieldOfView, zoomValue, Time.deltaTime * zoomSpeed);
+
+        Vector3 desiredPosition = new Vector3(transformer.position.x, floorManager.GetFloorLevel() * 12.6f , transformer.position.z);
+
+        transformer.position = Vector3.Lerp(transform.position, desiredPosition, Time.deltaTime * 5.0f);
     }
+
+    //Scroll Update
 
     private void ScrollUpdate()
     {
@@ -59,40 +78,49 @@ public class SpiritZoom : Photon.MonoBehaviour
         {
             if (Input.GetKey(KeyCode.LeftShift))
             {
-                //Changement de niveau
-
-                if (Input.GetAxis("Mouse ScrollWheel") > 0)//Scroll vers le haut
-                {
-                    floorManager.TryDecrease();
-                }
-                else
-                {
-                    floorManager.TryIncrease();
-                }
+                ScrollMaj();
             }
             else
             {
-                //Zoom régulier
-                if (Input.GetAxis("Mouse ScrollWheel") > 0) //Scroll vers le haut
-                {
-                    //On zoom
-                    zoomValue -= 5.0f; //Reduit le FoV
-                    if (zoomValue < 60.0f && zoomValue == Mathf.Clamp(zoomValue, zoomMin, zoomMax))
-                    {
-                        movement.cameraSpeed -= movementModifier; //Pour un zoom suffisamment élevé, on diminue la vitesse de la camera
-                    }
-                }
-                else
-                {
-                    //On dezoom
-                    if (zoomValue < 60.0f) //Augmente le FoV
-                    {
-                        movement.cameraSpeed += movementModifier; //L'inverse, on regagne la vitesse perdu
-                    }
-                    zoomValue += 5.0f;
-                }
-                zoomValue = Mathf.Clamp(zoomValue, zoomMin, zoomMax); //Cape le Fov entre zoomMin et zoomMax
+                ScrollNormal();
             }
+        }
+    }
+    private void ScrollNormal()
+    {
+        //Changement de niveau
+
+        if (Input.GetAxis("Mouse ScrollWheel") > 0)//Scroll vers le haut
+        {
+            floorManager.TryIncrease();
+        }
+        else
+        {
+            floorManager.TryDecrease();
+        }
+    }
+    private void ScrollMaj()
+    {
+        //Zoom de fov
+
+        if (Input.GetAxis("Mouse ScrollWheel") > 0) //Scroll vers le haut
+        {
+            //On zoom
+            zoomValue -= 5.0f; //Reduit le FoV
+        }
+        else
+        {
+            //On dezoom
+            zoomValue += 5.0f;
+        }
+        zoomValue = Mathf.Clamp(zoomValue, zoomMin, zoomMax); //Cape le Fov entre zoomMin et zoomMax
+    }
+
+    private void ScrollMiddle()
+    {
+        if (Input.GetMouseButtonDown(2))
+        {
+            zoomValue = baseZoomValue;
         }
     }
 

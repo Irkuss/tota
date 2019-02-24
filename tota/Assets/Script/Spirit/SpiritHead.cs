@@ -61,6 +61,7 @@ public class SpiritHead : Photon.MonoBehaviour
         if (Input.GetMouseButtonDown(1))
         {
             RightClickUpdate();
+            //BrouillonClicDroit();
         }
     }
 
@@ -109,6 +110,55 @@ public class SpiritHead : Photon.MonoBehaviour
             }
         }
 
+    }
+
+    //Brouillon RaycastAll
+
+    private void BrouillonClicDroit()
+    {
+        Ray ray = spiritCamera.GetComponent<Camera>().ScreenPointToRay(Input.mousePosition);
+        RaycastHit[] hits = Physics.RaycastAll(ray);
+
+        if (hits.Length > 0)
+        {
+            RaycastHit hit = GetNextVisibleHit(hits);
+
+            if (hit.transform.CompareTag("Chara"))
+            {
+                //Action si on clic droit sur un Chara
+            }
+            else
+            {
+                ActionMoveAllTo(hit.point);
+            }
+        }
+    }
+
+    private RaycastHit GetNextVisibleHit(RaycastHit[] hits)
+    {
+        Debug.Log("GetNextVisibleObject: Starting up");
+        RaycastHit hit;
+        int length = hits.Length;
+        int i = 0;
+        while(i < length)
+        {
+            Debug.Log("GetNextVisibleObject: Looking " + i + " on " + length);
+            hit = hits[i];
+            Debug.Log("GetNextVisibleObject: this hit is named " + hit.transform.gameObject.name);
+            if (hit.transform.gameObject.GetComponent<Renderer>() != null)
+            {
+                Debug.Log("GetNextVisibleObject: this hit has a renderer");
+                if (hit.transform.gameObject.GetComponent<Renderer>().enabled)
+                {
+                    Debug.Log("GetNextVisibleObject: this hit has a renderer which is enabled");
+                    return hit;
+                }
+                Debug.Log("GetNextVisibleObject: this hit has a renderer which is not enabled");
+            }
+            i++;
+        }
+        Debug.Log("GetNextVisibleObject: did not find valid hit");
+        return hits[0];
     }
 
     //Public methods
@@ -167,10 +217,10 @@ public class SpiritHead : Photon.MonoBehaviour
 
     private void ActionMoveAllTo(Vector3 destination)
     {
-        Debug.Log("SpiritHead: moving every chara to destination ("+selectedList.Count+")");
+        //Debug.Log("SpiritHead: moving every chara to destination ("+selectedList.Count+")");
         foreach (GameObject Chara in selectedList)
         {
-            Debug.Log("SpiritHead: moving one Chara");
+            //Debug.Log("SpiritHead: moving one Chara");
             Chara.GetComponent<CharaHead>().SetDestination(destination);
         }
     }

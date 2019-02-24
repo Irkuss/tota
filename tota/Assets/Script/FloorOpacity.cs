@@ -4,24 +4,28 @@ using UnityEngine;
 
 public class FloorOpacity : MonoBehaviour
 {
-    public int floor;
-    private FloorManager floorManager;
+    public int currentFloor = 0;
+    //private FloorManager floorManager;
 
     
     void Start()
     {
-        floorManager = GameObject.Find("eCentralManager").GetComponent<FloorManager>();
+        //subscribe to onFloorLevelChanged
+        FloorManager.onFloorLevelChanged += UpdateRenderer;
+        
     }
 
-    private void Update()
+    private void UpdateRenderer(int newFloorLevel) //Subscribed to onFloorLevelChanged
     {
-        if (floor > floorManager.GetFloorLevel())
+        if (currentFloor > newFloorLevel)
         {
             GetComponent<Renderer>().enabled = false;
+            GetComponent<Collider>().enabled = false;
         }
         else
         {
             GetComponent<Renderer>().enabled = true;
+            GetComponent<Collider>().enabled = true;
         }
     }
 }

@@ -70,6 +70,9 @@ public class NodeHead : Photon.MonoBehaviour
         //Randomize();
 
         InstantiateRoad();
+
+        //TEST TEST
+        PhotonNetwork.Instantiate("Buildings/build22/test22tower", this.transform.position, this.transform.rotation, 0);
     }
 
     private void Randomize()
