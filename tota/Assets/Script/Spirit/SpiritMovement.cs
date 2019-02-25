@@ -4,12 +4,14 @@ using UnityEngine;
 
 public class SpiritMovement : Photon.MonoBehaviour
 {
-    
-    public float cameraSpeed;
-    private float cameraSpeedBaseValue = 20.0f;
-    [SerializeField]
-    private ForceMode fm;
+    //Fast Component access
     private Rigidbody rb;
+
+    //Tweakable value (!)
+    private float cameraSpeed = 20.0f;
+    private ForceMode fm = ForceMode.VelocityChange;
+
+    // Unity Callbacks
 
     void Start()
     {
@@ -19,21 +21,26 @@ public class SpiritMovement : Photon.MonoBehaviour
         }
 
         rb = GetComponent<Rigidbody>();
-
-        cameraSpeed = cameraSpeedBaseValue;
     }
 
     void FixedUpdate()
     {
+        //Fixed update car on travaille avec de la physique (AddForce)
         Move();
     }
 
+    //Private Move called in FixedUpdate
+
     private void Move()
     {
-        float moveHorizontal = Input.GetAxis("Horizontal");
-        float moveVertical = Input.GetAxis("Vertical");
+        //Deplacement wasd sur le plan x/z
+        //NB: le deplacement vertical est géré dans SpiritZoom
+        float moveHorizontal = Input.GetAxis("Horizontal"); //Fleches horizontal ou 'a' / 'd'
+        float moveVertical = Input.GetAxis("Vertical"); //Fleches vertical ou 'w' / 's'
 
+        //Vector représentant la direction du mouvement
         Vector3 movement = new Vector3(moveHorizontal, 0.0f, moveVertical);
+        
 
         rb.AddForce(movement * cameraSpeed, fm);
     }

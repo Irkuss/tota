@@ -27,13 +27,13 @@ public class LoadingControl : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        if (currentAmount < 100 && count == 0)
+        if (currentAmount < 100 && count == 0 && false) //Tanguy: j'en ai marre d'attendre, bonsoir le merge
         {
             currentAmount += speed * Time.deltaTime;
         }
         else
         {
-            if (count == 0)
+            if (count == 0 || true) //Tanguy: j'en ai marre d'attendre, bonsoir le merge
             {
                 Loadscene();
                 count += 1;
@@ -47,6 +47,10 @@ public class LoadingControl : MonoBehaviour
 
     private void Loadscene()
     {
-        SceneManager.LoadScene(3);
+        //SceneManager.LoadScene(3);
+        if (PhotonNetwork.isMasterClient)
+        {
+            PhotonNetwork.LoadLevel(3); //tanguy: probleme de rpc peut etre resolu par ce changement
+        }
     }
 }

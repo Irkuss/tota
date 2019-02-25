@@ -9,7 +9,30 @@ public class CentralManager : Photon.MonoBehaviour
     public PermissionsManager permissions;
 
     public GameObject tempButton;
-    
+
+    private int usingSeed;
+
+
+    private void Awake()
+    {
+        if (PhotonNetwork.isMasterClient)
+        {
+            int seed = 144;
+
+            Debug.Log("Central Manager: Setting seed: " + seed);
+
+            GetComponent<PhotonView>().RPC("SetRandomSeed", PhotonTargets.AllBuffered,seed);
+        }
+        Random.InitState(usingSeed);
+    }
+
+    [PunRPC]
+    private void SetRandomSeed(int seed)
+    {
+        Debug.Log("Central Manager: " + PhotonNetwork.player.name + " is receiving seed as " + seed);
+        usingSeed = seed;
+    }
+
 
 
     private void Start()

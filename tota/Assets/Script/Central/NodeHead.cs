@@ -4,15 +4,149 @@ using UnityEngine;
 
 public class NodeHead : Photon.MonoBehaviour
 {
-    private int north = 0;
-    private int south = 0;
-    private int east = 0;
-    private int west = 0;
+    public class RoadNode
+    {
+        //directions dans laquelle la route part (16 combinaisons différentes)
+        private int _north = 0;
+        private int _south = 0;
+        private int _east = 0;
+        private int _west = 0;
 
+        //Coordonnée dans la matrice de Generator
+        public int x;
+        public int y;
+
+        //Constructor
+
+        public RoadNode(int xNew, int yNew)
+        {
+            x = xNew;
+            y = yNew;
+        }
+
+        //Public Getters
+
+        public int GetNorth()
+        {
+            return _north;
+        }
+        public int GetSouth()
+        {
+            return _south;
+        }
+        public int GetEast()
+        {
+            return _east;
+        }
+        public int GetWest()
+        {
+            return _west;
+        }
+
+        //Public Setters
+
+        public void OpenTo(RoadNode node)
+        {
+            if (x > node.x) //on est à l'est de node
+            {
+                _west = 1;
+                node._east = 1;
+            }
+            else if (x < node.x) //on est à l'ouest de node
+            {
+                _east = 1;
+                node._west = 1;
+            }
+            else if (y > node.y) //on est au nord de node
+            {
+                _south = 1;
+                node._north = 1;
+            }
+            else if (y < node.y) //on est au sud de node
+            {
+                _north = 1;
+                node._south = 1;
+            }
+            else
+            {
+                Debug.Log("NodeHead: OpenTo: Compared same node coord");
+            }
+        }
+
+        public void OpenNorth()
+        {
+            _north = 1;
+        }
+        public void OpenSouth()
+        {
+            _south = 1;
+        }
+        public void OpenEast()
+        {
+            _east = 1;
+        }
+        public void OpenWest()
+        {
+            _west = 1;
+        }
+
+        //End Generate
+
+        public void Generate()
+        {
+            InstantiateRoad();
+        }
+
+        private void InstantiateRoad()
+        {
+            //Le nom de la route est important
+            //NB: On aurait pu instantié separemment chaque branche du noeud + la piece centrale
+            string path = "Roads/eRoad";
+            path += _north;
+            path += _south;
+            path += _east;
+            path += _west;
+            PhotonNetwork.Instantiate(path, new Vector3(x, 0, y), Quaternion.identity, 0);
+        }
+    }
+
+
+
+    // DEPRECATED
+    // DEPRECATED
+    // DEPRECATED
+
+
+    //directions dans laquelle la route part (16 combinaisons différentes)
+    private int _north = 0;
+    private int _south = 0;
+    private int _east = 0;
+    private int _west = 0;
+
+    //Coordonnée dans la matrice de Generator
     public int x = 0;
     public int y = 0;
 
-    private Random rng;
+    //Public Getters
+
+    public int GetNorth()
+    {
+        return _north;
+    }
+    public int GetSouth()
+    {
+        return _south;
+    }
+    public int GetEast()
+    {
+        return _east;
+    }
+    public int GetWest()
+    {
+        return _west;
+    }
+
+    //Public Setters
 
     public void SetCoord(int xNew, int yNew)
     {
@@ -24,23 +158,23 @@ public class NodeHead : Photon.MonoBehaviour
     {
         if (x > node.x) //on est à l'est de node
         {
-            west = 1;
-            node.east = 1;
+            _west = 1;
+            node._east = 1;
         }
         else if (x < node.x) //on est à l'ouest de node
         {
-            east = 1;
-            node.west = 1;
+            _east = 1;
+            node._west = 1;
         }
         else if (y > node.y) //on est au nord de node
         {
-            south = 1;
-            node.north = 1;
+            _south = 1;
+            node._north = 1;
         }
         else if (y < node.y) //on est au sud de node
         {
-            north = 1;
-            node.south = 1;
+            _north = 1;
+            node._south = 1;
         }
         else
         {
@@ -50,61 +184,37 @@ public class NodeHead : Photon.MonoBehaviour
 
     public void OpenNorth()
     {
-        north = 1;
+        _north = 1;
     }
     public void OpenSouth()
     {
-        south = 1;
+        _south = 1;
     }
     public void OpenEast()
     {
-        east = 1;
+        _east = 1;
     }
     public void OpenWest()
     {
-        west = 1;
+        _west = 1;
     }
+
+    //End Generate
 
     public void Generate()
     {
-        //Randomize();
-
         InstantiateRoad();
-
-        //TEST TEST
-        PhotonNetwork.Instantiate("Buildings/build22/test22tower", this.transform.position, this.transform.rotation, 0);
-    }
-
-    private void Randomize()
-    {
-        int result = Random.Range(0, 3);
-
-        switch(result)
-        {
-            case 0:
-                north = 1;
-                south = 1;
-                east = 1;
-                west = 1;
-                break;
-            case 1:
-                north = 1;
-                south = 1;
-                break;
-            default:
-                east = 1;
-                west = 1;
-                break;
-        }
     }
 
     private void InstantiateRoad()
     {
+        //Le nom de la route est important
+        //NB: On aurait pu instantié separemment chaque branche du noeud + la piece centrale
         string path = "Roads/eRoad";
-        path += north;
-        path += south;
-        path += east;
-        path += west;
+        path += _north;
+        path += _south;
+        path += _east;
+        path += _west;
         PhotonNetwork.Instantiate(path, this.transform.position, this.transform.rotation, 0);
     }
 }

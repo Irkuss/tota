@@ -4,25 +4,25 @@ using UnityEngine;
 
 public class PermissionsManager : MonoBehaviour
 {
-    private List<List<string>> allTeams;
+    private List<List<string>> _allTeams;
 
     private void Start()
     {
-        allTeams = new List<List<string>>();
+        _allTeams = new List<List<string>>();
     }
 
     //Public methods
 
     public int GetNumberOfTeams()
     {
-        return allTeams.Count;
+        return _allTeams.Count;
     }
 
     public int GetGroupIndex(string playerToFind)
     {
-        for (int index = 0; index < allTeams.Count; index++)
+        for (int index = 0; index < _allTeams.Count; index++)
         {
-            foreach (string player in allTeams[index])
+            foreach (string player in _allTeams[index])
             {
                 if (player == playerToFind)
                 {
@@ -35,7 +35,7 @@ public class PermissionsManager : MonoBehaviour
 
     public bool IsPlayerInTeam(int index, string playerName)
     {
-        foreach (string player in allTeams[index])
+        foreach (string player in _allTeams[index])
         {
             if (player == playerName)
             {
@@ -49,16 +49,16 @@ public class PermissionsManager : MonoBehaviour
     [PunRPC]
     public void AddTeam()
     {
-        allTeams.Add(new List<string>());
+        _allTeams.Add(new List<string>());
     }
     [PunRPC]
     public void AddTeamWithPlayer(string playerName)
     {
-        allTeams.Add(new List<string>() { playerName });
+        _allTeams.Add(new List<string>() { playerName });
     }
     [PunRPC]
     public void AddPlayerToTeam(int index, string playerName)
     {
-        allTeams[index].Add(playerName);
+        _allTeams[index].Add(playerName);
     }
 }

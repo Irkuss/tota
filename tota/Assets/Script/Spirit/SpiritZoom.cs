@@ -4,27 +4,25 @@ using UnityEngine;
 
 public class SpiritZoom : Photon.MonoBehaviour
 {
+    //Init Spirit Body
     [SerializeField]
-    private GameObject spiritCamera;
-    [SerializeField]
-    private SpiritMovement movement;
-
+    private GameObject _spiritCamera;
     
-    private Camera cameraComp;
-    private Transform transformer;
+    //Fast Component access
+    private Camera _cameraComp;
+    private Transform _transformer;
 
-    private float baseZoomValue = 60.0f;
+    //Tweakable value (!)
+    private float _baseZoomValue = 60.0f;
 
-    private float zoomSpeed = 10.0f;
-    private float zoomValue; //= baseZoomValue at start
+    private float _zoomSpeed = 10.0f;
+    private float _zoomValue; //= baseZoomValue at start
 
-    private float zoomMin = 45.0f;
-    private float zoomMax = 90.0f;
+    private float _zoomMin = 45.0f;
+    private float _zoomMax = 90.0f;
 
-    private float movementModifier = 4.0f;
-
-    //private GameObject eManager;
-    private FloorManager floorManager;
+    //Init Spirit Environment
+    private FloorManager _floorManager;
 
     // Unity Callbacks
 
@@ -35,12 +33,12 @@ public class SpiritZoom : Photon.MonoBehaviour
         if (!photonView.isMine)
         {
             //Si ce n'est pas au joueur, se désactive
-            spiritCamera.SetActive(false);
+            _spiritCamera.SetActive(false);
             this.enabled = false;
         }
         else
         {
-            spiritCamera.SetActive(true);
+            _spiritCamera.SetActive(true);
             if (Camera.main != null)
             {
                 Camera.main.enabled = false;
@@ -49,25 +47,27 @@ public class SpiritZoom : Photon.MonoBehaviour
 
         //Initialisation
 
-        floorManager = GameObject.Find("eCentralManager").GetComponent<FloorManager>();
-        transformer = GetComponent<Transform>();
-        cameraComp = spiritCamera.GetComponent<Camera>();
-        zoomValue = baseZoomValue;
+        _floorManager = GameObject.Find("eCentralManager").GetComponent<FloorManager>();
+        _transformer = GetComponent<Transform>();
+        _cameraComp = _spiritCamera.GetComponent<Camera>();
+        _zoomValue = _baseZoomValue;
     }
     
 
     void Update()
     {
+        //Update Player Input (Leftclick,rightclick,middleclick)
         ScrollUpdate();
 
         ScrollMiddle();
 
+        //Gradually go to desired field of view
+        _cameraComp.fieldOfView = Mathf.Lerp(_cameraComp.fieldOfView, _zoomValue, Time.deltaTime * _zoomSpeed);
 
-        cameraComp.fieldOfView = Mathf.Lerp(cameraComp.fieldOfView, zoomValue, Time.deltaTime * zoomSpeed);
-
-        Vector3 desiredPosition = new Vector3(transformer.position.x, floorManager.GetFloorLevel() * 12.6f , transformer.position.z);
-
-        transformer.position = Vector3.Lerp(transform.position, desiredPosition, Time.deltaTime * 5.0f);
+        //Set desired position
+        Vector3 desiredPosition = new Vector3(_transformer.position.x, _floorManager.GetFloorLevel() * 12.6f , _transformer.position.z);
+        //Gradually go to desired position
+        _transformer.position = Vector3.Lerp(transform.position, desiredPosition, Time.deltaTime * 5.0f);
     }
 
     //Scroll Update
@@ -78,10 +78,12 @@ public class SpiritZoom : Photon.MonoBehaviour
         {
             if (Input.GetKey(KeyCode.LeftShift))
             {
+                //Field of view Scroll
                 ScrollMaj();
             }
             else
             {
+                //Position Scroll
                 ScrollNormal();
             }
         }
@@ -92,11 +94,11 @@ public class SpiritZoom : Photon.MonoBehaviour
 
         if (Input.GetAxis("Mouse ScrollWheel") > 0)//Scroll vers le haut
         {
-            floorManager.TryIncrease();
+            _floorManager.TryIncrease();
         }
         else
         {
-            floorManager.TryDecrease();
+            _floorManager.TryDecrease();
         }
     }
     private void ScrollMaj()
@@ -106,21 +108,22 @@ public class SpiritZoom : Photon.MonoBehaviour
         if (Input.GetAxis("Mouse ScrollWheel") > 0) //Scroll vers le haut
         {
             //On zoom
-            zoomValue -= 5.0f; //Reduit le FoV
+            _zoomValue -= 5.0f; //Reduit le FoV
         }
         else
         {
             //On dezoom
-            zoomValue += 5.0f;
+            _zoomValue += 5.0f;
         }
-        zoomValue = Mathf.Clamp(zoomValue, zoomMin, zoomMax); //Cape le Fov entre zoomMin et zoomMax
+        _zoomValue = Mathf.Clamp(_zoomValue, _zoomMin, _zoomMax); //Cape le Fov entre zoomMin et zoomMax
     }
 
     private void ScrollMiddle()
     {
+        //Middleclick reset le zoom field of view à sa valeur de départ
         if (Input.GetMouseButtonDown(2))
         {
-            zoomValue = baseZoomValue;
+            _zoomValue = _baseZoomValue;
         }
     }
 
