@@ -17,15 +17,24 @@ public class Generator : MonoBehaviour
         public int x;
         public int y;
 
+        //Nombre d'argument du deuxieme constructeur de RoadNode (prévu pour la Deserialisation)
+        private static int _packageSize = 6;
+        public static int GetPackageSize()
+        {
+            return _packageSize;
+        }
+
         //Constructor
 
         public RoadNode(int xNew, int yNew)
         {
+            //Master creation
             x = xNew;
             y = yNew;
         }
         public RoadNode(int xNew, int yNew, int north, int south, int east, int west)
         {
+            //part of the Deserialization process
             x = xNew;
             y = yNew;
             _north = north;
@@ -35,6 +44,7 @@ public class Generator : MonoBehaviour
         }
 
         //Serialize and Deserialize
+
         public static RoadNode Deserialize(int[] ser)
         {
             return new RoadNode(ser[0], ser[1], ser[2], ser[3], ser[4], ser[5]);
@@ -117,7 +127,6 @@ public class Generator : MonoBehaviour
         {
             InstantiateRoad(worldLengthAdaptor);
         }
-
         private void InstantiateRoad(float worldLengthAdaptor)
         {
             //Le nom de la route est important
@@ -130,7 +139,212 @@ public class Generator : MonoBehaviour
             Instantiate(Resources.Load<GameObject>(path), new Vector3(x * worldLengthAdaptor, 0, y * worldLengthAdaptor), Quaternion.identity);
         }
     }
-    
+
+    public class BuildNode
+    {
+        //Coordonnée du chunk dans le monde
+        private int _x;
+        private int _y;
+
+        //directions dont l'espace est libre (0 = libre, 1 occupé)
+        private int _north = 0;
+        private int _south = 0;
+        private int _east = 0;
+        private int _west = 0;
+
+        //All BuildSpotHead can force other BuildSpotHead to not generate on them
+        public bool isFree = true;
+
+        //Origin Node
+        private int _posToNode;//0 = SW , 1 = SE , 2 = NE, 3 = NW
+        private int _facingRotation = 0; //0f = south, 90f = (1) west, 180f = (2) north, 270f = (3) east
+
+        //Building to build
+        private string _pathBuilding = ""; //Chemin du batiment (à partir de Resources)
+        private int _buildingSizeType = 0; //0 = 2x2, 1 = 2x4, 2 = 2x4, 3 = 4*4 (à update a chaque qu'on decide d'entendre la taille possible des batiments
+
+        //Nombre d'argument du deuxieme constructeur de BuildNode (prévu pour la Deserialisation)
+        private static int _packageSize = 10;
+        public static int GetPackageSize()
+        {
+            return _packageSize;
+        }
+
+        //Constructeur
+        public BuildNode(int xNew, int yNew, RoadNode origin, int pos)
+        {
+            _x = xNew;
+            _y = yNew;
+
+            _posToNode = pos;
+
+            switch (_posToNode)
+            {
+                case 0: //0 = SW
+                    InitSetSpace(origin.GetWest(), 0, origin.GetSouth(), 0);
+                    break;
+                case 1: //1 = SE
+                    InitSetSpace(origin.GetEast(), 0, 0, origin.GetSouth());
+                    break;
+                case 2: //2 = NE
+                    InitSetSpace(0, origin.GetEast(), 0, origin.GetNorth());
+                    break;
+                default: //3 = NW
+                    InitSetSpace(0, origin.GetWest(), origin.GetNorth(), 0);
+                    break;
+            }
+            InitRotation();
+
+            //TEMPORAIRE
+            DecidePath();
+        }
+        public BuildNode(int xNew, int yNew, int north, int south, int east, int west, bool liberty, int pos, int rotation, int size, string path)
+        {
+            _x = xNew;
+            _y = yNew;
+
+            _north = north;
+            _south = south;
+            _east = east;
+            _west = west;
+
+            isFree = liberty;
+
+            _posToNode = pos;
+            _facingRotation = rotation;
+            _buildingSizeType = size;
+
+            _pathBuilding = path;
+        }
+
+        public void SetPath(string path)
+        {
+            _pathBuilding = path;
+        }
+
+        private void InitSetSpace(int north, int south, int east, int west)
+        {
+            _north = north;
+            _south = south;
+            _east = east;
+            _west = west;
+        }
+        private void InitRotation()
+        {
+            List<int> validRotation = new List<int>();
+            if (_south > 0) validRotation.Add(0);
+            if (_west > 0) validRotation.Add(1);
+            if (_north > 0) validRotation.Add(2);
+            if (_east > 0) validRotation.Add(3);
+
+            if (validRotation.Count > 0)
+            {
+                _facingRotation = validRotation[Random.Range(0, validRotation.Count)];
+            }
+        }
+
+        private void DecidePath()
+        {
+            //Choisir quel building construire
+            int rng = Random.Range(0, 3);
+            //rng = 0;
+            string path = "Buildings/build22/test" + rng;
+
+            _pathBuilding = path;
+        }
+        
+        //Generate
+        public void Generate(float worldLengthAdaptor)
+        {
+            if (!CanGenerateItself())
+            {
+                return;
+            }
+            Vector3 position = new Vector3(_x * worldLengthAdaptor, 0, _y * worldLengthAdaptor);
+
+            Vector3 offset = CalculateOffset();
+
+            //Instantié et le tourner dans la bonne direction
+            GameObject build = Instantiate(Resources.Load<GameObject>(_pathBuilding), position + offset, Quaternion.identity);
+            build.transform.Rotate(0, _facingRotation * 90f, 0);
+        }
+        private bool CanGenerateItself()
+        {
+            if (isFree)
+            {
+                if (_north + _south + _east + _west > 0)
+                {
+                    return true;
+                }
+                return false;
+            }
+            return false;
+        }
+        private Vector3 CalculateOffset()
+        {
+            //Bien le placer
+            Vector3 offsetRotation = new Vector3();
+
+            switch (_facingRotation)
+            {
+                case 0: //0f = 0 * 90 -> south
+                        //Debug.Log("facing South Moving not");
+                    offsetRotation.Set(0, 0, 0);
+                    break;
+                case 1: //90f = 1 * 90 -> west
+                        //Debug.Log("facing west Moving north");
+                    offsetRotation.Set(0, 0, 12.6f);
+                    break;
+                case 2: //180f = 2 * 90 -> north
+                        //Debug.Log("facing north Moving east and north");
+                    offsetRotation.Set(12.6f, 0, 12.6f);
+                    break;
+                default://270f = 3 * 90 -> east
+                        //Debug.Log("facing east Moving east");
+                    offsetRotation.Set(12.6f, 0, 0);
+                    break;
+            }
+
+            return offsetRotation;
+        }
+
+        //Serialize and Deserialize
+        public static BuildNode Deserialize(int[] ser,string path)
+        {
+            bool liberty;
+            if (ser[6] == 1)
+            {
+                liberty = true;
+            }
+            else
+            {
+                liberty = false;
+            }
+
+            return new BuildNode(ser[0], ser[1], ser[2], ser[3], ser[4], ser[5], liberty, ser[7], ser[8], ser[9], path);
+        }
+
+        public int[] SerializeArray()
+        {
+            int isFreeToInt;
+            if (isFree)
+            {
+                isFreeToInt = 1;
+            }
+            else
+            {
+                isFreeToInt = 0;
+            }
+            return new int[10] { _x, _y, _north, _south, _east, _west, isFreeToInt, _posToNode, _facingRotation, _buildingSizeType };
+
+        }
+        public string SerializeString()
+        {
+            return _pathBuilding;
+        }
+    }
+
+    #region Attributes
 
     public NavMeshSurface surface;
     private float tunkLength = 12.6f; //magic number with MagicaVoxel, tunk = technical chunk
@@ -139,15 +353,18 @@ public class Generator : MonoBehaviour
     private int cityY = 15;
 
     //Matrix où l'on stocke des Nodes
-    private GameObject[,] depre_nodeMatrix;
-
-    private RoadNode[,] masterRoads; //travaillé par master
+    private RoadNode[,] masterRoads; //matrice travaillée par Master
     private int[] serializedRoads = null; //envoyé par RPC
-    private RoadNode[,] roadMatrix; //décodé après RPC
+    private RoadNode[,] roadMatrix; //décodé après RPC, commun à tous
+
     private bool receivedPackage = false;
 
     //Matrix où l'on stocke les emplacements de bâtiments (BuildSpot)
-    private GameObject[,] buildSpotMatrix;
+    private BuildNode[,] masterBuilds; //matrice travaillée par Master
+    private int[] serializedBuilds = null; //envoyé par RPC
+    private string[] serializedPath = null; //envoyé par RPC
+    private BuildNode[,] buildMatrix; //décodé après RPC, commun à tous
+
     //Variable aide
     private float districtLength;
     private int borderNorth;
@@ -160,33 +377,63 @@ public class Generator : MonoBehaviour
     public float nodeMiddleX;
     public float nodeMiddleY;
 
+    #endregion
 
-    //Qd y augmente -> Nord
-    //Qd x augmente -> Est
 
-        //Start
+    // --- IMPORTANT TIPS AND TRICKS ---
+    //Quandd y augmente -> on va vers le Nord
+    //Quandd x augmente -> on ve vers l' Est
+
+    //Unity Callabcks
 
     private void Start()
     {
         districtLength = tunkLength * nTunkInDistrict;
         roadMatrix = new RoadNode[cityX, cityY];
+        buildMatrix = new BuildNode[cityX * 2, cityY * 2];
 
         if (PhotonNetwork.isMasterClient)
         {
             MasterInitialisation();
+
             MasterSetupRoads();
+            MasterSetupBuilds();
 
             UpdateRoads();
+            UpdateBuilds();
         }
     }
 
-    //Initialisation
+    private void Update()
+    {
+        if (!receivedPackage && serializedRoads != null && serializedBuilds != null &&  serializedPath != null)
+        {
+            receivedPackage = true;
+
+            //(serializedRoads a été modifié par RPC de meme pour cityX et cityY)
+            DecryptRoads();
+
+            DecryptBuilds();
+
+            //Generate les routes
+            GenerateRoads();
+
+            //Generate les bâtiments
+            GenerateBuilds();
+
+            //Update le NavMeshSurface entierement (fin)
+            surface.BuildNavMesh();
+        }
+    }
+
+    //Master Initialisation
 
     private void MasterInitialisation()
     {
         masterRoads = new RoadNode[cityX, cityY];
+        masterBuilds = new BuildNode[cityX * 2, cityY * 2];
 
-        
+
         borderNorth = cityY - 1;
         borderSouth = 0;
         borderEast = cityX - 1;
@@ -195,7 +442,7 @@ public class Generator : MonoBehaviour
         midY = cityY / 2;
     }
 
-    //Main Roads
+    //Master  Roads
 
     private void MasterSetupRoads()
     {
@@ -203,7 +450,7 @@ public class Generator : MonoBehaviour
         InitMasterRoads();
 
         //Modifier masterRoads
-        GenerateCityRoads();
+        MasterModifyRoads();
     }
 
     private void InitMasterRoads()
@@ -217,7 +464,7 @@ public class Generator : MonoBehaviour
         }
     }
 
-    private void GenerateCityRoads()
+    private void MasterModifyRoads()
     {
         //Setup des nodes spécifiques
 
@@ -257,19 +504,57 @@ public class Generator : MonoBehaviour
         ConnectAllBetween(north, east, south, west);
     }
 
-    //Send via RPC
+    //Master  Builds
+    private void MasterSetupBuilds()
+    {
+        for (int y = 0; y < cityY; y++)
+        {
+            for (int x = 0; x < cityX; x++)
+            {
+                MasterBuildAroundNode(masterRoads[x, y], x, y);
+            }
+        }
+    }
 
+    private void MasterBuildAroundNode(RoadNode roadOrigin, int xInMatrix, int yInMatrix)
+    {
+        int xChunk = roadOrigin.x * 5;
+        int yChunk = roadOrigin.y * 5;
+
+        //South West 0
+        //(nodeX - 25.2f, 0f, nodeY - 25.2f)
+
+        masterBuilds[2 * xInMatrix, 2 * yInMatrix] = new BuildNode(xChunk - 2, yChunk - 2, roadOrigin, 0);
+
+        //South East 1
+        //(nodeX + 12.6f, 0f, nodeY - 25.2f)
+
+        masterBuilds[2 * xInMatrix + 1, 2 * yInMatrix] = new BuildNode(xChunk + 1, yChunk - 2, roadOrigin, 1);
+
+        //North East 2
+        //(nodeX + 12.6f, 0f, nodeY + 12.6f)
+
+        masterBuilds[2 * xInMatrix + 1, 2 * yInMatrix + 1] = new BuildNode(xChunk + 1, yChunk + 1, roadOrigin, 2);
+
+        //North West 3
+        //(nodeX - 25.2f, 0f, nodeY + 12.6f)
+
+        masterBuilds[2 * xInMatrix, 2 * yInMatrix + 1] = new BuildNode(xChunk - 2, yChunk + 1, roadOrigin, 3);
+    }
+
+    #region  Send via RPC
+
+    //Send roads via RPC
     private void UpdateRoads()
     {
-        int[] package = Encrypt();
+        int[] package = EncryptRoads();
 
         GetComponent<PhotonView>().RPC("SendRoads",PhotonTargets.AllBuffered,package);
     }
-
-    private int[] Encrypt()
+    private int[] EncryptRoads()
     {
-        Debug.Log("Generator: Encrypting as " + PhotonNetwork.player.name);
-        int[] package = new int[cityX*cityY*6 + 2];
+        Debug.Log("Generator: Encrypting roads as " + PhotonNetwork.player.name);
+        int[] package = new int[cityX*cityY*(RoadNode.GetPackageSize()) + 2];
 
         package[0] = cityX;
         package[1] = cityY;
@@ -291,13 +576,11 @@ public class Generator : MonoBehaviour
             }
             x++;
         }
-
         return package;
     }
-
-    private void Decrypt()
+    private void DecryptRoads()
     {
-        Debug.Log("Generator: Decrypting as " + PhotonNetwork.player.name);
+        Debug.Log("Generator: Decrypting roads as " + PhotonNetwork.player.name);
         cityX = serializedRoads[0];
         cityY = serializedRoads[1];
 
@@ -305,53 +588,132 @@ public class Generator : MonoBehaviour
         int y = 0;
         int index = 2;
 
-
-
-        int[] nodeSerialized = new int[6];
+        int[] nodeSerialized = new int[RoadNode.GetPackageSize()];
         while (x < cityX)
         {
             y = 0;
             while (y < cityY)
             {
-                for (int i = 0; i < 6; i++)
+                //On recupere la version serialisé de la RoadNode
+                for (int i = 0; i < RoadNode.GetPackageSize(); i++)
                 {
                     nodeSerialized[i] = serializedRoads[index + i];
                 }
+                //On ajoute la RoadNode dans la matrice prévu à cette effet
                 roadMatrix[x, y] = RoadNode.Deserialize(nodeSerialized);
 
-                index += 6;
+                //Incrementation
+                index += RoadNode.GetPackageSize();
                 y++;
             }
             x++;
         }
     }
-
     [PunRPC]
     private void SendRoads(int[] package)
     {
-        Debug.Log("Generator: Received package as " + PhotonNetwork.player.name);
+        Debug.Log("Generator: Received road package as " + PhotonNetwork.player.name);
         serializedRoads = package;
     }
-    private void Update()
+
+    //Send buildings via RPC
+    private void UpdateBuilds()
     {
-        if (!receivedPackage && serializedRoads != null)
+        GetComponent<PhotonView>().RPC("SendBuildsArray", PhotonTargets.AllBuffered, EncryptBuildsArray());
+        GetComponent<PhotonView>().RPC("SendBuildsPath", PhotonTargets.AllBuffered, EncryptBuildsPath());
+    }
+    private int[] EncryptBuildsArray()
+    {
+        Debug.Log("Generator: Encrypting builds as " + PhotonNetwork.player.name);
+        int[] package = new int[(2 * cityX) * (2 * cityY) * BuildNode.GetPackageSize()];
+
+        int x = 0;
+        int y = 0;
+        int index = 0;
+        while (x < 2 * cityX)
         {
-            //(serializedRoads a été modifié par RPC)
-            Decrypt();
+            y = 0;
+            while (y < 2 * cityY)
+            {
+                foreach (int n in masterBuilds[x, y].SerializeArray())
+                {
+                    package[index] = n;
+                    index++;
+                }
+                y++;
+            }
+            x++;
+        }
+        return package;
+    }
+    private string[] EncryptBuildsPath()
+    {
+        Debug.Log("Generator: Encrypting builds as " + PhotonNetwork.player.name);
+        string[] package = new string[(2 * cityX) * (2 * cityY)];
 
-            receivedPackage = true;
+        int x = 0;
+        int y = 0;
+        int index = 0;
+        while (x < 2 * cityX)
+        {
+            y = 0;
+            while (y < 2 * cityY)
+            {
+                package[index] = masterBuilds[x, y].SerializeString();
+                index++;
+                y++;
+            }
+            x++;
+        }
+        return package;
+    }
+    private void DecryptBuilds()
+    {
+        Debug.Log("Generator: Decrypting builds as " + PhotonNetwork.player.name);
+        int x = 0;
+        int y = 0;
+        int indexArray = 0;
+        int indexPath = 0;
 
-            //Generate les routes
-            GenerateOnNode();
+        int[] buildSerialized = new int[BuildNode.GetPackageSize()];
+        while (x < 2 * cityX)
+        {
+            y = 0;
+            while (y < 2 * cityY)
+            {
+                //On recupere la version serialisé de la BuildNode
+                for (int i = 0; i < BuildNode.GetPackageSize(); i++)
+                {
+                    buildSerialized[i] = serializedBuilds[indexArray + i];
+                }
+                //On ajoute la BuildNode dans la matrice prévu à cette effet (+version sérialisé de son path)
+                buildMatrix[x, y] = BuildNode.Deserialize(buildSerialized, serializedPath[indexPath]);
 
-            //Update le NavMeshSurface entierement (fin)
-            surface.BuildNavMesh();
+                //Incrementation
+                indexArray += BuildNode.GetPackageSize();
+                indexPath++;
+                y++;
+            }
+            x++;
         }
     }
+    [PunRPC]
+    private void SendBuildsArray(int[] package)
+    {
+        Debug.Log("Generator: Received build package as " + PhotonNetwork.player.name);
+        serializedBuilds = package;
+    }
+    [PunRPC]
+    private void SendBuildsPath(string[] package)
+    {
+        Debug.Log("Generator: Received buildpath package as " + PhotonNetwork.player.name);
+        serializedPath = package;
+    }
 
+    #endregion
 
-    //GenerateOnNode
-    private void GenerateOnNode()
+    //Generate
+    private void GenerateRoads()
     {
         for (int y = 0; y < cityY; y++)
         {
@@ -362,9 +724,20 @@ public class Generator : MonoBehaviour
         }
     }
 
+    private void GenerateBuilds()
+    {
+        for (int y = 0; y < cityY * 2; y++)
+        {
+            for (int x = 0; x < cityX * 2; x++)
+            {
+                buildMatrix[x, y].Generate(tunkLength);
+            }
+        }
+    }
+
     //PlaceNode
 
-    #region GenerateCityRoads
+    #region MasterGenerateCityRoads
 
     //Node Getters
     private RoadNode GetNodeInRange(int xMin, int xMax, int yMin, int yMax)
@@ -508,92 +881,6 @@ public class Generator : MonoBehaviour
     private void CreateRoad(RoadNode node1, RoadNode node2)
     {
         ConnectPoint(FindPath(node1, node2));
-    }
-
-    #endregion
-
-    #region GenerateCityBuildings
-
-    private void GenerateCityBuildings()
-    {
-        PlaceBuildSpot();
-
-        GenerateOnBuildSpot();
-    }
-
-    private void PlaceBuildSpot()
-    {
-        NodeHead nodeSource;
-        GameObject buildSpot;
-        for (int y = 0; y < cityY; y++)
-        {
-            for (int x = 0; x < cityX; x++)
-            {
-                //InstantiateBuildSpotAroundNode(nodeMatrix[x, y].GetComponent<NodeHead>());
-            }
-        }
-    }
-
-    private void InstantiateBuildSpotAroundNode(NodeHead nodeSource)
-    {
-        GameObject buildSpot;
-
-        int nodeXPos = nodeSource.x;
-        int nodeYPos = nodeSource.y;
-
-        float nodeX = nodeXPos * districtLength; //Position dans la scene
-        float nodeY = nodeYPos * districtLength;
-
-
-        //South West 0
-        buildSpot = Instantiate(
-            Resources.Load<GameObject>("eBuildSpot"), 
-            new Vector3(nodeX - 25.2f, 0f, nodeY - 25.2f), Quaternion.identity);
-
-        buildSpot.GetComponent<BuildSpotHead>().Init(nodeSource,0);
-
-        buildSpotMatrix[2 * nodeXPos, 2 * nodeYPos] = buildSpot;
-
-
-        //South East 1
-        buildSpot = Instantiate(
-            Resources.Load<GameObject>("eBuildSpot"), 
-            new Vector3(nodeX + 12.6f, 0f, nodeY - 25.2f), Quaternion.identity);
-
-        buildSpot.GetComponent<BuildSpotHead>().Init(nodeSource,1);
-
-        buildSpotMatrix[2 * nodeXPos + 1, 2 * nodeYPos] = buildSpot;
-
-
-        //North East 2
-        buildSpot = Instantiate(
-            Resources.Load<GameObject>("eBuildSpot"), 
-            new Vector3(nodeX + 12.6f, 0f, nodeY + 12.6f), Quaternion.identity);
-
-        buildSpot.GetComponent<BuildSpotHead>().Init(nodeSource,2);
-
-        buildSpotMatrix[2 * nodeXPos + 1, 2 * nodeYPos + 1] = buildSpot;
-
-
-        //North West 3
-        buildSpot = Instantiate(
-            Resources.Load<GameObject>("eBuildSpot"), 
-            new Vector3(nodeX - 25.2f, 0f, nodeY + 12.6f), Quaternion.identity);
-
-        buildSpot.GetComponent<BuildSpotHead>().Init(nodeSource,3);
-
-        buildSpotMatrix[2 * nodeXPos, 2 * nodeYPos + 1] = buildSpot;
-    }
-
-    private void GenerateOnBuildSpot()
-    {
-        for (int y = 0; y < 2 * cityY; y++)
-        {
-            for (int x = 0; x < 2 * cityX; x++)
-            {
-                buildSpotMatrix[x, y].GetComponent<BuildSpotHead>().Generate();
-            }
-        }
     }
 
     #endregion

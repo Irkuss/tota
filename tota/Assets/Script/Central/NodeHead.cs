@@ -4,6 +4,10 @@ using UnityEngine;
 
 public class NodeHead : Photon.MonoBehaviour
 {
+    // DEPRECATED
+    // DEPRECATED
+    // DEPRECATED
+
     public class RoadNode
     {
         //directions dans laquelle la route part (16 combinaisons différentes)

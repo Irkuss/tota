@@ -4,6 +4,8 @@ using UnityEngine;
 
 public class BuildSpotHead : MonoBehaviour
 {
+    //DEPRECATED
+
     //directions dont l'espace est libre (0 = libre, 1 occupé)
     private int _north = 0;
     private int _south = 0;

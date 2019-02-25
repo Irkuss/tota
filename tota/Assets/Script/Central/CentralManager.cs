@@ -15,6 +15,7 @@ public class CentralManager : Photon.MonoBehaviour
 
     private void Awake()
     {
+        /*
         if (PhotonNetwork.isMasterClient)
         {
             int seed = 144;
@@ -24,6 +25,7 @@ public class CentralManager : Photon.MonoBehaviour
             GetComponent<PhotonView>().RPC("SetRandomSeed", PhotonTargets.AllBuffered,seed);
         }
         Random.InitState(usingSeed);
+        */
     }
 
     [PunRPC]
