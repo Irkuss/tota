@@ -40,7 +40,7 @@ public class FloorManager : MonoBehaviour
         if (floorLevel < maxFloorLevel)
         {
             floorLevel++;
-            Debug.Log("FloorManager: downed to " + floorLevel);
+            //Debug.Log("FloorManager: downed to " + floorLevel);
 
             //Call callbacks to everyone listening
             UpdateCallback();
@@ -52,7 +52,7 @@ public class FloorManager : MonoBehaviour
         if (floorLevel > 0)
         {
             floorLevel--;
-            Debug.Log("FloorManager: upped to " + floorLevel);
+            //Debug.Log("FloorManager: upped to " + floorLevel);
 
             //Call callbacks to everyone listening
             UpdateCallback();

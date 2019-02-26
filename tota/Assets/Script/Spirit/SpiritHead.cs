@@ -35,13 +35,16 @@ public class SpiritHead : Photon.MonoBehaviour
     {
         if (Input.GetKeyUp("space"))
         {
-            GameObject go = PhotonNetwork.Instantiate(
-                "Chara", 
-                new Vector3(gameObject.transform.position.x, 
-                            1, 
-                            gameObject.transform.position.z), 
-                Quaternion.identity, 
-                0);
+            Vector3 lowPosition = new Vector3(gameObject.transform.position.x, 1, gameObject.transform.position.z);
+            GameObject go;
+            if (PhotonNetwork.offlineMode)
+            {
+                go = Instantiate(Resources.Load<GameObject>("Chara"), lowPosition, Quaternion.identity);
+            }
+            else
+            {
+                go = PhotonNetwork.Instantiate("Chara", lowPosition, Quaternion.identity, 0);
+            }
 
             Debug.Log("Instantiatoion de: " + go);
 
@@ -67,7 +70,7 @@ public class SpiritHead : Photon.MonoBehaviour
 
     private void LeftClickUpdate()
     {
-        Debug.Log("SpiritHead: " + spiritName + " a fait un clic gauche");
+        //Debug.Log("SpiritHead: " + spiritName + " a fait un clic gauche");
 
         Ray ray = spiritCamera.GetComponent<Camera>().ScreenPointToRay(Input.mousePosition);
         RaycastHit hit;
@@ -93,7 +96,7 @@ public class SpiritHead : Photon.MonoBehaviour
 
     private void RightClickUpdate()
     {
-        Debug.Log("SpiritHead: " + spiritName + " a fait un clic droit");
+        //Debug.Log("SpiritHead: " + spiritName + " a fait un clic droit");
 
         Ray ray = spiritCamera.GetComponent<Camera>().ScreenPointToRay(Input.mousePosition);
         RaycastHit hit;

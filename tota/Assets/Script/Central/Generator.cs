@@ -399,8 +399,20 @@ public class Generator : MonoBehaviour
             MasterSetupRoads();
             MasterSetupBuilds();
 
-            UpdateRoads();
-            UpdateBuilds();
+
+            if (PhotonNetwork.offlineMode == true)
+            {
+                roadMatrix = masterRoads;
+                buildMatrix = masterBuilds;
+
+                //Saute l'envoi de RPC
+                GenerateEnd();
+            }
+            else
+            {
+                UpdateRoads();
+                UpdateBuilds();
+            }
         }
     }
 
@@ -410,20 +422,35 @@ public class Generator : MonoBehaviour
         {
             receivedPackage = true;
 
-            //(serializedRoads a été modifié par RPC de meme pour cityX et cityY)
-            DecryptRoads();
-
-            DecryptBuilds();
-
-            //Generate les routes
-            GenerateRoads();
-
-            //Generate les bâtiments
-            GenerateBuilds();
-
-            //Update le NavMeshSurface entierement (fin)
-            surface.BuildNavMesh();
+            OnReceivedPackage();
         }
+    }
+
+    private void OnReceivedPackage()
+    {
+        //(serializedRoads a été modifié par RPC de meme pour cityX et cityY)
+        DecryptRoads();
+
+        DecryptBuilds();
+
+        //Genere avec les informations recues
+        GenerateEnd();
+    }
+
+    private void GenerateEnd()
+    {
+        //Generate les routes
+        GenerateRoads();
+
+        //Generate les bâtiments
+        GenerateBuilds();
+
+        //Update le NavMeshSurface entierement (fin)
+        surface.BuildNavMesh();
+
+        //Update le spawnpoint (temporaire)
+        GetComponent<CentralManager>().generationIsFinished = true;
+        GetComponent<CentralManager>().spawnPoint = new Vector3((cityX * districtLength) / 2, 1000f, (cityY * districtLength) / 2);
     }
 
     //Master Initialisation
@@ -542,7 +569,7 @@ public class Generator : MonoBehaviour
         masterBuilds[2 * xInMatrix, 2 * yInMatrix + 1] = new BuildNode(xChunk - 2, yChunk + 1, roadOrigin, 3);
     }
 
-    #region  Send via RPC
+    #region  Send Generation via RPC
 
     //Send roads via RPC
     private void UpdateRoads()

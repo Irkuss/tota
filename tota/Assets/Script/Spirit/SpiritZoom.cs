@@ -13,6 +13,8 @@ public class SpiritZoom : Photon.MonoBehaviour
     private Transform _transformer;
 
     //Tweakable value (!)
+    private float _heightOffset = 20f;
+
     private float _baseZoomValue = 60.0f;
 
     private float _zoomSpeed = 10.0f;
@@ -65,7 +67,7 @@ public class SpiritZoom : Photon.MonoBehaviour
         _cameraComp.fieldOfView = Mathf.Lerp(_cameraComp.fieldOfView, _zoomValue, Time.deltaTime * _zoomSpeed);
 
         //Set desired position
-        Vector3 desiredPosition = new Vector3(_transformer.position.x, _floorManager.GetFloorLevel() * 12.6f , _transformer.position.z);
+        Vector3 desiredPosition = new Vector3(_transformer.position.x, _floorManager.GetFloorLevel() * 12.6f + _heightOffset , _transformer.position.z);
         //Gradually go to desired position
         _transformer.position = Vector3.Lerp(transform.position, desiredPosition, Time.deltaTime * 5.0f);
     }

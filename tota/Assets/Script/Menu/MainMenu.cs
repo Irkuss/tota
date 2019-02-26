@@ -7,8 +7,9 @@ public class MainMenu : MonoBehaviour
 {
     
     public void SoloGame()
-    {        
-        SceneManager.LoadScene(1);
+    {
+        PhotonNetwork.offlineMode = true;
+        SceneManager.LoadScene(3);
     }
 
     public void MultGame()

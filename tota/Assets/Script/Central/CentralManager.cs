@@ -5,60 +5,47 @@ using UnityEngine;
 public class CentralManager : Photon.MonoBehaviour
 {
     public Generator generator;
-    private Vector3 spawnPoint;
+    public Vector3 spawnPoint;
+    public bool generationIsFinished = false;
     public PermissionsManager permissions;
 
     public GameObject tempButton;
 
     private int usingSeed;
 
-
-    private void Awake()
-    {
-        /*
-        if (PhotonNetwork.isMasterClient)
-        {
-            int seed = 144;
-
-            Debug.Log("Central Manager: Setting seed: " + seed);
-
-            GetComponent<PhotonView>().RPC("SetRandomSeed", PhotonTargets.AllBuffered,seed);
-        }
-        Random.InitState(usingSeed);
-        */
-    }
-
-    [PunRPC]
-    private void SetRandomSeed(int seed)
-    {
-        Debug.Log("Central Manager: " + PhotonNetwork.player.name + " is receiving seed as " + seed);
-        usingSeed = seed;
-    }
-
-
-
-    private void Start()
-    {
-        spawnPoint = new Vector3(generator.nodeMiddleX, 15.0f, generator.nodeMiddleY);
-    }
-
-    //Public methods
-
+    //Spawn le joueur (appelé par le bouton spawn)
     public void InstantiateSpirit()
     {
+        if (!generationIsFinished)
+        {
+            return;
+        }
         Debug.Log("CentralManager: Instantiation de spirit");
-        GameObject spirit = PhotonNetwork.Instantiate("Spirit", spawnPoint, Quaternion.identity, 0);
-        SpiritHead init = spirit.GetComponent<SpiritHead>();
-        init.spiritName = PhotonNetwork.playerName;
+        //Instantiate the spirit
+        GameObject spirit;
+        if (PhotonNetwork.offlineMode)
+        {
+            spirit = Instantiate(Resources.Load<GameObject>("Spirit"), spawnPoint, Quaternion.identity);
+        }
+        else
+        {
+            spirit = PhotonNetwork.Instantiate("Spirit", spawnPoint, Quaternion.identity, 0);
+        }
+        
 
 
-        //permissions.AddTeamWithPlayer(PhotonNetwork.playerName); //TODO pour l'instant chaque joueur joue tout seul
+        //Initialise le Spirit
+        //Crée une nouvelle équipe et ajoute le spirit dans cette équipe//TODO pour l'instant chaque joueur joue tout seul
         permissions.GetComponent<PhotonView>().RPC("AddTeamWithPlayer", PhotonTargets.All, PhotonNetwork.playerName);
 
+        SpiritHead init = spirit.GetComponent<SpiritHead>();
+
+        init.spiritName = PhotonNetwork.playerName;
         init.groupIndex = permissions.GetGroupIndex(PhotonNetwork.playerName);
 
         Debug.Log("CentralManager: This spirit is named " + PhotonNetwork.playerName + " and is in team " + init.groupIndex);
 
+        //Enleve le bouton de spawn
         tempButton.SetActive(false);
     }
 }
