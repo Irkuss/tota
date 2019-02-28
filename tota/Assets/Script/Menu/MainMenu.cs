@@ -14,6 +14,7 @@ public class MainMenu : MonoBehaviour
 
     public void MultGame()
     {
+        PhotonNetwork.offlineMode = false;
         SceneManager.LoadScene(2); // When solo will be done get the index to 2
     }
 

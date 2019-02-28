@@ -7,8 +7,7 @@ public class SpiritHead : Photon.MonoBehaviour
     [SerializeField]
     private GameObject spiritCamera;
 
-    public string spiritName ="ERROR"; //Inititialisé lors de l'instantiation de Spirit
-    public int groupIndex = -1; //Inititialisé lors de l'instantiation de Spirit
+    private PermissionsManager.Player playerOwner;
 
     private List<GameObject> selectedList;
 
@@ -29,28 +28,39 @@ public class SpiritHead : Photon.MonoBehaviour
         ClickUpdate();
 
         TestBtw();
+        
     }
 
     private void TestBtw()
     {
         if (Input.GetKeyUp("space"))
         {
+            //Projection des positions sur le sol
             Vector3 lowPosition = new Vector3(gameObject.transform.position.x, 1, gameObject.transform.position.z);
+
+            //Instantiation de Chara
             GameObject go;
             if (PhotonNetwork.offlineMode)
             {
+                Debug.Log("SpiritHead: Instantiation du spirit (offline)");
                 go = Instantiate(Resources.Load<GameObject>("Chara"), lowPosition, Quaternion.identity);
             }
             else
             {
+                Debug.Log("SpiritHead: Instantiation du spirit (online)");
                 go = PhotonNetwork.Instantiate("Chara", lowPosition, Quaternion.identity, 0);
             }
-
-            Debug.Log("Instantiatoion de: " + go);
-
-            //go.GetComponent<CharaPermissions>().SetGroupMaster(groupIndex)
-            go.GetComponent<CharaPermissions>().GetComponent<PhotonView>().RPC("SetGroupMaster",PhotonTargets.All,groupIndex);
+            
+            //Met ce Chara dans notre équipe (par RPC)
+            go.GetComponent<CharaPermissions>().GetComponent<PhotonView>().RPC("SetTeam", PhotonTargets.AllBuffered, playerOwner.MyTeamName);
         }
+    }
+
+    //Permisssions initialisation
+
+    public void InitPermissions(PermissionsManager.Player player)
+    {
+        playerOwner = player;
     }
 
     //Clicking and selecting
@@ -64,7 +74,6 @@ public class SpiritHead : Photon.MonoBehaviour
         if (Input.GetMouseButtonDown(1))
         {
             RightClickUpdate();
-            //BrouillonClicDroit();
         }
     }
 
@@ -89,6 +98,7 @@ public class SpiritHead : Photon.MonoBehaviour
             }
             else
             {
+                GameObject.Find("eCentralManager").GetComponent<CentralManager>().DeactivateToolTip();
                 DeselectAll();
             }
         }
@@ -114,62 +124,16 @@ public class SpiritHead : Photon.MonoBehaviour
         }
 
     }
-
-    //Brouillon RaycastAll
-
-    private void BrouillonClicDroit()
-    {
-        Ray ray = spiritCamera.GetComponent<Camera>().ScreenPointToRay(Input.mousePosition);
-        RaycastHit[] hits = Physics.RaycastAll(ray);
-
-        if (hits.Length > 0)
-        {
-            RaycastHit hit = GetNextVisibleHit(hits);
-
-            if (hit.transform.CompareTag("Chara"))
-            {
-                //Action si on clic droit sur un Chara
-            }
-            else
-            {
-                ActionMoveAllTo(hit.point);
-            }
-        }
-    }
-
-    private RaycastHit GetNextVisibleHit(RaycastHit[] hits)
-    {
-        Debug.Log("GetNextVisibleObject: Starting up");
-        RaycastHit hit;
-        int length = hits.Length;
-        int i = 0;
-        while(i < length)
-        {
-            Debug.Log("GetNextVisibleObject: Looking " + i + " on " + length);
-            hit = hits[i];
-            Debug.Log("GetNextVisibleObject: this hit is named " + hit.transform.gameObject.name);
-            if (hit.transform.gameObject.GetComponent<Renderer>() != null)
-            {
-                Debug.Log("GetNextVisibleObject: this hit has a renderer");
-                if (hit.transform.gameObject.GetComponent<Renderer>().enabled)
-                {
-                    Debug.Log("GetNextVisibleObject: this hit has a renderer which is enabled");
-                    return hit;
-                }
-                Debug.Log("GetNextVisibleObject: this hit has a renderer which is not enabled");
-            }
-            i++;
-        }
-        Debug.Log("GetNextVisibleObject: did not find valid hit");
-        return hits[0];
-    }
-
+    
     //Public methods
 
     public void ClickOnChara(GameObject chara)
     {
+        //TEMPORAIRE, update le tooltip
+        GameObject.Find("eCentralManager").GetComponent<CentralManager>().UpdateToolTip(chara.GetComponent<CharaRpg>().GetToolTipInfo());
+
         //Debug.Log("SpiritHead: On essaye de selectionné chara");
-        if (chara.GetComponent<CharaHead>().LeftClickedOn(spiritName))
+        if (chara.GetComponent<CharaHead>().LeftClickedOn(playerOwner))
         {
             //Debug.Log("SpiritHead: On a réussi ");
             if (!(selectedList.Contains(chara)))

@@ -4,80 +4,87 @@ using UnityEngine;
 
 public class CharaPermissions : MonoBehaviour
 {
+    //Recuperer le permissions manager component
+    private PermissionsManager permManager;
 
-    //Index du groupe de joueurs qui peut controler Chara
-    private int groupMasterIndex = -1; //Initialisé lors de l'instantiation
+    private void Start()
+    {
+        permManager = GameObject.Find("eCentralManager").GetComponent<PermissionsManager>(); //pas ouf comm methode, mieux vaux avec un tag
+        
+        //teamNameRPC est initialisé par RPC des que Chara est instancié;
+        myTeam = permManager.GetTeamWithName(teamNameRPC);
+
+        GetComponent<CharaOutline>().OnFinishedPermissions();
+    }
+
+    //Appartenance à une équipe
+    private string teamNameRPC;
+    private PermissionsManager.Team myTeam = null; //if null then controlled by AI
 
     //Nom du Spirit qui controle Chara, null si personne ne la controle
-    private string spiritMasterName = null;
+    //NB: on utilise le string et non le Player car passable par RPC
+    private string ownerName = null;
 
 
-    //Public Methods
-
-        //Getters
-    public int GetGroupMasterIndex()
+    //Getters
+    public bool HasTeam()
     {
-        Debug.Log("CharaPermissions: Getting index: " + groupMasterIndex);
-        return groupMasterIndex;
+        return myTeam != null;
+    }
+    public PermissionsManager.Team GetTeam()
+    {
+        Debug.Log("CharaPermissions: Getting team: " + myTeam.Name);
+        return myTeam;
     }
 
-    public string GetSpiritMasterName()
+    public bool HasOwner()
     {
-        return spiritMasterName;
+        return (ownerName != null);
     }
-
-    public bool HasGroupMaster()
+    public string GetOwnerName()
     {
-        return (groupMasterIndex >= 0);
+        return ownerName;
     }
+    
 
-    public bool HasSpiritMaster()
-    {
-        return (spiritMasterName != null);
-    }
-
-        //Setters
+    //Setters RPC
     [PunRPC]
-    public void SetGroupMaster(int index) //
+    public void SetTeam(string teamName)
     {
-        Debug.Log("CharaPermissions: Setting group master to: " + index);
-        if (index >= 0)
+        Debug.Log("CharaPermissions: Setting Team to: " + teamName);
+
+        if (permManager == null) //Cas ou perManager n'a pas encore été trouvé (Start ne s'est pas lancé)
         {
-            Debug.Log("CharaPermissions: Successfully changed index");
-            groupMasterIndex = index;
+            teamNameRPC = teamName;
         }
-    }
-    [PunRPC]
-    public void SetGroupMasterNull() //Probably useless
-    {
-        if (groupMasterIndex >= 0)
+        else
         {
-            groupMasterIndex = -1;
+            myTeam = permManager.GetTeamWithName(teamName);
         }
+        
     }
     [PunRPC]
-    public void SetSpiritMasterNull()
+    public void SetTeamNull() //Probably useless now
     {
-        if (spiritMasterName != null)
-        {
-            spiritMasterName = null;
-        }
+        myTeam = null;
     }
+    
     [PunRPC]
-    public void SetSpiritMaster(string spiritName)
+    public void SetOwner(string newOwnerName)
     {
         //Change la personne qui a le controle de Chara
-        spiritMasterName = spiritName;
+        ownerName = newOwnerName;
+    }
+    [PunRPC]
+    public void SetOwnerNull()
+    {
+        ownerName = null;
     }
 
-        //Others
+    //Others
 
-    public bool IsSpiritMaster(string spiritName)
+    public bool IsOwner(string playerName)
     {
-        if (spiritMasterName != null)
-        {
-            return spiritMasterName == spiritName;
-        }
-        return false;
+        return ownerName == playerName;
     }
 }

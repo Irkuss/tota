@@ -12,7 +12,7 @@ public class CharaHead : MonoBehaviour
     private CharaOutline outline;
     
     private GameObject eManager;
-    private PermissionsManager permManager;
+    public PermissionsManager permManager;
 
     //Unity Callbacks
 
@@ -23,60 +23,66 @@ public class CharaHead : MonoBehaviour
     }
 
     //Public methods
-    public bool LeftClickedOn(string spiritName)
+    public bool LeftClickedOn(PermissionsManager.Player playerWhoClickedUs)
     {
         //LeftClickedOn renvoie true, si le Spirit a réussi a slectionné Chara, false sinon
+        //NB: Il renvoie aussi false lors de la deselection
+        
+        Debug.Log("Chara: I have been clicked by "+ playerWhoClickedUs.Name);
 
-        Debug.Log("Chara: I have been clicked by "+ spiritName);
+        //permManager.IsPlayerInTeam(permissions.GetGroupMasterIndex(),spiritName)
 
-
-        //Si le joueur qui a cliqué sur Chara appartient à notre équipe
-        if (permManager.IsPlayerInTeam(permissions.GetGroupMasterIndex(),spiritName))
+        
+        if (permissions.GetTeam().ContainsPlayer(playerWhoClickedUs))
         {
-            string ownerName = permissions.GetSpiritMasterName();
+            //Si le joueur qui a cliqué sur Chara appartient à notre équipe
 
-            //Si personne controle Chara, le joueur prend controle de Chara
-            if (ownerName == null)
+            if (!permissions.HasOwner())
             {
-                Debug.Log("Chara: now controlled by "+ spiritName +" (was empty)");
-                Select(spiritName);
+                //Si personne controle Chara, le joueur prend controle de Chara
+                Debug.Log("Chara: now controlled by "+ playerWhoClickedUs.Name + " (was empty)");
+
+                SelectAsPlayer(playerWhoClickedUs);
                 return true;
             }
-            //Si le joueur qui nous controle n'a pas cliqué sur Chara, un autre joueur l'a fait
-            else if (ownerName != spiritName)
+            else if (permissions.IsOwner(playerWhoClickedUs.Name))
             {
-                Debug.Log("Chara: now controlled by " + spiritName + " (was full)");
-                Select(spiritName);
-                return true;
-            }
-            //Si le joueur qui nous controle a cliqué sur Chara -> deselect
-            else
-            {
-                Debug.Log("Chara:deselected by " + spiritName);
+                //Si le joueur qui nous controle a cliqué sur Chara -> deselect
+                Debug.Log("Chara:deselected by " + playerWhoClickedUs.Name);
+
                 Deselect();
                 return false;
+                
             }
-            
+            else
+            {
+                //Si un joueur de notre équipe controle deja Chara, personne ne peut l'override
+                return false;
+            }
         }
         else
         {
-            Debug.Log("Chara: Access Denied: " + spiritName + " is not in team " + permissions.GetGroupMasterIndex());
+            //Si le joueur qui a cliqué sur Chara n'appartient pas à notre équipe
+
+            Debug.Log("Chara: Access Denied: " + playerWhoClickedUs.Name + " is not in team " + permissions.GetTeam().Name);
             return false;
         }
     }
 
-    public void Select(string spiritName)
+    public void SelectAsPlayer(PermissionsManager.Player player)
     {
-        //permissions.SetSpiritMaster(spiritName);
-        permissions.GetComponent<PhotonView>().RPC("SetSpiritMaster", PhotonTargets.All, spiritName);
-        outline.SetOutlineToSelected();
+        permissions.GetComponent<PhotonView>().RPC("SetOwner", PhotonTargets.AllBuffered, player.Name);
+
+        outline.GetComponent<PhotonView>().RPC("SetOutlineToSelected", PhotonTargets.AllBuffered);
+        outline.GetComponent<PhotonView>().RPC("ChangeColorTo", PhotonTargets.AllBuffered, player.LinkedColor);
+        //outline.SetOutlineToSelected();
     }
 
     public void Deselect()
     {
-        //permissions.SetSpiritMasterNull();
-        permissions.GetComponent<PhotonView>().RPC("SetSpiritMasterNull", PhotonTargets.All);
-        outline.SetOutlineToNotSelected();
+        permissions.GetComponent<PhotonView>().RPC("SetOwnerNull", PhotonTargets.AllBuffered);
+
+        outline.GetComponent<PhotonView>().RPC("SetOutlineToNotSelected", PhotonTargets.AllBuffered);
     }
 
     public void RightClickedOn(string spiritName)

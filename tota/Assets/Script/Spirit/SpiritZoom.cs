@@ -13,7 +13,7 @@ public class SpiritZoom : Photon.MonoBehaviour
     private Transform _transformer;
 
     //Tweakable value (!)
-    private float _heightOffset = 20f;
+    private float _heightOffset = 10f;
 
     private float _baseZoomValue = 60.0f;
 
