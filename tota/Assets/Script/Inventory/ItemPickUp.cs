@@ -25,9 +25,9 @@ public class ItemPickUp : MonoBehaviour
 
     void PickUp(GameObject player)
     {
-        //bool pickedUp = player.GetComponentInChildren<InventoryManager>().Add(item);
+        bool pickedUp = player.GetComponent<InventoryManager>().Add(item);
         //bool pickedUp = FindObjectOfType<InventoryManager>().Add(item);
-        bool pickedUp = InventoryManager.instance.Add(item);
+        //bool pickedUp = InventoryManager.instance.Add(item);
         if (pickedUp)
         {
             Destroy(gameObject);

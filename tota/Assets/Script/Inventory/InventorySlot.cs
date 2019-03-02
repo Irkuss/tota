@@ -11,12 +11,13 @@ public class InventorySlot : MonoBehaviour
     public Button removeButton;
     public GameObject count;
 
-    /*private InventoryManager instance;
+    private InventoryManager instance;
 
     private void Start()
     {
-        instance = GetComponentInParent<InventoryManager>().instance;
-    }*/
+        instance = GetComponentInParent<InventoryManager>();
+    }
+
 
     public void AddItem (Item newItem, int ccount) //(Item newItem)
     {
@@ -41,15 +42,15 @@ public class InventorySlot : MonoBehaviour
 
     public void OnRemoveButton()
     {
-        if (InventoryManager.instance.itemss[item] <= item.stack) 
+        if (instance.itemss[item] <= item.stack) 
         {
-            InventoryManager.instance.Remove(item); 
+            instance.Remove(item); 
         }
         else
         {
-            InventoryManager.instance.itemss[item] -= int.Parse(count.GetComponent<Text>().text);
+            instance.itemss[item] -= int.Parse(count.GetComponent<Text>().text);
             ClearSlot();
-            InventoryManager.instance.onItemChangedCallback.Invoke();  
+            instance.onItemChangedCallback.Invoke();  
         }
         // Remettre le gameObject dans la scène si possible 
     }

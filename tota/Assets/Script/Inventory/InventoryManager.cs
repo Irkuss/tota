@@ -4,11 +4,11 @@ using UnityEngine;
 
 public class InventoryManager : MonoBehaviour
 {
-    public static InventoryManager instance;
+    /*public static InventoryManager instance;
     void Awake()
     {
         instance = this;
-    }
+    }*/
     
     public delegate void OnItemChanged();
     public OnItemChanged onItemChangedCallback;
