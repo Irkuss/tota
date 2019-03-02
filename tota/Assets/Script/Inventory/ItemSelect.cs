@@ -30,26 +30,5 @@ public class ItemSelect : MonoBehaviour, IBeginDragHandler, IEndDragHandler, IDr
 
     }
 
-<<<<<<< HEAD
-    public void SelectItem()
-    {
-        //bool pickedUp = FindObjectOfType<InventoryManager>().Add(item);
-        bool pickedUp = InventoryManager.instance.Add(item);
-=======
-    /*
-    public void SelectItem()
-    {
-        bool pickedUp = player.GetComponent<InventoryManager>().Add(item);
-        //bool pickedUp = FindObjectOfType<InventoryManager>().Add(item);
-        //bool pickedUp = InventoryManager.instance.Add(item);
->>>>>>> launcher
-        if (pickedUp)
-        {
-            Destroy(gameObject);
-        }
-<<<<<<< HEAD
-    }
-=======
-    }*/
->>>>>>> launcher
+
 }
