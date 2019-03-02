@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.EventSystems;
 
 public class CharaHead : MonoBehaviour
 {
@@ -77,6 +78,12 @@ public class CharaHead : MonoBehaviour
         //permissions.SetSpiritMasterNull();
         permissions.GetComponent<PhotonView>().RPC("SetSpiritMasterNull", PhotonTargets.All);
         outline.SetOutlineToNotSelected();
+        //if (!EventSystem.current.IsPointerOverGameObject())
+        //{
+            RemoveInventoryOnDeselected(this.gameObject);
+        //}
+        
+
     }
 
     public void RightClickedOn(string spiritName)
@@ -86,6 +93,14 @@ public class CharaHead : MonoBehaviour
 
     public void SetDestination(Vector3 destination)
     {
+        //if (EventSystem.current.IsPointerOverGameObject()) return;
+
         movement.MoveTo(destination);
+    }
+
+    private void RemoveInventoryOnDeselected(GameObject chara)
+    {
+        chara.GetComponentInChildren<Inventory>().RemoveInventory();
+        Debug.Log("removing");
     }
 }

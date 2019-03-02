@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.EventSystems;
 
 public class SpiritHead : Photon.MonoBehaviour
 {
@@ -29,6 +30,8 @@ public class SpiritHead : Photon.MonoBehaviour
         ClickUpdate();
 
         TestBtw();
+
+        InventoryF();
     }
 
     private void TestBtw()
@@ -56,7 +59,8 @@ public class SpiritHead : Photon.MonoBehaviour
     {
         if (Input.GetMouseButtonDown(0))
         {
-            LeftClickUpdate();
+            if (!EventSystem.current.IsPointerOverGameObject())
+                LeftClickUpdate();
         }
         if (Input.GetMouseButtonDown(1))
         {
@@ -174,4 +178,13 @@ public class SpiritHead : Photon.MonoBehaviour
             Chara.GetComponent<CharaHead>().SetDestination(destination);
         }
     }
+
+    private void InventoryF()
+    {
+        foreach (GameObject Chara in selectedList)
+        {
+            Chara.GetComponent<Inventory>().DisplayInventory();            
+        }
+    }
+
 }

@@ -20,7 +20,7 @@ public class LoadingControl : MonoBehaviour
         get { return _loadingSlider; }
     }
 
-    private float currentAmount = 0;
+    /*private float currentAmount = 0;
     private float speed = 15;
     private float count = 0;
 
@@ -47,7 +47,27 @@ public class LoadingControl : MonoBehaviour
 
     private void Loadscene()
     {
-        // might have to do : PhotonNetwork.LoadLevel(3);
+        //PhotonNetwork.LoadLevel(3);
         SceneManager.LoadScene(3);
+    }*/
+
+    public void Start()
+    {
+        StartCoroutine(LoadAsynchronously(3));
+    }
+
+    IEnumerator LoadAsynchronously (int sceneIndex)
+    {
+        AsyncOperation operation = SceneManager.LoadSceneAsync(sceneIndex);
+
+        while (!operation.isDone)
+        {
+            float progress = Mathf.Clamp01(operation.progress / .9f);
+            SliderLoad.value = progress;
+            LoadingSlider.text = progress * 100f + "%";
+
+            yield return null;
+            
+        }
     }
 }
