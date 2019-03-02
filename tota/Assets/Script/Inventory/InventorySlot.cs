@@ -11,14 +11,6 @@ public class InventorySlot : MonoBehaviour
     public Button removeButton;
     public GameObject count;
 
-<<<<<<< HEAD
-    /*private InventoryManager instance;
-
-    private void Start()
-    {
-        instance = GetComponentInParent<InventoryManager>().instance;
-    }*/
-=======
     private InventoryManager instance;
 
     private void Start()
@@ -26,7 +18,6 @@ public class InventorySlot : MonoBehaviour
         instance = GetComponentInParent<InventoryManager>();
     }
 
->>>>>>> launcher
 
     public void AddItem (Item newItem, int ccount) //(Item newItem)
     {
@@ -50,18 +41,7 @@ public class InventorySlot : MonoBehaviour
     }
 
     public void OnRemoveButton()
-    {
-<<<<<<< HEAD
-        if (InventoryManager.instance.itemss[item] <= item.stack) 
-        {
-            InventoryManager.instance.Remove(item); 
-        }
-        else
-        {
-            InventoryManager.instance.itemss[item] -= int.Parse(count.GetComponent<Text>().text);
-            ClearSlot();
-            InventoryManager.instance.onItemChangedCallback.Invoke();  
-=======
+    { 
         if (instance.itemss[item] <= item.stack) 
         {
             instance.Remove(item); 
@@ -71,7 +51,7 @@ public class InventorySlot : MonoBehaviour
             instance.itemss[item] -= int.Parse(count.GetComponent<Text>().text);
             ClearSlot();
             instance.onItemChangedCallback.Invoke();  
->>>>>>> launcher
+
         }
         // Remettre le gameObject dans la scène si possible 
     }
