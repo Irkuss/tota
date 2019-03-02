@@ -20,37 +20,24 @@ public class LoadingControl : MonoBehaviour
         get { return _loadingSlider; }
     }
 
-    private float currentAmount = 0;
-    private float speed = 15;
-    private float count = 0;
-
-    // Update is called once per frame
-    void Update()
+    public void Start()
     {
-        if (currentAmount < 100 && count == 0 && false) //Tanguy: j'en ai marre d'attendre, bonsoir le merge
-        {
-            currentAmount += speed * Time.deltaTime;
-        }
-        else
-        {
-            if (count == 0 || true) //Tanguy: j'en ai marre d'attendre, bonsoir le merge
-            {
-                Loadscene();
-                count += 1;
-            }
-        }
-
-        SliderLoad.value = (currentAmount / 100); 
-        
-        LoadingSlider.text = Mathf.RoundToInt(Mathf.Clamp(currentAmount, 0,100)).ToString() + "%";
+        StartCoroutine(LoadAsynchronously(3));
     }
 
-    private void Loadscene()
+    IEnumerator LoadAsynchronously (int sceneIndex)
     {
-        //SceneManager.LoadScene(3);
-        if (PhotonNetwork.isMasterClient)
+        AsyncOperation operation = SceneManager.LoadSceneAsync(sceneIndex);
+
+        while (!operation.isDone)
         {
-            PhotonNetwork.LoadLevel(3); //tanguy: probleme de rpc peut etre resolu par ce changement
+            float progress = Mathf.Clamp01(operation.progress / .9f);
+            SliderLoad.value = progress;
+            LoadingSlider.text = progress * 100f + "%";
+
+            yield return null;
+            
+
         }
     }
 }
