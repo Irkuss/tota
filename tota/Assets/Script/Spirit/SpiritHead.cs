@@ -7,8 +7,10 @@ public class SpiritHead : Photon.MonoBehaviour
     [SerializeField]
     private GameObject spiritCamera;
 
+    //Le joueur qui contrôle ce Spirit (ne change pas)
     private PermissionsManager.Player playerOwner;
 
+    //Liste des Chara selectionnées
     private List<GameObject> selectedList;
 
     //Unity Callback
@@ -28,7 +30,6 @@ public class SpiritHead : Photon.MonoBehaviour
         ClickUpdate();
 
         TestBtw();
-        
     }
 
     private void TestBtw()

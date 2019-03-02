@@ -1,18 +1,22 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class CharaHead : MonoBehaviour
 {
+    //Chara Family (Component attaché à Chara)
     [SerializeField]
     private CharaMovement movement;
     [SerializeField]
     private CharaPermissions permissions;
     [SerializeField]
     private CharaOutline outline;
-    
+
+    //Searched in Start
     private GameObject eManager;
     public PermissionsManager permManager;
+    
 
     //Unity Callbacks
 
@@ -22,21 +26,16 @@ public class CharaHead : MonoBehaviour
         permManager = eManager.GetComponent<PermissionsManager>();
     }
 
-    //Public methods
+    //Clic Gauche
     public bool LeftClickedOn(PermissionsManager.Player playerWhoClickedUs)
     {
         //LeftClickedOn renvoie true, si le Spirit a réussi a slectionné Chara, false sinon
         //NB: Il renvoie aussi false lors de la deselection
-        
         Debug.Log("Chara: I have been clicked by "+ playerWhoClickedUs.Name);
-
-        //permManager.IsPlayerInTeam(permissions.GetGroupMasterIndex(),spiritName)
-
         
         if (permissions.GetTeam().ContainsPlayer(playerWhoClickedUs))
         {
             //Si le joueur qui a cliqué sur Chara appartient à notre équipe
-
             if (!permissions.HasOwner())
             {
                 //Si personne controle Chara, le joueur prend controle de Chara
@@ -49,7 +48,6 @@ public class CharaHead : MonoBehaviour
             {
                 //Si le joueur qui nous controle a cliqué sur Chara -> deselect
                 Debug.Log("Chara:deselected by " + playerWhoClickedUs.Name);
-
                 Deselect();
                 return false;
                 
@@ -63,19 +61,17 @@ public class CharaHead : MonoBehaviour
         else
         {
             //Si le joueur qui a cliqué sur Chara n'appartient pas à notre équipe
-
             Debug.Log("Chara: Access Denied: " + playerWhoClickedUs.Name + " is not in team " + permissions.GetTeam().Name);
             return false;
         }
     }
 
-    public void SelectAsPlayer(PermissionsManager.Player player)
+    private void SelectAsPlayer(PermissionsManager.Player player)
     {
         permissions.GetComponent<PhotonView>().RPC("SetOwner", PhotonTargets.AllBuffered, player.Name);
 
         outline.GetComponent<PhotonView>().RPC("SetOutlineToSelected", PhotonTargets.AllBuffered);
         outline.GetComponent<PhotonView>().RPC("ChangeColorTo", PhotonTargets.AllBuffered, player.LinkedColor);
-        //outline.SetOutlineToSelected();
     }
 
     public void Deselect()
@@ -84,6 +80,8 @@ public class CharaHead : MonoBehaviour
 
         outline.GetComponent<PhotonView>().RPC("SetOutlineToNotSelected", PhotonTargets.AllBuffered);
     }
+
+    //Clic Droit
 
     public void RightClickedOn(string spiritName)
     {
@@ -94,4 +92,7 @@ public class CharaHead : MonoBehaviour
     {
         movement.MoveTo(destination);
     }
+    
+
+    
 }

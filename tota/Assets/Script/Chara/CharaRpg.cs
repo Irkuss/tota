@@ -25,7 +25,11 @@ public class CharaRpg : MonoBehaviour
     }
 
     //UnityCallback
-    private void Start()
+    void Start()
+    {
+        InitStat();
+    }
+    private void InitStat()
     {
         _strength = Random.Range(1, 20) * 5;
         _intelligence = Random.Range(1, 20) * 5;

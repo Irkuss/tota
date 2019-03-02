@@ -5,11 +5,16 @@ using UnityEngine.UI;
 
 public class ToolTip : MonoBehaviour
 {
+    //Temporaire
+
+
+    //On recupere les Component Text qui seront modifiés
     public Text nameText;
     public Text strengthText;
     public Text intelligenceText;
     public Text perceptionText;
 
+    //Appelé après avoir cliqué sur un Chara dans SpiritHead.cs/ClickOnChara()
     public void UpdateWith(string[] info)
     {
         nameText.text = "Name: " + info[0];

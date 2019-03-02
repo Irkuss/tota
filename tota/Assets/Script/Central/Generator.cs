@@ -261,23 +261,10 @@ public class Generator : MonoBehaviour
             }
         }
 
-        public void DecidePath(string file, int size)
+        //Appelé dans MasterChoice apres CornerBehavior
+        public void SetPath(string path)
         {
-
-            //Size est le nombre d'élément spawnable de file (sous la forme "file + 0" ... "file + (size-1)")
-            if (size == 0)
-            {
-                _pathBuilding = file;
-            }
-            else
-            {
-                //Choisir quel building construire
-                int rng = Random.Range(0, size);
-                //rng = 0;
-                string path = file + rng;
-
-                _pathBuilding = path;
-            }
+            _pathBuilding = path;
         }
         
         //Generate
@@ -412,14 +399,16 @@ public class Generator : MonoBehaviour
 
     #endregion
 
-    //Path and directories (TO TWEAK)
+    //Path and directories
 
-    private string _pathBuild22 = "Buildings/build22/";
-    private string _pathBuild24 = "Buildings/build24/";
-    private string _pathBuild42left = "Buildings/build42left/";
-    private string _pathBuild42right = "Buildings/build42right/";
-    private string _pathBuild44 = "Buildings/build44/";
-
+    [SerializeField]
+    private buildTable table22;
+    [SerializeField]
+    private buildTable table24;
+    [SerializeField]
+    private buildTable table42left;
+    [SerializeField]
+    private buildTable table42right;
 
     // --- IMPORTANT TIPS AND TRICKS ---
     //Quandd y augmente -> on va vers le Nord
@@ -780,6 +769,8 @@ public class Generator : MonoBehaviour
     }
 
     #region MasterModifyBuilds
+    //NB: ça sert a rien d'essayer de comprendre ce qui se passe, faut juste retenir que masterBuilds est modifié
+
     private void MasterChooseBuildsAt(int x, int y)
     {
         BuildNode build = masterBuilds[x, y];
@@ -824,7 +815,6 @@ public class Generator : MonoBehaviour
         //fmd = l'entre est sur l'axe nord-sud
         bool fmd = (facingRotation == 2);
         string file = "Error: did not modified wtf";
-        int fileSize = 0;
         int result;
         //Specific Behavior
         
@@ -836,13 +826,13 @@ public class Generator : MonoBehaviour
             if (!westFree)
             {
                 //Sud occupé, Ouest occupé -> carré
-                MasterChoice(out result, out file, out fileSize, true, false, false, false);
+                MasterChoice(out result, out file, true, false, false, false);
                 //Pas de slave à mettre
             }
             else
             {
                 //Sud occupé, Ouest libre -> carré / vertical
-                MasterChoice(out result, out file, out fileSize, true, !fmd, fmd, false);
+                MasterChoice(out result, out file, true, !fmd, fmd, false);
                 if (result != 0)
                 {
                     masterBuilds[x - 1, y].SetSlave();
@@ -854,7 +844,7 @@ public class Generator : MonoBehaviour
             if (!westFree)
             {
                 //Sud libre, Ouest occupé -> carré / horizontal
-                MasterChoice(out result, out file, out fileSize, true, fmd, false, !fmd);
+                MasterChoice(out result, out file, true, fmd, false, !fmd);
                 if (result != 0)
                 {
                     masterBuilds[x, y - 1].SetSlave();
@@ -863,7 +853,7 @@ public class Generator : MonoBehaviour
             else
             {
                 //Sud libre, Ouest libre -> carré / horizontal / vertical
-                MasterChoice(out result, out file, out fileSize, true, true, fmd, !fmd);
+                MasterChoice(out result, out file, true, true, fmd, !fmd);
                 switch (result)
                 {
                     case 1:
@@ -891,7 +881,8 @@ public class Generator : MonoBehaviour
         //Debug.Log("CornerBehaviorSW: " +"("+southFree+", "+westFree+") "+ result + " at (" + x + ", " + y + ")");
         //Common Behavior Ending
         build.generationDecided = true;
-        build.DecidePath(file, fileSize);
+
+        build.SetPath(file);
     }
     private void CornerBehaviorSE(BuildNode build, int x, int y)
     {
@@ -900,7 +891,6 @@ public class Generator : MonoBehaviour
         //fmd = l'entre est sur l'axe nord-sud
         bool fmd = (facingRotation == 2);
         string file = "Error: did not modified wtf";
-        int fileSize = 0;
         int result;
         //Specific Behavior
 
@@ -912,13 +902,13 @@ public class Generator : MonoBehaviour
             if (!eastFree)
             {
                 //Sud occupé, Est occupé -> carré
-                MasterChoice(out result, out file, out fileSize, true, false, false, false);
+                MasterChoice(out result, out file, true, false, false, false);
                 //Pas de slave à mettre
             }
             else
             {
                 //Sud occupé, Est libre -> carré / horizontal
-                MasterChoice(out result, out file, out fileSize, true, !fmd, false, fmd);
+                MasterChoice(out result, out file, true, !fmd, false, fmd);
                 if (result != 0)
                 {
                     masterBuilds[x + 1, y].SetSlave();
@@ -930,7 +920,7 @@ public class Generator : MonoBehaviour
             if (!eastFree)
             {
                 //Sud libre, Est occupé -> carré / vertical
-                MasterChoice(out result, out file, out fileSize, true, fmd, !fmd, false);
+                MasterChoice(out result, out file, true, fmd, !fmd, false);
                 if (result != 0)
                 {
                     masterBuilds[x, y - 1].SetSlave();
@@ -939,7 +929,7 @@ public class Generator : MonoBehaviour
             else
             {
                 //Sud libre, Est libre -> carré / horizontal / vertical
-                MasterChoice(out result, out file, out fileSize, true, true, !fmd, fmd);
+                MasterChoice(out result, out file,  true, true, !fmd, fmd);
                 switch (result)
                 {
                     case 1:
@@ -967,7 +957,8 @@ public class Generator : MonoBehaviour
         //Debug.Log("CornerBehaviorSE: " + "(" + southFree + ", " + eastFree + ") " + result + " at (" + x + ", " + y + ")");
         //Common Behavior Ending
         build.generationDecided = true;
-        build.DecidePath(file, fileSize);
+
+        build.SetPath(file);
     }
     private void CornerBehaviorNE(BuildNode build, int x, int y)
     {
@@ -976,7 +967,6 @@ public class Generator : MonoBehaviour
         //fmd = l'entre est sur l'axe nord-sud
         bool fmd = (facingRotation == 0);
         string file = "Error: did not modified wtf";
-        int fileSize = 0;
         int result;
         //Specific Behavior
 
@@ -988,14 +978,13 @@ public class Generator : MonoBehaviour
             if (!eastFree)
             {
                 //Nord occupé, Est occupé -> carré
-                MasterChoice(out result, out file, out fileSize, true, false, false, false);
+                MasterChoice(out result, out file, true, false, false, false);
                 //Pas de slave à mettre
-
             }
             else
             {
                 //Nord occupé, Est libre -> carré / horizontal
-                MasterChoice(out result, out file, out fileSize, true, !fmd, fmd, false);
+                MasterChoice(out result, out file, true, !fmd, fmd, false);
                 if (result != 0)
                 {
                     masterBuilds[x + 1, y].SetSlave();
@@ -1007,7 +996,7 @@ public class Generator : MonoBehaviour
             if (!eastFree)
             {
                 //Nord libre, Est occupé -> carré / vertical
-                MasterChoice(out result, out file, out fileSize, true, fmd, false, !fmd);
+                MasterChoice(out result, out file, true, fmd, false, !fmd);
                 if (result != 0)
                 {
                     masterBuilds[x, y + 1].SetSlave();
@@ -1016,7 +1005,7 @@ public class Generator : MonoBehaviour
             else
             {
                 //Nord libre, Est libre -> carré / horizontal / vertical
-                MasterChoice(out result, out file, out fileSize, true, true, fmd, !fmd);
+                MasterChoice(out result, out file, true, true, fmd, !fmd);
                 switch (result)
                 {
                     case 1:
@@ -1040,11 +1029,12 @@ public class Generator : MonoBehaviour
                 }
             }
         }
-
         //Debug.Log("CornerBehaviorNE: " + "(" + northFree + ", " + eastFree + ") " + result + " at (" + x + ", " + y + ")");
+
         //Common Behavior Ending
         build.generationDecided = true;
-        build.DecidePath(file, fileSize);
+
+        build.SetPath(file);
     }
     private void CornerBehaviorNW(BuildNode build, int x, int y)
     {
@@ -1053,7 +1043,6 @@ public class Generator : MonoBehaviour
         //fmd = l'entre est sur l'axe nord-sud
         bool fmd = (facingRotation == 0);
         string file = "Error: did not modified wtf";
-        int fileSize = 0;
         int result;
         //Specific Behavior
 
@@ -1065,12 +1054,12 @@ public class Generator : MonoBehaviour
             if (!westFree)
             {
                 //Nord occupé, Ouest occupé -> carré
-                MasterChoice(out result, out file, out fileSize, true, false, false, false);
+                MasterChoice(out result, out file, true, false, false, false);
             }
             else
             {
                 //Nord occupé, Ouest libre -> carré / horizontal
-                MasterChoice(out result, out file, out fileSize, true, !fmd, false, fmd);
+                MasterChoice(out result, out file,  true, !fmd, false, fmd);
                 if (result != 0)
                 {
                     masterBuilds[x - 1, y].SetSlave();
@@ -1082,7 +1071,7 @@ public class Generator : MonoBehaviour
             if (!westFree)
             {
                 //Nord libre, Ouest occupé -> carré / vertical
-                MasterChoice(out result, out file, out fileSize, true, fmd, !fmd, false);
+                MasterChoice(out result, out file, true, fmd, !fmd, false);
                 if (result != 0)
                 {
                     masterBuilds[x, y + 1].SetSlave();
@@ -1091,7 +1080,7 @@ public class Generator : MonoBehaviour
             else
             {
                 //Nord libre, Ouest libre -> carré / horizontal / vertical
-                MasterChoice(out result, out file, out fileSize, true, true, !fmd, fmd);
+                MasterChoice(out result, out file, true, true, !fmd, fmd);
                 switch (result)
                 {
                     case 1:
@@ -1120,20 +1109,36 @@ public class Generator : MonoBehaviour
 
         //Common Behavior Ending
         build.generationDecided = true;
-        build.DecidePath(file, fileSize);
+
+        build.SetPath(file);
     }
     
-    private void MasterChoice(out int result, out string file, out int size, bool f22,bool f24,bool f42left, bool f42right)
+    private void MasterChoice(out int result, out string file, bool f22,bool f24,bool f42left, bool f42right)
     {
-        //La magie noire qui se passe ici est relativement incroyable
+        //But de cette fonction:
+        //  Faire un choix entre la taille du bâtiment parmis les tailles possibles
+        //  Les 4 booléens en paramètres représentent les choix possibles
+        //      f22: génération d'un bâtiment de taille 2*2 (petit carré)
+        //      f24: génération d'un bâtiment de taille 2*4 (rectangle avec entrée coté de longueur 2)
+        //      f42left: génération d'un bâtiment de taille 4*2 (rectangle avec entrée coté de longueur 4 à gauche quand face au Sud)
+        //      f42left: génération d'un bâtiment de taille 4*2 (rectangle avec entrée coté de longueur 4 à droite quand face au Nord)
+        //  le string "file" pris en paramètres est renvoyé pour modifier le chemin de build
+        //  le string "result" représente la décision prise et est renvoyé pour SetSlave() ou non les voisins concernés
+
+        //On crée une array stockant toutes les décisions possibles
         bool[] stock = new bool[4] { f22, f24, f42left, f42right };
 
+        //On compte le nombre de choix valides
         int trueCount = 0;
         foreach(bool b in stock) if (b) trueCount++;
 
-        result = 0;
+        //Pris de décision au hasard
         int rng = Random.Range(0, trueCount);
 
+        //Result représente l'index de la décision prise
+        result = 0;
+
+        //Result augmente jusqu'à qu'on soit arrivé à la décision voulue
         foreach (bool b in stock)
         {
             if (b)
@@ -1147,46 +1152,14 @@ public class Generator : MonoBehaviour
             result++;
         }
 
+        //Modification de file en fonction du résultat précédent
         switch (result)
         {
-            case 0:
-                SetFileTo22(out file, out size);
-                break;
-            case 1:
-                SetFileTo24(out file, out size);
-                break;
-            case 2:
-                SetFileTo42left(out file, out size);
-                break;
-            default:
-                SetFileTo42right(out file, out size);
-                break;
+            case 0: file = table22.GetRandomPath(); break;
+            case 1: file = table24.GetRandomPath(); break;
+            case 2: file = table42left.GetRandomPath(); break;
+            default: file = table42right.GetRandomPath(); break;
         }
-    }
-
-    private void SetFileTo22(out string file, out int size)
-    {
-        file = _pathBuild22;
-        file += "test";
-        size = 3;
-    }
-    private void SetFileTo24(out string file, out int size)
-    {
-        file = _pathBuild24;
-        file += "test24";
-        size = 0;
-    }
-    private void SetFileTo42left(out string file, out int size)
-    {
-        file = _pathBuild42left;
-        file += "test42left";
-        size = 0;
-    }
-    private void SetFileTo42right(out string file, out int size)
-    {
-        file = _pathBuild42right;
-        file += "test42right";
-        size = 0;
     }
 
     private bool MasterCheckNorth(BuildNode build, int x, int y)
@@ -1336,6 +1309,7 @@ public class Generator : MonoBehaviour
     }
 
     //Send buildings via RPC
+    
     private void UpdateBuilds()
     {
         GetComponent<PhotonView>().RPC("SendBuildsArray", PhotonTargets.AllBuffered, EncryptBuildsArray());
