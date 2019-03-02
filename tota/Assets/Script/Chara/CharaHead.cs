@@ -85,7 +85,6 @@ public class CharaHead : MonoBehaviour
         {
             RemoveInventoryOnDeselected(this.gameObject);
         }
-        
     }
 
     //Clic Droit

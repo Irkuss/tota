@@ -12,8 +12,13 @@ public class InventoryUI : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
+<<<<<<< HEAD
         inventory = InventoryManager.instance;
         //inventory = GetComponentInParent<InventoryManager>().instance;
+=======
+        //inventory = InventoryManager.instance;
+        inventory = GetComponentInParent<InventoryManager>();
+>>>>>>> launcher
         inventory.onItemChangedCallback += UpdateUI;
 
         slots = itemsParent.GetComponentsInChildren<InventorySlot>();

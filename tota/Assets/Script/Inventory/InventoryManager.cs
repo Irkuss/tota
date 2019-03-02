@@ -4,11 +4,19 @@ using UnityEngine;
 
 public class InventoryManager : MonoBehaviour
 {
+<<<<<<< HEAD
     public static InventoryManager instance;
     void Awake()
     {
         instance = this;
     }
+=======
+    /*public static InventoryManager instance;
+    void Awake()
+    {
+        instance = this;
+    }*/
+>>>>>>> launcher
     
     public delegate void OnItemChanged();
     public OnItemChanged onItemChangedCallback;
