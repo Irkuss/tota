@@ -8,9 +8,7 @@ public class SpiritHead : Photon.MonoBehaviour
     //utilisé pour debugger (à swap avec un scriptable object des que possible)
     private string charaPath = "CharaTriHardTanguy";
     [SerializeField]
-    private Item itemtest1;
-    [SerializeField]
-    private Item itemtest2;
+    private ItemTable itemTable;
 
     [SerializeField]
     private GameObject spiritCamera;
@@ -77,12 +75,7 @@ public class SpiritHead : Photon.MonoBehaviour
     {
         if (Input.GetKeyDown(KeyCode.I))
         {
-            Item item;
-            if (Random.Range(0,2) == 0)
-            {
-                item = itemtest1;
-            } else { item = itemtest2; }
-            TestAddToAll(item);
+            TestAddToAll(itemTable.GetRandomItem());
         }
     }
 
@@ -97,14 +90,20 @@ public class SpiritHead : Photon.MonoBehaviour
 
     private void ClickUpdate()
     {
+
         if (Input.GetMouseButtonDown(0))
         {
             if (!EventSystem.current.IsPointerOverGameObject())
+            {
                 LeftClickUpdate();
+            }
         }
         if (Input.GetMouseButtonDown(1))
         {
-            RightClickUpdate();
+            if (!EventSystem.current.IsPointerOverGameObject())
+            {
+                RightClickUpdate();
+            }
         }
     }
 

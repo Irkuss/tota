@@ -82,11 +82,10 @@ public class CharaHead : MonoBehaviour
         permissions.GetComponent<PhotonView>().RPC("SetOwnerNull", PhotonTargets.AllBuffered);
 
         outline.GetComponent<PhotonView>().RPC("SetOutlineToNotSelected", PhotonTargets.AllBuffered);
-        if (!EventSystem.current.IsPointerOverGameObject())
-        {
-            //RemoveInventoryOnDeselected(this.gameObject);
-            CloseInventoryOnDeselected();
-        }
+
+        //NB: removed "if (!EventSystem.current.IsPointerOverGameObject())" and moved it to SpiritHead
+        //RemoveInventoryOnDeselected(this.gameObject);
+        CloseInventoryOnDeselected();
     }
 
     //Clic Droit

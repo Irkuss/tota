@@ -9,10 +9,9 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: de27991aa168d2947a1855222e69f97a, type: 3}
-  m_Name: Test Item 1
+  m_Script: {fileID: 11500000, guid: 7cbadc39eb96c074c8fa9f8baab8f333, type: 3}
+  m_Name: ItemDatabase
   m_EditorClassIdentifier: 
-  nickName: Item Name
-  icon: {fileID: 21300000, guid: 9866a92691696b346901281f2b329034, type: 3}
-  stack: 2
-  isDefaultItem: 0
+  allItemArray:
+  - {fileID: 11400000, guid: 3ed3bbc5733d20d4da862672827befa3, type: 2}
+  - {fileID: 11400000, guid: 6d4e20f6acb894f42a7a0cc2f5632849, type: 2}

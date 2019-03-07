@@ -8,6 +8,8 @@ public class CharaInventory : MonoBehaviour
 {
     public class Slot
     {
+        
+
         private Item _item;
         private int _itemCount;
 
@@ -67,13 +69,14 @@ public class CharaInventory : MonoBehaviour
             //Appelé par le bouton pour detruire l'item
             if (_linkedInventory[_item] <= _item.stack)
             {
-                _linkedInventory.Remove(_item);
+                //_linkedInventory.Remove(_item); -> Pour utiliser le rpc
+                _linkedCharaInventory.Remove(_item);
             }
             else
             {
-                _linkedInventory[_item] -= _itemCount;
-                ClearSlot();
-                //onItemChangedCallback.Invoke();
+                //_linkedInventory[_item] -= _itemCount; -> Pour utiliser le rpc
+                _linkedCharaInventory.ModifyCount(_item, -_itemCount);
+                //ClearSlot(); lets try this
             }
             _linkedCharaInventory.UpdateUI();
         }
@@ -82,6 +85,10 @@ public class CharaInventory : MonoBehaviour
     //Le gameObject canvas
     [SerializeField]
     private GameObject _canvas;
+
+    //Database des items (pour avoir leur id, pour les update en rpc)
+    [SerializeField]
+    private ItemTable itemTable;
 
     //Position et rotation (Tweakable)
     private Vector3 _inventPosition = new Vector3(0, 3, 2);
@@ -223,13 +230,15 @@ public class CharaInventory : MonoBehaviour
         {
             Debug.Log("CharaInventory: Item was already present");
             //Si l'item était déjà dans l'inventaire, augmente son compte de 1
-            inventory[item] += 1;
+            //inventory[item] += 1;
+            ModifyCount(item, 1);
         }
         else
         {
             Debug.Log("CharaInventory: Item was not present");
             //Si l'item n'était pas dans l'inventaire, ajoute un exemplaire de cet item
-            inventory.Add(item, 1);
+            //inventory.Add(item, 1);
+            GetComponent<PhotonView>().RPC("AddWithId", PhotonTargets.AllBuffered, itemTable.GetIdWithItem(item));
         }
         Debug.Log("CharaInventory: Item has been added");
         //Appelle le Callback en s'assurant que quelqu'un écoute
@@ -242,9 +251,38 @@ public class CharaInventory : MonoBehaviour
 
     public void Remove(Item item)
     {
-        inventory.Remove(item);
-        //Appelle le Callback en s'assurant que quelqu'un écoute
-        //if (onItemChangedCallback != null) onItemChangedCallback.Invoke();
+        GetComponent<PhotonView>().RPC("RemoveWithId", PhotonTargets.AllBuffered, itemTable.GetIdWithItem(item));
+
+        //inventory.Remove(item);
+        //UpdateUI();
+    }
+
+    public void ModifyCount(Item item, int countModifier)
+    {
+        GetComponent<PhotonView>().RPC("ModifyCountWithId", PhotonTargets.AllBuffered, itemTable.GetIdWithItem(item), countModifier);
+    }
+
+    //RPC functions
+
+    [PunRPC]
+    public void RemoveWithId(int id)
+    {
+        inventory.Remove(itemTable.GetItemWithId(id));
+
+        UpdateUI();
+    }
+    [PunRPC]
+    public void AddWithId(int id)
+    {
+        inventory.Add(itemTable.GetItemWithId(id),1);
+
+        UpdateUI();
+    }
+    [PunRPC]
+    public void ModifyCountWithId(int id, int countModifier)
+    {
+        inventory[itemTable.GetItemWithId(id)] += countModifier;
+
         UpdateUI();
     }
 

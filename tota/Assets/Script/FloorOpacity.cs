@@ -5,27 +5,42 @@ using UnityEngine;
 public class FloorOpacity : MonoBehaviour
 {
     public int currentFloor = 0;
-    //private FloorManager floorManager;
 
-    
+    private Renderer _renderer;
+    private Collider _collider;
+
     void Start()
     {
-        //subscribe to onFloorLevelChanged
-        FloorManager.onFloorLevelChanged += UpdateRenderer;
-        
+        _renderer = GetComponent<Renderer>();
+        _collider = GetComponent<Collider>();
+
+        if (_renderer != null && _collider != null)
+        {
+            //subscribe to onFloorLevelChanged
+            FloorManager.onFloorLevelChanged += UpdateRenderer;
+        }
     }
 
     private void UpdateRenderer(int newFloorLevel) //Subscribed to onFloorLevelChanged
     {
         if (currentFloor > newFloorLevel)
         {
-            GetComponent<Renderer>().enabled = false;
-            GetComponent<Collider>().enabled = false;
+            _renderer.enabled = false;
+            _collider.enabled = false;
         }
         else
         {
-            GetComponent<Renderer>().enabled = true;
-            GetComponent<Collider>().enabled = true;
+            _renderer.enabled = true;
+            _collider.enabled = true;
+        }
+    }
+
+    private void OnDestroy()
+    {
+        if (_renderer != null && _collider != null)
+        {
+            //Unsubscribe to prevent momory leak
+            FloorManager.onFloorLevelChanged -= UpdateRenderer;
         }
     }
 }
