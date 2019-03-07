@@ -6,8 +6,8 @@ public class InventoryUI : MonoBehaviour
 {
     public Transform itemsParent;
 
-    InventoryManager inventory;
-    InventorySlot[] slots;
+    private InventoryManager inventory;
+    private InventorySlot[] slots;
 
     // Start is called before the first frame update
     void Start()
@@ -17,7 +17,6 @@ public class InventoryUI : MonoBehaviour
         inventory.onItemChangedCallback += UpdateUI;
 
         slots = itemsParent.GetComponentsInChildren<InventorySlot>();
-
     }
 
     void UpdateUI()
@@ -27,18 +26,18 @@ public class InventoryUI : MonoBehaviour
         {
             if (i < slots.Length)
             {
-                int value = item.Value;
-                int stack = item.Key.stack;
+                int count = item.Value;
+                int maxCount = item.Key.stack;
 
-                if (value >= stack)
+                if (count >= maxCount)
                 {
-                    while (value > stack)
+                    while (count > maxCount)
                     {
-                        slots[i].AddItem(item.Key, stack);
+                        slots[i].AddItem(item.Key, maxCount);
                         i++;
-                        value -= stack;
+                        count -= maxCount;
                     }
-                    slots[i].AddItem(item.Key, value);
+                    slots[i].AddItem(item.Key, count);
                     i++;
 
                 }
@@ -50,6 +49,7 @@ public class InventoryUI : MonoBehaviour
             }
             else return;
         }
+        //Clear tout les spots suivants
         for (; i < slots.Length; i++)
         {
             slots[i].ClearSlot();

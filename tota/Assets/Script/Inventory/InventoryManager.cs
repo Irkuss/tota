@@ -4,6 +4,8 @@ using UnityEngine;
 
 public class InventoryManager : MonoBehaviour
 {
+    //Un component de Chara
+
     /*public static InventoryManager instance;
     void Awake()
     {
@@ -22,19 +24,27 @@ public class InventoryManager : MonoBehaviour
 
     public bool Add(Item item)
     {
-        if (!item.isDefaultItem)
+        if (!item.isDefaultItem) //Jamais 
         {
-            if (itemss.Count >= space) return false;
+            if (itemss.Count >= space)
+            {
+                return false;
+            }
 
-            if (!itemss.ContainsKey(item)) itemss.Add(item, 1);
+            if (!itemss.ContainsKey(item))
+            {
+                itemss.Add(item, 1);
+            }
             else
             {
-                itemss[item] += 1;                
+                itemss[item] += 1;
             }
 
             if (onItemChangedCallback != null)
             {
                 onItemChangedCallback.Invoke();
+
+                //onItemChangedCallback();
             }
         }
         return true;

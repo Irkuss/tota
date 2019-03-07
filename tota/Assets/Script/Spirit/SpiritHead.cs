@@ -5,6 +5,13 @@ using UnityEngine.EventSystems;
 
 public class SpiritHead : Photon.MonoBehaviour
 {
+    //utilisé pour debugger (à swap avec un scriptable object des que possible)
+    private string charaPath = "CharaTriHardTanguy";
+    [SerializeField]
+    private Item itemtest1;
+    [SerializeField]
+    private Item itemtest2;
+
     [SerializeField]
     private GameObject spiritCamera;
 
@@ -28,14 +35,20 @@ public class SpiritHead : Photon.MonoBehaviour
 
     void Update()
     {
+        //Right Left click check
         ClickUpdate();
 
-        TestBtw();
+        //Space Bar check
+        TestCharaSpawn();
 
-        InventoryF();
+        //Keycode.I check
+        TestInventoryAdd();
+
+        //Keycode.E Check
+        InventoryUpdate();
     }
 
-    private void TestBtw()
+    private void TestCharaSpawn()
     {
         if (Input.GetKeyUp("space"))
         {
@@ -47,16 +60,29 @@ public class SpiritHead : Photon.MonoBehaviour
             if (PhotonNetwork.offlineMode)
             {
                 Debug.Log("SpiritHead: Instantiation du spirit (offline)");
-                go = Instantiate(Resources.Load<GameObject>("Chara"), lowPosition, Quaternion.identity);
+                go = Instantiate(Resources.Load<GameObject>(charaPath), lowPosition, Quaternion.identity);
             }
             else
             {
                 Debug.Log("SpiritHead: Instantiation du spirit (online)");
-                go = PhotonNetwork.Instantiate("Chara", lowPosition, Quaternion.identity, 0);
+                go = PhotonNetwork.Instantiate(charaPath, lowPosition, Quaternion.identity, 0);
             }
             
             //Met ce Chara dans notre équipe (par RPC)
             go.GetComponent<CharaPermissions>().GetComponent<PhotonView>().RPC("SetTeam", PhotonTargets.AllBuffered, playerOwner.MyTeamName);
+        }
+    }
+
+    private void TestInventoryAdd()
+    {
+        if (Input.GetKeyDown(KeyCode.I))
+        {
+            Item item;
+            if (Random.Range(0,2) == 0)
+            {
+                item = itemtest1;
+            } else { item = itemtest2; }
+            TestAddToAll(item);
         }
     }
 
@@ -103,7 +129,7 @@ public class SpiritHead : Photon.MonoBehaviour
             }
             else
             {
-                GameObject.Find("eCentralManager").GetComponent<CentralManager>().DeactivateToolTip();
+                GameObject.Find("eCentralManager").GetComponent<CentralManager>().DeactivateToolTip(); //pas beau
                 DeselectAll();
             }
         }
@@ -172,17 +198,17 @@ public class SpiritHead : Photon.MonoBehaviour
         selectedList.Clear();
     }
 
-    public void DeselectAllExcept(GameObject except)
+    public void DeselectAllExcept(GameObject exception)
     {
         foreach (GameObject chara in selectedList)
         {
-            if (chara != except)
+            if (chara != exception)
             {
                 chara.GetComponent<CharaHead>().Deselect();
             }
         }
         selectedList.Clear();
-        selectedList.Add(except);
+        selectedList.Add(exception);
     }
 
     //Private methods
@@ -197,11 +223,28 @@ public class SpiritHead : Photon.MonoBehaviour
         }
     }
 
-    private void InventoryF()
+    //Inventory
+
+    private void InventoryUpdate()
+    {
+        if (Input.GetKeyDown(KeyCode.E))
+        {
+            //Toggle l'inventaire dans chaque Chara selectionné
+            //(l'ouvre s'il est fermé, le ferme s'il est ouvert)
+            foreach (GameObject Chara in selectedList)
+            {
+                //Chara.GetComponent<Inventory>().DisplayInventory();
+                Chara.GetComponent<CharaInventory>().ToggleInventory();
+            }
+        }
+    }
+
+    private void TestAddToAll(Item item)
     {
         foreach (GameObject Chara in selectedList)
         {
-            Chara.GetComponent<Inventory>().DisplayInventory();            
+            //Chara.GetComponent<Inventory>().DisplayInventory();
+            Chara.GetComponent<CharaInventory>().Add(item);
         }
     }
 

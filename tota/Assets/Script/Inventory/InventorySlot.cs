@@ -5,58 +5,73 @@ using UnityEngine.UI;
 
 public class InventorySlot : MonoBehaviour
 {
-    // METTRE [SERIALIZEFIELD]
-    Item item;
-    public Image icon;
-    public Button removeButton;
-    public GameObject count;
+    private Item _item;
+    private int _itemCount;
 
-    private InventoryManager instance;
+    //Element lié au slot
+    [SerializeField]
+    private Image _icon;
+    [SerializeField]
+    private Button _removeButton;
+    [SerializeField]
+    private GameObject _counter;
+
+    //private InventoryManager _instance; //Changed _instance to _inventory
+    private CharaInventory _inventory;
 
     private void Start()
     {
-        instance = GetComponentInParent<InventoryManager>();
+        //_instance = GetComponentInParent<InventoryManager>();
+        _inventory = GetComponentInParent<CharaInventory>();
     }
 
 
-    public void AddItem (Item newItem, int ccount) //(Item newItem)
+    public void AddItem (Item item, int itemCount) //(Item newItem)
     {
-        item = newItem;
+        _item = item;
+        _itemCount = itemCount;
 
-        icon.sprite = item.icon;
-        icon.enabled = true;
-        count.SetActive(true);
-        count.GetComponent<Text>().text = ccount.ToString();
-        removeButton.interactable = true;
+        //Change Icon
+        _icon.sprite = _item.icon;
+        _icon.enabled = true;
+        //Change counter
+        _counter.SetActive(true);
+        _counter.GetComponent<Text>().text = _itemCount.ToString();
+        //RemoveButton is now active
+        _removeButton.interactable = true;
     }
 
     public void ClearSlot()
     {
-        item = null;
+        _item = null;
 
-        icon.sprite = null;
-        icon.enabled = false;
-        count.SetActive(false);
-        removeButton.interactable = false;
+        //Clear Icon
+        _icon.sprite = null;
+        _icon.enabled = false;
+        //Clear counter
+        _counter.SetActive(false);
+        //deactivate RemoveButton=
+        _removeButton.interactable = false;
     }
 
     public void OnRemoveButton()
     { 
-        if (instance.itemss[item] <= item.stack) 
+        //Appelé par le bouton pour detruire l'item
+        if (_inventory.inventory[_item] <= _item.stack) 
         {
-            instance.Remove(item); 
+            _inventory.Remove(_item);
         }
         else
         {
-            instance.itemss[item] -= int.Parse(count.GetComponent<Text>().text);
+            _inventory.inventory[_item] -= _itemCount;
             ClearSlot();
-            instance.onItemChangedCallback.Invoke();  
-
+            _inventory.onItemChangedCallback.Invoke();
         }
         // Remettre le gameObject dans la scène si possible 
     }
 
-    /*public void UseItem()
+    /*
+    public void UseItem()
     {
         if (item != null)
         {

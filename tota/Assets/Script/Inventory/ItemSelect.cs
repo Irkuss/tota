@@ -27,7 +27,6 @@ public class ItemSelect : MonoBehaviour, IBeginDragHandler, IEndDragHandler, IDr
     {
         itemBeingDragged = null;
         transform.position = startPosition;
-
     }
 
 

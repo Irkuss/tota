@@ -4,6 +4,8 @@ using UnityEngine;
 
 public class Inventory : MonoBehaviour
 {
+    //Un component de Chara
+
     public GameObject canvas;
     Vector3 inventPosition;
     Quaternion inventRotation;
@@ -37,10 +39,7 @@ public class Inventory : MonoBehaviour
 
     public void DisplayInventory()
     {
-        if (Input.GetKeyDown(KeyCode.E))
-        {
-            canvas.SetActive(!canvas.activeSelf);
-        }
+        canvas.SetActive(!canvas.activeSelf);
     }
 
     public void RemoveInventory()

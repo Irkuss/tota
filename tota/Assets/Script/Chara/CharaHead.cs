@@ -78,12 +78,14 @@ public class CharaHead : MonoBehaviour
 
     public void Deselect()
     {
+        //Appelé par SpiritHead (par une des 3 fonctions Deselect: DeselectChara(), DeselectAll(), DeselectAllExcept())
         permissions.GetComponent<PhotonView>().RPC("SetOwnerNull", PhotonTargets.AllBuffered);
 
         outline.GetComponent<PhotonView>().RPC("SetOutlineToNotSelected", PhotonTargets.AllBuffered);
         if (!EventSystem.current.IsPointerOverGameObject())
         {
-            RemoveInventoryOnDeselected(this.gameObject);
+            //RemoveInventoryOnDeselected(this.gameObject);
+            CloseInventoryOnDeselected();
         }
     }
 
@@ -103,7 +105,17 @@ public class CharaHead : MonoBehaviour
 
     private void RemoveInventoryOnDeselected(GameObject chara)
     {
+        //DEPRECATED
+
+        //Appelé par Deselect()
         chara.GetComponentInChildren<Inventory>().RemoveInventory();
-        Debug.Log("removing");
+        Debug.Log("CharaHead: closing inventory of a deselected Chara");
+    }
+
+    private void CloseInventoryOnDeselected()
+    {
+        //Appelé par Deselect()
+        GetComponent<CharaInventory>().CloseInventory();
+        Debug.Log("CharaHead: closing inventory of a deselected Chara");
     }
 }
