@@ -268,12 +268,12 @@ public class Generator : MonoBehaviour
         }
         
         //Generate
-        public void Generate(float worldLengthAdaptor)
+        public bool Generate(float worldLengthAdaptor)
         {
             //Verifions que le building peut se générer
             if (!CanGenerateBuilding()) //|| _pathBuilding == ""
             {
-                return;
+                return false;
             }
 
             //Le building peut se généré, debut de la génération
@@ -285,6 +285,7 @@ public class Generator : MonoBehaviour
             //Instantié et le tourner dans la bonne direction
             GameObject build = Instantiate(Resources.Load<GameObject>(_pathBuilding), position + offset, Quaternion.identity);
             build.transform.Rotate(0, _facingRotation * 90f, 0);
+            return true;
         }
         public bool CanGenerateBuilding()
         {
@@ -469,15 +470,20 @@ public class Generator : MonoBehaviour
 
     private void GenerateEnd()
     {
+        //Genere le sol
+        StartCoroutine(GenerateFloor());
+
         //Generate les routes
-        GenerateRoads();
+        //StartCoroutine(GenerateRoads());
 
         //Generate les bâtiments
-        GenerateBuilds();
+        //StartCoroutine(GenerateBuilds());
 
-        //Genere le sol
-        GenerateFloor();
+        
+    }
 
+    private void OnGenerationEnded()
+    {
         //Update le NavMeshSurface entierement (fin)
         surface.BuildNavMesh();
 
@@ -1200,39 +1206,49 @@ public class Generator : MonoBehaviour
     #endregion
 
     //Generate
-    private void GenerateRoads()
-    {
-        for (int y = 0; y < cityY; y++)
-        {
-            for (int x = 0; x < cityX; x++)
-            {
-                roadMatrix[x, y].Generate(districtLength);
-            }
-        }
-    }
-
-    private void GenerateBuilds()
-    {
-        for (int y = 0; y < cityY * 2; y++)
-        {
-            for (int x = 0; x < cityX * 2; x++)
-            {
-                buildMatrix[x, y].Generate(tunkLength);
-            }
-        }
-    }
-
-    private void GenerateFloor()
+    private IEnumerator GenerateFloor()
     {
         for (int y = 0; y < cityY; y++)
         {
             for (int x = 0; x < cityX; x++)
             {
                 //roadMatrix[x, y].Generate(districtLength);
-                Instantiate(Resources.Load<GameObject>("testEmpty"),new Vector3(x*districtLength, -0.5f,y*districtLength),Quaternion.identity);
+                Instantiate(Resources.Load<GameObject>("testEmpty"), new Vector3(x * districtLength, -0.5f, y * districtLength), Quaternion.identity);
+                yield return new WaitForSeconds(0.00001f);
             }
         }
+        StartCoroutine(GenerateRoads());
     }
+
+    private IEnumerator  GenerateRoads()
+    {
+        for (int y = 0; y < cityY; y++)
+        {
+            for (int x = 0; x < cityX; x++)
+            {
+                roadMatrix[x, y].Generate(districtLength);
+                yield return new WaitForSeconds(0.00001f);
+            }
+        }
+        StartCoroutine(GenerateBuilds());
+    }
+
+    private IEnumerator GenerateBuilds()
+    {
+        for (int y = 0; y < cityY * 2; y++)
+        {
+            for (int x = 0; x < cityX * 2; x++)
+            {
+                if(buildMatrix[x, y].Generate(tunkLength))
+                {
+                    yield return new WaitForSeconds(0.00001f);
+                }
+            }
+        }
+        OnGenerationEnded();
+    }
+
+    
     
     #region  Send Generation via RPC
 
