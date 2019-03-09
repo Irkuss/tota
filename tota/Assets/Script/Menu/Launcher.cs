@@ -6,8 +6,7 @@ using UnityEngine.UI;
 
 public class Launcher : Photon.PunBehaviour
 {
-    [SerializeField]
-    private PhotonLogLevel Loglevel = PhotonLogLevel.Informational;
+    [SerializeField] private PhotonLogLevel Loglevel = PhotonLogLevel.Informational;
     [Tooltip("The maximum number of players per room. When a room is full, it can't be joined by new players and so new room will be created")]
     private byte MaxPlayersPerRoom = 4;
 
@@ -21,15 +20,13 @@ public class Launcher : Photon.PunBehaviour
 
     public GameObject sliderObject;
 
-    [SerializeField]
-    private GameObject _playerLayoutGroup;
+    [SerializeField] private GameObject _playerLayoutGroup = null;
     private GameObject PlayerLayoutGroup
     {
         get { return _playerLayoutGroup; }
     }
 
-    [SerializeField]
-    private GameObject _playerListingPrefab;
+    [SerializeField] private GameObject _playerListingPrefab = null;
     private GameObject PlayerListingPrefab
     {
         get { return _playerListingPrefab; }

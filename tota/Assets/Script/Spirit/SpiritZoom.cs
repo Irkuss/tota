@@ -5,8 +5,7 @@ using UnityEngine;
 public class SpiritZoom : Photon.MonoBehaviour
 {
     //Init Spirit Body
-    [SerializeField]
-    private GameObject _spiritCamera;
+    [SerializeField] private GameObject _spiritCamera = null;
     
     //Fast Component access
     private Camera _cameraComp;

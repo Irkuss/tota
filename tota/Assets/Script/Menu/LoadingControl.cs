@@ -6,15 +6,13 @@ using UnityEngine.SceneManagement;
 
 public class LoadingControl : MonoBehaviour
 {
-    [SerializeField]
-    private Slider _sliderLoad;
+    [SerializeField] private Slider _sliderLoad = null;
     private Slider SliderLoad
     {
         get { return _sliderLoad; }
     }
 
-    [SerializeField]
-    private Text _loadingSlider;
+    [SerializeField] private Text _loadingSlider = null;
     private Text LoadingSlider
     {
         get { return _loadingSlider; }

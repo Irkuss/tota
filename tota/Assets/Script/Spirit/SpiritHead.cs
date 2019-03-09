@@ -7,11 +7,9 @@ public class SpiritHead : Photon.MonoBehaviour
 {
     //utilisé pour debugger (à swap avec un scriptable object des que possible)
     private string _charaPath = "CharaTriHardTanguy";
-    [SerializeField]
-    private ItemTable itemTable;
+    [SerializeField] private ItemTable itemTable = null;
 
-    [SerializeField]
-    private GameObject _spiritCamera;
+    [SerializeField] private GameObject _spiritCamera = null;
 
     //Le joueur qui contrôle ce Spirit (ne change pas)
     private PermissionsManager.Player _playerOwner;

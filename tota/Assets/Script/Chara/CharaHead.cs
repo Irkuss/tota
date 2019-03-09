@@ -8,12 +8,9 @@ using UnityEngine.EventSystems;
 public class CharaHead : MonoBehaviour
 {
     //Chara Family (Component attaché à Chara)
-    [SerializeField]
-    private CharaMovement _movement;
-    [SerializeField]
-    private CharaPermissions _permissions;
-    [SerializeField]
-    private CharaOutline _outline;
+    [SerializeField] private CharaMovement _movement = null;
+    [SerializeField] private CharaPermissions _permissions = null;
+    [SerializeField] private CharaOutline _outline = null;
 
     //Searched in Start
     private GameObject _eManager;

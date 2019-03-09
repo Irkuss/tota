@@ -83,12 +83,10 @@ public class CharaInventory : MonoBehaviour
     }
 
     //Le gameObject canvas
-    [SerializeField]
-    private GameObject _canvas;
+    [SerializeField] private GameObject _canvas = null;
 
     //Database des items (pour avoir leur id, pour les update en rpc)
-    [SerializeField]
-    private ItemTable itemTable;
+    [SerializeField] private ItemTable itemTable = null;
 
     //Position et rotation (Tweakable)
     private Vector3 _inventPosition = new Vector3(0, 3, 2);
@@ -106,8 +104,7 @@ public class CharaInventory : MonoBehaviour
     public OnItemChanged onItemChangedCallback;
 
     //List and stuff (slots)
-    [SerializeField]
-    private GameObject _slotParent;
+    [SerializeField] private GameObject _slotParent = null;
     private Slot[] _slots;
 
     //Init

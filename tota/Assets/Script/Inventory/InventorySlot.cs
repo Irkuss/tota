@@ -9,12 +9,9 @@ public class InventorySlot : MonoBehaviour
     private int _itemCount;
 
     //Element lié au slot
-    [SerializeField]
-    private Image _icon;
-    [SerializeField]
-    private Button _removeButton;
-    [SerializeField]
-    private GameObject _counter;
+    [SerializeField] private Image _icon = null;
+    [SerializeField] private Button _removeButton = null;
+    [SerializeField] private GameObject _counter = null;
 
     //private InventoryManager _instance; //Changed _instance to _inventory
     private CharaInventory _inventory;

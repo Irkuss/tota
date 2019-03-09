@@ -389,9 +389,8 @@ public class Generator : MonoBehaviour
     //Variable aide
     private float districtLength;
     private int borderNorth;
-    private int borderSouth;
     private int borderEast;
-    private int borderWest;
+    
     private int midX;
     private int midY;
 
@@ -403,13 +402,13 @@ public class Generator : MonoBehaviour
     //Path and directories
 
     [SerializeField]
-    private buildTable table22;
+    private buildTable table22 = null;
     [SerializeField]
-    private buildTable table24;
+    private buildTable table24 = null;
     [SerializeField]
-    private buildTable table42left;
+    private buildTable table42left = null;
     [SerializeField]
-    private buildTable table42right;
+    private buildTable table42right = null;
 
     // --- IMPORTANT TIPS AND TRICKS ---
     //Quandd y augmente -> on va vers le Nord
@@ -498,12 +497,9 @@ public class Generator : MonoBehaviour
     {
         masterRoads = new RoadNode[cityX, cityY];
         masterBuilds = new BuildNode[cityX * 2, cityY * 2];
-
-
+        
         borderNorth = cityY - 1;
-        borderSouth = 0;
         borderEast = cityX - 1;
-        borderWest = 0;
         midX = cityX / 2;
         midY = cityY / 2;
     }
@@ -1261,7 +1257,7 @@ public class Generator : MonoBehaviour
     }
     private int[] EncryptRoads()
     {
-        Debug.Log("Generator: Encrypting roads as " + PhotonNetwork.player.name);
+        Debug.Log("Generator: Encrypting roads as " + PhotonNetwork.player.NickName);
         int[] package = new int[cityX*cityY*(RoadNode.GetPackageSize()) + 2];
 
         package[0] = cityX;
@@ -1288,7 +1284,7 @@ public class Generator : MonoBehaviour
     }
     private void DecryptRoads()
     {
-        Debug.Log("Generator: Decrypting roads as " + PhotonNetwork.player.name);
+        Debug.Log("Generator: Decrypting roads as " + PhotonNetwork.player.NickName);
         cityX = serializedRoads[0];
         cityY = serializedRoads[1];
 
@@ -1320,7 +1316,7 @@ public class Generator : MonoBehaviour
     [PunRPC]
     private void SendRoads(int[] package)
     {
-        Debug.Log("Generator: Received road package as " + PhotonNetwork.player.name);
+        Debug.Log("Generator: Received road package as " + PhotonNetwork.player.NickName);
         serializedRoads = package;
     }
 
@@ -1333,7 +1329,7 @@ public class Generator : MonoBehaviour
     }
     private int[] EncryptBuildsArray()
     {
-        Debug.Log("Generator: Encrypting builds as " + PhotonNetwork.player.name);
+        Debug.Log("Generator: Encrypting builds as " + PhotonNetwork.player.NickName);
         int[] package = new int[(2 * cityX) * (2 * cityY) * BuildNode.GetPackageSize()];
 
         int x = 0;
@@ -1357,7 +1353,7 @@ public class Generator : MonoBehaviour
     }
     private string[] EncryptBuildsPath()
     {
-        Debug.Log("Generator: Encrypting builds as " + PhotonNetwork.player.name);
+        Debug.Log("Generator: Encrypting builds as " + PhotonNetwork.player.NickName);
         string[] package = new string[(2 * cityX) * (2 * cityY)];
 
         int x = 0;
@@ -1378,7 +1374,7 @@ public class Generator : MonoBehaviour
     }
     private void DecryptBuilds()
     {
-        Debug.Log("Generator: Decrypting builds as " + PhotonNetwork.player.name);
+        Debug.Log("Generator: Decrypting builds as " + PhotonNetwork.player.NickName);
         int x = 0;
         int y = 0;
         int indexArray = 0;
@@ -1409,13 +1405,13 @@ public class Generator : MonoBehaviour
     [PunRPC]
     private void SendBuildsArray(int[] package)
     {
-        Debug.Log("Generator: Received build package as " + PhotonNetwork.player.name);
+        Debug.Log("Generator: Received build package as " + PhotonNetwork.player.NickName);
         serializedBuilds = package;
     }
     [PunRPC]
     private void SendBuildsPath(string[] package)
     {
-        Debug.Log("Generator: Received buildpath package as " + PhotonNetwork.player.name);
+        Debug.Log("Generator: Received buildpath package as " + PhotonNetwork.player.NickName);
         serializedPath = package;
     }
 

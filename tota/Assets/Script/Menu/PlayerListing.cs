@@ -7,8 +7,7 @@ public class PlayerListing : MonoBehaviour
 {
     public PhotonPlayer PhotonPlayer { get; private set; }
 
-    [SerializeField]
-    private Text _playerName;
+    [SerializeField] private Text _playerName = null;
     private Text PlayerName
     {
         get { return _playerName; }

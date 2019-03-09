@@ -9,13 +9,13 @@ public class ToolTip : MonoBehaviour
 
 
     //On recupere les Component Text qui seront modifiés
-    [SerializeField] private Text _nameText;
-    [SerializeField] private Text _strengthText;
-    [SerializeField] private Text _intelligenceText;
-    [SerializeField] private Text _perceptionText;
-    [SerializeField] private Text _mentalText;
-    [SerializeField] private Text _socialText;
-    [SerializeField] private Text _hungerText;
+    [SerializeField] private Text _nameText = null;
+    [SerializeField] private Text _strengthText = null;
+    [SerializeField] private Text _intelligenceText = null;
+    [SerializeField] private Text _perceptionText = null;
+    [SerializeField] private Text _mentalText = null;
+    [SerializeField] private Text _socialText = null;
+    [SerializeField] private Text _hungerText = null;
 
     //Appelé après avoir cliqué sur un Chara dans SpiritHead.cs/ClickOnChara()
     public void UpdateWith(string[] info)

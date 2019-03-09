@@ -15,8 +15,7 @@ public class CharaOutline : MonoBehaviour
     private PermissionsManager permManager;
 
     //Recuperer le Outline Component attaché au Chara
-    [SerializeField]
-    private Outline outline;
+    [SerializeField] private Outline outline = null;
 
     //Différent mode possible
     private Outline.Mode _selectedMod = Outline.Mode.OutlineAndSilhouette;
@@ -48,7 +47,7 @@ public class CharaOutline : MonoBehaviour
 
         if (team != null)
         {
-            if (team.ContainsPlayer(permManager.GetPlayerWithName(PhotonNetwork.player.name)))
+            if (team.ContainsPlayer(permManager.GetPlayerWithName(PhotonNetwork.player.NickName)))
             {
                 //Cas ou le Chara a une équipe et le client est dedans
                 _clientIsInOurTeam = true;

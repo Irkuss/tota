@@ -64,10 +64,10 @@ public class CentralManager : Photon.MonoBehaviour
         //Crée une nouvelle équipe avec comme nom "teamName"
         permissions.GetComponent<PhotonView>().RPC("CreateTeam", PhotonTargets.AllBuffered, teamName);
         //Ajoute un nouveau joueur avec comme nom celui du client //TODO pour l'instant chaque joueur joue tout seul
-        permissions.GetComponent<PhotonView>().RPC("AddNewPlayerToTeam", PhotonTargets.AllBuffered, teamName, PhotonNetwork.player.name);
+        permissions.GetComponent<PhotonView>().RPC("AddNewPlayerToTeam", PhotonTargets.AllBuffered, teamName, PhotonNetwork.player.NickName);
 
         //Recupere le Player crée par AddNewPlayerToTeam
-        PermissionsManager.Player player = permissions.GetPlayerWithName(PhotonNetwork.player.name);
+        PermissionsManager.Player player = permissions.GetPlayerWithName(PhotonNetwork.player.NickName);
 
         //L'attribue à notre spirit nouvellement crée
         spirit.GetComponent<SpiritHead>().InitPermissions(player);
