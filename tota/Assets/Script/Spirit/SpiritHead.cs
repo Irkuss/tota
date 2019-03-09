@@ -6,18 +6,18 @@ using UnityEngine.EventSystems;
 public class SpiritHead : Photon.MonoBehaviour
 {
     //utilisé pour debugger (à swap avec un scriptable object des que possible)
-    private string charaPath = "CharaTriHardTanguy";
+    private string _charaPath = "CharaTriHardTanguy";
     [SerializeField]
     private ItemTable itemTable;
 
     [SerializeField]
-    private GameObject spiritCamera;
+    private GameObject _spiritCamera;
 
     //Le joueur qui contrôle ce Spirit (ne change pas)
-    private PermissionsManager.Player playerOwner;
+    private PermissionsManager.Player _playerOwner;
 
     //Liste des Chara selectionnées
-    private List<GameObject> selectedList;
+    private List<GameObject> _selectedList;
 
     //Unity Callback
     void Start()
@@ -28,7 +28,7 @@ public class SpiritHead : Photon.MonoBehaviour
             this.enabled = false;
         }
 
-        selectedList = new List<GameObject>();
+        _selectedList = new List<GameObject>();
     }
 
     void Update()
@@ -58,16 +58,16 @@ public class SpiritHead : Photon.MonoBehaviour
             if (PhotonNetwork.offlineMode)
             {
                 Debug.Log("SpiritHead: Instantiation du spirit (offline)");
-                go = Instantiate(Resources.Load<GameObject>(charaPath), lowPosition, Quaternion.identity);
+                go = Instantiate(Resources.Load<GameObject>(_charaPath), lowPosition, Quaternion.identity);
             }
             else
             {
                 Debug.Log("SpiritHead: Instantiation du spirit (online)");
-                go = PhotonNetwork.Instantiate(charaPath, lowPosition, Quaternion.identity, 0);
+                go = PhotonNetwork.Instantiate(_charaPath, lowPosition, Quaternion.identity, 0);
             }
             
             //Met ce Chara dans notre équipe (par RPC)
-            go.GetComponent<CharaPermissions>().GetComponent<PhotonView>().RPC("SetTeam", PhotonTargets.AllBuffered, playerOwner.MyTeamName);
+            go.GetComponent<CharaPermissions>().GetComponent<PhotonView>().RPC("SetTeam", PhotonTargets.AllBuffered, _playerOwner.MyTeamName);
         }
     }
 
@@ -83,7 +83,7 @@ public class SpiritHead : Photon.MonoBehaviour
 
     public void InitPermissions(PermissionsManager.Player player)
     {
-        playerOwner = player;
+        _playerOwner = player;
     }
 
     //Clicking and selecting
@@ -107,15 +107,22 @@ public class SpiritHead : Photon.MonoBehaviour
         }
     }
 
-    private void LeftClickUpdate()
+    private bool ClickedOnSomething(out RaycastHit hit)
     {
-        //Debug.Log("SpiritHead: " + spiritName + " a fait un clic gauche");
-
-        Ray ray = spiritCamera.GetComponent<Camera>().ScreenPointToRay(Input.mousePosition);
-        RaycastHit hit;
-            
+        Ray ray = _spiritCamera.GetComponent<Camera>().ScreenPointToRay(Input.mousePosition);
 
         if (Physics.Raycast(ray, out hit))
+        {
+            return true;
+        }
+        return false;
+    }
+
+    private void LeftClickUpdate()
+    {
+        RaycastHit hit;
+
+        if (ClickedOnSomething(out hit))
         {
             if (hit.transform.CompareTag("Chara"))
             {
@@ -136,19 +143,21 @@ public class SpiritHead : Photon.MonoBehaviour
 
     private void RightClickUpdate()
     {
-        //Debug.Log("SpiritHead: " + spiritName + " a fait un clic droit");
-
-        Ray ray = spiritCamera.GetComponent<Camera>().ScreenPointToRay(Input.mousePosition);
         RaycastHit hit;
 
-        if (Physics.Raycast(ray, out hit))
+        if (ClickedOnSomething(out hit))
         {
-            if (hit.transform.CompareTag("Chara"))
+            if (hit.transform.CompareTag("Interactable"))
             {
-                //Action si on clic droit sur un Chara
+                Interactable inter = hit.collider.GetComponent<Interactable>();
+                if (inter != null)
+                {
+                    SetFocusAll(inter);
+                }
             }
             else
             {
+                RemoveFocusAll();
                 ActionMoveAllTo(hit.point);
             }
         }
@@ -163,20 +172,20 @@ public class SpiritHead : Photon.MonoBehaviour
         GameObject.Find("eCentralManager").GetComponent<CentralManager>().UpdateToolTip(chara.GetComponent<CharaRpg>().GetToolTipInfo());
 
         //Debug.Log("SpiritHead: On essaye de selectionné chara");
-        if (chara.GetComponent<CharaHead>().LeftClickedOn(playerOwner))
+        if (chara.GetComponent<CharaHead>().LeftClickedOn(_playerOwner))
         {
             //Debug.Log("SpiritHead: On a réussi ");
-            if (!(selectedList.Contains(chara)))
+            if (!(_selectedList.Contains(chara)))
             {
-                selectedList.Add(chara);
+                _selectedList.Add(chara);
             }
         }
         else
         {
             //Debug.Log("SpiritHead: On a échoué ");
-            if (selectedList.Contains(chara))
+            if (_selectedList.Contains(chara))
             {
-                selectedList.Remove(chara);
+                _selectedList.Remove(chara);
             } 
         }
         
@@ -185,29 +194,29 @@ public class SpiritHead : Photon.MonoBehaviour
     public void DeselectChara(GameObject chara)
     {
         chara.GetComponent<CharaHead>().Deselect();
-        selectedList.Remove(chara);
+        _selectedList.Remove(chara);
     }
 
     public void DeselectAll()
     {
-        foreach(GameObject chara in selectedList)
+        foreach(GameObject chara in _selectedList)
         {
             chara.GetComponent<CharaHead>().Deselect();
         }
-        selectedList.Clear();
+        _selectedList.Clear();
     }
 
     public void DeselectAllExcept(GameObject exception)
     {
-        foreach (GameObject chara in selectedList)
+        foreach (GameObject chara in _selectedList)
         {
             if (chara != exception)
             {
                 chara.GetComponent<CharaHead>().Deselect();
             }
         }
-        selectedList.Clear();
-        selectedList.Add(exception);
+        _selectedList.Clear();
+        _selectedList.Add(exception);
     }
 
     //Private methods
@@ -215,10 +224,28 @@ public class SpiritHead : Photon.MonoBehaviour
     private void ActionMoveAllTo(Vector3 destination)
     {
         //Debug.Log("SpiritHead: moving every chara to destination ("+selectedList.Count+")");
-        foreach (GameObject Chara in selectedList)
+        foreach (GameObject Chara in _selectedList)
         {
             //Debug.Log("SpiritHead: moving one Chara");
             Chara.GetComponent<CharaHead>().SetDestination(destination);
+        }
+    }
+
+    private void SetFocusAll(Interactable inter)
+    {
+        foreach (GameObject Chara in _selectedList)
+        {
+            //Debug.Log("SpiritHead: moving one Chara");
+            Chara.GetComponent<CharaHead>().SetFocus(inter);
+        }
+    }
+
+    private void RemoveFocusAll()
+    {
+        foreach (GameObject Chara in _selectedList)
+        {
+            //Debug.Log("SpiritHead: moving one Chara");
+            Chara.GetComponent<CharaHead>().RemoveFocus();
         }
     }
 
@@ -230,7 +257,7 @@ public class SpiritHead : Photon.MonoBehaviour
         {
             //Toggle l'inventaire dans chaque Chara selectionné
             //(l'ouvre s'il est fermé, le ferme s'il est ouvert)
-            foreach (GameObject Chara in selectedList)
+            foreach (GameObject Chara in _selectedList)
             {
                 //Chara.GetComponent<Inventory>().DisplayInventory();
                 Chara.GetComponent<CharaInventory>().ToggleInventory();
@@ -240,7 +267,7 @@ public class SpiritHead : Photon.MonoBehaviour
 
     private void TestAddToAll(Item item)
     {
-        foreach (GameObject Chara in selectedList)
+        foreach (GameObject Chara in _selectedList)
         {
             //Chara.GetComponent<Inventory>().DisplayInventory();
             Chara.GetComponent<CharaInventory>().Add(item);

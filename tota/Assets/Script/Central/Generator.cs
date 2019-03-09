@@ -474,10 +474,10 @@ public class Generator : MonoBehaviour
         StartCoroutine(GenerateFloor());
 
         //Generate les routes
-        //StartCoroutine(GenerateRoads());
+        StartCoroutine(GenerateRoads());
 
         //Generate les bâtiments
-        //StartCoroutine(GenerateBuilds());
+        StartCoroutine(GenerateBuilds());
 
         
     }
@@ -1217,7 +1217,7 @@ public class Generator : MonoBehaviour
                 yield return new WaitForSeconds(0.00001f);
             }
         }
-        StartCoroutine(GenerateRoads());
+        //StartCoroutine(GenerateRoads());
     }
 
     private IEnumerator  GenerateRoads()
@@ -1230,7 +1230,7 @@ public class Generator : MonoBehaviour
                 yield return new WaitForSeconds(0.00001f);
             }
         }
-        StartCoroutine(GenerateBuilds());
+        //StartCoroutine(GenerateBuilds());
     }
 
     private IEnumerator GenerateBuilds()

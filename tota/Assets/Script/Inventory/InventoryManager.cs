@@ -24,7 +24,7 @@ public class InventoryManager : MonoBehaviour
 
     public bool Add(Item item)
     {
-        if (!item.isDefaultItem) //Jamais 
+        if (true)//!item.isDefaultItem) //Jamais 
         {
             if (itemss.Count >= space)
             {

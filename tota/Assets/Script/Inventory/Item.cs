@@ -7,8 +7,7 @@ public class Item : ScriptableObject
 {
     public string nickName = "Item Name";
     public Sprite icon = null;
-    public int stack;
-    public bool isDefaultItem = false;
+    public int stack = 0;
 
     /*public virtual void Use()
     {

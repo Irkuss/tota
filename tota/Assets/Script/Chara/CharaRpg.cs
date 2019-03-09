@@ -23,17 +23,39 @@ public class CharaRpg : MonoBehaviour
     {
         get => _perception;
     }
+    private int _mental;
+    public int Mental
+    {
+        get => _mental;
+    }
+    private int _social;
+    public int Social
+    {
+        get => _social;
+    }
+
+    //Status
+    private int _hunger;
+    private int _maxHunger = 10;
 
     //UnityCallback
     void Start()
     {
         InitStat();
+
+        InitStatus();
     }
     private void InitStat()
     {
         _strength = Random.Range(1, 20) * 5;
         _intelligence = Random.Range(1, 20) * 5;
         _perception = Random.Range(1, 20) * 5;
+        _mental = Random.Range(1, 20) * 5;
+        _social = Random.Range(1, 20) * 5;
+    }
+    private void InitStatus()
+    {
+        _hunger = _maxHunger / 2;
     }
     //Public Getters
     public string GetFullName()
@@ -42,7 +64,17 @@ public class CharaRpg : MonoBehaviour
     }
     public string[] GetToolTipInfo()
     {
-        return new string[4] { GetFullName(), _strength.ToString(), _intelligence.ToString(), _perception.ToString() };
+        return new string[8] 
+        {
+            GetFullName(),
+            _strength.ToString(),
+            _intelligence.ToString(),
+            _perception.ToString(),
+            _mental.ToString(),
+            _social.ToString(),
+            _hunger.ToString(),
+            _maxHunger.ToString()
+        };
     }
     
 }

@@ -9,36 +9,36 @@ public class CharaHead : MonoBehaviour
 {
     //Chara Family (Component attaché à Chara)
     [SerializeField]
-    private CharaMovement movement;
+    private CharaMovement _movement;
     [SerializeField]
-    private CharaPermissions permissions;
+    private CharaPermissions _permissions;
     [SerializeField]
-    private CharaOutline outline;
+    private CharaOutline _outline;
 
     //Searched in Start
-    private GameObject eManager;
-    public PermissionsManager permManager;
-    
+    private GameObject _eManager;
+    private PermissionsManager _permManager;
 
     //Unity Callbacks
 
     private void Start()
     {
-        eManager = GameObject.Find("eCentralManager"); //pas ouf comm methode, mieux vaux avec un tag
-        permManager = eManager.GetComponent<PermissionsManager>();
+        _eManager = GameObject.Find("eCentralManager"); //pas ouf comm methode, mieux vaux avec un tag
+        _permManager = _eManager.GetComponent<PermissionsManager>();
     }
 
     //Clic Gauche
+
     public bool LeftClickedOn(PermissionsManager.Player playerWhoClickedUs)
     {
         //LeftClickedOn renvoie true, si le Spirit a réussi a slectionné Chara, false sinon
         //NB: Il renvoie aussi false lors de la deselection
         Debug.Log("Chara: I have been clicked by "+ playerWhoClickedUs.Name);
         
-        if (permissions.GetTeam().ContainsPlayer(playerWhoClickedUs))
+        if (_permissions.GetTeam().ContainsPlayer(playerWhoClickedUs))
         {
             //Si le joueur qui a cliqué sur Chara appartient à notre équipe
-            if (!permissions.HasOwner())
+            if (!_permissions.HasOwner())
             {
                 //Si personne controle Chara, le joueur prend controle de Chara
                 Debug.Log("Chara: now controlled by "+ playerWhoClickedUs.Name + " (was empty)");
@@ -46,7 +46,7 @@ public class CharaHead : MonoBehaviour
                 SelectAsPlayer(playerWhoClickedUs);
                 return true;
             }
-            else if (permissions.IsOwner(playerWhoClickedUs.Name))
+            else if (_permissions.IsOwner(playerWhoClickedUs.Name))
             {
                 //Si le joueur qui nous controle a cliqué sur Chara -> deselect
                 Debug.Log("Chara:deselected by " + playerWhoClickedUs.Name);
@@ -63,25 +63,25 @@ public class CharaHead : MonoBehaviour
         else
         {
             //Si le joueur qui a cliqué sur Chara n'appartient pas à notre équipe
-            Debug.Log("Chara: Access Denied: " + playerWhoClickedUs.Name + " is not in team " + permissions.GetTeam().Name);
+            Debug.Log("Chara: Access Denied: " + playerWhoClickedUs.Name + " is not in team " + _permissions.GetTeam().Name);
             return false;
         }
     }
 
     private void SelectAsPlayer(PermissionsManager.Player player)
     {
-        permissions.GetComponent<PhotonView>().RPC("SetOwner", PhotonTargets.AllBuffered, player.Name);
+        _permissions.GetComponent<PhotonView>().RPC("SetOwner", PhotonTargets.AllBuffered, player.Name);
 
-        outline.GetComponent<PhotonView>().RPC("SetOutlineToSelected", PhotonTargets.AllBuffered);
-        outline.GetComponent<PhotonView>().RPC("ChangeColorTo", PhotonTargets.AllBuffered, player.LinkedColor);
+        _outline.GetComponent<PhotonView>().RPC("SetOutlineToSelected", PhotonTargets.AllBuffered);
+        _outline.GetComponent<PhotonView>().RPC("ChangeColorTo", PhotonTargets.AllBuffered, player.LinkedColor);
     }
 
     public void Deselect()
     {
         //Appelé par SpiritHead (par une des 3 fonctions Deselect: DeselectChara(), DeselectAll(), DeselectAllExcept())
-        permissions.GetComponent<PhotonView>().RPC("SetOwnerNull", PhotonTargets.AllBuffered);
+        _permissions.GetComponent<PhotonView>().RPC("SetOwnerNull", PhotonTargets.AllBuffered);
 
-        outline.GetComponent<PhotonView>().RPC("SetOutlineToNotSelected", PhotonTargets.AllBuffered);
+        _outline.GetComponent<PhotonView>().RPC("SetOutlineToNotSelected", PhotonTargets.AllBuffered);
 
         //NB: removed "if (!EventSystem.current.IsPointerOverGameObject())" and moved it to SpiritHead
         //RemoveInventoryOnDeselected(this.gameObject);
@@ -97,9 +97,7 @@ public class CharaHead : MonoBehaviour
 
     public void SetDestination(Vector3 destination)
     {
-        //if (EventSystem.current.IsPointerOverGameObject()) return;
-
-        movement.MoveTo(destination);
+        _movement.MoveTo(destination);
     }
 
     private void RemoveInventoryOnDeselected(GameObject chara)
@@ -116,5 +114,44 @@ public class CharaHead : MonoBehaviour
         //Appelé par Deselect()
         GetComponent<CharaInventory>().CloseInventory();
         Debug.Log("CharaHead: closing inventory of a deselected Chara");
+    }
+
+    //Focus on Interactable
+
+    private Interactable _focus;
+    private IEnumerator _checkCor;
+
+    public void SetFocus(Interactable inter)
+    {
+         _focus = inter;
+        _movement.MoveToInter(_focus);
+
+        _checkCor = CheckDistanceInter();
+        StartCoroutine(_checkCor);
+    }
+
+    public void RemoveFocus()
+    {
+        if (_focus != null)
+        {
+            StopCoroutine(_checkCor);
+            //Reset le focus
+            _focus = null;
+            _movement.StopAgent();
+        }
+    }
+
+    private IEnumerator CheckDistanceInter()
+    {
+        while (Vector3.Distance(transform.position, _focus.InterTransform.position) > _focus.Radius * 0.8f)
+        {
+            yield return new WaitForSeconds(0.5f);
+        }
+        //Interragis avec l'Interactable une fois proche
+        _focus.Interact(this);
+
+        //Reset le focus
+        _focus = null;
+        _movement.StopAgent();
     }
 }
