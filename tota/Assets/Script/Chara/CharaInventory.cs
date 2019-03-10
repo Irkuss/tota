@@ -11,8 +11,10 @@ public class CharaInventory : MonoBehaviour
         
 
         private Item _item;
+        public Item item { get { return _item; } }
         private int _itemCount;
-
+        public int itemCount { get { return _itemCount; } }
+        public bool isEmpty;
         private Image _icon;
         private Button _removeButton;
         private GameObject _counter;
@@ -20,12 +22,13 @@ public class CharaInventory : MonoBehaviour
         private Dictionary<Item, int> _linkedInventory;
         private CharaInventory _linkedCharaInventory;
 
-        public Slot(CharaInventory charaInventory,Dictionary<Item, int> inventory,Image icon, Button removeButton, GameObject counter)
+        public Slot(CharaInventory charaInventory,Dictionary<Item, int> inventory,Image icon, Button removeButton, GameObject counter, bool pos)
         {
             //Reference au CharaInventory pour appeler UpdateUI (SPAGHETTI BOIII)
             _linkedCharaInventory = charaInventory;
             //Reference à l'inventaire
             _linkedInventory = inventory;
+            isEmpty = pos;
             //Initialisation de  l'UI
             _icon = icon;
             _removeButton = removeButton;
@@ -49,6 +52,7 @@ public class CharaInventory : MonoBehaviour
             _counter.GetComponent<Text>().text = _itemCount.ToString();
             //RemoveButton is now active
             _removeButton.interactable = true;
+            isEmpty = false;
         }
 
         public void ClearSlot()
@@ -62,20 +66,19 @@ public class CharaInventory : MonoBehaviour
             _counter.SetActive(false);
             //deactivate RemoveButton=
             _removeButton.interactable = false;
+            isEmpty = true;
         }
 
         public void OnRemoveButton()
         {
             //Appelé par le bouton pour detruire l'item
-            if (_linkedInventory[_item] <= _item.stack)
+            if (_linkedInventory[_item] <= 1)
             {
-                //_linkedInventory.Remove(_item); -> Pour utiliser le rpc
-                _linkedCharaInventory.Remove(_item);
+               _linkedCharaInventory.Remove(_item);
             }
             else
             {
-                //_linkedInventory[_item] -= _itemCount; -> Pour utiliser le rpc
-                _linkedCharaInventory.ModifyCount(_item, -_itemCount);
+                _linkedCharaInventory.ModifyCount(_item, -1);
                 //ClearSlot(); lets try this
             }
             _linkedCharaInventory.UpdateUI();
@@ -139,7 +142,8 @@ public class CharaInventory : MonoBehaviour
                 inventory, 
                 child.transform.GetChild(0).GetComponent<Image>(), 
                 child.transform.GetChild(1).GetComponent<Button>(), 
-                child.transform.GetChild(2).gameObject);
+                child.transform.GetChild(2).gameObject,
+                true);
         }
         //Desactive les slots en trop
         for (; i < childrenCount; i++)
@@ -220,7 +224,9 @@ public class CharaInventory : MonoBehaviour
     {
         //Le booléen retourné représente la réussite de l'ajout de l'item
         Debug.Log("CharaInventory: Checking space");
-        if (inventory.Count >= _inventorySpace)
+        if (inventory.Count >= _inventorySpace || 
+            _slots[_inventorySpace-1].isEmpty == false && 
+            (_slots[_inventorySpace - 1].itemCount == item.stack || _slots[_inventorySpace - 1].item != item)) // Du spaghetti comme on aime
         {
             //Si l'inventaire est rempli, ne fait rien
             return false;
@@ -244,7 +250,7 @@ public class CharaInventory : MonoBehaviour
         //Appelle le Callback en s'assurant que quelqu'un écoute
         //if (onItemChangedCallback != null) onItemChangedCallback.Invoke();
 
-        UpdateUI();
+        //UpdateUI();
 
         return true;
     }
