@@ -17,7 +17,7 @@ public class FieldOfView : MonoBehaviour
     public int edgeResolveIterations;
     public float edgeDstThreshold;
 
-    public float maskCutawayDst = .15f;
+    public float maskCutawayDst = .1f;
 
     public MeshFilter viewMeshFilter;
     Mesh viewMesh;
