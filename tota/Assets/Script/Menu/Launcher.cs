@@ -42,6 +42,8 @@ public class Launcher : Photon.PunBehaviour
     private bool isConnecting;
     
     private string roomName = "";
+    [SerializeField]
+    private Text error;
     
 
     //Unity Callback
@@ -56,6 +58,8 @@ public class Launcher : Photon.PunBehaviour
 
         // Force LogLevel
         PhotonNetwork.logLevel = Loglevel;
+
+        error.enabled = false;
     }
 
     //Photon Callback
@@ -79,13 +83,27 @@ public class Launcher : Photon.PunBehaviour
         Debug.Log("No longer connected to Photon");
     }
 
-    public virtual void OnPhotonJoinedRoomFailed(object[] codeAndMsg)
+    public override void OnPhotonCreateRoomFailed(object[] codeAndMsg)
     {
-        //Origin: SearchRoom()
-
-        Debug.Log("Failed to joined " + roomName);
+        Debug.Log("Failed to create " + roomName);
+        error.text = "FAILED TO CREATE THE ROOM";
+        StartCoroutine(Waiting());
     }
 
+    public override void OnPhotonJoinRoomFailed(object[] codeAndMsg)
+    {
+        //Origin: SearchRoom()
+        error.text = "FAILED TO JOIN THE ROOM";
+        Debug.Log("Failed to joined " + roomName);
+        StartCoroutine(Waiting());       
+    }
+
+    IEnumerator Waiting()
+    {
+        error.enabled = true;
+        yield return new WaitForSeconds(3);
+        error.enabled = false;
+    }
 
     public override void OnJoinedRoom()
     {        
@@ -183,6 +201,12 @@ public class Launcher : Photon.PunBehaviour
             //Callback suivant: OnJoinedRoom()
             //Callback suivant: OnPhotonJoinedRoomFailed(object[] codeAndMsg)
         }
+        else
+        {
+            error.text = "FAILED TO CREATE THE ROOM";
+            StartCoroutine(Waiting());
+        }
+        
     }
 
     public void CreateRoom()
@@ -193,6 +217,11 @@ public class Launcher : Photon.PunBehaviour
         {
             PhotonNetwork.CreateRoom(roomName, new RoomOptions() { MaxPlayers = MaxPlayersPerRoom },null);            
             Debug.Log("Created room " + roomName);
+        }
+        else
+        {
+            error.text = "FAILED TO CREATE THE ROOM";
+            StartCoroutine(Waiting());
         }
     }
 
