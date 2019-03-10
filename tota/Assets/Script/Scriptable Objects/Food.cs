@@ -6,4 +6,9 @@ using UnityEngine;
 public class Food : Item
 {
     public int foodValue = 0;
+
+    public override void Use()
+    {
+        Debug.Log("Using food:" + this.nickName);
+    }
 }

@@ -8,10 +8,12 @@ public class Item : ScriptableObject
     public string nickName = "Item Name";
     public Sprite icon = null;
     public int stack = 0;
+    public int weight = 0;
+    public bool usable = true;
 
-    /*public virtual void Use()
+    public virtual void Use()
     {
-        //USE THE ITEM
-    }*/
+        
+    }
 
 }

@@ -97,15 +97,6 @@ public class CharaHead : MonoBehaviour
         _movement.MoveTo(destination);
     }
 
-    private void RemoveInventoryOnDeselected(GameObject chara)
-    {
-        //DEPRECATED
-
-        //Appelé par Deselect()
-        chara.GetComponentInChildren<Inventory>().RemoveInventory();
-        Debug.Log("CharaHead: closing inventory of a deselected Chara");
-    }
-
     private void CloseInventoryOnDeselected()
     {
         //Appelé par Deselect()
