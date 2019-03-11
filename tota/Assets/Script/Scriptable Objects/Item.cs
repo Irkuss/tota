@@ -11,9 +11,9 @@ public class Item : ScriptableObject
     public int weight = 0;
     public bool usable = true;
 
-    public virtual void Use()
+    public virtual void Use(GameObject refInventChara)
     {
-        
+        refInventChara.GetComponentInParent<CharaRpg>().UseItem(); // On utilise l'item sur le bon chara par référence de son inventaire
     }
 
 }

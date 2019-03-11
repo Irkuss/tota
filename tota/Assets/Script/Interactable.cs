@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class Interactable : MonoBehaviour
 {
-    [SerializeField] private float _radius = 1;
+    [SerializeField] private float _radius = 5;
     public float Radius { get => _radius; }
 
     [SerializeField] private Transform _interTransform = null;
@@ -13,5 +13,6 @@ public class Interactable : MonoBehaviour
     public virtual void Interact(CharaHead chara)
     {
         Debug.Log("Interactable: Interacting as " + chara.name);
+        //PickUp() provenant de itemPickUp.cs
     }
 }

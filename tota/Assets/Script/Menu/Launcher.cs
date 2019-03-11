@@ -110,7 +110,7 @@ public class Launcher : Photon.PunBehaviour
         waitingRoom.SetActive(false);
         currentRoom.SetActive(true);
         GameObject menu = GameObject.FindGameObjectWithTag("MenuButton");
-        menu.transform.position = new Vector3(menu.transform.position.x - 40, menu.transform.position.y, menu.transform.position.z);
+        menu.transform.position = new Vector3(menu.transform.position.x - 20, menu.transform.position.y, menu.transform.position.z);
 
         /*foreach (Transform child in PlayerLayoutGroup.transform)
         {
@@ -261,6 +261,6 @@ public class Launcher : Photon.PunBehaviour
         sliderObject.SetActive(true);
         currentRoom.SetActive(false);
         GameObject menu = GameObject.FindGameObjectWithTag("MenuButton");
-        menu.transform.position = new Vector3(menu.transform.position.x + 40, menu.transform.position.y, menu.transform.position.z);
+        menu.transform.position = new Vector3(menu.transform.position.x + 20, menu.transform.position.y, menu.transform.position.z);
     }
 }

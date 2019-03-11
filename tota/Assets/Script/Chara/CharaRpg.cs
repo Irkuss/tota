@@ -34,17 +34,21 @@ public class CharaRpg : MonoBehaviour
         get => _social;
     }
 
+
     //Status
     private int _hunger;
-    private int _maxHunger = 10;
-
+    private int _maxHunger = 100;
+    private float timer = 0f;
+    
     //UnityCallback
     void Start()
     {
         InitStat();
 
         InitStatus();
+
     }
+
     private void InitStat()
     {
         _strength = Random.Range(1, 20) * 5;
@@ -75,6 +79,28 @@ public class CharaRpg : MonoBehaviour
             _hunger.ToString(),
             _maxHunger.ToString()
         };
+    }
+
+    public void Eat(int food)
+    {
+        if (_hunger > 0)
+        {
+            _hunger -= food;
+            GameObject.Find("eCentralManager").GetComponent<CentralManager>().UpdateToolTip(GetToolTipInfo()); // On appelle l'update du tooltip
+        }
+    }
+
+    public void UseItem()
+    {
+
+    }
+
+    public void RemoveCharaTeam()
+    {
+        if (_hunger == _maxHunger)
+        {
+            GetComponent<CharaPermissions>().SetTeamNull();
+        }
     }
     
 }
