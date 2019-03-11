@@ -8,8 +8,6 @@ public class CharaInventory : MonoBehaviour
 {
     public class Slot
     {
-        
-
         private Item _item;
         public Item item { get { return _item; } }
         private int _itemCount;
@@ -17,12 +15,13 @@ public class CharaInventory : MonoBehaviour
         public bool isEmpty;
         private Image _icon;
         private Button _removeButton;
+        private Button _itemButton;
         private GameObject _counter;
 
         private Dictionary<Item, int> _linkedInventory;
         private CharaInventory _linkedCharaInventory;
 
-        public Slot(CharaInventory charaInventory,Dictionary<Item, int> inventory,Image icon, Button removeButton, GameObject counter, bool pos)
+        public Slot(CharaInventory charaInventory,Dictionary<Item, int> inventory,Image icon, Button removeButton, Button itemButton, GameObject counter, bool pos)
         {
             //Reference au CharaInventory pour appeler UpdateUI (SPAGHETTI BOIII)
             _linkedCharaInventory = charaInventory;
@@ -32,9 +31,11 @@ public class CharaInventory : MonoBehaviour
             //Initialisation de  l'UI
             _icon = icon;
             _removeButton = removeButton;
+            _itemButton = itemButton;
             _counter = counter;
             //Initialisation du bouton (appelle OnRemoveButton quand il est cliqué)
             _removeButton.onClick.AddListener(OnRemoveButton);
+            _itemButton.onClick.AddListener(OnClickButton);
             //L'emplacement est initialisé vide
             ClearSlot();
         }
@@ -82,6 +83,16 @@ public class CharaInventory : MonoBehaviour
                 //ClearSlot(); lets try this
             }
             _linkedCharaInventory.UpdateUI();
+        }
+
+        public void OnClickButton()
+        {
+            // Si l'item est utilisable
+            if (item.usable)
+            {
+                item.Use(_linkedCharaInventory._slotParent); // On appelle la fonction virtual de l'item en prenant la référence de son parent
+                OnRemoveButton();                            // On enleve l'item utilisé
+            }
         }
     }
 
@@ -138,7 +149,8 @@ public class CharaInventory : MonoBehaviour
                 this,
                 inventory, 
                 child.transform.GetChild(0).GetComponent<Image>(), 
-                child.transform.GetChild(1).GetComponent<Button>(), 
+                child.transform.GetChild(1).GetComponent<Button>(),
+                child.transform.GetChild(0).GetComponent<Button>(),
                 child.transform.GetChild(2).gameObject,
                 true);
         }
