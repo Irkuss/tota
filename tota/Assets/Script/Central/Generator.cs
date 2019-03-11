@@ -477,7 +477,7 @@ public class Generator : MonoBehaviour
 
         //Generate les bâtiments
         StartCoroutine(GenerateBuilds());
-
+        //Generate Builds appelle OnGenerationEnden à la fin
         
     }
 
@@ -1210,7 +1210,7 @@ public class Generator : MonoBehaviour
             {
                 //roadMatrix[x, y].Generate(districtLength);
                 Instantiate(Resources.Load<GameObject>("testEmpty"), new Vector3(x * districtLength, -0.5f, y * districtLength), Quaternion.identity);
-                yield return new WaitForSeconds(0.00001f);
+                yield return null;//new WaitForSeconds(0.00001f);
             }
         }
         //StartCoroutine(GenerateRoads());
@@ -1223,7 +1223,7 @@ public class Generator : MonoBehaviour
             for (int x = 0; x < cityX; x++)
             {
                 roadMatrix[x, y].Generate(districtLength);
-                yield return new WaitForSeconds(0.00001f);
+                yield return null;//new WaitForSeconds(0.00001f);
             }
         }
         //StartCoroutine(GenerateBuilds());
@@ -1237,7 +1237,7 @@ public class Generator : MonoBehaviour
             {
                 if(buildMatrix[x, y].Generate(tunkLength))
                 {
-                    yield return new WaitForSeconds(0.00001f);
+                    yield return null;// new WaitForSeconds(0.00001f);
                 }
             }
         }
