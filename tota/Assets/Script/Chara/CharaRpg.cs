@@ -38,8 +38,6 @@ public class CharaRpg : MonoBehaviour
     //Status
     private int _hunger;
     private int _maxHunger = 100;
-    private float timer = 0f;
-    
     //UnityCallback
     void Start()
     {
@@ -94,13 +92,4 @@ public class CharaRpg : MonoBehaviour
     {
 
     }
-
-    public void RemoveCharaTeam()
-    {
-        if (_hunger == _maxHunger)
-        {
-            GetComponent<CharaPermissions>().SetTeamNull();
-        }
-    }
-    
 }

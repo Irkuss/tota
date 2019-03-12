@@ -43,7 +43,7 @@ public class Launcher : Photon.PunBehaviour
     
     private string roomName = "";
     [SerializeField]
-    private Text error;
+    private Text error = null;
     
 
     //Unity Callback

@@ -59,7 +59,7 @@ public class OrganicOpacity : MonoBehaviour
 
     private bool IsAboveFloorLevel(int newFloorLevel)
     {
-        if (transform.position.y > newFloorLevel * 12.6f + 12.0f)
+        if (transform.position.y > newFloorLevel * FloorManager.ChunkHeight + FloorManager.ChunkHeight*0.95f)
         {
             return true;
         }

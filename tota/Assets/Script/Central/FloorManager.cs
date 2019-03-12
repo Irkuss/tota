@@ -4,6 +4,9 @@ using UnityEngine;
 
 public class FloorManager : MonoBehaviour
 {
+    private static float _chunkHeight = 8.0f;
+    public static float ChunkHeight { get => _chunkHeight; }
+
     private int floorLevel = 8;
 
     private int maxFloorLevel = 8; //A MODIFIER SI ON A DES BATIMENTS AVEC PLUS D'ETAGES

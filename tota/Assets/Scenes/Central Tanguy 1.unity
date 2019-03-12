@@ -647,6 +647,7 @@ GameObject:
   m_Component:
   - component: {fileID: 636862119}
   - component: {fileID: 636862118}
+  - component: {fileID: 636862120}
   m_Layer: 0
   m_Name: Directional Light
   m_TagString: Untagged
@@ -706,6 +707,20 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 3
   m_LocalEulerAnglesHint: {x: 50, y: -30, z: 0}
+--- !u!114 &636862120
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 636862117}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4270e47b2dac188499826ad578d835a5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  speed: 600
+  heure: 12
 --- !u!1001 &702124430
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -1041,14 +1056,14 @@ MonoBehaviour:
   m_LayerMask:
     serializedVersion: 2
     m_Bits: 4294967295
-  m_UseGeometry: 0
+  m_UseGeometry: 1
   m_DefaultArea: 0
   m_IgnoreNavMeshAgent: 1
   m_IgnoreNavMeshObstacle: 1
   m_OverrideTileSize: 0
   m_TileSize: 256
   m_OverrideVoxelSize: 0
-  m_VoxelSize: 0.33333334
+  m_VoxelSize: 0.16666667
   m_BuildHeightMesh: 0
   m_NavMeshData: {fileID: 23800000, guid: 253208c42ea26d24cb2d9348af661071, type: 2}
 --- !u!4 &830072123
