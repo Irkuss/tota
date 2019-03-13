@@ -97,6 +97,11 @@ public class CharaHead : MonoBehaviour
         _movement.MoveTo(destination);
     }
 
+    public void SetStopDistance(float newStop)
+    {
+        _movement.SetStoppingDistance(newStop);
+    }
+
     private void CloseInventoryOnDeselected()
     {
         //Appelé par Deselect()

@@ -34,6 +34,10 @@ public class CharaMovement : MonoBehaviour
         navMeshAgent.SetDestination(position);
     }
 
+    public void SetStoppingDistance(float newStop)
+    {
+        navMeshAgent.stoppingDistance = newStop;
+    }
 
     //Deplacement vers un Interactable
     public void MoveToInter(Interactable inter)

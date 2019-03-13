@@ -221,11 +221,15 @@ public class SpiritHead : Photon.MonoBehaviour
 
     private void ActionMoveAllTo(Vector3 destination)
     {
+        float stopDistance = 0.2f + (_selectedList.Count - 1) * 0.4f;
+
+
         //Debug.Log("SpiritHead: moving every chara to destination ("+selectedList.Count+")");
         foreach (GameObject Chara in _selectedList)
         {
             //Debug.Log("SpiritHead: moving one Chara");
             Chara.GetComponent<CharaHead>().SetDestination(destination);
+            Chara.GetComponent<CharaHead>().SetStopDistance(stopDistance);
         }
     }
 
