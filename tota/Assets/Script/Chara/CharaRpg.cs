@@ -81,9 +81,9 @@ public class CharaRpg : MonoBehaviour
 
     public void Eat(int food)
     {
-        if (_hunger > 0)
+        if (_hunger < _maxHunger)
         {
-            _hunger -= food;
+            _hunger += food;
             GameObject.Find("eCentralManager").GetComponent<CentralManager>().UpdateToolTip(GetToolTipInfo()); // On appelle l'update du tooltip
         }
     }

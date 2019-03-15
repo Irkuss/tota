@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 public class CentralManager : Photon.MonoBehaviour
 {
@@ -11,11 +12,17 @@ public class CentralManager : Photon.MonoBehaviour
     //Bouton et interface
     public GameObject tempButton;
     public GameObject toolTip;
+    public GameObject teamList;
+    public GameObject pauseMenu;
+    public GameObject nameTeam;
+    public GameObject panel;
+
+    public static bool isPause = false;
 
     public void UpdateToolTip(string[] info)
     {
         toolTip.SetActive(true);
-        toolTip.GetComponent<ToolTip>().UpdateWith(info);
+        toolTip.GetComponent<ToolTip>().UpdateTool(info);
     }
     public void DeactivateToolTip()
     {
@@ -29,7 +36,78 @@ public class CentralManager : Photon.MonoBehaviour
         if (!PhotonNetwork.offlineMode)
         {
             tempButton.SetActive(false);
+            //teamList.SetActive(false);
+            //nameTeam.SetActive(false);
         }
+    }
+
+    private void Update()
+    {
+        if(Input.GetKeyDown(KeyCode.Escape) || Input.GetKeyDown(KeyCode.P))
+        {
+            if (isPause)
+            {
+                Resume();
+            }
+            else
+            {
+                Pause();
+            }
+        }
+    }
+
+    private void Pause()
+    {
+        pauseMenu.SetActive(true);
+        isPause = true;
+    }
+
+    public void Resume()
+    {
+        pauseMenu.SetActive(false);
+        isPause = false;
+    }
+
+    public void LoadMenu()
+    {
+        SceneManager.LoadScene(2);
+        //PhotonNetwork.Destroy(photonview);
+        PhotonNetwork.Disconnect();
+    }
+
+    public void Options()
+    {
+
+    }
+
+    public void Quit()
+    {
+        Application.Quit();
+    }
+
+    private void TeamListing()
+    {
+        //foreach(var team in teamLists)
+        //{
+        //  AddTeam(team):
+        //}
+    }
+
+    private void AddTeam()
+    {
+        /*
+        if (team == null)
+            return;
+
+        //PlayerLeftRoom(photonPlayer);
+
+        GameObject teamListingObj = Instantiate(teamListPrefab);
+        teamListingObj.transform.SetParent(TeamLayoutGroup.transform, false);
+
+        teamListingObj.GetComponent<Text>().text = team.ToString();
+
+        TeamListings.Add(teamListing);
+         */
     }
 
     //Special Callbacks
@@ -37,6 +115,9 @@ public class CentralManager : Photon.MonoBehaviour
     {
         //Appelé par Generator/Start/*Received Package*/GenerateEnd une fois que le monde s'est généré
         tempButton.SetActive(true);
+        //teamList.SetActive(true);
+        //nameTeam.SetActive(true);
+        panel.SetActive(true);
     }
 
     //Spawn le joueur (appelé par le bouton spawn)
@@ -76,5 +157,8 @@ public class CentralManager : Photon.MonoBehaviour
 
         //Enleve le bouton de spawn
         tempButton.SetActive(false);
+        //teamList.SetActive(false);
+        //nameTeam.SetActive(false);
+        panel.SetActive(false);
     }
 }
