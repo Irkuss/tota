@@ -123,11 +123,11 @@ public class Generator : MonoBehaviour
 
         //End Generate
 
-        public void Generate(float worldLengthAdaptor)
+        public void Generate()
         {
-            InstantiateRoad(worldLengthAdaptor);
+            InstantiateRoad();
         }
-        private void InstantiateRoad(float worldLengthAdaptor)
+        private void InstantiateRoad()
         {
             //Le nom de la route est important
             //NB: On aurait pu instantié separemment chaque branche du noeud + la piece centrale
@@ -136,7 +136,7 @@ public class Generator : MonoBehaviour
             path += _south;
             path += _east;
             path += _west;
-            Instantiate(Resources.Load<GameObject>(path), new Vector3(x * worldLengthAdaptor, 0, y * worldLengthAdaptor), Quaternion.identity);
+            Instantiate(Resources.Load<GameObject>(path), new Vector3(x * c_districtLength, 0, y * c_districtLength), Quaternion.identity);
         }
     }
 
@@ -185,11 +185,7 @@ public class Generator : MonoBehaviour
         private int _buildingSizeType = 0; //0 = 2x2, 1 = 2x4, 2 = 2x4, 3 = 4*4 (à update a chaque qu'on decide d'entendre la taille possible des batiments
 
         //Nombre d'argument du deuxieme constructeur de BuildNode (prévu pour la Deserialisation)
-        private static int _packageSize = 10;
-        public static int GetPackageSize()
-        {
-            return _packageSize;
-        }
+        public const int c_packageSize = 10;
 
         //Constructeur
         public BuildNode(int xNew, int yNew, RoadNode origin, int pos)
@@ -268,10 +264,10 @@ public class Generator : MonoBehaviour
         }
         
         //Generate
-        public bool Generate(float worldLengthAdaptor)
+        public bool Generate()
         {
             //Verifions que le building peut se générer
-            if (!CanGenerateBuilding()) //|| _pathBuilding == ""
+            if (!CanGenerateBuilding())
             {
                 return false;
             }
@@ -279,7 +275,7 @@ public class Generator : MonoBehaviour
             //Le building peut se généré, debut de la génération
             //Debug.Log("Generate: Instantiating with path: " + _pathBuilding);
 
-            Vector3 position = new Vector3(_x * worldLengthAdaptor + 6.3f, 0, _y * worldLengthAdaptor + 6.3f);
+            Vector3 position = new Vector3(_x * c_voxChunkLength + 6.3f, 0, _y * c_voxChunkLength + 6.3f);
             Vector3 offset = CalculateOffset();
 
             //Instantié et le tourner dans la bonne direction
@@ -368,10 +364,12 @@ public class Generator : MonoBehaviour
     #region Attributes
 
     public NavMeshSurface surface;
-    private float tunkLength = 12.6f; //magic number with MagicaVoxel, tunk = technical chunk
-    private float nTunkInDistrict = 5.0f;
-    private int cityX = 15;
-    private int cityY = 15;
+    //Constante de génération
+    public const float c_voxChunkLength = 12.6f; //magic number with MagicaVoxel, tunk = technical chunk
+    public const int c_voxChunkInDistrict = 5;
+    public const float c_districtLength = c_voxChunkLength * c_voxChunkInDistrict;
+    public const int c_districtInWorldChunk = 16;
+    public const float c_worldChunkLength = c_districtLength * c_districtInWorldChunk;
 
     //Matrix où l'on stocke des Nodes
     private RoadNode[,] masterRoads; //matrice travaillée par Master
@@ -387,7 +385,6 @@ public class Generator : MonoBehaviour
     private BuildNode[,] buildMatrix; //décodé après RPC, commun à tous
 
     //Variable aide
-    private float districtLength;
     private int borderNorth;
     private int borderEast;
     
@@ -401,14 +398,10 @@ public class Generator : MonoBehaviour
 
     //Path and directories
 
-    [SerializeField]
-    private buildTable table22 = null;
-    [SerializeField]
-    private buildTable table24 = null;
-    [SerializeField]
-    private buildTable table42left = null;
-    [SerializeField]
-    private buildTable table42right = null;
+    [SerializeField] private buildTable table22 = null;
+    [SerializeField] private buildTable table24 = null;
+    [SerializeField] private buildTable table42left = null;
+    [SerializeField] private buildTable table42right = null;
 
     // --- IMPORTANT TIPS AND TRICKS ---
     //Quandd y augmente -> on va vers le Nord
@@ -418,9 +411,8 @@ public class Generator : MonoBehaviour
 
     private void Start()
     {
-        districtLength = tunkLength * nTunkInDistrict;
-        roadMatrix = new RoadNode[cityX, cityY];
-        buildMatrix = new BuildNode[cityX * 2, cityY * 2];
+        roadMatrix = new RoadNode[c_districtInWorldChunk, c_districtInWorldChunk];
+        buildMatrix = new BuildNode[c_districtInWorldChunk * 2, c_districtInWorldChunk * 2];
 
         if (PhotonNetwork.isMasterClient)
         {
@@ -488,20 +480,20 @@ public class Generator : MonoBehaviour
 
         //Update le spawnpoint (temporaire)
         GetComponent<CentralManager>().OnGenerationFinished();
-        GetComponent<CentralManager>().spawnPoint = new Vector3((cityX * districtLength) / 2, 1000f, (cityY * districtLength) / 2);
+        GetComponent<CentralManager>().spawnPoint = new Vector3((c_worldChunkLength) / 2, 1000f, (c_worldChunkLength) / 2);
     }
 
     //Master Initialisation
 
     private void MasterInitialisation()
     {
-        masterRoads = new RoadNode[cityX, cityY];
-        masterBuilds = new BuildNode[cityX * 2, cityY * 2];
+        masterRoads = new RoadNode[c_districtInWorldChunk, c_districtInWorldChunk];
+        masterBuilds = new BuildNode[c_districtInWorldChunk * 2, c_districtInWorldChunk * 2];
         
-        borderNorth = cityY - 1;
-        borderEast = cityX - 1;
-        midX = cityX / 2;
-        midY = cityY / 2;
+        borderNorth = c_districtInWorldChunk - 1;
+        borderEast = c_districtInWorldChunk - 1;
+        midX = c_districtInWorldChunk / 2;
+        midY = c_districtInWorldChunk / 2;
     }
 
     //Master  Roads
@@ -517,9 +509,9 @@ public class Generator : MonoBehaviour
 
     private void MasterInitRoads()
     {
-        for (int y = 0; y < cityY; y++)
+        for (int y = 0; y < c_districtInWorldChunk; y++)
         {
-            for (int x = 0; x < cityX; x++)
+            for (int x = 0; x < c_districtInWorldChunk; x++)
             {
                 masterRoads[x, y] = new RoadNode(x, y);
             }
@@ -531,8 +523,8 @@ public class Generator : MonoBehaviour
         //Setup des nodes spécifiques
 
         RoadNode nodeMiddle = GetPoiMiddle();
-        nodeMiddleX = nodeMiddle.x * districtLength;
-        nodeMiddleY = nodeMiddle.y * districtLength;
+        nodeMiddleX = nodeMiddle.x * c_districtLength;
+        nodeMiddleY = nodeMiddle.y * c_districtLength;
 
 
         RoadNode nodePoiSW = GetPoiSouthWest();
@@ -581,8 +573,8 @@ public class Generator : MonoBehaviour
         return GetNodeInRange(
             midX - 1,
             midX + 1,
-            cityY / 2 - 1,
-            cityY / 2 + 1);
+            c_districtInWorldChunk / 2 - 1,
+            c_districtInWorldChunk / 2 + 1);
     }
 
     private RoadNode GetPoiSouthWest()
@@ -724,9 +716,9 @@ public class Generator : MonoBehaviour
 
     private void MasterInitBuilds()
     {
-        for (int y = 0; y < cityY; y++)
+        for (int y = 0; y < c_districtInWorldChunk; y++)
         {
-            for (int x = 0; x < cityX; x++)
+            for (int x = 0; x < c_districtInWorldChunk; x++)
             {
                 MasterBuildAroundNode(masterRoads[x, y], x, y);
             }
@@ -739,31 +731,23 @@ public class Generator : MonoBehaviour
         int yChunk = roadOrigin.y * 5;
 
         //South West 0
-        //(nodeX - 25.2f, 0f, nodeY - 25.2f)
-
         masterBuilds[2 * xInMatrix, 2 * yInMatrix] = new BuildNode(xChunk - 2, yChunk - 2, roadOrigin, 0);
 
         //South East 1
-        //(nodeX + 12.6f, 0f, nodeY - 25.2f)
-
         masterBuilds[2 * xInMatrix + 1, 2 * yInMatrix] = new BuildNode(xChunk + 1, yChunk - 2, roadOrigin, 1);
 
         //North East 2
-        //(nodeX + 12.6f, 0f, nodeY + 12.6f)
-
         masterBuilds[2 * xInMatrix + 1, 2 * yInMatrix + 1] = new BuildNode(xChunk + 1, yChunk + 1, roadOrigin, 2);
 
         //North West 3
-        //(nodeX - 25.2f, 0f, nodeY + 12.6f)
-
         masterBuilds[2 * xInMatrix, 2 * yInMatrix + 1] = new BuildNode(xChunk - 2, yChunk + 1, roadOrigin, 3);
     }
 
     private void MasterModifyBuilds()
     {
-        for (int y = 0; y < cityY * 2; y++)
+        for (int y = 0; y < c_districtInWorldChunk * 2; y++)
         {
-            for (int x = 0; x < cityX * 2; x++)
+            for (int x = 0; x < c_districtInWorldChunk * 2; x++)
             {
                 MasterChooseBuildsAt(x, y);
             }
@@ -1166,7 +1150,7 @@ public class Generator : MonoBehaviour
 
     private bool MasterCheckNorth(BuildNode build, int x, int y)
     {
-        if (y == cityY * 2 - 1) return false; //Si on a atteint la bordure Nord
+        if (y == c_districtInWorldChunk * 2 - 1) return false; //Si on a atteint la bordure Nord
         if (build.North == 1) return false; //Si passage au Nord est occupé
 
         //Si le batiment au Nord a deja decidé sa génération ou qqun a déja décidé pour lui
@@ -1184,7 +1168,7 @@ public class Generator : MonoBehaviour
     }
     private bool MasterCheckEast(BuildNode build, int x, int y)
     {
-        if (x == cityX * 2 - 1) return false; //Si on a atteint la bordure Est
+        if (x == c_districtInWorldChunk * 2 - 1) return false; //Si on a atteint la bordure Est
         if (build.East == 1) return false; //Si le passage à l'Est est occupé
 
         //Si le batiment à l'Est a deja decidé sa génération ou qqun a déja décidé pour lui
@@ -1204,13 +1188,12 @@ public class Generator : MonoBehaviour
     //Generate
     private IEnumerator GenerateFloor()
     {
-        for (int y = 0; y < cityY; y++)
+        for (int y = 0; y < c_districtInWorldChunk; y++)
         {
-            for (int x = 0; x < cityX; x++)
+            for (int x = 0; x < c_districtInWorldChunk; x++)
             {
-                //roadMatrix[x, y].Generate(districtLength);
-                Instantiate(Resources.Load<GameObject>("testEmpty"), new Vector3(x * districtLength, -0.5f, y * districtLength), Quaternion.identity);
-                yield return null;//new WaitForSeconds(0.00001f);
+                Instantiate(Resources.Load<GameObject>("testEmpty"), new Vector3(x * c_districtLength, -0.5f, y * c_districtLength), Quaternion.identity);
+                yield return null;
             }
         }
         //StartCoroutine(GenerateRoads());
@@ -1218,12 +1201,12 @@ public class Generator : MonoBehaviour
 
     private IEnumerator  GenerateRoads()
     {
-        for (int y = 0; y < cityY; y++)
+        for (int y = 0; y < c_districtInWorldChunk; y++)
         {
-            for (int x = 0; x < cityX; x++)
+            for (int x = 0; x < c_districtInWorldChunk; x++)
             {
-                roadMatrix[x, y].Generate(districtLength);
-                yield return null;//new WaitForSeconds(0.00001f);
+                roadMatrix[x, y].Generate();
+                yield return null;
             }
         }
         //StartCoroutine(GenerateBuilds());
@@ -1231,13 +1214,13 @@ public class Generator : MonoBehaviour
 
     private IEnumerator GenerateBuilds()
     {
-        for (int y = 0; y < cityY * 2; y++)
+        for (int y = 0; y < c_districtInWorldChunk * 2; y++)
         {
-            for (int x = 0; x < cityX * 2; x++)
+            for (int x = 0; x < c_districtInWorldChunk * 2; x++)
             {
-                if(buildMatrix[x, y].Generate(tunkLength))
+                if(buildMatrix[x, y].Generate())
                 {
-                    yield return null;// new WaitForSeconds(0.00001f);
+                    yield return null;
                 }
             }
         }
@@ -1258,18 +1241,15 @@ public class Generator : MonoBehaviour
     private int[] EncryptRoads()
     {
         Debug.Log("Generator: Encrypting roads as " + PhotonNetwork.player.NickName);
-        int[] package = new int[cityX*cityY*(RoadNode.GetPackageSize()) + 2];
-
-        package[0] = cityX;
-        package[1] = cityY;
+        int[] package = new int[c_districtInWorldChunk * c_districtInWorldChunk * (RoadNode.GetPackageSize())];
 
         int x = 0;
         int y = 0;
-        int index = 2;
-        while (x < cityX)
+        int index = 0;
+        while (x < c_districtInWorldChunk)
         {
             y = 0;
-            while (y < cityY)
+            while (y < c_districtInWorldChunk)
             {
                 foreach (int n in masterRoads[x, y].Serialize())
                 {
@@ -1285,18 +1265,16 @@ public class Generator : MonoBehaviour
     private void DecryptRoads()
     {
         Debug.Log("Generator: Decrypting roads as " + PhotonNetwork.player.NickName);
-        cityX = serializedRoads[0];
-        cityY = serializedRoads[1];
 
         int x = 0;
         int y = 0;
-        int index = 2;
+        int index = 0;
 
         int[] nodeSerialized = new int[RoadNode.GetPackageSize()];
-        while (x < cityX)
+        while (x < c_districtInWorldChunk)
         {
             y = 0;
-            while (y < cityY)
+            while (y < c_districtInWorldChunk)
             {
                 //On recupere la version serialisé de la RoadNode
                 for (int i = 0; i < RoadNode.GetPackageSize(); i++)
@@ -1313,8 +1291,7 @@ public class Generator : MonoBehaviour
             x++;
         }
     }
-    [PunRPC]
-    private void SendRoads(int[] package)
+    [PunRPC] private void SendRoads(int[] package)
     {
         Debug.Log("Generator: Received road package as " + PhotonNetwork.player.NickName);
         serializedRoads = package;
@@ -1330,15 +1307,15 @@ public class Generator : MonoBehaviour
     private int[] EncryptBuildsArray()
     {
         Debug.Log("Generator: Encrypting builds as " + PhotonNetwork.player.NickName);
-        int[] package = new int[(2 * cityX) * (2 * cityY) * BuildNode.GetPackageSize()];
+        int[] package = new int[(2 * c_districtInWorldChunk) * (2 * c_districtInWorldChunk) * BuildNode.c_packageSize];
 
         int x = 0;
         int y = 0;
         int index = 0;
-        while (x < 2 * cityX)
+        while (x < 2 * c_districtInWorldChunk)
         {
             y = 0;
-            while (y < 2 * cityY)
+            while (y < 2 * c_districtInWorldChunk)
             {
                 foreach (int n in masterBuilds[x, y].SerializeArray())
                 {
@@ -1354,15 +1331,15 @@ public class Generator : MonoBehaviour
     private string[] EncryptBuildsPath()
     {
         Debug.Log("Generator: Encrypting builds as " + PhotonNetwork.player.NickName);
-        string[] package = new string[(2 * cityX) * (2 * cityY)];
+        string[] package = new string[(2 * c_districtInWorldChunk) * (2 * c_districtInWorldChunk)];
 
         int x = 0;
         int y = 0;
         int index = 0;
-        while (x < 2 * cityX)
+        while (x < 2 * c_districtInWorldChunk)
         {
             y = 0;
-            while (y < 2 * cityY)
+            while (y < 2 * c_districtInWorldChunk)
             {
                 package[index] = masterBuilds[x, y].SerializeString();
                 index++;
@@ -1380,14 +1357,14 @@ public class Generator : MonoBehaviour
         int indexArray = 0;
         int indexPath = 0;
 
-        int[] buildSerialized = new int[BuildNode.GetPackageSize()];
-        while (x < 2 * cityX)
+        int[] buildSerialized = new int[BuildNode.c_packageSize];
+        while (x < 2 * c_districtInWorldChunk)
         {
             y = 0;
-            while (y < 2 * cityY)
+            while (y < 2 * c_districtInWorldChunk)
             {
                 //On recupere la version serialisé de la BuildNode
-                for (int i = 0; i < BuildNode.GetPackageSize(); i++)
+                for (int i = 0; i < BuildNode.c_packageSize; i++)
                 {
                     buildSerialized[i] = serializedBuilds[indexArray + i];
                 }
@@ -1395,21 +1372,19 @@ public class Generator : MonoBehaviour
                 buildMatrix[x, y] = BuildNode.Deserialize(buildSerialized, serializedPath[indexPath]);
 
                 //Incrementation
-                indexArray += BuildNode.GetPackageSize();
+                indexArray += BuildNode.c_packageSize;
                 indexPath++;
                 y++;
             }
             x++;
         }
     }
-    [PunRPC]
-    private void SendBuildsArray(int[] package)
+    [PunRPC] private void SendBuildsArray(int[] package)
     {
         Debug.Log("Generator: Received build package as " + PhotonNetwork.player.NickName);
         serializedBuilds = package;
     }
-    [PunRPC]
-    private void SendBuildsPath(string[] package)
+    [PunRPC] private void SendBuildsPath(string[] package)
     {
         Debug.Log("Generator: Received buildpath package as " + PhotonNetwork.player.NickName);
         serializedPath = package;
