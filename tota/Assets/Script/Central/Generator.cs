@@ -920,7 +920,7 @@ public class Generator : MonoBehaviour
         }
         public string[] GetBuildPathData()
         {
-            Debug.Log("Generator: Encrypting builds as " + PhotonNetwork.player.NickName);
+            Debug.Log("Generator: Encrypting buildsPaths as " + PhotonNetwork.player.NickName);
             string[] package = new string[(2 * c_districtInWorldChunk) * (2 * c_districtInWorldChunk)];
 
             int x = 0;
@@ -1043,8 +1043,10 @@ public class Generator : MonoBehaviour
         public int x;
         public int y;
         //Type de Node
-        public WorldBiome biome;
-        public WorldLayout layout;
+        private WorldBiome _biome;
+        public WorldBiome Biome { get => _biome; }
+        private WorldLayout _layout;
+        public WorldLayout Layout { get => _layout; }
         //Caractéristique des Roads (-1 si pas de route, sinon de 0 à 15 partant du sud ou de l'ouest)
         public int openNorth = -1;
         public int openSouth = -1;
@@ -1054,6 +1056,8 @@ public class Generator : MonoBehaviour
         //Caractéristique des Builds
         public int[] buildData;
         public string[] buildPathData;
+        //Aide au DecideMasterData
+        public bool hasGenerationData = false;
 
         //Constructeur
         public WorldNode(int xWorld,int yWorld)
@@ -1064,20 +1068,22 @@ public class Generator : MonoBehaviour
         //Modification par le master
         public bool TrySetBiome(WorldBiome newBiome)
         {
-            if (biome == WorldBiome.Undecided)
+            if (_biome == WorldBiome.Undecided)
             {
-                biome = newBiome;
+                _biome = newBiome;
                 return true;
             }
             return false;
         }
         public void SetLayout(WorldLayout newLayout)
         {
-            layout = newLayout;
+            _layout = newLayout;
         }
         public void DecideMasterdata()
         {
-            if (layout == WorldLayout.City)
+            hasGenerationData = true;
+
+            if (_layout == WorldLayout.City)
             {
                 //Genere une ville
                 CityNode city = new CityNode();
@@ -1113,11 +1119,13 @@ public class Generator : MonoBehaviour
         public void UpdateType(WorldBiome masterBiome, WorldLayout masterLayout)
         {
             //Appelé par les clients après que le maître ait envoyé les infos sur le type
-            biome = masterBiome;
-            layout = masterLayout;
+            _biome = masterBiome;
+            _layout = masterLayout;
         }
         public void UpdateMasterData(int[] roads, int[] builds, string[] buildPaths)
         {
+            hasGenerationData = true;
+
             roadData = roads;
             buildData = builds;
             buildPathData = buildPaths;
@@ -1127,7 +1135,7 @@ public class Generator : MonoBehaviour
         public void Generate()
         {
             GenerateFloor();
-            if (layout == WorldLayout.City)
+            if (_layout == WorldLayout.City)
             {
                 CityNode.GenerateOffset(x, y, roadData, buildData, buildPathData);
             }
@@ -1135,9 +1143,9 @@ public class Generator : MonoBehaviour
         }
         private void GenerateFloor()
         {
-            for (int yCycle = 0; y < c_districtInWorldChunk; yCycle++)
+            for (int yCycle = 0; yCycle < c_districtInWorldChunk; yCycle++)
             {
-                for (int xCycle = 0; x < c_districtInWorldChunk; xCycle++)
+                for (int xCycle = 0; xCycle < c_districtInWorldChunk; xCycle++)
                 {
                     Instantiate(
                         Resources.Load<GameObject>("testEmpty"), 
@@ -1157,8 +1165,9 @@ public class Generator : MonoBehaviour
     public enum WorldLayout
     {
         Undecided = 0,
-        Village = 1,
-        City = 2,
+        Empty = 1,
+        Village = 2,
+        City = 3,
     }
 
     #region Attributes
@@ -1220,13 +1229,194 @@ public class Generator : MonoBehaviour
     //Quandd y augmente -> on va vers le Nord
     //Quandd x augmente -> on ve vers l' Est
 
-    //Unity Callabcks
+    //Attribut du World
+    private WorldNode[,] _world = null;
+    private int _worldLength = 2;
+
+    //Init les buildTable en tant que static (pour les rendre accessible par CityNode)
     private void Awake()
     {
         InitBuildTable();
     }
 
+
     private void Start()
+    {
+        //Tout le monde Initialise la matrice des WorldNode
+        _world = new WorldNode[_worldLength, _worldLength];
+        InitWorld();
+
+        if (PhotonNetwork.isMasterClient)
+        {
+            //Au start le master decide le type des WorldNode
+            MasterInitWorldType();
+            int[] worldTypeData = MasterGetWorldTypeData();
+            //Le master envoie l'entiereté des infos et update la condition de réception
+            MasterSendWorldType(worldTypeData);
+            OnWorldTypeReceived();//Temporaire
+        }
+        else
+        {
+            //Les clients attendent les infos du master (Coroutine lancé par le master)
+        }
+    }
+    private void InitWorld()
+    {
+        for (int y = 0; y < _worldLength; y++)
+        {
+            for (int x = 0; x < _worldLength; x++)
+            {
+                _world[x, y] = new WorldNode(x, y);
+            }
+        }
+    }
+    //Master Decide World Type
+
+    private void MasterInitWorldType()
+    {
+        MasterInitBiome();
+        MasterInitLayout();
+    }
+    private void MasterInitBiome()
+    {
+        for (int y = 0; y < _worldLength; y++)
+        {
+            for (int x = 0; x < _worldLength; x++)
+            {
+                _world[x, y].TrySetBiome(WorldBiome.Plain);
+            }
+        }
+    }
+    private void MasterInitLayout()
+    {
+        for (int y = 0; y < _worldLength; y++)
+        {
+            for (int x = 0; x < _worldLength; x++)
+            {
+                _world[x, y].SetLayout(WorldLayout.City);
+            }
+        }
+    }
+    
+    private int[] MasterGetWorldTypeData()
+    {
+        int[] package = new int[_worldLength * _worldLength * 2];
+
+        int index = 0;
+        for (int y = 0; y < _worldLength; y++)
+        {
+            for (int x = 0; x < _worldLength; x++)
+            {
+                package[index] = (int)(_world[x,y].Biome);
+                package[index + 1] = (int)(_world[x, y].Layout);
+
+                index += 2;
+            }
+        }
+
+        return package;
+    }
+
+    //Master Send World Type
+    private void MasterSendWorldType(int[] worldTypeData)
+    {
+        Debug.Log("MasterSendWorldType: Sending world type Data as master");
+        GetComponent<PhotonView>().RPC("MasterSendWorldTypeRPC", PhotonTargets.OthersBuffered, worldTypeData);
+    }
+    [PunRPC] private void MasterSendWorldTypeRPC(int[] worldTypeData)
+    {
+        Debug.Log("MasterSendWorldTypeRPC: receiving world type Data");
+        StartCoroutine(WaitForWorldInit(worldTypeData));
+    }
+
+    //Coroutine du start des clients (lancé par le master)
+    public IEnumerator WaitForWorldInit(int[] worldTypeData)
+    {
+        while(_world == null)
+        {
+            Debug.Log("WaitForWorldInit: waiting for _world to Init");
+            yield return new WaitForSeconds(1);
+        }
+        //Les clients recoivent l'entiereté des infos
+        ClientUpdateWorldType(worldTypeData);
+        OnWorldTypeReceived();
+    }
+    private void ClientUpdateWorldType(int[] worldTypeData)
+    {
+        Debug.Log("ClientUpdateWorldType: Updating worldtype as client");
+        int index = 0;
+        for (int y = 0; y < _worldLength; y++)
+        {
+            for (int x = 0; x < _worldLength; x++)
+            {
+                _world[x, y].UpdateType((WorldBiome)(worldTypeData[index]), (WorldLayout)(worldTypeData[index + 1]));
+
+                index += 2;
+            }
+        }
+    }
+
+    private void OnWorldTypeReceived()
+    {
+        Debug.Log("OnWorldTypeReceived: Starting loading of chunk 0,0");
+        //The truest Start
+        //ClientLoadChunk(0, 0);
+        for (int y = 0; y < _worldLength; y++)
+        {
+            for (int x = 0; x < _worldLength; x++)
+            {
+                ClientLoadChunk(x, y);
+            }
+        }
+    }
+    
+    //Fin de l'init de WorldNode
+
+
+
+    //Debut de l'update permanente
+
+    private void ClientLoadChunk(int x, int y)
+    {
+        Debug.Log("ClientLoadChunk: Asking to master WorldNode Data");
+        //Un client demande la génération d'un chunk au master
+        GetComponent<PhotonView>().RPC("MasterDataAskedHandler", PhotonTargets.MasterClient, x, y, PhotonNetwork.player.ID);
+    }
+    [PunRPC] private void MasterDataAskedHandler(int x, int y, int IdOfAsker)
+    {
+        //Appelé par RPC par ClientLoadChunk (seulement effectué par Master)
+
+        WorldNode worldTarget = _world[x, y];
+        //Le master regarde s'il a lui meme décidé de la génération
+        if (!worldTarget.hasGenerationData)
+        {
+            //Si non , il décide de la génération
+            worldTarget.DecideMasterdata();
+        }
+        //il envoie les informations de la génération au client
+        int[] roads = worldTarget.roadData;
+        int[] builds = worldTarget.buildData;
+        string[] buildPaths = worldTarget.buildPathData;
+        GetComponent<PhotonView>().RPC("ClientUpdateDataAt", PhotonPlayer.Find(IdOfAsker), x, y, roads, builds, buildPaths);
+    }
+    [PunRPC] private void ClientUpdateDataAt(int x, int y, int[] roads, int[] builds, string[] buildPaths)
+    {
+        //Appelé après ClientLoadChunk (apres etre passé par MasterDataAskedHandler)
+        _world[x, y].UpdateMasterData(roads, builds, buildPaths);
+
+        ClientGenerateAt(x, y);
+    }
+    private void ClientGenerateAt(int x, int y)
+    {
+        Debug.Log("ClientGenerateAt: Generating at " + x + "," + y);
+        _world[x, y].Generate();
+    }
+
+
+    #region DEPRECATED
+
+    //Deprecated
+    private void depre_Start()
     {
         roadMatrix = new RoadNode[c_districtInWorldChunk, c_districtInWorldChunk];
         buildMatrix = new BuildNode[c_districtInWorldChunk * 2, c_districtInWorldChunk * 2];
@@ -1255,7 +1445,7 @@ public class Generator : MonoBehaviour
         }
     }
 
-    private void Update()
+    private void depre_Update()
     {
         if (!receivedPackage && serializedRoads != null && serializedBuilds != null &&  serializedPath != null)
         {
@@ -2208,6 +2398,8 @@ public class Generator : MonoBehaviour
     }
 
     #endregion
-    
+
+    #endregion
+
 
 }
