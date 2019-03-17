@@ -79,12 +79,25 @@ public class CharaRpg : MonoBehaviour
         };
     }
 
+    [PunRPC]
+    public void SendToolTipInfo(string[] info)
+    {
+        _strength = int.Parse(info[1]);
+        _intelligence = int.Parse(info[2]);
+        _perception = int.Parse(info[3]);
+        _mental = int.Parse(info[4]);
+        _social = int.Parse(info[5]);
+        _hunger = int.Parse(info[6]);
+        _maxHunger = int.Parse(info[7]);
+    }
+
     public void Eat(int food)
     {
         if (_hunger < _maxHunger)
         {
             _hunger += food;
             GameObject.Find("eCentralManager").GetComponent<CentralManager>().UpdateToolTip(GetToolTipInfo()); // On appelle l'update du tooltip
+            //GetComponent<PhotonView>().RPC("SendToolTipInfo", PhotonTargets.AllBuffered, GetToolTipInfo());
         }
     }
 

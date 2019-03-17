@@ -44,8 +44,8 @@ public class ToolTip : MonoBehaviour
         _socialText.text = "Social: " + info[5];
 
         _hungerText.text = "Hunger: " + info[6] + "/" + info[7];
-
     }
+
 
     public void UpdateTool(string[] info)
     {
