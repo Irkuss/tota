@@ -332,7 +332,7 @@ public class Generator : MonoBehaviour
     public class CityNode
     {
         //But de cette class, produire les datas necessaire à une City
-
+        private WorldLayout _layout;
         //Les matrices travaillées
         public RoadNode[,] roadMatrix;
         public BuildNode[,] buildMatrix;
@@ -340,14 +340,29 @@ public class Generator : MonoBehaviour
         private int borderNorth;
         private int borderEast;
         private int midCoord;
+        //Ouverture
+        private int _openNorth = -1;
+        private int _openSouth = -1;
+        private int _openEast = -1;
+        private int _openWest = -1;
         //Constructeur
-        public CityNode()
+        public CityNode(WorldLayout layout, int north, int south, int east, int west)
         {
+            Debug.Log("CityNode: creating new City with " + (int)layout + "as biome");
+            _layout = layout;
+
+            _openNorth = north;
+            _openSouth = south;
+            _openEast = east;
+            _openWest = west;
+
             Init();
 
             SetupRoads();
-
-            SetupBuilds();
+            if (_layout != WorldLayout.Empty)
+            {
+                SetupBuilds();
+            }
         }
 
         //Initialisation générale
@@ -383,25 +398,87 @@ public class Generator : MonoBehaviour
         }
         private void ModifyRoads()
         {
+            switch (_layout)
+            {
+                case WorldLayout.Empty: ModifyRoadsEmpty(); break;
+                case WorldLayout.Village: ModifyRoadsVillage(); break;
+                case WorldLayout.City: ModifyRoadsCity(); break;
+                default: break;
+            }
+        }
+        private void ModifyRoadsEmpty()
+        {
+            RoadNode north = null;
+            RoadNode south = null;
+            RoadNode east = null;
+            RoadNode west = null;
+            if (_openNorth != -1)
+            {
+                north = roadMatrix[_openNorth, borderNorth];
+                north.OpenNorth();
+            }
+            if (_openSouth != -1)
+            {
+                south = roadMatrix[_openSouth, 0];
+                south.OpenSouth();
+            }
+            if (_openEast != -1)
+            {
+                east = roadMatrix[borderEast, _openEast];
+                east.OpenEast();
+            }
+            if (_openWest != -1)
+            {
+                west = roadMatrix[0, _openWest];
+                west.OpenWest();
+            }
+
+            RoadNode nodeMiddle = GetNodeInRange(midCoord - 1, midCoord + 1, midCoord - 1, midCoord + 1);
+
+            CreateRoad(nodeMiddle, north);
+            CreateRoad(nodeMiddle, south);
+            CreateRoad(nodeMiddle, east);
+            CreateRoad(nodeMiddle, west);
+        }
+        private void ModifyRoadsVillage()
+        {
+
+        }
+        private void ModifyRoadsCity()
+        {
             //Setup des nodes spécifiques
             RoadNode nodeMiddle = GetNodeInRange(midCoord - 1, midCoord + 1, midCoord - 1, midCoord + 1);
+
             RoadNode nodePoiSW = GetNodeInRange(1, midCoord - 2, 1, midCoord - 2);
             RoadNode nodePoiSE = GetNodeInRange(midCoord + 2, borderEast - 1, 1, midCoord - 2);
             RoadNode nodePoiNW = GetNodeInRange(1, midCoord - 2, midCoord + 2, borderNorth - 1);
             RoadNode nodePoiNE = GetNodeInRange(midCoord + 2, borderEast - 1, midCoord + 2, borderNorth - 1);
 
             //Get les entrées
-            int ouverture = 3; //Compris entre 1 et min(midX,midY), plus ouverture est petit plus la variance est grande
-
-            RoadNode north = GetNodeInRange(ouverture, borderEast - ouverture, borderNorth, borderNorth);
-            RoadNode south = GetNodeInRange(ouverture, borderEast - ouverture, 0, 0);
-            RoadNode east = GetNodeInRange(borderEast, borderEast, ouverture, borderNorth - ouverture);
-            RoadNode west = GetNodeInRange(0, 0, ouverture, borderNorth - ouverture);
-            //ouvrir les entrées
-            north.OpenNorth();
-            south.OpenSouth();
-            east.OpenEast();
-            west.OpenWest();
+            RoadNode north = null;
+            RoadNode south = null;
+            RoadNode east = null;
+            RoadNode west = null;
+            if (_openNorth != -1)
+            {
+                north = roadMatrix[_openNorth, borderNorth];
+                north.OpenNorth();
+            }
+            if (_openSouth != -1)
+            {
+                south = roadMatrix[_openSouth, 0];
+                south.OpenSouth();
+            }
+            if (_openEast != -1)
+            {
+                east = roadMatrix[borderEast, _openEast];
+                east.OpenEast();
+            }
+            if (_openWest != -1)
+            {
+                west = roadMatrix[0, _openWest];
+                west.OpenWest();
+            }
             //Connectez des nodes avec routes
             ConnectCardinalTo(nodeMiddle, north, south, east, west);
             CreateRoad(nodeMiddle, nodePoiNE);
@@ -423,10 +500,10 @@ public class Generator : MonoBehaviour
         //Connectors
         private void ConnectCardinalTo(RoadNode node, RoadNode north, RoadNode south, RoadNode east, RoadNode west)
         {
-            ConnectPoint(FindPath(north, node));
-            ConnectPoint(FindPath(south, node));
-            ConnectPoint(FindPath(east, node));
-            ConnectPoint(FindPath(west, node));
+            CreateRoad(north, node);
+            CreateRoad(south, node);
+            CreateRoad(east, node);
+            CreateRoad(west, node);
         }
         private void ConnectAllBetween(RoadNode n1, RoadNode n2, RoadNode n3, RoadNode n4)
         {
@@ -502,6 +579,7 @@ public class Generator : MonoBehaviour
         }
         private void CreateRoad(RoadNode node1, RoadNode node2)
         {
+            if (node1 == null || node2 == null) return;
             ConnectPoint(FindPath(node1, node2));
         }
         #endregion
@@ -896,6 +974,11 @@ public class Generator : MonoBehaviour
         }
         public int[] GetBuildData()
         {
+            if (_layout == WorldLayout.Empty)
+            {
+                return null;
+            }
+
             Debug.Log("Generator: Encrypting builds as " + PhotonNetwork.player.NickName);
             int[] package = new int[(2 * c_districtInWorldChunk) * (2 * c_districtInWorldChunk) * BuildNode.c_packageSize];
 
@@ -920,6 +1003,11 @@ public class Generator : MonoBehaviour
         }
         public string[] GetBuildPathData()
         {
+            if (_layout == WorldLayout.Empty)
+            {
+                return null;
+            }
+
             Debug.Log("Generator: Encrypting buildsPaths as " + PhotonNetwork.player.NickName);
             string[] package = new string[(2 * c_districtInWorldChunk) * (2 * c_districtInWorldChunk)];
 
@@ -943,6 +1031,8 @@ public class Generator : MonoBehaviour
         //Generateur static (decrypt)
         public static void GenerateOffset(int xOffset, int yOffset, int[] roadData, int[] buildData, string[] buildPathData)
         {
+            Debug.Log("Generator: Generating as " + PhotonNetwork.player.NickName);
+
             GenerateRoads(DecryptRoads(roadData), xOffset, yOffset);
 
             GenerateBuilds(DecryptBuilds(buildData, buildPathData), xOffset, yOffset);
@@ -950,8 +1040,6 @@ public class Generator : MonoBehaviour
 
         private static RoadNode[,] DecryptRoads(int[] roadData)
         {
-            Debug.Log("Generator: Decrypting roads as " + PhotonNetwork.player.NickName);
-
             RoadNode[,] tempRoadMatrix = new RoadNode[c_districtInWorldChunk, c_districtInWorldChunk];
 
             int x = 0;
@@ -993,8 +1081,10 @@ public class Generator : MonoBehaviour
 
         private static BuildNode[,] DecryptBuilds(int[] buildData, string[] buildPathData)
         {
-            Debug.Log("Generator: Decrypting builds as " + PhotonNetwork.player.NickName);
-
+            if(buildData == null && buildPathData == null)
+            {
+                return null;
+            }
             BuildNode[,] tempBuildMatrix = new BuildNode[c_districtInWorldChunk * 2, c_districtInWorldChunk * 2];
 
             int x = 0;
@@ -1027,6 +1117,7 @@ public class Generator : MonoBehaviour
         }
         private static void GenerateBuilds(BuildNode[,] tempBuildMatrix, int xOffset, int yOffset)
         {
+            if (tempBuildMatrix == null) return;
             for (int y = 0; y < c_districtInWorldChunk * 2; y++)
             {
                 for (int x = 0; x < c_districtInWorldChunk * 2; x++)
@@ -1053,12 +1144,42 @@ public class Generator : MonoBehaviour
         public int openEast = -1;
         public int openWest = -1;
         public int[] roadData;
+        public void OpenTo(WorldNode node, int overture)
+        {
+            if (x > node.x) //on est à l'est de node
+            {
+                openWest = overture;
+                node.openEast = overture;
+            }
+            else if (x < node.x) //on est à l'ouest de node
+            {
+                openEast = overture;
+                node.openWest = overture;
+            }
+            else if (y > node.y) //on est au nord de node
+            {
+                openSouth = overture;
+                node.openNorth = overture;
+            }
+            else if (y < node.y) //on est au sud de node
+            {
+                openNorth = overture;
+                node.openSouth = overture;
+            }
+            else
+            {
+                Debug.Log("NodeHead: OpenTo: Compared same node coord");
+            }
+        }
         //Caractéristique des Builds
         public int[] buildData;
         public string[] buildPathData;
         //Aide au DecideMasterData
         public bool hasGenerationData = false;
-
+        public bool hasRoadData = false;
+        public bool hasBuildData = false;
+        public bool hasBuildPathData = false;
+        public bool isLoaded = false;
         //Constructeur
         public WorldNode(int xWorld,int yWorld)
         {
@@ -1066,14 +1187,9 @@ public class Generator : MonoBehaviour
             y = yWorld;
         }
         //Modification par le master
-        public bool TrySetBiome(WorldBiome newBiome)
+        public void SetBiome(WorldBiome newBiome)
         {
-            if (_biome == WorldBiome.Undecided)
-            {
-                _biome = newBiome;
-                return true;
-            }
-            return false;
+            _biome = newBiome;
         }
         public void SetLayout(WorldLayout newLayout)
         {
@@ -1082,36 +1198,15 @@ public class Generator : MonoBehaviour
         public void DecideMasterdata()
         {
             hasGenerationData = true;
-
-            if (_layout == WorldLayout.City)
-            {
-                //Genere une ville
-                CityNode city = new CityNode();
-                //Update les datas
-                roadData = city.GetRoadData();
-                buildData = city.GetBuildData();
-                buildPathData = city.GetBuildPathData();
-            }
+            
+            //Genere une ville
+            CityNode city = new CityNode(_layout,openNorth,openSouth,openEast,openWest);
+            //Update les datas
+            roadData = city.GetRoadData();
+            buildData = city.GetBuildData();
+            buildPathData = city.GetBuildPathData();
         }
         /// <summary>°0:North,1:South,2:East,3:West; value range from 0 to 15 </summary>
-        public void Open(int direction, int value)
-        {
-            switch (direction)
-            {
-                case 0:
-                    openNorth = value;
-                    break;
-                case 1:
-                    openSouth = value;
-                    break;
-                case 2:
-                    openEast = value;
-                    break;
-                default:
-                    openWest = value;
-                    break;
-            }
-        }
         //Envoi (côté master)
 
 
@@ -1130,16 +1225,35 @@ public class Generator : MonoBehaviour
             buildData = builds;
             buildPathData = buildPaths;
         }
+        public void UpdateRoadData(int[] roads)
+        {
+            hasRoadData = true;
+            roadData = roads;
+        }
+        public void UpdateBuildData(int[] builds)
+        {
+            hasBuildData = true;
+            buildData = builds;
+        }
+        public void UpdateBuildPathData(string[] buildPaths)
+        {
+            hasBuildPathData = true;
+            buildPathData = buildPaths;
+        }
+        public bool HasGenerationData()
+        {
+            hasGenerationData = hasGenerationData || (hasRoadData && hasBuildData && hasBuildPathData);
+            return hasGenerationData;
+        }
 
         //Generation
-        public void Generate()
+        public IEnumerator Generate()
         {
+            isLoaded = true;
             GenerateFloor();
-            if (_layout == WorldLayout.City)
-            {
-                CityNode.GenerateOffset(x, y, roadData, buildData, buildPathData);
-            }
-
+            yield return null;
+            CityNode.GenerateOffset(x, y, roadData, buildData, buildPathData);
+            yield return null;
         }
         private void GenerateFloor()
         {
@@ -1158,7 +1272,7 @@ public class Generator : MonoBehaviour
 
     public enum WorldBiome
     {
-        Undecided = 0,
+        Undecided = 0, //NB: l'index 0 est le seul biome temporaire
         Plain = 1,
         Forest = 2,
     }
@@ -1231,7 +1345,8 @@ public class Generator : MonoBehaviour
 
     //Attribut du World
     private WorldNode[,] _world = null;
-    private int _worldLength = 2;
+    private int _worldLength = 10;
+    public int spawnPoint = 3;
 
     //Init les buildTable en tant que static (pour les rendre accessible par CityNode)
     private void Awake()
@@ -1253,7 +1368,7 @@ public class Generator : MonoBehaviour
             int[] worldTypeData = MasterGetWorldTypeData();
             //Le master envoie l'entiereté des infos et update la condition de réception
             MasterSendWorldType(worldTypeData);
-            OnWorldTypeReceived();//Temporaire
+            StartCoroutine(OnWorldTypeReceived());//Temporaire
         }
         else
         {
@@ -1271,111 +1386,407 @@ public class Generator : MonoBehaviour
         }
     }
     //Master Decide World Type
-
-    private void MasterInitWorldType()
-    {
-        MasterInitBiome();
-        MasterInitLayout();
-    }
-    private void MasterInitBiome()
-    {
-        for (int y = 0; y < _worldLength; y++)
+        private void MasterInitWorldType()
         {
-            for (int x = 0; x < _worldLength; x++)
+            MasterInitBiome();
+            MasterInitLayout();
+            MasterInitRoads();
+        }
+        //Init Biome
+            private void MasterInitBiome()
             {
-                _world[x, y].TrySetBiome(WorldBiome.Plain);
+                WorldBiome[,] worldBiomes = new WorldBiome[_worldLength, _worldLength];
+                InitWorldBiomes(worldBiomes); //Remplis de Undecided
+                Debug.Log("MasterInitBiome: Placing Origin");
+                InitWorldBiomesOrigin(worldBiomes); //Marque certain endroit d'origine de biome
+                TestPrintBiomes(worldBiomes);
+                Debug.Log("MasterInitBiome: Starting Expansion");
+                InitWorldBiomesExpansion(worldBiomes); //Cycle through every biomeOrigin and expand until no one can expand anymore)
+                TestPrintBiomes(worldBiomes);
+                InitWorldBiomesCopy(worldBiomes); //Copy worldBiome biomes into world
+
+                //Depre (on laisse jusqua terminer les trucs en haut btw)
+                for (int y = 0; y < _worldLength; y++)
+                {
+                    for (int x = 0; x < _worldLength; x++)
+                    {
+                        _world[x, y].SetBiome(WorldBiome.Plain);
+                    }
+                }
             }
-        }
-    }
-    private void MasterInitLayout()
-    {
-        for (int y = 0; y < _worldLength; y++)
-        {
-            for (int x = 0; x < _worldLength; x++)
+            private void InitWorldBiomes(WorldBiome[,] worldBiomes)
             {
-                _world[x, y].SetLayout(WorldLayout.City);
+                for (int i = 0; i < _worldLength; i++)
+                {
+                    for (int j = 0; j < _worldLength; j++)
+                    {
+                        worldBiomes[i, j] = WorldBiome.Undecided;
+                    }
+                }
             }
-        }
-    }
-    
-    private int[] MasterGetWorldTypeData()
-    {
-        int[] package = new int[_worldLength * _worldLength * 2];
-
-        int index = 0;
-        for (int y = 0; y < _worldLength; y++)
-        {
-            for (int x = 0; x < _worldLength; x++)
+            private void InitWorldBiomesOrigin(WorldBiome[,] worldBiomes)
             {
-                package[index] = (int)(_world[x,y].Biome);
-                package[index + 1] = (int)(_world[x, y].Layout);
-
-                index += 2;
+                for (int i = 0; i < _worldLength; i++)
+                {
+                    for (int j = 0; j < _worldLength; j++)
+                    {
+                        if (Random.Range(0,100) < 10)
+                        {
+                            worldBiomes[i, j] = GetRandomBiome();
+                        }
+                    }
+                }
             }
-        }
-
-        return package;
-    }
-
-    //Master Send World Type
-    private void MasterSendWorldType(int[] worldTypeData)
-    {
-        Debug.Log("MasterSendWorldType: Sending world type Data as master");
-        GetComponent<PhotonView>().RPC("MasterSendWorldTypeRPC", PhotonTargets.OthersBuffered, worldTypeData);
-    }
-    [PunRPC] private void MasterSendWorldTypeRPC(int[] worldTypeData)
-    {
-        Debug.Log("MasterSendWorldTypeRPC: receiving world type Data");
-        StartCoroutine(WaitForWorldInit(worldTypeData));
-    }
-
-    //Coroutine du start des clients (lancé par le master)
-    public IEnumerator WaitForWorldInit(int[] worldTypeData)
-    {
-        while(_world == null)
-        {
-            Debug.Log("WaitForWorldInit: waiting for _world to Init");
-            yield return new WaitForSeconds(1);
-        }
-        //Les clients recoivent l'entiereté des infos
-        ClientUpdateWorldType(worldTypeData);
-        OnWorldTypeReceived();
-    }
-    private void ClientUpdateWorldType(int[] worldTypeData)
-    {
-        Debug.Log("ClientUpdateWorldType: Updating worldtype as client");
-        int index = 0;
-        for (int y = 0; y < _worldLength; y++)
-        {
-            for (int x = 0; x < _worldLength; x++)
+            private WorldBiome GetRandomBiome()
             {
-                _world[x, y].UpdateType((WorldBiome)(worldTypeData[index]), (WorldLayout)(worldTypeData[index + 1]));
-
-                index += 2;
+                int biomeCount = System.Enum.GetNames(typeof(WorldBiome)).Length;
+        
+                return (WorldBiome)(Random.Range(1, biomeCount)); //1 à 5 pour count = 6
             }
-        }
-    }
+            private void InitWorldBiomesExpansion(WorldBiome[,] worldBiomes)
+            {
+                bool undecidedLeft = true;
+                WorldBiome biomeOrigin;
+                while (undecidedLeft)
+                {
+                    WorldBiome[,] worldBiomesCopy = GetCopyWorldBiomes(worldBiomes);
+                    undecidedLeft = false;
+                    for (int i = 0; i < _worldLength; i++)
+                    {
+                        for (int j = 0; j < _worldLength; j++)
+                        {
+                            if (worldBiomesCopy[i, j] == WorldBiome.Undecided)
+                            {
+                                //Il reste des endroits à remplir
+                                undecidedLeft = true;
+                            }
+                            else
+                            {
+                                biomeOrigin = worldBiomes[i, j];
+                                InitWorldBiomesTryReplace(worldBiomes, i + 1, j, biomeOrigin);
+                                InitWorldBiomesTryReplace(worldBiomes, i - 1, j, biomeOrigin);
+                                InitWorldBiomesTryReplace(worldBiomes, i, j + 1, biomeOrigin);
+                                InitWorldBiomesTryReplace(worldBiomes, i, j - 1, biomeOrigin);
+                            }
+                        }
+                    }
+                }
+            }
+            private WorldBiome[,] GetCopyWorldBiomes(WorldBiome[,] worldBiomes)
+            {
+                WorldBiome[,] worldBiomesCopy = new WorldBiome[_worldLength, _worldLength];
 
-    private void OnWorldTypeReceived()
+                for (int i = 0; i < _worldLength; i++)
+                {
+                    for (int j = 0; j < _worldLength; j++)
+                    {
+                        worldBiomesCopy[i, j] = worldBiomes[i, j];
+                    }
+                }
+
+                return worldBiomesCopy;
+            }
+            private bool InitWorldBiomesTryReplace(WorldBiome[,] worldBiomes, int x, int y, WorldBiome newBiome)
+            {
+                if (x >= 0 && y >= 0 && x < _worldLength && y < _worldLength)
+                {
+                    if (worldBiomes[x,y] == WorldBiome.Undecided)
+                    {
+                        worldBiomes[x, y] = newBiome;
+                        return true;
+                    }
+                }
+                return false;
+            }
+            private void InitWorldBiomesCopy(WorldBiome[,] worldBiomes)
+            {
+                for (int y = 0; y < _worldLength; y++)
+                {
+                    for (int x = 0; x < _worldLength; x++)
+                    {
+                        _world[x, y].SetBiome(worldBiomes[x, y]);
+                    }
+                }
+            }
+            private void TestPrintBiomes(WorldBiome[,] worldBiomes)
+            {
+                string line = "";
+                for (int i = 0; i < _worldLength; i++)
+                {
+                    for (int j = 0; j < _worldLength; j++)
+                    {
+                        line += (int)(worldBiomes[i, j]);
+                        line += "    ";
+                    }
+                    line += "\n";
+                }
+                Debug.Log(line);
+            }
+        //Init Layout
+            private void MasterInitLayout()
+            {
+                for (int y = 0; y < _worldLength; y++)
+                {
+                    for (int x = 0; x < _worldLength; x++)
+                    {
+                        if (Random.Range(0, 8) == 0)
+                        {
+                            _world[x, y].SetLayout(WorldLayout.City);
+                        }
+                        else
+                        {
+                            _world[x, y].SetLayout(WorldLayout.Empty);
+                        }
+                    }
+                }
+                MasterForceLayoutAtSpawnPoint();
+            }
+            private void MasterForceLayoutAtSpawnPoint()
+            {
+                _world[spawnPoint, spawnPoint].SetLayout(WorldLayout.City);
+            }
+        //Init Roads
+            private void MasterInitRoads()
+            {
+                MasterConnectCities();
+            }
+            private List<WorldNode> MasterFindPath(WorldNode node1, WorldNode node2)
+            {
+                List<WorldNode> path = new List<WorldNode>();
+                //Current X and Y
+                int currX = node1.x;
+                int currY = node1.y;
+                //Destination X and Y
+                int destX = node2.x;
+                int destY = node2.y;
+                //Distance between Destination and Current
+                int distX; //Si distX positif, la destination est à l'Est
+                int distY; //Si distY positif, la destination est au Nord
+
+                int absDistX;
+                int absDistY;
+
+                while (currX != destX || currY != destY)
+                {
+                    //On ajoute la node là où on se trouve
+                    path.Add(_world[currX, currY]);
+                    //On met à jour la distance
+                    distX = destX - currX;
+                    distY = destY - currY;
+                    //On met à jour la distance absolu
+                    absDistX = (distX > 0) ? distX : -distX;
+                    absDistY = (distY > 0) ? distY : -distY;
+                    //Choisir l'axe de déplacement
+                    if (absDistX > absDistY)
+                    {
+                        if (distX > 0)
+                        {
+                            currX++; //On se déplace à l'Est
+                        }
+                        else
+                        {
+                            currX--; //On se déplace à l'Ouest
+                        }
+                    }
+                    else
+                    {
+                        if (distY > 0)
+                        {
+                            currY++;  //On se déplace au Nord
+                        }
+                        else
+                        {
+                            currY--;  //On se déplace au Sud
+                        }
+                    }
+                    //Fin de la boucle, on a mis à jour les coordonnées suivantes
+                }
+                //Il manque la destination dans path
+                path.Add(_world[destX, destY]);
+
+                return path;
+            }
+            private void MasterConnectWorldNode(List<WorldNode> path)
+            {
+                if (path.Count == 0)
+                {
+                    Debug.Log("MasterConnectPoint: path is empty");
+                    return;
+                }
+
+                WorldNode previousNode = path[0];
+
+                for (int i = 1; i < path.Count; i++)
+                {
+                    previousNode.OpenTo(path[i],Random.Range(5,10));
+                    previousNode = path[i];
+                }
+            }
+            private void MasterCreateRoad(WorldNode node1, WorldNode node2)
+            {
+                MasterConnectWorldNode(MasterFindPath(node1, node2));
+            }
+            private List<WorldNode> MasterFindNonEmpty(WorldNode nodeCenter, int radius)
+            {
+                int searchSquareLength = radius * 2 + 1;
+                List<WorldNode> closeNodes = new List<WorldNode>();
+                WorldNode tempNode;
+                for (int y = nodeCenter.y - radius; y <= nodeCenter.y + radius; y++)
+                {
+                    for (int x = nodeCenter.x - radius; x <= nodeCenter.x + radius; x++)
+                    {
+                        tempNode = MasterCheckNonEmpty(x, y);
+                        if (tempNode != null)
+                        {
+                            closeNodes.Add(tempNode);
+                        }
+                    }
+                }
+                return closeNodes;
+            }
+            private WorldNode MasterCheckNonEmpty(int x, int y)
+            {
+                if (x >= 0 && y >= 0 && x < _worldLength && y < _worldLength)
+                {
+                    if (_world[x, y].Layout != WorldLayout.Empty)
+                    {
+                        return _world[x, y];
+                    }
+                }
+                return null;
+            }
+            private void MasterConnectToNodeList(WorldNode nodeCenter, List<WorldNode> nodeList)
+            {
+                foreach(WorldNode node in nodeList)
+                {
+                    MasterCreateRoad(nodeCenter, node);
+                }
+            }
+            private void MasterConnectToCloseNode(WorldNode nodeCenter)
+            {
+                MasterConnectToNodeList(nodeCenter, MasterFindNonEmpty(nodeCenter, 2));
+            }
+            private void MasterConnectCities()
+            {
+                for (int y = 0; y < _worldLength; y++)
+                {
+                    for (int x = 0; x < _worldLength; x++)
+                    {
+                        if(_world[x,y].Layout == WorldLayout.City)
+                        {
+                            MasterConnectToCloseNode(_world[x, y]);
+                        }
+                    }
+                }
+            }
+            //Get Data
+            private int[] MasterGetWorldTypeData()
+            {
+                int[] package = new int[_worldLength * _worldLength * 2];
+
+                int index = 0;
+                for (int y = 0; y < _worldLength; y++)
+                {
+                    for (int x = 0; x < _worldLength; x++)
+                    {
+                        package[index] = (int)(_world[x,y].Biome);
+                        package[index + 1] = (int)(_world[x, y].Layout);
+
+                        index += 2;
+                    }
+                }
+
+                return package;
+            }
+            //Master Send World Type
+            private void MasterSendWorldType(int[] worldTypeData)
+            {
+                Debug.Log("MasterSendWorldType: Sending world type Data as master");
+                GetComponent<PhotonView>().RPC("MasterSendWorldTypeRPC", PhotonTargets.OthersBuffered, worldTypeData);
+            }
+            [PunRPC] private void MasterSendWorldTypeRPC(int[] worldTypeData)
+            {
+                Debug.Log("MasterSendWorldTypeRPC: receiving world type Data");
+                StartCoroutine(WaitForWorldInit(worldTypeData));
+            }
+            //Coroutine du start des clients (lancé par le master)
+            public IEnumerator WaitForWorldInit(int[] worldTypeData)
+            {
+                while(_world == null)
+                {
+                    Debug.Log("WaitForWorldInit: waiting for _world to Init");
+                    yield return new WaitForSeconds(1);
+                }
+                //Les clients recoivent l'entiereté des infos
+                ClientUpdateWorldType(worldTypeData);
+                OnWorldTypeReceived();
+            }
+            private void ClientUpdateWorldType(int[] worldTypeData)
+            {
+                Debug.Log("ClientUpdateWorldType: Updating worldtype as client");
+                int index = 0;
+                for (int y = 0; y < _worldLength; y++)
+                {
+                    for (int x = 0; x < _worldLength; x++)
+                    {
+                        _world[x, y].UpdateType((WorldBiome)(worldTypeData[index]), (WorldLayout)(worldTypeData[index + 1]));
+
+                        index += 2;
+                    }
+                }
+            StartCoroutine(OnWorldTypeReceived());
+            }
+    //Fin de l'init de WorldNode (TRUE START HERE)
+    private IEnumerator OnWorldTypeReceived()
     {
         Debug.Log("OnWorldTypeReceived: Starting loading of chunk 0,0");
         //The truest Start
-        //ClientLoadChunk(0, 0);
-        for (int y = 0; y < _worldLength; y++)
+        LoadChunkAround(1, 1);
+        LoadChunkAround(4, 1);
+        LoadChunkAround(1, 4);
+        LoadChunkAround(4, 4);
+        Debug.Log("Waiting 15 seconds");
+        yield return new WaitForSeconds(15f);
+        Debug.Log("Waiting for end of frame");
+        yield return new WaitForEndOfFrame();
+        //ULTRA TEMPORAIRE
+        Debug.Log("Navmesh generation !! (might take a little time)");
+        OnGenerationEnded();
+    }
+    
+
+    //Debut de l'update permanente
+
+    private void LoadChunkAround(int x, int y)
+    {
+        StartCoroutine(CorLoadChunkAround(x, y));
+    }
+
+    private IEnumerator CorLoadChunkAround(int x, int y)
+    {
+        SafeLoadChunkAt(x - 1, y - 1); yield return new WaitForSeconds(0.1f);
+        SafeLoadChunkAt(x    , y - 1); yield return new WaitForSeconds(0.1f);
+        SafeLoadChunkAt(x + 1, y - 1); yield return new WaitForSeconds(0.1f);
+
+        SafeLoadChunkAt(x - 1, y    ); yield return new WaitForSeconds(0.1f);
+        SafeLoadChunkAt(x    , y    ); yield return new WaitForSeconds(0.1f);
+        SafeLoadChunkAt(x + 1, y    ); yield return new WaitForSeconds(0.1f);
+
+        SafeLoadChunkAt(x - 1, y + 1); yield return new WaitForSeconds(0.1f);
+        SafeLoadChunkAt(x    , y + 1); yield return new WaitForSeconds(0.1f);
+        SafeLoadChunkAt(x + 1, y + 1); yield return new WaitForSeconds(0.1f);
+    }
+
+    private void SafeLoadChunkAt(int x, int y)
+    {
+        if (x >= 0 && y >= 0 && x < _worldLength && y < _worldLength)
         {
-            for (int x = 0; x < _worldLength; x++)
+            if (!_world[x, y].isLoaded) //Changé au moment de Generate
             {
                 ClientLoadChunk(x, y);
             }
         }
     }
-    
-    //Fin de l'init de WorldNode
-
-
-
-    //Debut de l'update permanente
-
     private void ClientLoadChunk(int x, int y)
     {
         Debug.Log("ClientLoadChunk: Asking to master WorldNode Data");
@@ -1384,8 +1795,8 @@ public class Generator : MonoBehaviour
     }
     [PunRPC] private void MasterDataAskedHandler(int x, int y, int IdOfAsker)
     {
+        Debug.Log("MasterDataAskedHandler: Master sending data to " + PhotonPlayer.Find(IdOfAsker).NickName);
         //Appelé par RPC par ClientLoadChunk (seulement effectué par Master)
-
         WorldNode worldTarget = _world[x, y];
         //Le master regarde s'il a lui meme décidé de la génération
         if (!worldTarget.hasGenerationData)
@@ -1398,88 +1809,59 @@ public class Generator : MonoBehaviour
         int[] builds = worldTarget.buildData;
         string[] buildPaths = worldTarget.buildPathData;
         GetComponent<PhotonView>().RPC("ClientUpdateDataAt", PhotonPlayer.Find(IdOfAsker), x, y, roads, builds, buildPaths);
+        //StartCoroutine(MasterSendData(x, y, roads, builds, buildPaths, IdOfAsker));
+    }
+    private IEnumerator MasterSendData(int x, int y, int[] roads, int[] builds, string[] buildPaths, int IdOfAsker)
+    {
+        GetComponent<PhotonView>().RPC("ClientUpdateRoadDataAt", PhotonPlayer.Find(IdOfAsker), x, y, roads);
+        yield return new WaitForSeconds(0.5f);
+        GetComponent<PhotonView>().RPC("ClientUpdateBuildDataAt", PhotonPlayer.Find(IdOfAsker), x, y, builds);
+        yield return new WaitForSeconds(0.5f);
+        GetComponent<PhotonView>().RPC("ClientUpdateBuildPathDataAt", PhotonPlayer.Find(IdOfAsker), x, y, buildPaths);
+        yield return new WaitForSeconds(0.5f);
     }
     [PunRPC] private void ClientUpdateDataAt(int x, int y, int[] roads, int[] builds, string[] buildPaths)
     {
+        Debug.Log("ClientUpdateDataAt: Receiving Generation Data as " + PhotonNetwork.player.NickName);
         //Appelé après ClientLoadChunk (apres etre passé par MasterDataAskedHandler)
         _world[x, y].UpdateMasterData(roads, builds, buildPaths);
 
         ClientGenerateAt(x, y);
     }
+    [PunRPC] private void ClientUpdateRoadDataAt(int x, int y, int[] roads)
+    {
+        Debug.Log("Generating: Updating Roads Data at " + x + "," + y + " as " + PhotonNetwork.player.NickName);
+        _world[x, y].UpdateRoadData(roads);
+        ClientTryGenerateAt(x, y);
+    }
+    [PunRPC] private void ClientUpdateBuildDataAt(int x, int y, int[] builds)
+    {
+        Debug.Log("Generating: Updating Builds Data at " + x + "," + y + " as " + PhotonNetwork.player.NickName);
+        _world[x, y].UpdateBuildData(builds);
+        ClientTryGenerateAt(x, y);
+    }
+    [PunRPC] private void ClientUpdateBuildPathDataAt(int x, int y, string[] buildPaths)
+    {
+        Debug.Log("Generating: Updating BuildPaths Data at " + x + "," + y + " as " + PhotonNetwork.player.NickName);
+        _world[x, y].UpdateBuildPathData(buildPaths);
+        ClientTryGenerateAt(x, y);
+    }
+
+    private void ClientTryGenerateAt(int x, int y)
+    {
+        if (_world[x,y].HasGenerationData() && !_world[x,y].isLoaded)
+        {
+            ClientGenerateAt(x, y);
+        }
+    }
     private void ClientGenerateAt(int x, int y)
     {
         Debug.Log("ClientGenerateAt: Generating at " + x + "," + y);
-        _world[x, y].Generate();
+        StartCoroutine(_world[x, y].Generate());
     }
 
 
-    #region DEPRECATED
-
-    //Deprecated
-    private void depre_Start()
-    {
-        roadMatrix = new RoadNode[c_districtInWorldChunk, c_districtInWorldChunk];
-        buildMatrix = new BuildNode[c_districtInWorldChunk * 2, c_districtInWorldChunk * 2];
-
-        if (PhotonNetwork.isMasterClient)
-        {
-            MasterInitialisation();
-
-            MasterSetupRoads();
-            MasterSetupBuilds();
-
-
-            if (PhotonNetwork.offlineMode == true)
-            {
-                roadMatrix = masterRoads;
-                buildMatrix = masterBuilds;
-
-                //Saute l'envoi de RPC
-                GenerateEnd();
-            }
-            else
-            {
-                UpdateRoads();
-                UpdateBuilds();
-            }
-        }
-    }
-
-    private void depre_Update()
-    {
-        if (!receivedPackage && serializedRoads != null && serializedBuilds != null &&  serializedPath != null)
-        {
-            receivedPackage = true;
-
-            OnReceivedPackage();
-        }
-    }
-
-    private void OnReceivedPackage()
-    {
-        //(serializedRoads a été modifié par RPC de meme pour cityX et cityY)
-        DecryptRoads();
-
-        DecryptBuilds();
-
-        //Genere avec les informations recues
-        GenerateEnd();
-    }
-
-    private void GenerateEnd()
-    {
-        //Genere le sol
-        StartCoroutine(GenerateFloor());
-
-        //Generate les routes
-        StartCoroutine(GenerateRoads());
-
-        //Generate les bâtiments
-        StartCoroutine(GenerateBuilds());
-        //Generate Builds appelle OnGenerationEnden à la fin
-        
-    }
-
+    //Depre
     private void OnGenerationEnded()
     {
         //Update le NavMeshSurface entierement (fin)
@@ -1487,919 +1869,6 @@ public class Generator : MonoBehaviour
 
         //Update le spawnpoint (temporaire)
         GetComponent<CentralManager>().OnGenerationFinished();
-        GetComponent<CentralManager>().spawnPoint = new Vector3((c_worldChunkLength) / 2, 1000f, (c_worldChunkLength) / 2);
+        GetComponent<CentralManager>().spawnPoint = new Vector3((spawnPoint + 0.5f) * c_worldChunkLength, 1000f, (spawnPoint + 0.5f) * c_worldChunkLength);
     }
-
-    //Master Initialisation
-
-    private void MasterInitialisation()
-    {
-        masterRoads = new RoadNode[c_districtInWorldChunk, c_districtInWorldChunk];
-        masterBuilds = new BuildNode[c_districtInWorldChunk * 2, c_districtInWorldChunk * 2];
-        
-        borderNorth = c_districtInWorldChunk - 1;
-        borderEast = c_districtInWorldChunk - 1;
-        midX = c_districtInWorldChunk / 2;
-        midY = c_districtInWorldChunk / 2;
-    }
-
-    //Master  Roads
-
-    private void MasterSetupRoads()
-    {
-        //remplir masterRoads
-        MasterInitRoads();
-
-        //Modifier masterRoads
-        MasterModifyRoads();
-    }
-
-    private void MasterInitRoads()
-    {
-        for (int y = 0; y < c_districtInWorldChunk; y++)
-        {
-            for (int x = 0; x < c_districtInWorldChunk; x++)
-            {
-                masterRoads[x, y] = new RoadNode(x, y);
-            }
-        }
-    }
-
-    private void MasterModifyRoads()
-    {
-        //Setup des nodes spécifiques
-
-        RoadNode nodeMiddle = GetPoiMiddle();
-        nodeMiddleX = nodeMiddle.x * c_districtLength;
-        nodeMiddleY = nodeMiddle.y * c_districtLength;
-
-
-        RoadNode nodePoiSW = GetPoiSouthWest();
-        RoadNode nodePoiSE = GetPoiSouthEast();
-        RoadNode nodePoiNW = GetPoiNorthWest();
-        RoadNode nodePoiNE = GetPoiNorthEast();
-
-        //Get les entrées
-        int ouverture = 3; //Compris entre 1 et min(midX,midY), plus ouverture est petit plus la variance est grande
-
-        RoadNode north = GetNodeInRange(ouverture, borderEast - ouverture, borderNorth, borderNorth);
-        RoadNode south = GetNodeInRange(ouverture, borderEast - ouverture, 0, 0);
-        RoadNode east = GetNodeInRange(borderEast, borderEast, ouverture, borderNorth - ouverture);
-        RoadNode west = GetNodeInRange(0, 0, ouverture, borderNorth - ouverture);
-        //ouvrir les entrées
-        north.OpenNorth();
-        south.OpenSouth();
-        east.OpenEast();
-        west.OpenWest();
-
-        //Connectez des nodes avec routes
-
-        ConnectCardinalTo(nodeMiddle, north, south, east, west);
-
-        CreateRoad(nodeMiddle, nodePoiNE);
-        CreateRoad(nodeMiddle, nodePoiSE);
-        CreateRoad(nodeMiddle, nodePoiNW);
-        CreateRoad(nodeMiddle, nodePoiSW);
-
-        ConnectAllBetween(nodePoiSW, nodePoiSE, nodePoiNE, nodePoiNW);
-        ConnectAllBetween(north, east, south, west);
-    }
-
-    #region MasterModifyRoads
-
-    //Node Getters
-    private RoadNode GetNodeInRange(int xMin, int xMax, int yMin, int yMax)
-    {
-        int x = Random.Range(xMin, xMax + 1);
-        int y = Random.Range(yMin, yMax + 1);
-
-        return masterRoads[x, y];
-    }
-    private RoadNode GetPoiMiddle()
-    {
-        return GetNodeInRange(
-            midX - 1,
-            midX + 1,
-            c_districtInWorldChunk / 2 - 1,
-            c_districtInWorldChunk / 2 + 1);
-    }
-
-    private RoadNode GetPoiSouthWest()
-    {
-        return GetNodeInRange(
-            1,
-            midX - 2,
-            1,
-            midY - 2);
-    }
-    private RoadNode GetPoiSouthEast()
-    {
-        return GetNodeInRange(
-            midX + 2,
-            borderEast - 1,
-            1,
-            midY - 2);
-    }
-    private RoadNode GetPoiNorthWest()
-    {
-        return GetNodeInRange(
-            1,
-            midX - 2,
-            midY + 2,
-            borderNorth - 1);
-    }
-    private RoadNode GetPoiNorthEast()
-    {
-        return GetNodeInRange(
-            midX + 2,
-            borderEast - 1,
-            midY + 2,
-            borderNorth - 1);
-    }
-
-    //Connectors
-    private void ConnectCardinalTo(RoadNode node, RoadNode north, RoadNode south, RoadNode east, RoadNode west)
-    {
-        ConnectPoint(FindPath(north, node));
-        ConnectPoint(FindPath(south, node));
-        ConnectPoint(FindPath(east, node));
-        ConnectPoint(FindPath(west, node));
-    }
-    private void ConnectAllBetween(RoadNode n1, RoadNode n2, RoadNode n3, RoadNode n4)
-    {
-        CreateRoad(n1, n2);
-        CreateRoad(n2, n3);
-        CreateRoad(n3, n4);
-        CreateRoad(n4, n1);
-    }
-
-    //CreateRoad
-    private List<RoadNode> FindPath(RoadNode node1, RoadNode node2)
-    {
-        List<RoadNode> path = new List<RoadNode>();
-        //Current X and Y
-        int currX = node1.x;
-        int currY = node1.y;
-        //Destination X and Y
-        int destX = node2.x;
-        int destY = node2.y;
-        //Distance between Destination and Current
-        int distX; //Si distX positif, la destination est à l'Est
-        int distY; //Si distY positif, la destination est au Nord
-
-        int absDistX;
-        int absDistY;
-
-        while (currX != destX || currY != destY)
-        {
-            //On ajoute la node là où on se trouve
-            path.Add(masterRoads[currX, currY]);
-            //On met à jour la distance
-            distX = destX - currX;
-            distY = destY - currY;
-            //On met à jour la distance absolu
-            absDistX = (distX > 0) ? distX : -distX;
-            absDistY = (distY > 0) ? distY : -distY;
-            //Choisir l'axe de déplacement
-            if (absDistX > absDistY)
-            {
-                if (distX > 0)
-                {
-                    currX++; //On se déplace à l'Est
-                }
-                else
-                {
-                    currX--; //On se déplace à l'Ouest
-                }
-            }
-            else
-            {
-                if (distY > 0)
-                {
-                    currY++;  //On se déplace au Nord
-                }
-                else
-                {
-                    currY--;  //On se déplace au Sud
-                }
-            }
-            //Fin de la boucle, on a mis à jour les coordonnées suivantes
-        }
-        //Il manque la destination dans path
-        path.Add(masterRoads[destX, destY]);
-
-        return path;
-    }
-    private void ConnectPoint(List<RoadNode> path)
-    {
-        if (path.Count == 0)
-        {
-            Debug.Log("ConnectPoint: path is empty");
-            return;
-        }
-
-        RoadNode previousNode = path[0];
-
-        for (int i = 1; i < path.Count; i++)
-        {
-            previousNode.OpenTo(path[i]);
-            previousNode = path[i];
-        }
-    }
-    private void CreateRoad(RoadNode node1, RoadNode node2)
-    {
-        ConnectPoint(FindPath(node1, node2));
-    }
-
-    #endregion
-
-    //Master  Builds
-    private void MasterSetupBuilds()
-    {
-        MasterInitBuilds();
-
-        MasterModifyBuilds();
-    }
-
-    private void MasterInitBuilds()
-    {
-        for (int y = 0; y < c_districtInWorldChunk; y++)
-        {
-            for (int x = 0; x < c_districtInWorldChunk; x++)
-            {
-                MasterBuildAroundNode(masterRoads[x, y], x, y);
-            }
-        }
-    }
-
-    private void MasterBuildAroundNode(RoadNode roadOrigin, int xInMatrix, int yInMatrix)
-    {
-        int xChunk = roadOrigin.x * 5;
-        int yChunk = roadOrigin.y * 5;
-
-        //South West 0
-        masterBuilds[2 * xInMatrix, 2 * yInMatrix] = new BuildNode(xChunk - 2, yChunk - 2, roadOrigin, 0);
-
-        //South East 1
-        masterBuilds[2 * xInMatrix + 1, 2 * yInMatrix] = new BuildNode(xChunk + 1, yChunk - 2, roadOrigin, 1);
-
-        //North East 2
-        masterBuilds[2 * xInMatrix + 1, 2 * yInMatrix + 1] = new BuildNode(xChunk + 1, yChunk + 1, roadOrigin, 2);
-
-        //North West 3
-        masterBuilds[2 * xInMatrix, 2 * yInMatrix + 1] = new BuildNode(xChunk - 2, yChunk + 1, roadOrigin, 3);
-    }
-
-    private void MasterModifyBuilds()
-    {
-        for (int y = 0; y < c_districtInWorldChunk * 2; y++)
-        {
-            for (int x = 0; x < c_districtInWorldChunk * 2; x++)
-            {
-                MasterChooseBuildsAt(x, y);
-            }
-        }
-    }
-
-    #region MasterModifyBuilds
-    //NB: ça sert a rien d'essayer de comprendre ce qui se passe, faut juste retenir que masterBuilds est modifié
-
-    private void MasterChooseBuildsAt(int x, int y)
-    {
-        BuildNode build = masterBuilds[x, y];
-        if (!build.IsFree)
-        {
-            return;
-        }
-        if (build.IsNextToRoad)
-        {
-            //size --> 0 = 2x2, 1 = 2x4, 2 = 2x4, 3 = 4*4
-            //facing rotation --> 0f = south, 90f = (1) west, 180f = (2) north, 270f = (3) east
-            //pos to Node -->0 = SW , 1 = SE , 2 = NE, 3 = NW
-
-            int pos = build.PosToNode;
-
-            switch (pos)
-            {
-                case 0: //SW par rapport à son origine roadNode
-                    CornerBehaviorSW(build,x,y);
-                    break;
-                case 1: //SE par rapport à son origine roadNode
-                    CornerBehaviorSE(build, x, y);
-                    break;
-                case 2: //NE par rapport à son origine roadNode
-                    CornerBehaviorNE(build, x, y);
-                    break;
-                default: //NW par rapport à son origine roadNode
-                    CornerBehaviorNW(build, x, y);
-                    break;
-            }
-        }
-        else
-        {
-            //Pas a coté de la route
-        }
-    }
-
-    private void CornerBehaviorSW(BuildNode build, int x, int y)
-    {
-        //Common Behavior Start
-        int facingRotation = build.FacingRotation;
-        //fmd = l'entre est sur l'axe nord-sud
-        bool fmd = (facingRotation == 2);
-        string file = "Error: did not modified wtf";
-        int result;
-        //Specific Behavior
-        
-        bool southFree = MasterCheckSouth(build, x, y);
-        bool westFree = MasterCheckWest(build, x, y);
-
-        if (!southFree)
-        {
-            if (!westFree)
-            {
-                //Sud occupé, Ouest occupé -> carré
-                MasterChoice(out result, out file, true, false, false, false);
-                //Pas de slave à mettre
-            }
-            else
-            {
-                //Sud occupé, Ouest libre -> carré / vertical
-                MasterChoice(out result, out file, true, !fmd, fmd, false);
-                if (result != 0)
-                {
-                    masterBuilds[x - 1, y].SetSlave();
-                }
-            }
-        }
-        else
-        {
-            if (!westFree)
-            {
-                //Sud libre, Ouest occupé -> carré / horizontal
-                MasterChoice(out result, out file, true, fmd, false, !fmd);
-                if (result != 0)
-                {
-                    masterBuilds[x, y - 1].SetSlave();
-                }
-            }
-            else
-            {
-                //Sud libre, Ouest libre -> carré / horizontal / vertical
-                MasterChoice(out result, out file, true, true, fmd, !fmd);
-                switch (result)
-                {
-                    case 1:
-                        if (fmd)
-                        {
-                            masterBuilds[x, y - 1].SetSlave();
-                        }
-                        else
-                        {
-                            masterBuilds[x - 1, y].SetSlave();
-                        }
-                        break;
-                    case 2:
-                        masterBuilds[x - 1, y].SetSlave();
-                        break;
-                    case 3:
-                        masterBuilds[x, y - 1].SetSlave();
-                        break;
-                    default:
-                        break;
-                }
-            }
-        }
-
-        //Debug.Log("CornerBehaviorSW: " +"("+southFree+", "+westFree+") "+ result + " at (" + x + ", " + y + ")");
-        //Common Behavior Ending
-        build.generationDecided = true;
-
-        build.SetPath(file);
-    }
-    private void CornerBehaviorSE(BuildNode build, int x, int y)
-    {
-        //Common Behavior Start
-        int facingRotation = build.FacingRotation;
-        //fmd = l'entre est sur l'axe nord-sud
-        bool fmd = (facingRotation == 2);
-        string file = "Error: did not modified wtf";
-        int result;
-        //Specific Behavior
-
-        bool southFree = MasterCheckSouth(build, x, y);
-        bool eastFree = MasterCheckEast(build, x, y);
-
-        if (!southFree)
-        {
-            if (!eastFree)
-            {
-                //Sud occupé, Est occupé -> carré
-                MasterChoice(out result, out file, true, false, false, false);
-                //Pas de slave à mettre
-            }
-            else
-            {
-                //Sud occupé, Est libre -> carré / horizontal
-                MasterChoice(out result, out file, true, !fmd, false, fmd);
-                if (result != 0)
-                {
-                    masterBuilds[x + 1, y].SetSlave();
-                }
-            }
-        }
-        else
-        {
-            if (!eastFree)
-            {
-                //Sud libre, Est occupé -> carré / vertical
-                MasterChoice(out result, out file, true, fmd, !fmd, false);
-                if (result != 0)
-                {
-                    masterBuilds[x, y - 1].SetSlave();
-                }
-            }
-            else
-            {
-                //Sud libre, Est libre -> carré / horizontal / vertical
-                MasterChoice(out result, out file,  true, true, !fmd, fmd);
-                switch (result)
-                {
-                    case 1:
-                        if (fmd)
-                        {
-                            masterBuilds[x, y - 1].SetSlave();
-                        }
-                        else
-                        {
-                            masterBuilds[x + 1, y].SetSlave();
-                        }
-                        break;
-                    case 2:
-                        masterBuilds[x, y - 1].SetSlave();
-                        break;
-                    case 3:
-                        masterBuilds[x + 1, y].SetSlave();
-                        break;
-                    default:
-                        break;
-                }
-            }
-        }
-
-        //Debug.Log("CornerBehaviorSE: " + "(" + southFree + ", " + eastFree + ") " + result + " at (" + x + ", " + y + ")");
-        //Common Behavior Ending
-        build.generationDecided = true;
-
-        build.SetPath(file);
-    }
-    private void CornerBehaviorNE(BuildNode build, int x, int y)
-    {
-        //Common Behavior Start
-        int facingRotation = build.FacingRotation;
-        //fmd = l'entre est sur l'axe nord-sud
-        bool fmd = (facingRotation == 0);
-        string file = "Error: did not modified wtf";
-        int result;
-        //Specific Behavior
-
-        bool northFree = MasterCheckNorth(build, x, y);
-        bool eastFree = MasterCheckEast(build, x, y);
-
-        if (!northFree)
-        {
-            if (!eastFree)
-            {
-                //Nord occupé, Est occupé -> carré
-                MasterChoice(out result, out file, true, false, false, false);
-                //Pas de slave à mettre
-            }
-            else
-            {
-                //Nord occupé, Est libre -> carré / horizontal
-                MasterChoice(out result, out file, true, !fmd, fmd, false);
-                if (result != 0)
-                {
-                    masterBuilds[x + 1, y].SetSlave();
-                }
-            }
-        }
-        else
-        {
-            if (!eastFree)
-            {
-                //Nord libre, Est occupé -> carré / vertical
-                MasterChoice(out result, out file, true, fmd, false, !fmd);
-                if (result != 0)
-                {
-                    masterBuilds[x, y + 1].SetSlave();
-                }
-            }
-            else
-            {
-                //Nord libre, Est libre -> carré / horizontal / vertical
-                MasterChoice(out result, out file, true, true, fmd, !fmd);
-                switch (result)
-                {
-                    case 1:
-                        if (fmd)
-                        {
-                            masterBuilds[x, y + 1].SetSlave();
-                        }
-                        else
-                        {
-                            masterBuilds[x + 1, y].SetSlave();
-                        }
-                        break;
-                    case 2:
-                        masterBuilds[x + 1, y].SetSlave();
-                        break;
-                    case 3:
-                        masterBuilds[x, y + 1].SetSlave();
-                        break;
-                    default:
-                        break;
-                }
-            }
-        }
-        //Debug.Log("CornerBehaviorNE: " + "(" + northFree + ", " + eastFree + ") " + result + " at (" + x + ", " + y + ")");
-
-        //Common Behavior Ending
-        build.generationDecided = true;
-
-        build.SetPath(file);
-    }
-    private void CornerBehaviorNW(BuildNode build, int x, int y)
-    {
-        //Common Behavior Start
-        int facingRotation = build.FacingRotation;
-        //fmd = l'entre est sur l'axe nord-sud
-        bool fmd = (facingRotation == 0);
-        string file = "Error: did not modified wtf";
-        int result;
-        //Specific Behavior
-
-        bool northFree = MasterCheckNorth(build, x, y);
-        bool westFree = MasterCheckWest(build, x, y);
-
-        if (!northFree)
-        {
-            if (!westFree)
-            {
-                //Nord occupé, Ouest occupé -> carré
-                MasterChoice(out result, out file, true, false, false, false);
-            }
-            else
-            {
-                //Nord occupé, Ouest libre -> carré / horizontal
-                MasterChoice(out result, out file,  true, !fmd, false, fmd);
-                if (result != 0)
-                {
-                    masterBuilds[x - 1, y].SetSlave();
-                }
-            }
-        }
-        else
-        {
-            if (!westFree)
-            {
-                //Nord libre, Ouest occupé -> carré / vertical
-                MasterChoice(out result, out file, true, fmd, !fmd, false);
-                if (result != 0)
-                {
-                    masterBuilds[x, y + 1].SetSlave();
-                }
-            }
-            else
-            {
-                //Nord libre, Ouest libre -> carré / horizontal / vertical
-                MasterChoice(out result, out file, true, true, !fmd, fmd);
-                switch (result)
-                {
-                    case 1:
-                        if (fmd)
-                        {
-                            masterBuilds[x, y + 1].SetSlave();
-                        }
-                        else
-                        {
-                            masterBuilds[x - 1, y].SetSlave();
-                        }
-                        break;
-                    case 2:
-                        masterBuilds[x, y + 1].SetSlave();
-                        break;
-                    case 3:
-                        masterBuilds[x - 1, y].SetSlave();
-                        break;
-                    default:
-                        break;
-                }
-            }
-        }
-
-        //Debug.Log("CornerBehaviorNW: " + "(" + northFree + ", " + westFree + ") " + result + " at ("+x+", "+y+")");
-
-        //Common Behavior Ending
-        build.generationDecided = true;
-
-        build.SetPath(file);
-    }
-    
-    private void MasterChoice(out int result, out string file, bool f22,bool f24,bool f42left, bool f42right)
-    {
-        //But de cette fonction:
-        //  Faire un choix entre la taille du bâtiment parmis les tailles possibles
-        //  Les 4 booléens en paramètres représentent les choix possibles
-        //      f22: génération d'un bâtiment de taille 2*2 (petit carré)
-        //      f24: génération d'un bâtiment de taille 2*4 (rectangle avec entrée coté de longueur 2)
-        //      f42left: génération d'un bâtiment de taille 4*2 (rectangle avec entrée coté de longueur 4 à gauche quand face au Sud)
-        //      f42left: génération d'un bâtiment de taille 4*2 (rectangle avec entrée coté de longueur 4 à droite quand face au Nord)
-        //  le string "file" pris en paramètres est renvoyé pour modifier le chemin de build
-        //  le string "result" représente la décision prise et est renvoyé pour SetSlave() ou non les voisins concernés
-
-        //On crée une array stockant toutes les décisions possibles
-        bool[] stock = new bool[4] { f22, f24, f42left, f42right };
-
-        //On compte le nombre de choix valides
-        int trueCount = 0;
-        foreach(bool b in stock) if (b) trueCount++;
-
-        //Pris de décision au hasard
-        int rng = Random.Range(0, trueCount);
-
-        //Result représente l'index de la décision prise
-        result = 0;
-
-        //Result augmente jusqu'à qu'on soit arrivé à la décision voulue
-        foreach (bool b in stock)
-        {
-            if (b)
-            {
-                if (rng == 0)
-                {
-                    break;
-                }
-                rng--;
-            }
-            result++;
-        }
-
-        //Modification de file en fonction du résultat précédent
-        switch (result)
-        {
-            case 0: file = table22.GetRandomPath(); break;
-            case 1: file = table24.GetRandomPath(); break;
-            case 2: file = table42left.GetRandomPath(); break;
-            default: file = table42right.GetRandomPath(); break;
-        }
-    }
-
-    private bool MasterCheckNorth(BuildNode build, int x, int y)
-    {
-        if (y == c_districtInWorldChunk * 2 - 1) return false; //Si on a atteint la bordure Nord
-        if (build.North == 1) return false; //Si passage au Nord est occupé
-
-        //Si le batiment au Nord a deja decidé sa génération ou qqun a déja décidé pour lui
-        if (!masterBuilds[x, y + 1].IsFree || masterBuilds[x, y + 1].generationDecided) return false; 
-        return true;
-    }
-    private bool MasterCheckSouth(BuildNode build, int x, int y)
-    {
-        if (y == 0) return false; //Si on a atteint la bordure Sud
-        if (build.South == 1) return false; //Si passage au Sud est occupé
-
-        //Si le batiment au Sud a deja decidé sa génération ou qqun a déja décidé pour lui
-        if (!masterBuilds[x, y - 1].IsFree || masterBuilds[x, y - 1].generationDecided) return false;
-        return true;
-    }
-    private bool MasterCheckEast(BuildNode build, int x, int y)
-    {
-        if (x == c_districtInWorldChunk * 2 - 1) return false; //Si on a atteint la bordure Est
-        if (build.East == 1) return false; //Si le passage à l'Est est occupé
-
-        //Si le batiment à l'Est a deja decidé sa génération ou qqun a déja décidé pour lui
-        if (!masterBuilds[x + 1, y].IsFree || masterBuilds[x + 1, y].generationDecided) return false; 
-        return true;
-    }
-    private bool MasterCheckWest(BuildNode build, int x, int y)
-    {
-        if (x == 0) return false; //Si on a atteint la bordure Ouest
-        if (build.West == 1) return false; //Si le passage à l'Ouest est occupé
-        //Si le batiment à l'Ouest a deja decidé sa génération ou qqun a déja décidé pour lui
-        if (!masterBuilds[x - 1, y].IsFree || masterBuilds[x - 1, y].generationDecided) return false; 
-        return true;
-    }
-    #endregion
-
-    //Generate
-    private IEnumerator GenerateFloor()
-    {
-        for (int y = 0; y < c_districtInWorldChunk; y++)
-        {
-            for (int x = 0; x < c_districtInWorldChunk; x++)
-            {
-                Instantiate(Resources.Load<GameObject>("testEmpty"), new Vector3(x * c_districtLength, -0.5f, y * c_districtLength), Quaternion.identity);
-                yield return null;
-            }
-        }
-        //StartCoroutine(GenerateRoads());
-    }
-
-    private IEnumerator  GenerateRoads()
-    {
-        for (int y = 0; y < c_districtInWorldChunk; y++)
-        {
-            for (int x = 0; x < c_districtInWorldChunk; x++)
-            {
-                roadMatrix[x, y].Generate(0, 0);
-                yield return null;
-            }
-        }
-        //StartCoroutine(GenerateBuilds());
-    }
-
-    private IEnumerator GenerateBuilds()
-    {
-        for (int y = 0; y < c_districtInWorldChunk * 2; y++)
-        {
-            for (int x = 0; x < c_districtInWorldChunk * 2; x++)
-            {
-                if(buildMatrix[x, y].Generate(0,0))
-                {
-                    yield return null;
-                }
-            }
-        }
-        OnGenerationEnded();
-    }
-
-    
-    
-    #region  Send Generation via RPC
-
-    //Send roads via RPC
-    private void UpdateRoads()
-    {
-        int[] package = EncryptRoads();
-
-        GetComponent<PhotonView>().RPC("SendRoads",PhotonTargets.AllBuffered,package);
-    }
-    private int[] EncryptRoads()
-    {
-        Debug.Log("Generator: Encrypting roads as " + PhotonNetwork.player.NickName);
-        int[] package = new int[c_districtInWorldChunk * c_districtInWorldChunk * (RoadNode.packageSize)];
-
-        int x = 0;
-        int y = 0;
-        int index = 0;
-        while (x < c_districtInWorldChunk)
-        {
-            y = 0;
-            while (y < c_districtInWorldChunk)
-            {
-                foreach (int n in masterRoads[x, y].Serialize())
-                {
-                    package[index] = n;
-                    index++;
-                }
-                y++;
-            }
-            x++;
-        }
-        return package;
-    }
-    private void DecryptRoads()
-    {
-        Debug.Log("Generator: Decrypting roads as " + PhotonNetwork.player.NickName);
-
-        int x = 0;
-        int y = 0;
-        int index = 0;
-
-        int[] nodeSerialized = new int[RoadNode.packageSize];
-        while (x < c_districtInWorldChunk)
-        {
-            y = 0;
-            while (y < c_districtInWorldChunk)
-            {
-                //On recupere la version serialisé de la RoadNode
-                for (int i = 0; i < RoadNode.packageSize; i++)
-                {
-                    nodeSerialized[i] = serializedRoads[index + i];
-                }
-                //On ajoute la RoadNode dans la matrice prévu à cette effet
-                roadMatrix[x, y] = RoadNode.Deserialize(nodeSerialized);
-
-                //Incrementation
-                index += RoadNode.packageSize;
-                y++;
-            }
-            x++;
-        }
-    }
-    [PunRPC] private void SendRoads(int[] package)
-    {
-        Debug.Log("Generator: Received road package as " + PhotonNetwork.player.NickName);
-        serializedRoads = package;
-    }
-
-    //Send buildings via RPC
-    
-    private void UpdateBuilds()
-    {
-        GetComponent<PhotonView>().RPC("SendBuildsArray", PhotonTargets.AllBuffered, EncryptBuildsArray());
-        GetComponent<PhotonView>().RPC("SendBuildsPath", PhotonTargets.AllBuffered, EncryptBuildsPath());
-    }
-    private int[] EncryptBuildsArray()
-    {
-        Debug.Log("Generator: Encrypting builds as " + PhotonNetwork.player.NickName);
-        int[] package = new int[(2 * c_districtInWorldChunk) * (2 * c_districtInWorldChunk) * BuildNode.c_packageSize];
-
-        int x = 0;
-        int y = 0;
-        int index = 0;
-        while (x < 2 * c_districtInWorldChunk)
-        {
-            y = 0;
-            while (y < 2 * c_districtInWorldChunk)
-            {
-                foreach (int n in masterBuilds[x, y].SerializeArray())
-                {
-                    package[index] = n;
-                    index++;
-                }
-                y++;
-            }
-            x++;
-        }
-        return package;
-    }
-    private string[] EncryptBuildsPath()
-    {
-        Debug.Log("Generator: Encrypting builds as " + PhotonNetwork.player.NickName);
-        string[] package = new string[(2 * c_districtInWorldChunk) * (2 * c_districtInWorldChunk)];
-
-        int x = 0;
-        int y = 0;
-        int index = 0;
-        while (x < 2 * c_districtInWorldChunk)
-        {
-            y = 0;
-            while (y < 2 * c_districtInWorldChunk)
-            {
-                package[index] = masterBuilds[x, y].SerializeString();
-                index++;
-                y++;
-            }
-            x++;
-        }
-        return package;
-    }
-    private void DecryptBuilds()
-    {
-        Debug.Log("Generator: Decrypting builds as " + PhotonNetwork.player.NickName);
-        int x = 0;
-        int y = 0;
-        int indexArray = 0;
-        int indexPath = 0;
-
-        int[] buildSerialized = new int[BuildNode.c_packageSize];
-        while (x < 2 * c_districtInWorldChunk)
-        {
-            y = 0;
-            while (y < 2 * c_districtInWorldChunk)
-            {
-                //On recupere la version serialisé de la BuildNode
-                for (int i = 0; i < BuildNode.c_packageSize; i++)
-                {
-                    buildSerialized[i] = serializedBuilds[indexArray + i];
-                }
-                //On ajoute la BuildNode dans la matrice prévu à cette effet (+version sérialisé de son path)
-                buildMatrix[x, y] = BuildNode.Deserialize(buildSerialized, serializedPath[indexPath]);
-
-                //Incrementation
-                indexArray += BuildNode.c_packageSize;
-                indexPath++;
-                y++;
-            }
-            x++;
-        }
-    }
-    [PunRPC] private void SendBuildsArray(int[] package)
-    {
-        Debug.Log("Generator: Received build package as " + PhotonNetwork.player.NickName);
-        serializedBuilds = package;
-    }
-    [PunRPC] private void SendBuildsPath(string[] package)
-    {
-        Debug.Log("Generator: Received buildpath package as " + PhotonNetwork.player.NickName);
-        serializedPath = package;
-    }
-
-    #endregion
-
-    #endregion
-
-
 }
