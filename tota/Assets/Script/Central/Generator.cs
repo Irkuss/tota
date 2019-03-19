@@ -540,7 +540,7 @@ public class Generator : MonoBehaviour
                 absDistX = (distX > 0) ? distX : -distX;
                 absDistY = (distY > 0) ? distY : -distY;
                 //Choisir l'axe de déplacement
-                if (absDistX > absDistY)
+                if (distY == 0 || (Random.Range(0,2) == 0 && distX != 0))//(absDistX > absDistY)
                 {
                     if (distX > 0) { currX++; //On se déplace à l'Est
                     }
@@ -950,7 +950,7 @@ public class Generator : MonoBehaviour
         //Data encrypt
         public int[] GetRoadData()
         {
-            Debug.Log("Generator: Encrypting roads as " + PhotonNetwork.player.NickName);
+            //Debug.Log("Generator: Encrypting roads as " + PhotonNetwork.player.NickName);
             int[] package = new int[c_districtInWorldChunk * c_districtInWorldChunk * (RoadNode.packageSize)];
 
             int x = 0;
@@ -979,7 +979,7 @@ public class Generator : MonoBehaviour
                 return null;
             }
 
-            Debug.Log("Generator: Encrypting builds as " + PhotonNetwork.player.NickName);
+            //Debug.Log("Generator: Encrypting builds as " + PhotonNetwork.player.NickName);
             int[] package = new int[(2 * c_districtInWorldChunk) * (2 * c_districtInWorldChunk) * BuildNode.c_packageSize];
 
             int x = 0;
@@ -1008,7 +1008,7 @@ public class Generator : MonoBehaviour
                 return null;
             }
 
-            Debug.Log("Generator: Encrypting buildsPaths as " + PhotonNetwork.player.NickName);
+            //Debug.Log("Generator: Encrypting buildsPaths as " + PhotonNetwork.player.NickName);
             string[] package = new string[(2 * c_districtInWorldChunk) * (2 * c_districtInWorldChunk)];
 
             int x = 0;
@@ -1031,7 +1031,7 @@ public class Generator : MonoBehaviour
         //Generateur static (decrypt)
         public static void GenerateOffset(int xOffset, int yOffset, int[] roadData, int[] buildData, string[] buildPathData)
         {
-            Debug.Log("Generator: Generating as " + PhotonNetwork.player.NickName);
+            //Debug.Log("Generator: Generating as " + PhotonNetwork.player.NickName);
 
             GenerateRoads(DecryptRoads(roadData), xOffset, yOffset);
 
@@ -1133,6 +1133,8 @@ public class Generator : MonoBehaviour
         //Coordonnée dans la matrice globale (initialisé par le constructeur)
         public int x;
         public int y;
+        //GameobjectParent
+        private GameObject worldNode;
         //Type de Node
         private WorldBiome _biome;
         public WorldBiome Biome { get => _biome; }
@@ -1180,11 +1182,18 @@ public class Generator : MonoBehaviour
         public bool hasBuildData = false;
         public bool hasBuildPathData = false;
         public bool isLoaded = false;
+
         //Constructeur
         public WorldNode(int xWorld,int yWorld)
         {
             x = xWorld;
             y = yWorld;
+
+            InitWorldNodeGameObject();
+        }
+        private void InitWorldNodeGameObject()
+        {
+            worldNode = Instantiate( Resources.Load<GameObject>("worldNode"), new Vector3(x * c_worldChunkLength, 0, y * c_worldChunkLength), Quaternion.identity);
         }
         //Modification par le master
         public void SetBiome(WorldBiome newBiome)
@@ -1254,17 +1263,36 @@ public class Generator : MonoBehaviour
             yield return null;
             CityNode.GenerateOffset(x, y, roadData, buildData, buildPathData);
             yield return null;
+            worldNode.GetComponent<NavMeshSurface>().BuildNavMesh();
+            worldNode.GetComponent<WorldNodeBehavior>().link1.UpdateLink();
+            worldNode.GetComponent<WorldNodeBehavior>().link2.UpdateLink();
         }
         private void GenerateFloor()
         {
+            //Decide floor (temporary)
+            string floorFile;
+            if (_biome == WorldBiome.Arid)
+            {
+                Debug.Log("floor file is Arid");
+                floorFile = "Floors/floorArid1";
+            }
+            else
+            {
+                Debug.Log("floor file is Plain (" + (int)_biome+ ")");
+                floorFile = "Floors/floorPlain1";
+            }
+            //Place Floor
+            GameObject newFloor;
             for (int yCycle = 0; yCycle < c_districtInWorldChunk; yCycle++)
             {
                 for (int xCycle = 0; xCycle < c_districtInWorldChunk; xCycle++)
                 {
-                    Instantiate(
-                        Resources.Load<GameObject>("testEmpty"), 
+                    newFloor = Instantiate(
+                        Resources.Load<GameObject>(floorFile),
                         new Vector3(xCycle * c_districtLength + x * c_worldChunkLength, -0.5f, yCycle * c_districtLength + y * c_worldChunkLength), 
                         Quaternion.identity);
+
+                    newFloor.transform.parent = worldNode.transform;
                 }
             }
         }
@@ -1275,6 +1303,7 @@ public class Generator : MonoBehaviour
         Undecided = 0, //NB: l'index 0 est le seul biome temporaire
         Plain = 1,
         Forest = 2,
+        Arid = 3
     }
     public enum WorldLayout
     {
@@ -1283,42 +1312,17 @@ public class Generator : MonoBehaviour
         Village = 2,
         City = 3,
     }
-
-    #region Attributes
+    
 
     public NavMeshSurface surface;
     //Constante de génération
     public const float c_voxChunkLength = 12.6f; //magic number with MagicaVoxel, tunk = technical chunk
     public const int c_voxChunkInDistrict = 5;
-    public const float c_districtLength = c_voxChunkLength * c_voxChunkInDistrict;
+    public const float c_districtLength = c_voxChunkLength * c_voxChunkInDistrict; //63
     public const int c_districtInWorldChunk = 16;
-    public const float c_worldChunkLength = c_districtLength * c_districtInWorldChunk;
-
-    //Matrix où l'on stocke des Nodes
-    private RoadNode[,] masterRoads; //matrice travaillée par Master
-    private int[] serializedRoads = null; //envoyé par RPC
-    private RoadNode[,] roadMatrix; //décodé après RPC, commun à tous
-
-    private bool receivedPackage = false;
-
-    //Matrix où l'on stocke les emplacements de bâtiments (BuildSpot)
-    private BuildNode[,] masterBuilds; //matrice travaillée par Master
-    private int[] serializedBuilds = null; //envoyé par RPC
-    private string[] serializedPath = null; //envoyé par RPC
-    private BuildNode[,] buildMatrix; //décodé après RPC, commun à tous
-
-    //Variable aide
-    private int borderNorth;
-    private int borderEast;
+    public const float c_worldChunkLength = c_districtLength * c_districtInWorldChunk; //1008
     
-    private int midX;
-    private int midY;
-
-    public float nodeMiddleX;
-    public float nodeMiddleY;
-
-    #endregion
-
+    
     //Path and directories
 
     [SerializeField] private buildTable _table22 = null;
@@ -1404,15 +1408,6 @@ public class Generator : MonoBehaviour
                 InitWorldBiomesExpansion(worldBiomes); //Cycle through every biomeOrigin and expand until no one can expand anymore)
                 TestPrintBiomes(worldBiomes);
                 InitWorldBiomesCopy(worldBiomes); //Copy worldBiome biomes into world
-
-                //Depre (on laisse jusqua terminer les trucs en haut btw)
-                for (int y = 0; y < _worldLength; y++)
-                {
-                    for (int x = 0; x < _worldLength; x++)
-                    {
-                        _world[x, y].SetBiome(WorldBiome.Plain);
-                    }
-                }
             }
             private void InitWorldBiomes(WorldBiome[,] worldBiomes)
             {
@@ -1746,7 +1741,7 @@ public class Generator : MonoBehaviour
         LoadChunkAround(1, 4);
         LoadChunkAround(4, 4);
         Debug.Log("Waiting 15 seconds");
-        yield return new WaitForSeconds(15f);
+        yield return new WaitForSeconds(10f);
         Debug.Log("Waiting for end of frame");
         yield return new WaitForEndOfFrame();
         //ULTRA TEMPORAIRE
@@ -1789,7 +1784,7 @@ public class Generator : MonoBehaviour
     }
     private void ClientLoadChunk(int x, int y)
     {
-        Debug.Log("ClientLoadChunk: Asking to master WorldNode Data");
+        //Debug.Log("ClientLoadChunk: Asking to master WorldNode Data");
         //Un client demande la génération d'un chunk au master
         GetComponent<PhotonView>().RPC("MasterDataAskedHandler", PhotonTargets.MasterClient, x, y, PhotonNetwork.player.ID);
     }
@@ -1865,7 +1860,7 @@ public class Generator : MonoBehaviour
     private void OnGenerationEnded()
     {
         //Update le NavMeshSurface entierement (fin)
-        surface.BuildNavMesh();
+        //surface.BuildNavMesh();
 
         //Update le spawnpoint (temporaire)
         GetComponent<CentralManager>().OnGenerationFinished();
