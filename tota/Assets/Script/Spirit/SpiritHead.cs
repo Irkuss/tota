@@ -7,6 +7,7 @@ public class SpiritHead : Photon.MonoBehaviour
 {
     //utilisé pour debugger (à swap avec un scriptable object des que possible)
     private string _charaPath = "CharaTanguy";
+    [SerializeField] private ItemRecipe bigAppleRecipe = null;
     [SerializeField] private ItemTable itemTable = null;
 
     [SerializeField] private GameObject _spiritCamera = null;
@@ -34,14 +35,23 @@ public class SpiritHead : Photon.MonoBehaviour
         //Right Left click check
         ClickUpdate();
 
+        //Do all test functions
+        TestAll();
+
+        //Keycode.E Check
+        InventoryUpdate();
+    }
+
+    private void TestAll()
+    {
         //Space Bar check
         TestCharaSpawn();
 
         //Keycode.I check
         TestInventoryAdd();
 
-        //Keycode.E Check
-        InventoryUpdate();
+        //Keycode.O check
+        TestCraftBigApple();
     }
 
     private void TestCharaSpawn()
@@ -68,12 +78,36 @@ public class SpiritHead : Photon.MonoBehaviour
             go.GetComponent<CharaPermissions>().GetComponent<PhotonView>().RPC("SetTeam", PhotonTargets.AllBuffered, _playerOwner.MyTeamName);
         }
     }
-
     private void TestInventoryAdd()
     {
         if (Input.GetKeyDown(KeyCode.I))
         {
-            TestAddToAll(itemTable.GetRandomItem());
+            Item item = itemTable.GetRandomItem();
+            foreach (GameObject Chara in _selectedList)
+            {
+                Chara.GetComponent<CharaInventory>().Add(item);
+            }
+        }
+    }
+    private void TestCraftBigApple()
+    {
+        if (Input.GetKeyDown(KeyCode.O))
+        {
+            foreach (GameObject Chara in _selectedList)
+            {
+                Debug.Log("TestCraftBigApple: Trying to craft bigApple");
+                CharaInventory charaInv = Chara.GetComponent<CharaInventory>();
+                if (bigAppleRecipe.CanBeCraftedWith(charaInv.inventory))
+                {
+                    Debug.Log("TestCraftBigApple: crafted bigApple");
+                    bigAppleRecipe.CraftWith(charaInv);
+                }
+                else
+                {
+                    Debug.Log("TestCraftBigApple: failed to craft bigApple");
+                }
+                
+            }
         }
     }
 
@@ -264,15 +298,6 @@ public class SpiritHead : Photon.MonoBehaviour
                 //Chara.GetComponent<Inventory>().DisplayInventory();
                 Chara.GetComponent<CharaInventory>().ToggleInventory();
             }
-        }
-    }
-
-    private void TestAddToAll(Item item)
-    {
-        foreach (GameObject Chara in _selectedList)
-        {
-            //Chara.GetComponent<Inventory>().DisplayInventory();
-            Chara.GetComponent<CharaInventory>().Add(item);
         }
     }
 

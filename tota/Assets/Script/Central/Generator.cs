@@ -13,6 +13,11 @@ public class Generator : MonoBehaviour
         private int _east = 0;
         private int _west = 0;
 
+        public int North { get => _north; }
+        public int South { get => _south; }
+        public int East { get => _east; }
+        public int West { get => _west; }
+
         //Coordonnée dans la matrice de Generator
         public int x;
         public int y;
@@ -50,13 +55,6 @@ public class Generator : MonoBehaviour
         {
             return new int[packageSize] {x, y, _north, _south, _east, _west};
         }
-
-        //Public Getters
-
-        public int GetNorth() { return _north; }
-        public int GetSouth() { return _south; }
-        public int GetEast() { return _east; }
-        public int GetWest() { return _west; }
 
         //Public Setters
 
@@ -138,6 +136,11 @@ public class Generator : MonoBehaviour
 
         public bool generationDecided = false;
 
+        public bool IsABuilding()
+        {
+            return !_isFree || (_pathBuilding != "");
+        }
+
         //Origin Node
         private int _posToNode;//0 = SW , 1 = SE , 2 = NE, 3 = NW
         public int PosToNode { get => _posToNode; }
@@ -145,7 +148,7 @@ public class Generator : MonoBehaviour
         public int FacingRotation { get => _facingRotation; }
 
         //Building to build
-        private string _pathBuilding = ""; //Chemin du batiment (à partir de Resources)
+        private string _pathBuilding = ""; //Chemin du batiment (à partir de Resources) //Aussi utilisé dans IsABuilding
         private int _buildingSizeType = 0; //0 = 2x2, 1 = 2x4, 2 = 2x4, 3 = 4*4 (à update a chaque qu'on decide d'entendre la taille possible des batiments
 
         //Nombre d'argument du deuxieme constructeur de BuildNode (prévu pour la Deserialisation)
@@ -162,16 +165,16 @@ public class Generator : MonoBehaviour
             switch (_posToNode)
             {
                 case 0: //0 = SW
-                    InitSetSpace(origin.GetWest(), 0, origin.GetSouth(), 0);
+                    InitSetSpace(origin.West, 0, origin.South, 0);
                     break;
                 case 1: //1 = SE
-                    InitSetSpace(origin.GetEast(), 0, 0, origin.GetSouth());
+                    InitSetSpace(origin.East, 0, 0, origin.South);
                     break;
                 case 2: //2 = NE
-                    InitSetSpace(0, origin.GetEast(), 0, origin.GetNorth());
+                    InitSetSpace(0, origin.East, 0, origin.North);
                     break;
                 default: //3 = NW
-                    InitSetSpace(0, origin.GetWest(), origin.GetNorth(), 0);
+                    InitSetSpace(0, origin.West, origin.North, 0);
                     break;
             }
             InitRotation();
@@ -1029,15 +1032,20 @@ public class Generator : MonoBehaviour
         }
 
         //Generateur static (decrypt)
-        public static void GenerateOffset(int xOffset, int yOffset, int[] roadData, int[] buildData, string[] buildPathData)
+        public static void GenerateOffset(int xOffset, int yOffset, int[] roadData, int[] buildData, string[] buildPathData, WorldLayout layout)
         {
             //Debug.Log("Generator: Generating as " + PhotonNetwork.player.NickName);
+            RoadNode[,] tempRoads = DecryptRoads(roadData);
+            BuildNode[,] tempBuilds = DecryptBuilds(buildData, buildPathData);
+            GenerateRoads( tempRoads, xOffset, yOffset);
 
-            GenerateRoads(DecryptRoads(roadData), xOffset, yOffset);
+            if (tempBuilds == null) return;
+            GenerateBuilds(tempBuilds, xOffset, yOffset);
 
-            GenerateBuilds(DecryptBuilds(buildData, buildPathData), xOffset, yOffset);
+            if (layout != WorldLayout.City) return;
+            GenerateStreets(tempRoads, tempBuilds, xOffset, yOffset);
+            
         }
-
         private static RoadNode[,] DecryptRoads(int[] roadData)
         {
             RoadNode[,] tempRoadMatrix = new RoadNode[c_districtInWorldChunk, c_districtInWorldChunk];
@@ -1068,20 +1076,9 @@ public class Generator : MonoBehaviour
             }
             return tempRoadMatrix;
         }
-        private static void GenerateRoads(RoadNode[,] tempRoadMatrix, int xOffset, int yOffset)
-        {
-            for (int y = 0; y < c_districtInWorldChunk; y++)
-            {
-                for (int x = 0; x < c_districtInWorldChunk; x++)
-                {
-                    tempRoadMatrix[x, y].Generate(xOffset, yOffset);
-                }
-            }
-        }
-
         private static BuildNode[,] DecryptBuilds(int[] buildData, string[] buildPathData)
         {
-            if(buildData == null && buildPathData == null)
+            if (buildData == null && buildPathData == null)
             {
                 return null;
             }
@@ -1115,14 +1112,90 @@ public class Generator : MonoBehaviour
             }
             return tempBuildMatrix;
         }
+        private static void GenerateRoads(RoadNode[,] tempRoadMatrix, int xOffset, int yOffset)
+        {
+            for (int y = 0; y < c_districtInWorldChunk; y++)
+            {
+                for (int x = 0; x < c_districtInWorldChunk; x++)
+                {
+                    tempRoadMatrix[x, y].Generate(xOffset, yOffset);
+                }
+            }
+        }
         private static void GenerateBuilds(BuildNode[,] tempBuildMatrix, int xOffset, int yOffset)
         {
-            if (tempBuildMatrix == null) return;
             for (int y = 0; y < c_districtInWorldChunk * 2; y++)
             {
                 for (int x = 0; x < c_districtInWorldChunk * 2; x++)
                 {
                     tempBuildMatrix[x, y].Generate(xOffset, yOffset);
+                }
+            }
+        }
+        private static void GenerateStreets(RoadNode[,] tempRoadMatrix, BuildNode[,] tempBuildMatrix, int xOffset, int yOffset)
+        {
+            RoadNode road;
+            bool isBuildSW;
+            bool isBuildSE;
+            bool isBuildNE;
+            bool isBuildNW;
+            int branchCount;
+            for (int y = 0; y < c_districtInWorldChunk; y++)
+            {
+                for (int x = 0; x < c_districtInWorldChunk; x++)
+                {
+                    road = tempRoadMatrix[x, y];
+                    isBuildSW = tempBuildMatrix[2 * x, 2 * y].IsABuilding();
+                    isBuildSE = tempBuildMatrix[2 * x + 1, 2 * y].IsABuilding();
+                    isBuildNE = tempBuildMatrix[2 * x + 1, 2 * y + 1].IsABuilding();
+                    isBuildNW = tempBuildMatrix[2 * x, 2 * y + 1].IsABuilding();
+                    branchCount = 0;
+                    if (isBuildSW || isBuildSE || isBuildNE || isBuildSW)
+                    {
+                        Quaternion quater;
+                        if ((isBuildNW && isBuildNE) && (road.North == 0)) //N 0 degre
+                        {
+                            branchCount++;
+                            quater = Quaternion.Euler(0, 0, 0);
+                            Instantiate(Resources.Load<GameObject>("fillBranch"),
+                            new Vector3(x * c_districtLength + xOffset * c_worldChunkLength, 0, y * c_districtLength + yOffset * c_worldChunkLength),
+                            quater);
+                        }
+                        if ((isBuildNE && isBuildSE) && (road.East == 0)) //E 90
+                        {
+                            branchCount++;
+                            quater = Quaternion.Euler(0, 90, 0);
+                            Instantiate(Resources.Load<GameObject>("fillBranch"),
+                            new Vector3(x * c_districtLength + xOffset * c_worldChunkLength, 0, y * c_districtLength + yOffset * c_worldChunkLength),
+                            quater);
+                        }
+                        if ((isBuildSE && isBuildSW) && (road.South == 0)) //S 180
+                        {
+                            branchCount++;
+                            quater = Quaternion.Euler(0, 180, 0);
+                            Instantiate(Resources.Load<GameObject>("fillBranch"),
+                            new Vector3(x * c_districtLength + xOffset * c_worldChunkLength, 0, y * c_districtLength + yOffset * c_worldChunkLength),
+                            quater);
+                        }
+                        if ((isBuildSW && isBuildNW) && (road.West == 0)) //W 270
+                        {
+                            branchCount++;
+                            quater = Quaternion.Euler(0, 270, 0);
+                            Instantiate(Resources.Load<GameObject>("fillBranch"),
+                            new Vector3(x * c_districtLength + xOffset * c_worldChunkLength, 0, y * c_districtLength + yOffset * c_worldChunkLength),
+                            quater);
+                        }
+                        //Pice Central
+                        if ((road.North == 0 && road.South == 0 && road.East == 0 && road.West == 0) && branchCount >= 2)
+                        {
+                            Instantiate(Resources.Load<GameObject>("fillCentral"),
+                            new Vector3(x * c_districtLength + xOffset * c_worldChunkLength, 0, y * c_districtLength + yOffset * c_worldChunkLength),
+                            Quaternion.identity);
+                        }
+                        //SUBARASHI CONDITION
+                        //((isBuildSW && isBuildSE) || (isBuildNE && isBuildNW) || (isBuildSE && isBuildNW) || (isBuildSE && isBuildNE) || (isBuildSW && isBuildNW) || (isBuildSW && isBuildNE))
+
+                    }
                 }
             }
         }
@@ -1261,11 +1334,11 @@ public class Generator : MonoBehaviour
             isLoaded = true;
             GenerateFloor();
             yield return null;
-            CityNode.GenerateOffset(x, y, roadData, buildData, buildPathData);
+            CityNode.GenerateOffset(x, y, roadData, buildData, buildPathData, _layout);
             yield return null;
             worldNode.GetComponent<NavMeshSurface>().BuildNavMesh();
-            worldNode.GetComponent<WorldNodeBehavior>().link1.UpdateLink();
-            worldNode.GetComponent<WorldNodeBehavior>().link2.UpdateLink();
+            //worldNode.GetComponent<WorldNodeBehavior>().link1.UpdateLink();
+            //worldNode.GetComponent<WorldNodeBehavior>().link2.UpdateLink();
         }
         private void GenerateFloor()
         {
