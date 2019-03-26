@@ -155,14 +155,17 @@ public class CentralManager : Photon.MonoBehaviour
 
         //Initialise le Spirit
         string teamName;
-        if (nameTeam != null)
+        /*
+        string nameT = nameTeam.GetComponent<Text>().text;
+        if (nameT != "")
         {
-            teamName = nameTeam.GetComponent<Text>().text;
+            teamName = nameT;
         }
         else
         {
             teamName = "Team " + GameObject.Find("eCentralManager").GetComponent<PermissionsManager>().GetNumberOfTeams();
-        }
+        }*/
+        teamName = "Team " + GameObject.Find("eCentralManager").GetComponent<PermissionsManager>().GetNumberOfTeams();
 
         //Crée une nouvelle équipe avec comme nom "teamName"
         permissions.GetComponent<PhotonView>().RPC("CreateTeam", PhotonTargets.AllBuffered, teamName);

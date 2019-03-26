@@ -7,6 +7,10 @@ public class PlayerListing : MonoBehaviour
 {
     public PhotonPlayer PhotonPlayer { get; private set; }
 
+    [HideInInspector] public bool isReady = false;
+
+    public GameObject toggle;
+
     [SerializeField] private Text _playerName = null;
     private Text PlayerName
     {

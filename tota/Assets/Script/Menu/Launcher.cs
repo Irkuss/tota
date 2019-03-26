@@ -10,15 +10,21 @@ public class Launcher : Photon.PunBehaviour
     [Tooltip("The maximum number of players per room. When a room is full, it can't be joined by new players and so new room will be created")]
     private byte MaxPlayersPerRoom = 4;
 
-    public GameObject photonConnectButton;
+    [SerializeField] private GameObject photonConnectButton = null;
 
-    public GameObject currentRoom;
-    public GameObject waitingRoom;
-    
-    public GameObject nameField;
-    public Text namefield;
+    [SerializeField] private GameObject currentRoom = null;
+    [SerializeField] private GameObject roomList = null;
+    [SerializeField] private GameObject createRoom = null;
 
-    public GameObject sliderObject;
+    [SerializeField] private GameObject nameField = null;
+    [SerializeField] private Text namefield = null;
+
+    [SerializeField] private GameObject sliderObject = null;
+
+    [SerializeField] private GameObject backMenu = null;
+
+
+    #region PlayerListing
 
     [SerializeField] private GameObject _playerLayoutGroup = null;
     private GameObject PlayerLayoutGroup
@@ -38,12 +44,13 @@ public class Launcher : Photon.PunBehaviour
         get { return _playerListings; }
     }
 
+    #endregion    
+
     private string _gameVersion = "1";
     private bool isConnecting;
     
     private string roomName = "";
-    [SerializeField]
-    private Text error = null;
+    [SerializeField] private Text error = null;
     
 
     //Unity Callback
@@ -70,11 +77,20 @@ public class Launcher : Photon.PunBehaviour
 
         photonConnectButton.SetActive(false);
 
-        waitingRoom.SetActive(true);
+        roomList.SetActive(true);
+        
+        nameField.SetActive(false);
 
-        nameField.SetActive(false);             
+        backMenu.SetActive(false);
 
         Debug.Log("Connected to Master");
+
+        PhotonNetwork.JoinLobby(TypedLobby.Default);
+    }
+
+    public override void OnJoinedLobby()
+    {
+        Debug.Log("Joined a lobby");
     }
 
 
@@ -106,11 +122,15 @@ public class Launcher : Photon.PunBehaviour
     }
 
     public override void OnJoinedRoom()
-    {        
-        waitingRoom.SetActive(false);
+    {
+        roomList.SetActive(false);
+        createRoom.SetActive(false);
         currentRoom.SetActive(true);
-        GameObject menu = GameObject.FindGameObjectWithTag("MenuButton");
-        menu.transform.position = new Vector3(menu.transform.position.x - 20, menu.transform.position.y, menu.transform.position.z);
+
+        Debug.Log("Joined a room");
+
+        //GameObject menu = GameObject.FindGameObjectWithTag("MenuButton");
+        //menu.transform.position = new Vector3(menu.transform.position.x - 20, menu.transform.position.y, menu.transform.position.z);
 
         /*foreach (Transform child in PlayerLayoutGroup.transform)
         {
@@ -161,6 +181,35 @@ public class Launcher : Photon.PunBehaviour
             Destroy(PlayerListings[index].gameObject);
             PlayerListings.RemoveAt(index);
         }
+    }
+
+    public void ReadyInRoom(PhotonPlayer player)
+    {
+        int index = PlayerListings.FindIndex(x => x.PhotonPlayer == player);
+        if (index != -1)
+        {
+            GameObject toggle = PlayerListings[index].toggle;
+            if (PlayerListings[index].isReady)
+            {
+                PlayerListings[index].isReady = false;
+                toggle.SetActive(false);
+            }
+            else
+            {
+                PlayerListings[index].isReady = true;
+                toggle.SetActive(true);
+            }
+            
+        }
+    }
+
+    public bool LaunchIfReady()
+    {
+        foreach(var player in PlayerListings)
+        {
+            if (!player.isReady) return false;
+        }
+        return true;
     }
 
     //Public methods
@@ -223,6 +272,15 @@ public class Launcher : Photon.PunBehaviour
             error.text = "FAILED TO CREATE THE ROOM";
             StartCoroutine(Waiting());
         }
+        
+        //connectRoom.SetActive(true);
+        //current.SetActive(false);
+    }
+
+    public void BeginRoom()
+    {
+        roomList.SetActive(false);
+        createRoom.SetActive(true);
     }
 
     public void SetRoomName(string name)
@@ -242,7 +300,10 @@ public class Launcher : Photon.PunBehaviour
     public override void OnLeftRoom()
     {
         //Origin: LeaveRoom()
-        SceneManager.LoadScene(2);
+        //SceneManager.LoadScene(2);
+
+        currentRoom.SetActive(false);
+        roomList.SetActive(true);
     }
 
     //Public methods
@@ -263,4 +324,122 @@ public class Launcher : Photon.PunBehaviour
         GameObject menu = GameObject.FindGameObjectWithTag("MenuButton");
         menu.transform.position = new Vector3(menu.transform.position.x + 20, menu.transform.position.y, menu.transform.position.z);
     }
+
+    // PARTIE LISTE DES ROOMS A VOIR SI DANS UN AUTRE SCRIPT
+
+    [SerializeField] private GameObject _roomListingPrefab = null;
+    private GameObject RoomListingPrefab
+    {
+        get { return _roomListingPrefab; }
+    }
+
+    [SerializeField] private GameObject _roomLayoutGroup = null;
+    private GameObject RoomLayoutGroup
+    {
+        get { return _roomLayoutGroup; }
+    }
+
+    private List<RoomListing> _roomListingButtons = new List<RoomListing>();
+    private List<RoomListing> RoomListingButtons 
+    {
+        get { return _roomListingButtons; }
+    }
+
+    public override void OnReceivedRoomListUpdate()
+    {
+        RoomInfo[] rooms = PhotonNetwork.GetRoomList();
+
+        foreach(RoomInfo room in rooms)
+        {
+            ReceivedRoom(room);
+        }
+        RemoveOldRooms();
+    }
+
+    private void ReceivedRoom(RoomInfo room)
+    {
+        int index = RoomListingButtons.FindIndex(x => x.RoomName == room.Name);
+
+        if (index == -1)
+        {
+            if (room.IsVisible && room.PlayerCount < room.MaxPlayers)
+            {
+                GameObject roomListingObj = Instantiate(RoomListingPrefab);
+                roomListingObj.transform.SetParent(RoomLayoutGroup.transform, false);
+
+                RoomListing roomListing = roomListingObj.GetComponent<RoomListing>();
+                RoomListingButtons.Add(roomListing);
+
+                index = (RoomListingButtons.Count - 1);
+            }
+        }
+
+        if (index != -1)
+        {
+            RoomListing roomListing = RoomListingButtons[index];
+            roomListing.SetRoomName(room.Name);
+            roomListing.Updated = true;
+        }
+    }
+
+    private void RemoveOldRooms()
+    {
+        List<RoomListing> removeRooms = new List<RoomListing>();
+
+        foreach (RoomListing roomListing in RoomListingButtons)
+        {
+            if (!roomListing.Updated)
+                removeRooms.Add(roomListing);
+            else
+                roomListing.Updated = false;
+        }
+
+        foreach (RoomListing roomListing in removeRooms)
+        {
+            GameObject roomListingObj = roomListing.gameObject;
+            RoomListingButtons.Remove(roomListing);
+            Destroy(roomListingObj);
+        }
+    }
+
+
+    [SerializeField] private GameObject panel = null;
+    [SerializeField] private Text password = null;
+    private RoomInfo _room = null;
+
+    public void EnterPassword(RoomInfo room)
+    {
+        panel.SetActive(true);
+        _room = room;
+    }
+
+    private void Update()
+    {
+        if (panel.activeSelf)
+        {
+            if (Input.GetKeyDown(KeyCode.Escape))
+            {
+                panel.SetActive(false);
+            }
+        }
+    }
+
+    public void ValidPassword()
+    {
+        if (_room != null)
+        {
+            if (password.text == (string)_room.CustomProperties["password"])
+            {
+                PhotonNetwork.JoinRoom(_room.Name);
+            }
+            else
+            {
+                error.text = "Wrong password";
+                Debug.Log("Failed to joined " + roomName); 
+                StartCoroutine(Waiting());
+            }
+        }
+    }
+
+
 }
