@@ -32,10 +32,10 @@ public class OptionRoom : MonoBehaviour
 
     private void Start()
     {
-        passwordToggle = passwordObject.GetComponent<Toggle>();
-        maxInRoomToggle = maxInRoom.GetComponent<Toggle>();
-        maxInTeamToggle = maxInTeam.GetComponent<Toggle>();
-        randomChara = randomCharacters.GetComponent<Slider>();
+        passwordToggle = passwordObject.GetComponentInChildren<Toggle>();
+        maxInRoomToggle = maxInRoom.GetComponentInChildren<Toggle>();
+        maxInTeamToggle = maxInTeam.GetComponentInChildren<Toggle>();
+        randomChara = randomCharacters.GetComponentInChildren<Slider>();
     }
 
     public void PasswordToggle()
@@ -109,8 +109,8 @@ public class OptionRoom : MonoBehaviour
         roomOptions.CustomRoomProperties = new ExitGames.Client.Photon.Hashtable();
         roomOptions.CustomRoomProperties.Add("password", _password);
 
-        //if (_maxInTeam == "") roomOptions.CustomRoomProperties.Add("maxInTeam", 4);
-        //else roomOptions.CustomRoomProperties.Add("maxInTeam", int.Parse(_maxInTeam));
+        if (_maxInTeam == "") roomOptions.CustomRoomProperties.Add("maxInTeam", 4);
+        else roomOptions.CustomRoomProperties.Add("maxInTeam", int.Parse(_maxInTeam));
 
         //roomOptions.CustomRoomProperties.Add("charaPerTeam", randomChara.value);
 
@@ -122,13 +122,23 @@ public class OptionRoom : MonoBehaviour
         };
 
         if (roomName.text != "")
-        {
+        {            
             PhotonNetwork.CreateRoom(roomName.text, roomOptions, default);
+            passwordObject.GetComponentInChildren<InputField>().text = "";
+            maxInRoom.GetComponentInChildren<InputField>().text = "";
+            maxInTeam.GetComponentInChildren<InputField>().text = "";
+            randomChara.value = 0;
+            roomName.text = "";
         }
     }
 
     public void Cancel()
     {
+        passwordObject.GetComponentInChildren<InputField>().text = "";
+        maxInRoom.GetComponentInChildren<InputField>().text = "";
+        maxInTeam.GetComponentInChildren<InputField>().text = "";
+        randomChara.value = 0;
+        roomName.text = "";
         current.SetActive(false);
         previous.SetActive(true);
     }

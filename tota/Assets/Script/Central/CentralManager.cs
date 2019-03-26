@@ -18,11 +18,6 @@ public class CentralManager : Photon.MonoBehaviour
     public GameObject nameTeam;
     public GameObject panel;
 
-    //Liste des teams
-    [SerializeField] private GameObject _teamLayoutGroup = null;
-    [SerializeField] private GameObject _teamListingPrefab = null;
-    private List<PermissionsManager.Team> teams = new List<PermissionsManager.Team>();
-
     public static bool isPause = false;
 
     public void UpdateToolTip(string[] info)
@@ -91,40 +86,6 @@ public class CentralManager : Photon.MonoBehaviour
         Application.Quit();
     }
 
-    private void AddTeam(List<PermissionsManager.Team> teamList)
-    {
-        foreach(var team in teamList)
-        {
-            TeamListing(team);
-        }
-    }
-
-    private void TeamListing(PermissionsManager.Team team)
-    {
-        
-        if (team == null)
-            return;
-
-        //TeamLeftRoom(team);
-
-        GameObject teamListingObj = Instantiate(_teamListingPrefab);
-        //teamListingObj.GetComponent<Button>().onClick.AddListener(JoinTeam());
-        teamListingObj.transform.SetParent(_teamLayoutGroup.transform, false);
-
-        teamListingObj.GetComponent<Text>().text = team.Name;
-
-        teams.Add(team);        
-    }
-
-    private void TeamLeftRoom(PermissionsManager.Team team)
-    {
-        int index = teams.FindIndex(x => x.Name == team.Name);
-        if (index != -1)
-        {
-            Destroy(_teamLayoutGroup.transform.GetChild(index));
-            teams.RemoveAt(index);
-        }
-    }
 
     //Special Callbacks
     public void OnGenerationFinished()
@@ -155,16 +116,7 @@ public class CentralManager : Photon.MonoBehaviour
 
         //Initialise le Spirit
         string teamName;
-        /*
-        string nameT = nameTeam.GetComponent<Text>().text;
-        if (nameT != "")
-        {
-            teamName = nameT;
-        }
-        else
-        {
-            teamName = "Team " + GameObject.Find("eCentralManager").GetComponent<PermissionsManager>().GetNumberOfTeams();
-        }*/
+        
         teamName = "Team " + GameObject.Find("eCentralManager").GetComponent<PermissionsManager>().GetNumberOfTeams();
 
         //Crée une nouvelle équipe avec comme nom "teamName"

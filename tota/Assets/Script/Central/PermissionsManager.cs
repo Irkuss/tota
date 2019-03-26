@@ -57,6 +57,11 @@ public class PermissionsManager : MonoBehaviour
             get => _name;
         }
         private List<Player> _playerList;
+        public List<Player> PlayerList
+        {
+            get { return _playerList; }
+        }
+
         private int[] _linkedColor;
         public int[] LinkedColor
         {
@@ -133,6 +138,10 @@ public class PermissionsManager : MonoBehaviour
     //Attributes
 
     private List<Team> _teamList;
+    public List<Team> TeamList
+    {
+        get { return _teamList; }
+    }
 
     //Unity Callbacks
 
@@ -196,9 +205,14 @@ public class PermissionsManager : MonoBehaviour
     {
         _teamList.Add(new Team(teamName));
     }
+
     [PunRPC]
     public void AddNewPlayerToTeam(string teamName, string playerName)
     {
         GetTeamWithName(teamName).AddPlayer(new Player(playerName,teamName));
+        foreach (var team in _teamList)
+        {
+            gameObject.GetComponent<Launcher>().TeamListing(team);
+        }
     }
 }
