@@ -18,7 +18,7 @@ public class ReadyRoom : MonoBehaviour
 
     [SerializeField] private GameObject sliderObject = null;
 
-    [SerializeField] private Text teamName = null;
+    [SerializeField] private InputField teamName = null;
     [SerializeField] private GameObject createTeam = null;
 
     private Launcher launcher;
@@ -26,11 +26,11 @@ public class ReadyRoom : MonoBehaviour
     private void Start()
     {
         launcher = GameObject.Find("eLaucher").GetComponent<Launcher>();
-        if (PhotonNetwork.masterClient.NickName == PhotonNetwork.player.NickName)
+        /*if (PhotonNetwork.masterClient.NickName == PhotonNetwork.player.NickName)
         {
             launchButton.SetActive(true);
             forceLaunchButton.SetActive(true);
-        }
+        }*/
 
         GameObject settingObj = Instantiate(_settingPrefab);
         settingObj.transform.SetParent(_settings.transform, false);
@@ -51,12 +51,12 @@ public class ReadyRoom : MonoBehaviour
 
     public void LeaveRoom()
     {
-        for(int i = 1; i<_settings.transform.childCount; i++)
+        for(int i = 1; i < _settings.transform.childCount; i++)
         {
             Destroy(_settings.transform.GetChild(i));
         }
-        PhotonNetwork.LeaveRoom();
-        //Le joueur doit pouvoir quitter la team et la room -> màj pour tout le monde
+        teamName.text = "";
+        PhotonNetwork.LeaveRoom();        
     }
 
     public void Ready()
@@ -92,8 +92,9 @@ public class ReadyRoom : MonoBehaviour
     public void CreateTeam()
     {
         if (teamName.text != "")
-        {
+        {            
             launcher.AddTeam(teamName.text);
+            teamName.text = "";
         }
     }
 

@@ -13,10 +13,7 @@ public class CentralManager : Photon.MonoBehaviour
     //Bouton et interface
     public GameObject tempButton;
     public GameObject toolTip;
-    public GameObject teamList;
     public GameObject pauseMenu;
-    public GameObject nameTeam;
-    public GameObject panel;
 
     public static bool isPause = false;
 
@@ -30,17 +27,7 @@ public class CentralManager : Photon.MonoBehaviour
         toolTip.SetActive(false);
     }
 
-
     //Unity Callbacks
-    private void Start()
-    {
-        if (!PhotonNetwork.offlineMode)
-        {
-            tempButton.SetActive(false);
-            //teamList.SetActive(false);
-            //nameTeam.SetActive(false);
-        }
-    }
 
     private void Update()
     {
@@ -92,9 +79,6 @@ public class CentralManager : Photon.MonoBehaviour
     {
         //Appelé par Generator/Start/*Received Package*/GenerateEnd une fois que le monde s'est généré
         tempButton.SetActive(true);
-        //teamList.SetActive(true);
-        //nameTeam.SetActive(true);
-        panel.SetActive(true);
     }
 
     //Spawn le joueur (appelé par le bouton spawn)
@@ -113,17 +97,17 @@ public class CentralManager : Photon.MonoBehaviour
             spirit = PhotonNetwork.Instantiate("Spirit", spawnPoint, Quaternion.identity, 0);
         }
 
-
         //Initialise le Spirit
         string teamName;
         
         teamName = "Team " + GameObject.Find("eCentralManager").GetComponent<PermissionsManager>().GetNumberOfTeams();
 
+
+        // A enlever 
         //Crée une nouvelle équipe avec comme nom "teamName"
         permissions.GetComponent<PhotonView>().RPC("CreateTeam", PhotonTargets.AllBuffered, teamName);
         //Ajoute un nouveau joueur avec comme nom celui du client //TODO pour l'instant chaque joueur joue tout seul
         permissions.GetComponent<PhotonView>().RPC("AddNewPlayerToTeam", PhotonTargets.AllBuffered, teamName, PhotonNetwork.player.NickName);
-        //Ajoute la team dans la liste des teams
 
 
         //Recupere le Player crée par AddNewPlayerToTeam
@@ -136,41 +120,5 @@ public class CentralManager : Photon.MonoBehaviour
 
         //Enleve le bouton de spawn
         tempButton.SetActive(false);
-        //teamList.SetActive(false);
-        //nameTeam.SetActive(false);
-        panel.SetActive(false);
-    }
-
-    public void JoinTeam(GameObject team)
-    {
-        string teamName = team.GetComponent<Text>().text;
-        //Instantiate the spirit
-        GameObject spirit;
-        if (PhotonNetwork.offlineMode)
-        {
-            spirit = Instantiate(Resources.Load<GameObject>("Spirit"), spawnPoint, Quaternion.identity);
-        }
-        else
-        {
-            spirit = PhotonNetwork.Instantiate("Spirit", spawnPoint, Quaternion.identity, 0);
-        }
-
-        //Ajoute un nouveau joueur avec comme nom celui du client //TODO pour l'instant chaque joueur joue tout seul
-        permissions.GetComponent<PhotonView>().RPC("AddNewPlayerToTeam", PhotonTargets.AllBuffered, teamName, PhotonNetwork.player.NickName);
-
-        //Recupere le Player crée par AddNewPlayerToTeam
-        PermissionsManager.Player player = permissions.GetPlayerWithName(PhotonNetwork.player.NickName);
-
-        //L'attribue à notre spirit nouvellement crée
-        spirit.GetComponent<SpiritHead>().InitPermissions(player);
-
-        Debug.Log("CentralManager: This spirit is named " + PhotonNetwork.playerName + " and is in team " + teamName);
-
-        //Enleve le bouton de spawn
-        tempButton.SetActive(false);
-        //teamList.SetActive(false);
-        //nameTeam.SetActive(false);
-        panel.SetActive(false);
-
     }
 }

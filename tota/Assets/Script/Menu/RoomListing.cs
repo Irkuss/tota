@@ -5,9 +5,9 @@ using UnityEngine.UI;
 
 public class RoomListing : MonoBehaviour
 {
-    [SerializeField] private Text _roomName;
-    private Launcher launcher;
+    private Launcher _launcher;
 
+    [SerializeField] private Text _roomName;
     private Text roomName
     {
         get { return _roomName; }
@@ -18,7 +18,7 @@ public class RoomListing : MonoBehaviour
 
     private void Start()
     {
-        launcher = GameObject.Find("eLaucher").GetComponent<Launcher>();
+        _launcher = GameObject.Find("eLaucher").GetComponent<Launcher>();
         Button button = GetComponent<Button>();
         button.onClick.AddListener(() => OnClickJoinRoom(roomName.text));
     }
@@ -45,7 +45,7 @@ public class RoomListing : MonoBehaviour
             {
                 if((string) room.CustomProperties["password"] != "")
                 {
-                    launcher.EnterPassword(room);
+                    _launcher.EnterPassword(room);
                 }
                 else PhotonNetwork.JoinRoom(roomName);
             }

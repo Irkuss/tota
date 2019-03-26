@@ -18,10 +18,10 @@ public class OptionRoom : MonoBehaviour
     [SerializeField] private GameObject maxInRoom = null;
     [SerializeField] private GameObject maxInTeam = null;
 
-    [SerializeField] private Text passwordInput = null;
+    [SerializeField] private InputField passwordInput = null;
     [SerializeField] private Text maxInRoomInput = null;
     [SerializeField] private Text maxInTeamInput = null;
-    [SerializeField] private Text roomName = null;
+    [SerializeField] private InputField roomName = null;
 
     [SerializeField] private GameObject randomCharacters = null;
 
@@ -100,6 +100,7 @@ public class OptionRoom : MonoBehaviour
         //_randomChara = (int) randomChara.value;
 
         RoomOptions roomOptions = new RoomOptions();
+
         if (_maxInRoom == "") roomOptions.MaxPlayers = 4;
         else roomOptions.MaxPlayers = byte.Parse(_maxInRoom);
 
@@ -122,13 +123,13 @@ public class OptionRoom : MonoBehaviour
         };
 
         if (roomName.text != "")
-        {            
-            PhotonNetwork.CreateRoom(roomName.text, roomOptions, default);
+        {
             passwordObject.GetComponentInChildren<InputField>().text = "";
             maxInRoom.GetComponentInChildren<InputField>().text = "";
             maxInTeam.GetComponentInChildren<InputField>().text = "";
             randomChara.value = 0;
             roomName.text = "";
+            PhotonNetwork.CreateRoom(roomName.text, roomOptions, default);
         }
     }
 

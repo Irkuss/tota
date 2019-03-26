@@ -7,8 +7,8 @@ using UnityEngine.UI;
 public class Launcher : Photon.PunBehaviour
 {
     [SerializeField] private PhotonLogLevel Loglevel = PhotonLogLevel.Informational;
-    [Tooltip("The maximum number of players per room. When a room is full, it can't be joined by new players and so new room will be created")]
-    private byte MaxPlayersPerRoom = 4;
+    /*[Tooltip("The maximum number of players per room. When a room is full, it can't be joined by new players and so new room will be created")]
+    private byte MaxPlayersPerRoom = 4;*/
 
     [SerializeField] private GameObject photonConnectButton = null;
 
@@ -25,7 +25,6 @@ public class Launcher : Photon.PunBehaviour
 
     [SerializeField] private GameObject launchButton = null;
     [SerializeField] private GameObject forceLaunchButton = null;
-
 
     #region PlayerListing
 
@@ -52,6 +51,7 @@ public class Launcher : Photon.PunBehaviour
     [SerializeField] private GameObject _teamLayoutGroup = null;
     [SerializeField] private GameObject _teamListingPrefab = null;
     [SerializeField] private GameObject _teamNamePrefab = null;
+
     private List<PermissionsManager.Team> teams = new List<PermissionsManager.Team>();
     private List<PlayerListing> _playerListInTeam = new List<PlayerListing>();
     private List<PlayerListing> PlayerListInTeam
@@ -62,9 +62,7 @@ public class Launcher : Photon.PunBehaviour
     private string _gameVersion = "1";
     private bool isConnecting;
     
-    private string roomName = "";
-    [SerializeField] private Text error = null;
-    
+    private string roomName = "";    
 
     //Unity Callback
 
@@ -78,8 +76,6 @@ public class Launcher : Photon.PunBehaviour
 
         // Force LogLevel
         PhotonNetwork.logLevel = Loglevel;
-
-        error.enabled = false;
     }
 
     //Photon Callback
@@ -106,7 +102,6 @@ public class Launcher : Photon.PunBehaviour
         Debug.Log("Joined a lobby");
     }
 
-
     public override void OnDisconnectedFromPhoton()
     {
         Debug.Log("No longer connected to Photon");
@@ -115,24 +110,24 @@ public class Launcher : Photon.PunBehaviour
     public override void OnPhotonCreateRoomFailed(object[] codeAndMsg)
     {
         Debug.Log("Failed to create " + roomName);
-        error.text = "FAILED TO CREATE THE ROOM";
-        StartCoroutine(Waiting());
+        /*error.text = "FAILED TO CREATE THE ROOM";
+        StartCoroutine(Waiting());*/
     }
 
     public override void OnPhotonJoinRoomFailed(object[] codeAndMsg)
     {
         //Origin: SearchRoom()
-        error.text = "FAILED TO JOIN THE ROOM";
+        //error.text = "FAILED TO JOIN THE ROOM";
         Debug.Log("Failed to joined " + roomName);
-        StartCoroutine(Waiting());       
+        //StartCoroutine(Waiting());       
     }
 
-    IEnumerator Waiting()
+    /*IEnumerator Waiting()
     {
         error.enabled = true;
         yield return new WaitForSeconds(3);
         error.enabled = false;
-    }
+    }*/
 
     [PunRPC]
     public void ActiveMasterButton()
@@ -153,9 +148,6 @@ public class Launcher : Photon.PunBehaviour
         }
 
         Debug.Log("Joined a room");
-
-        //GameObject menu = GameObject.FindGameObjectWithTag("MenuButton");
-        //menu.transform.position = new Vector3(menu.transform.position.x - 20, menu.transform.position.y, menu.transform.position.z);
 
         foreach (Transform child in PlayerLayoutGroup.transform)
         {
@@ -244,8 +236,7 @@ public class Launcher : Photon.PunBehaviour
             {
                 PlayerListings[index].isReady = true;
                 toggle.SetActive(true);
-            }
-            
+            }            
         }
         else
         {
@@ -263,7 +254,6 @@ public class Launcher : Photon.PunBehaviour
                     PlayerListInTeam[indexT].isReady = true;
                     toggle.SetActive(true);
                 }
-
             }
         }
     }
@@ -271,6 +261,10 @@ public class Launcher : Photon.PunBehaviour
     public bool LaunchIfReady()
     {
         foreach(var player in PlayerListings)
+        {
+            if (!player.isReady) return false;
+        }
+        foreach(var player in _playerListInTeam)
         {
             if (!player.isReady) return false;
         }
@@ -357,64 +351,19 @@ public class Launcher : Photon.PunBehaviour
         }       
     }
 
-    public void SearchRoom()
-    {
-        //Origin: searchButton
-
-        if (roomName != "")
-        {
-            if (PhotonNetwork.JoinRoom(roomName))
-            {
-
-            }
-            else
-            {
-                Debug.Log("On doit renvoyer un message d'erreur");
-            }
-            
-            //Callback suivant: OnJoinedRoom()
-            //Callback suivant: OnPhotonJoinedRoomFailed(object[] codeAndMsg)
-        }
-        else
-        {
-            error.text = "FAILED TO CREATE THE ROOM";
-            StartCoroutine(Waiting());
-        }
-        
-    }
-
-    public void CreateRoom()
-    {
-        //Origin: createButton
-        Debug.Log("Trying to Create");
-        if (roomName != "")
-        {
-            PhotonNetwork.CreateRoom(roomName, new RoomOptions() { MaxPlayers = MaxPlayersPerRoom },null);            
-            Debug.Log("Created room " + roomName);
-        }
-        else
-        {
-            error.text = "FAILED TO CREATE THE ROOM";
-            StartCoroutine(Waiting());
-        }
-        
-        //connectRoom.SetActive(true);
-        //current.SetActive(false);
-    }
-
     public void BeginRoom()
     {
         roomList.SetActive(false);
         createRoom.SetActive(true);
     }
 
-    public void SetRoomName(string name)
+    /*public void SetRoomName(string name)
     {
         //Origin: inputField
 
         Debug.Log("Changed room name to " + name);
         roomName = name;
-    }
+    }*/
 
     public void BackToMenu()
     {
@@ -444,22 +393,22 @@ public class Launcher : Photon.PunBehaviour
 
     //Public methods
 
-    public void LeaveRoom()
+    /*public void LeaveRoom()
     {
         //Origin: Leave button
 
         PhotonNetwork.LeaveRoom();
 
         //Callback suivant: OnLeftRoom()
-    }
+    }*/
 
-    public void JoinGame()
+    /*public void JoinGame()
     {
         sliderObject.SetActive(true);
         currentRoom.SetActive(false);
         GameObject menu = GameObject.FindGameObjectWithTag("MenuButton");
         menu.transform.position = new Vector3(menu.transform.position.x + 20, menu.transform.position.y, menu.transform.position.z);
-    }
+    }*/
 
     // PARTIE LISTE DES ROOMS A VOIR SI DANS UN AUTRE SCRIPT
 
@@ -540,7 +489,7 @@ public class Launcher : Photon.PunBehaviour
 
 
     [SerializeField] private GameObject panel = null;
-    [SerializeField] private Text password = null;
+    [SerializeField] private InputField password = null;
     private RoomInfo _room = null;
 
     public void EnterPassword(RoomInfo room)
@@ -571,9 +520,9 @@ public class Launcher : Photon.PunBehaviour
             }
             else
             {
-                error.text = "Wrong password";
+                /*error.text = "Wrong password";
                 Debug.Log("Failed to joined " + roomName); 
-                StartCoroutine(Waiting());
+                StartCoroutine(Waiting());*/
             }
         }
     }
