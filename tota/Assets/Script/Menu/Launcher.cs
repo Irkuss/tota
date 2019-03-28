@@ -147,24 +147,26 @@ public class Launcher : Photon.PunBehaviour
             gameObject.GetComponent<PhotonView>().RPC("ActiveMasterButton", PhotonNetwork.player);
         }
 
-        Debug.Log("Joined a room");
-
         foreach (Transform child in PlayerLayoutGroup.transform)
         {
+            Debug.Log("Destroying on join" + child.name);
             Destroy(child.gameObject);
+            Debug.Log("Destroyed on join");
         }
 
         foreach (Transform child in _teamLayoutGroup.transform)
         {
+            Debug.Log("Destroying on join" + child.name);
             Destroy(child.gameObject);
+            Debug.Log("Destroyed on join");
         }
-
+                
         PhotonPlayer[] photonPlayers = PhotonNetwork.playerList;
         for (int i = 0; i < photonPlayers.Length; i++)
         {
             PlayerJoinedRoom(photonPlayers[i]);
         }
-
+        Debug.Log("Joined a room");
     }
 
     //Called by photon when a player joins the room.
@@ -176,12 +178,17 @@ public class Launcher : Photon.PunBehaviour
     //Called by photon when a player leaves the room.
     public override void OnPhotonPlayerDisconnected(PhotonPlayer photonPlayer)
     {
+        System.Random rnd = new System.Random();
+        int rand = rnd.Next(PlayerListings.Count);
         PlayerLeftRoom(photonPlayer);
         if (photonPlayer.IsMasterClient)
         {
-            PhotonNetwork.SetMasterClient(PlayerListings[0].PhotonPlayer);
-            gameObject.GetComponent<PhotonView>().RPC("ActiveMasterButton", PlayerListings[0].PhotonPlayer);
+            Debug.Log(PhotonNetwork.masterClient.NickName);
+            PhotonNetwork.SetMasterClient(PlayerListings[rand].PhotonPlayer);
+            Debug.Log(PhotonNetwork.masterClient.NickName);
+            gameObject.GetComponent<PhotonView>().RPC("ActiveMasterButton", PhotonTargets.MasterClient);
         }
+        Debug.Log("OnPhotonPlayerDisconnected");
     }
 
     private void PlayerJoinedRoom(PhotonPlayer photonPlayer)
@@ -198,6 +205,7 @@ public class Launcher : Photon.PunBehaviour
         playerListing.ApplyPhotonPlayer(photonPlayer);
 
         PlayerListings.Add(playerListing);
+        Debug.Log("PlayerJoinedRoom");
     }
 
     private void PlayerLeftRoom(PhotonPlayer photonPlayer)
@@ -208,6 +216,17 @@ public class Launcher : Photon.PunBehaviour
             Destroy(PlayerListings[index].gameObject);
             PlayerListings.RemoveAt(index);
         }
+        else
+        {
+            int indexT = PlayerListInTeam.FindIndex(x => x.PhotonPlayer == photonPlayer);
+            if (indexT != -1)
+            {
+                Debug.Log(PlayerListInTeam[indexT].PhotonPlayer.NickName);
+                Destroy(PlayerListInTeam[indexT].gameObject);
+                PlayerListInTeam.RemoveAt(indexT);
+            }
+        }
+        Debug.Log("PlayerLeftRoom");
     }
 
     [PunRPC]
@@ -273,15 +292,32 @@ public class Launcher : Photon.PunBehaviour
 
     public void AddTeam(string teamName)
     {
+        PermissionsManager permissions = gameObject.GetComponent<PermissionsManager>();
+        if (permissions.GetTeamWithName(teamName) != null && permissions.GetTeamWithPlayer(permissions.GetPlayerWithName(PhotonNetwork.player.NickName)) != null)
+        {
+            return;
+        }
         gameObject.GetComponent<PhotonView>().RPC("CreateTeam", PhotonTargets.AllBuffered, teamName);
         AddToTeam(teamName, PhotonNetwork.player);
     }
 
     public void AddToTeam(string teamName, PhotonPlayer player)
     {
-        int playersInTeam = gameObject.GetComponent<PermissionsManager>().GetTeamWithName(teamName).PlayerList.Count;
+        PermissionsManager permissions = gameObject.GetComponent<PermissionsManager>();
+        PermissionsManager.Player playerPerm = permissions.GetPlayerWithName(player.NickName);
+
+        int playersInTeam = permissions.GetTeamWithName(teamName).PlayerList.Count;
         if (playersInTeam < (int) PhotonNetwork.room.CustomProperties["maxInTeam"])
         {
+            foreach (var team in permissions.TeamList)
+            {
+                if (playerPerm != null && team.ContainsPlayer(playerPerm))
+                {
+                    gameObject.GetComponent<PhotonView>().RPC("RemovePlayerFromTeam", PhotonTargets.AllBuffered, team.Name, playerPerm.Name);
+                    Debug.Log("C'est à cause de ça ! ");
+                    //return;
+                }
+            }
             gameObject.GetComponent<PhotonView>().RPC("AddNewPlayerToTeam", PhotonTargets.AllBuffered, teamName, player.NickName);
             gameObject.GetComponent<PhotonView>().RPC("PlayerLeftNoTeam", PhotonTargets.AllBuffered, player);
         }        
@@ -292,7 +328,7 @@ public class Launcher : Photon.PunBehaviour
         if (team == null)
             return;
 
-        //TeamLeftRoom(team);
+        TeamLeftRoom(team);
 
         GameObject teamListingObj = Instantiate(_teamListingPrefab);
         teamListingObj.transform.SetParent(_teamLayoutGroup.transform, false);
@@ -321,13 +357,32 @@ public class Launcher : Photon.PunBehaviour
         teams.Add(team);
     }
 
-    private void TeamLeftRoom(PermissionsManager.Team team)
+    public void TeamLeftRoom(PermissionsManager.Team team)
     {
+        int indexPlayer;
         int index = teams.FindIndex(x => x.Name == team.Name);
         if (index != -1)
         {
-            Destroy(_teamLayoutGroup.transform.GetChild(index));
+            Destroy(_teamLayoutGroup.transform.GetChild(index).gameObject); 
+            foreach (var player in team.PlayerList)
+            {
+                indexPlayer = PlayerListInTeam.FindIndex(x => x.PhotonPlayer.NickName == player.Name);
+                if (indexPlayer != -1)
+                {
+                    PlayerListInTeam.RemoveAt(indexPlayer);
+                }
+            }
             teams.RemoveAt(index);
+        }
+
+    }
+
+    public void PlayerLeftTeam(PermissionsManager.Player player)
+    {
+        int index = PlayerListInTeam.FindIndex(x => x.PhotonPlayer.NickName == player.Name);
+        if (index != -1)
+        {
+            PlayerListInTeam.RemoveAt(index);
         }
     }
 
@@ -357,14 +412,6 @@ public class Launcher : Photon.PunBehaviour
         createRoom.SetActive(true);
     }
 
-    /*public void SetRoomName(string name)
-    {
-        //Origin: inputField
-
-        Debug.Log("Changed room name to " + name);
-        roomName = name;
-    }*/
-
     public void BackToMenu()
     {
         SceneManager.LoadScene(0);
@@ -376,39 +423,12 @@ public class Launcher : Photon.PunBehaviour
         //Origin: LeaveRoom()
         //SceneManager.LoadScene(2);
 
-        foreach(Transform child in _teamLayoutGroup.transform)
-        {
-            Destroy(child.gameObject);
-        }
-
-        foreach (Transform child in PlayerLayoutGroup.transform)
-        {
-            Destroy(child.gameObject);
-        }
-
         currentRoom.SetActive(false);
         roomList.SetActive(true);
-        Debug.Log("Left a room");
+        Debug.Log("Left a room");        
     }
 
     //Public methods
-
-    /*public void LeaveRoom()
-    {
-        //Origin: Leave button
-
-        PhotonNetwork.LeaveRoom();
-
-        //Callback suivant: OnLeftRoom()
-    }*/
-
-    /*public void JoinGame()
-    {
-        sliderObject.SetActive(true);
-        currentRoom.SetActive(false);
-        GameObject menu = GameObject.FindGameObjectWithTag("MenuButton");
-        menu.transform.position = new Vector3(menu.transform.position.x + 20, menu.transform.position.y, menu.transform.position.z);
-    }*/
 
     // PARTIE LISTE DES ROOMS A VOIR SI DANS UN AUTRE SCRIPT
 

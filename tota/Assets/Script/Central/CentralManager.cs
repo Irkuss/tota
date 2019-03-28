@@ -29,6 +29,11 @@ public class CentralManager : Photon.MonoBehaviour
 
     //Unity Callbacks
 
+    private void Start()
+    {
+        tempButton.SetActive(false);
+    }
+
     private void Update()
     {
         if(Input.GetKeyDown(KeyCode.Escape) || Input.GetKeyDown(KeyCode.P))

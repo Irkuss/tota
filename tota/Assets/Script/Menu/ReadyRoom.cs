@@ -53,9 +53,23 @@ public class ReadyRoom : MonoBehaviour
     {
         for(int i = 1; i < _settings.transform.childCount; i++)
         {
-            Destroy(_settings.transform.GetChild(i));
+            Destroy(_settings.transform.GetChild(i).gameObject);
         }
         teamName.text = "";
+
+        GameObject launcherD = GameObject.Find("eLaucher");
+
+        PermissionsManager permissions = launcherD.GetComponent<PermissionsManager>();
+        PermissionsManager.Player player = permissions.GetPlayerWithName(PhotonNetwork.player.NickName);
+        PermissionsManager.Team team = permissions.GetTeamWithPlayer(player);
+
+        if (player != null && team != null)
+        {
+            string playerName = player.Name;
+            string teamname = player.MyTeamName; 
+       
+            launcherD.GetComponent<PhotonView>().RPC("RemovePlayerFromTeam", PhotonTargets.AllBuffered, teamname, playerName);            
+        }
         PhotonNetwork.LeaveRoom();        
     }
 
@@ -67,7 +81,7 @@ public class ReadyRoom : MonoBehaviour
     [PunRPC]
     private void ReadyRPC(PhotonPlayer photonPlayer)
     {
-        launcher.ReadyInRoom(photonPlayer);
+        GameObject.Find("eLaucher").GetComponent<Launcher>().ReadyInRoom(photonPlayer);
     }
 
     public void Launch()

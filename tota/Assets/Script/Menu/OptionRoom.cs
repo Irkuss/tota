@@ -29,6 +29,7 @@ public class OptionRoom : MonoBehaviour
     private string _maxInRoom = "";
     private string _maxInTeam = "";
     private int _randomChara = 0;
+    private string _room = "";
 
     private void Start()
     {
@@ -128,8 +129,9 @@ public class OptionRoom : MonoBehaviour
             maxInRoom.GetComponentInChildren<InputField>().text = "";
             maxInTeam.GetComponentInChildren<InputField>().text = "";
             randomChara.value = 0;
+            _room = roomName.text;
             roomName.text = "";
-            PhotonNetwork.CreateRoom(roomName.text, roomOptions, default);
+            PhotonNetwork.CreateRoom(_room, roomOptions, default);
         }
     }
 

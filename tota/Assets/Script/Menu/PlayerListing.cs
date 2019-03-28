@@ -17,6 +17,12 @@ public class PlayerListing : MonoBehaviour
         get { return _playerName; }
     }
 
+    private void Start()
+    {
+        if (isReady) toggle.SetActive(true);
+        else toggle.SetActive(false);
+    }
+
     public void ApplyPhotonPlayer(PhotonPlayer photonPlayer)
     {
         PhotonPlayer = photonPlayer;

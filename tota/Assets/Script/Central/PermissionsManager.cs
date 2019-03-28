@@ -92,11 +92,13 @@ public class PermissionsManager : MonoBehaviour
 
         public void AddPlayer(Player player)
         {
+            if (ContainsPlayer(player)) return;
             _playerList.Add(player);
         }
 
         public void RemovePlayer(Player player)
         {
+            if (!ContainsPlayer(player)) return;
             _playerList.Remove(player);
         }
 
@@ -210,9 +212,22 @@ public class PermissionsManager : MonoBehaviour
     public void AddNewPlayerToTeam(string teamName, string playerName)
     {
         GetTeamWithName(teamName).AddPlayer(new Player(playerName,teamName));
-        foreach (var team in _teamList)
+        gameObject.GetComponent<Launcher>().TeamListing(GetTeamWithName(teamName));
+    }
+
+    [PunRPC]
+    public void RemovePlayerFromTeam(string teamName, string playerName)
+    {
+        Player player = GetPlayerWithName(playerName);
+        Team team = GetTeamWithName(teamName); 
+
+        team.RemovePlayer(player);
+        gameObject.GetComponent<Launcher>().PlayerLeftTeam(player);
+        if (team.PlayerList.Count == 0)
         {
-            gameObject.GetComponent<Launcher>().TeamListing(team);
+            gameObject.GetComponent<Launcher>().TeamLeftRoom(team);
+            TeamList.Remove(team);
         }
+        
     }
 }
