@@ -292,19 +292,24 @@ public class Launcher : Photon.PunBehaviour
 
     public void AddTeam(string teamName)
     {
-        PermissionsManager permissions = gameObject.GetComponent<PermissionsManager>();
+        PermissionsManager permissions = GameObject.Find("PermissionManager").GetComponent<PermissionsManager>();
         if (permissions.GetTeamWithName(teamName) != null && permissions.GetTeamWithPlayer(permissions.GetPlayerWithName(PhotonNetwork.player.NickName)) != null)
         {
             return;
         }
-        gameObject.GetComponent<PhotonView>().RPC("CreateTeam", PhotonTargets.AllBuffered, teamName);
+        GameObject.Find("PermissionManager").GetComponent<PhotonView>().RPC("CreateTeam", PhotonTargets.AllBuffered, teamName);
         AddToTeam(teamName, PhotonNetwork.player);
     }
 
     public void AddToTeam(string teamName, PhotonPlayer player)
     {
-        PermissionsManager permissions = gameObject.GetComponent<PermissionsManager>();
+        PermissionsManager permissions = GameObject.Find("PermissionManager").GetComponent<PermissionsManager>();
         PermissionsManager.Player playerPerm = permissions.GetPlayerWithName(player.NickName);
+
+        if (playerPerm != null && permissions.GetTeamWithName(teamName) != null)
+        {
+            if (permissions.GetTeamWithName(teamName) == permissions.GetTeamWithPlayer(playerPerm)) return;
+        }
 
         int playersInTeam = permissions.GetTeamWithName(teamName).PlayerList.Count;
         if (playersInTeam < (int) PhotonNetwork.room.CustomProperties["maxInTeam"])
@@ -313,12 +318,12 @@ public class Launcher : Photon.PunBehaviour
             {
                 if (playerPerm != null && team.ContainsPlayer(playerPerm))
                 {
-                    gameObject.GetComponent<PhotonView>().RPC("RemovePlayerFromTeam", PhotonTargets.AllBuffered, team.Name, playerPerm.Name);
+                    GameObject.Find("PermissionManager").GetComponent<PhotonView>().RPC("RemovePlayerFromTeam", PhotonTargets.AllBuffered, team.Name, playerPerm.Name);
                     Debug.Log("C'est à cause de ça ! ");
                     //return;
                 }
             }
-            gameObject.GetComponent<PhotonView>().RPC("AddNewPlayerToTeam", PhotonTargets.AllBuffered, teamName, player.NickName);
+            GameObject.Find("PermissionManager").GetComponent<PhotonView>().RPC("AddNewPlayerToTeam", PhotonTargets.AllBuffered, teamName, player.NickName,false);
             gameObject.GetComponent<PhotonView>().RPC("PlayerLeftNoTeam", PhotonTargets.AllBuffered, player);
         }        
     }

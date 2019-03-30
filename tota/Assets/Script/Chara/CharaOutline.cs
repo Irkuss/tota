@@ -32,7 +32,7 @@ public class CharaOutline : MonoBehaviour
     {
         //Called by Start in CharaPermissions
 
-        permManager = GameObject.Find("eCentralManager").GetComponent<PermissionsManager>(); //pas ouf comm methode, mieux vaux avec un tag
+        permManager = PermissionsManager.Instance;
 
         
 

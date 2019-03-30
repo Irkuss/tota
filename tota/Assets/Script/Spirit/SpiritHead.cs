@@ -12,7 +12,7 @@ public class SpiritHead : Photon.MonoBehaviour
     [SerializeField] private GameObject _spiritCamera = null;
 
     //Le joueur qui contrôle ce Spirit (ne change pas)
-    private PermissionsManager.Player _playerOwner;
+    private PermissionsManager.Player _playerOwner = null;
 
     //Liste des Chara selectionnées
     private List<GameObject> _selectedList;
@@ -65,7 +65,11 @@ public class SpiritHead : Photon.MonoBehaviour
             }
             
             //Met ce Chara dans notre équipe (par RPC)
-            go.GetComponent<CharaPermissions>().GetComponent<PhotonView>().RPC("SetTeam", PhotonTargets.AllBuffered, _playerOwner.MyTeamName);
+            if (_playerOwner != null)
+            {
+                go.GetComponent<CharaPermissions>().GetComponent<PhotonView>().RPC("SetTeam", PhotonTargets.AllBuffered, _playerOwner.MyTeamName);
+            }
+            
         }
     }
 
@@ -166,12 +170,11 @@ public class SpiritHead : Photon.MonoBehaviour
 
     public void ClickOnChara(GameObject chara)
     {
-        //TEMPORAIRE, update le tooltip
-        GameObject.Find("eCentralManager").GetComponent<CentralManager>().UpdateToolTip(chara.GetComponent<CharaRpg>().GetToolTipInfo());
-
         //Debug.Log("SpiritHead: On essaye de selectionné chara");
         if (chara.GetComponent<CharaHead>().LeftClickedOn(_playerOwner))
         {
+            GameObject.Find("eCentralManager").GetComponent<CentralManager>().UpdateToolTip(chara.GetComponent<CharaRpg>().GetToolTipInfo());
+
             //Debug.Log("SpiritHead: On a réussi ");
             if (!(_selectedList.Contains(chara)))
             {
@@ -180,6 +183,8 @@ public class SpiritHead : Photon.MonoBehaviour
         }
         else
         {
+            GameObject.Find("eCentralManager").GetComponent<CentralManager>().DeactivateToolTip();
+
             //Debug.Log("SpiritHead: On a échoué ");
             if (_selectedList.Contains(chara))
             {

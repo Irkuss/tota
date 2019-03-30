@@ -21,7 +21,7 @@ public class CharaHead : MonoBehaviour
     private void Start()
     {
         _eManager = GameObject.Find("eCentralManager"); //pas ouf comm methode, mieux vaux avec un tag
-        _permManager = _eManager.GetComponent<PermissionsManager>();
+        _permManager = PermissionsManager.Instance;
     }
 
     //Clic Gauche
@@ -30,8 +30,14 @@ public class CharaHead : MonoBehaviour
     {
         //LeftClickedOn renvoie true, si le Spirit a réussi a slectionné Chara, false sinon
         //NB: Il renvoie aussi false lors de la deselection
+
+        if (playerWhoClickedUs == null) return false;
+
         Debug.Log("Chara: I have been clicked by "+ playerWhoClickedUs.Name);
-        
+
+        PermissionsManager.Team team = _permissions.GetTeam();
+        if (team == null) return false;
+
         if (_permissions.GetTeam().ContainsPlayer(playerWhoClickedUs))
         {
             //Si le joueur qui a cliqué sur Chara appartient à notre équipe

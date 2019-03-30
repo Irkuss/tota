@@ -8,14 +8,17 @@ public class CentralManager : Photon.MonoBehaviour
 {
     public Generator generator;
     public Vector3 spawnPoint;
-    public PermissionsManager permissions;
-
+    
     //Bouton et interface
     public GameObject tempButton;
     public GameObject toolTip;
     public GameObject pauseMenu;
 
     public static bool isPause = false;
+
+    private PermissionsManager permi;
+    private PermissionsManager.Team team = null;
+    private PermissionsManager.Player player = null;
 
     public void UpdateToolTip(string[] info)
     {
@@ -28,6 +31,16 @@ public class CentralManager : Photon.MonoBehaviour
     }
 
     //Unity Callbacks
+    private void Awake()
+    {
+        permi = PermissionsManager.Instance;
+        player = permi.GetPlayerWithName(PhotonNetwork.player.NickName);
+        if (player != null)
+        {
+            team = permi.GetTeamWithPlayer(player);
+        }
+        
+    }
 
     private void Start()
     {
@@ -91,6 +104,17 @@ public class CentralManager : Photon.MonoBehaviour
     {
         Debug.Log("CentralManager: Instantiation de spirit");
 
+        
+        Debug.Log("Teams : ");
+        foreach (var team in permi.TeamList)
+        {
+            Debug.Log(team.Name);
+            foreach (var playr in team.PlayerList)
+            {
+                Debug.Log(playr.Name);
+            }
+        }
+
         //Instantiate the spirit
         GameObject spirit;
         if (PhotonNetwork.offlineMode)
@@ -104,19 +128,21 @@ public class CentralManager : Photon.MonoBehaviour
 
         //Initialise le Spirit
         string teamName;
-        
-        teamName = "Team " + GameObject.Find("eCentralManager").GetComponent<PermissionsManager>().GetNumberOfTeams();
 
-
-        // A enlever 
-        //Crée une nouvelle équipe avec comme nom "teamName"
-        permissions.GetComponent<PhotonView>().RPC("CreateTeam", PhotonTargets.AllBuffered, teamName);
-        //Ajoute un nouveau joueur avec comme nom celui du client //TODO pour l'instant chaque joueur joue tout seul
-        permissions.GetComponent<PhotonView>().RPC("AddNewPlayerToTeam", PhotonTargets.AllBuffered, teamName, PhotonNetwork.player.NickName);
-
-
-        //Recupere le Player crée par AddNewPlayerToTeam
-        PermissionsManager.Player player = permissions.GetPlayerWithName(PhotonNetwork.player.NickName);
+        if (player == null || team == null)
+        {
+            teamName = "Team" + permi.GetNumberOfTeams();
+            //Crée une nouvelle équipe avec comme nom "teamName"
+            permi.GetComponent<PhotonView>().RPC("CreateTeam", PhotonTargets.AllBuffered, teamName);
+            //Ajoute un nouveau joueur avec comme nom celui du client //TODO pour l'instant chaque joueur joue tout seul
+            permi.GetComponent<PhotonView>().RPC("AddNewPlayerToTeam", PhotonTargets.AllBuffered, teamName, PhotonNetwork.player.NickName,true);
+            //Recupere le Player crée par AddNewPlayerToTeam
+            player = permi.GetPlayerWithName(PhotonNetwork.player.NickName);
+        }
+        else
+        {
+            teamName = team.Name;
+        }
 
         //L'attribue à notre spirit nouvellement crée
         spirit.GetComponent<SpiritHead>().InitPermissions(player);

@@ -147,6 +147,25 @@ public class PermissionsManager : MonoBehaviour
 
     //Unity Callbacks
 
+    public static PermissionsManager Instance;
+
+    private void Awake()
+    {
+        if (Instance == null)
+        {
+            DontDestroyOnLoad(this);
+            Instance = this;
+        }
+        else
+        {
+            if (Instance != this)
+            {
+                Destroy(this);
+            }
+        }
+        
+    }
+
     private void Start()
     {
         _teamList = new List<Team>();
@@ -209,10 +228,14 @@ public class PermissionsManager : MonoBehaviour
     }
 
     [PunRPC]
-    public void AddNewPlayerToTeam(string teamName, string playerName)
+    public void AddNewPlayerToTeam(string teamName, string playerName, bool game)
     {
         GetTeamWithName(teamName).AddPlayer(new Player(playerName,teamName));
-        gameObject.GetComponent<Launcher>().TeamListing(GetTeamWithName(teamName));
+        if (!game)
+        {
+            GameObject.Find("eLaucher").GetComponent<Launcher>().TeamListing(GetTeamWithName(teamName));
+        }
+        
     }
 
     [PunRPC]
@@ -222,10 +245,10 @@ public class PermissionsManager : MonoBehaviour
         Team team = GetTeamWithName(teamName); 
 
         team.RemovePlayer(player);
-        gameObject.GetComponent<Launcher>().PlayerLeftTeam(player);
+        GameObject.Find("eLaucher").GetComponent<Launcher>().PlayerLeftTeam(player);
         if (team.PlayerList.Count == 0)
         {
-            gameObject.GetComponent<Launcher>().TeamLeftRoom(team);
+            GameObject.Find("eLaucher").GetComponent<Launcher>().TeamLeftRoom(team);
             TeamList.Remove(team);
         }
         

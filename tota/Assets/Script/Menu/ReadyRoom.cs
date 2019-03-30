@@ -58,8 +58,9 @@ public class ReadyRoom : MonoBehaviour
         teamName.text = "";
 
         GameObject launcherD = GameObject.Find("eLaucher");
+        GameObject permission = GameObject.Find("PermissionManager");
 
-        PermissionsManager permissions = launcherD.GetComponent<PermissionsManager>();
+        PermissionsManager permissions = permission.GetComponent<PermissionsManager>();
         PermissionsManager.Player player = permissions.GetPlayerWithName(PhotonNetwork.player.NickName);
         PermissionsManager.Team team = permissions.GetTeamWithPlayer(player);
 
@@ -68,7 +69,7 @@ public class ReadyRoom : MonoBehaviour
             string playerName = player.Name;
             string teamname = player.MyTeamName; 
        
-            launcherD.GetComponent<PhotonView>().RPC("RemovePlayerFromTeam", PhotonTargets.AllBuffered, teamname, playerName);            
+            permission.GetComponent<PhotonView>().RPC("RemovePlayerFromTeam", PhotonTargets.AllBuffered, teamname, playerName);            
         }
         PhotonNetwork.LeaveRoom();        
     }
@@ -92,6 +93,17 @@ public class ReadyRoom : MonoBehaviour
             gameObject.SetActive(false);
             PhotonNetwork.room.IsOpen = false;
             PhotonNetwork.room.IsVisible = false;
+        }
+        GameObject launcherD = GameObject.Find("PermissionManager");
+        PermissionsManager permissions = launcherD.GetComponent<PermissionsManager>();
+        Debug.Log("Teams : ");
+        foreach(var team in permissions.TeamList)
+        {
+            Debug.Log(team.Name);
+            foreach(var player in team.PlayerList)
+            {
+                Debug.Log(player.Name);
+            }
         }
     }
 
