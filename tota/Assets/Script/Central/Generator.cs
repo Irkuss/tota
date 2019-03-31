@@ -1423,7 +1423,7 @@ public class Generator : MonoBehaviour
     //Attribut du World
     private WorldNode[,] _world = null;
     private int _worldLength = 10;
-    public int spawnPoint = 3;
+    public int spawnPoint = 4;
 
     //Init les buildTable en tant que static (pour les rendre accessible par CityNode)
     private void Awake()
@@ -1809,9 +1809,9 @@ public class Generator : MonoBehaviour
     {
         Debug.Log("OnWorldTypeReceived: Starting loading of chunk 0,0");
         //The truest Start
-        LoadChunkAround(1, 1);
-        LoadChunkAround(4, 1);
-        LoadChunkAround(1, 4);
+        //LoadChunkAround(1, 1);
+        //LoadChunkAround(4, 1);
+        //LoadChunkAround(1, 4);
         LoadChunkAround(4, 4);
         Debug.Log("Waiting 15 seconds");
         yield return new WaitForSeconds(10f);

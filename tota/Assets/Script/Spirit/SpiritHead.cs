@@ -52,6 +52,8 @@ public class SpiritHead : Photon.MonoBehaviour
 
         //Keycode.O check
         TestCraftBigApple();
+
+        TestBuild();
     }
 
     private void TestCharaSpawn()
@@ -107,6 +109,48 @@ public class SpiritHead : Photon.MonoBehaviour
                     Debug.Log("TestCraftBigApple: failed to craft bigApple");
                 }
                 
+            }
+        }
+    }
+    private GameObject currentBuild = null;
+    private Vector3 desiredBuildRotation;
+    private void TestBuild()
+    {
+        //Entree et sortie du buildMode
+        if (Input.GetKeyDown(KeyCode.B))
+        {
+            if (currentBuild == null)
+            {
+                currentBuild = Instantiate(Resources.Load<GameObject>("testWall"));
+                desiredBuildRotation = currentBuild.transform.rotation.eulerAngles;
+            }
+            else
+            {
+                Destroy(currentBuild);
+            }
+        }
+        //Gestion du buildMode
+        if (currentBuild != null)
+        {
+            //Deplacement du build
+            RaycastHit hit;
+
+            if (ClickedOnSomething(out hit))
+            {
+                currentBuild.transform.position = hit.point;
+            }
+            //Rotation du build
+            if (Input.GetKeyDown(KeyCode.Alpha1)) desiredBuildRotation = desiredBuildRotation + new Vector3(0, -90, 0);
+            if (Input.GetKeyDown(KeyCode.Alpha2)) desiredBuildRotation = desiredBuildRotation + new Vector3(0,  90, 0);
+
+            currentBuild.transform.rotation = Quaternion.Lerp(currentBuild.transform.rotation, Quaternion.Euler(desiredBuildRotation), 0.5f);
+
+            //Placer le bâtiment
+            if (Input.GetKeyDown(KeyCode.Alpha3))
+            {
+                currentBuild.GetComponent<VisuHandler>().EndVisualisation();
+                currentBuild.transform.rotation = Quaternion.Euler(desiredBuildRotation);
+                currentBuild = null;
             }
         }
     }
