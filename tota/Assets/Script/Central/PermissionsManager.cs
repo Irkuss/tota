@@ -57,6 +57,11 @@ public class PermissionsManager : MonoBehaviour
             get => _name;
         }
         private List<Player> _playerList;
+        public List<Player> PlayerList
+        {
+            get { return _playerList; }
+        }
+
         private int[] _linkedColor;
         public int[] LinkedColor
         {
@@ -87,11 +92,13 @@ public class PermissionsManager : MonoBehaviour
 
         public void AddPlayer(Player player)
         {
+            if (ContainsPlayer(player)) return;
             _playerList.Add(player);
         }
 
         public void RemovePlayer(Player player)
         {
+            if (!ContainsPlayer(player)) return;
             _playerList.Remove(player);
         }
 
@@ -133,8 +140,31 @@ public class PermissionsManager : MonoBehaviour
     //Attributes
 
     private List<Team> _teamList;
+    public List<Team> TeamList
+    {
+        get { return _teamList; }
+    }
 
     //Unity Callbacks
+
+    public static PermissionsManager Instance;
+
+    private void Awake()
+    {
+        if (Instance == null)
+        {
+            DontDestroyOnLoad(this);
+            Instance = this;
+        }
+        else
+        {
+            if (Instance != this)
+            {
+                Destroy(this);
+            }
+        }
+        
+    }
 
     private void Start()
     {
@@ -196,9 +226,31 @@ public class PermissionsManager : MonoBehaviour
     {
         _teamList.Add(new Team(teamName));
     }
+
     [PunRPC]
-    public void AddNewPlayerToTeam(string teamName, string playerName)
+    public void AddNewPlayerToTeam(string teamName, string playerName, bool game)
     {
         GetTeamWithName(teamName).AddPlayer(new Player(playerName,teamName));
+        if (!game)
+        {
+            GameObject.Find("eLaucher").GetComponent<Launcher>().TeamListing(GetTeamWithName(teamName));
+        }
+        
+    }
+
+    [PunRPC]
+    public void RemovePlayerFromTeam(string teamName, string playerName)
+    {
+        Player player = GetPlayerWithName(playerName);
+        Team team = GetTeamWithName(teamName); 
+
+        team.RemovePlayer(player);
+        GameObject.Find("eLaucher").GetComponent<Launcher>().PlayerLeftTeam(player);
+        if (team.PlayerList.Count == 0)
+        {
+            GameObject.Find("eLaucher").GetComponent<Launcher>().TeamLeftRoom(team);
+            TeamList.Remove(team);
+        }
+        
     }
 }

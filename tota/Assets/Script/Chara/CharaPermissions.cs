@@ -6,13 +6,20 @@ public class CharaPermissions : MonoBehaviour
 {
     //Recuperer le permissions manager component
     private PermissionsManager permManager;
+    private PermissionsManager.Player player = null;
+    private PermissionsManager.Team team = null;
 
     private void Start()
     {
-        permManager = GameObject.Find("eCentralManager").GetComponent<PermissionsManager>(); //pas ouf comm methode, mieux vaux avec un tag
-        
+        permManager = PermissionsManager.Instance;
+
         //teamNameRPC est initialisé par RPC des que Chara est instancié;
-        myTeam = permManager.GetTeamWithName(teamNameRPC);
+        //myTeam = permManager.GetTeamWithName(teamNameRPC);
+        player = permManager.GetPlayerWithName(PhotonNetwork.player.NickName);
+        if (player != null)
+        {
+            team = permManager.GetTeamWithPlayer(player);
+        }
 
         GetComponent<CharaOutline>().OnFinishedPermissions();
     }
@@ -29,12 +36,18 @@ public class CharaPermissions : MonoBehaviour
     //Getters
     public bool HasTeam()
     {
-        return myTeam != null;
+        //return myTeam != null;
+        return team != null;
     }
     public PermissionsManager.Team GetTeam()
     {
-        Debug.Log("CharaPermissions: Getting team: " + myTeam.Name);
-        return myTeam;
+        if (team != null)
+        {
+            Debug.Log("CharaPermissions: Getting team: " + team.Name);
+        }
+        
+        //return myTeam;
+        return team;
     }
 
     public bool HasOwner()
@@ -59,14 +72,16 @@ public class CharaPermissions : MonoBehaviour
         }
         else
         {
-            myTeam = permManager.GetTeamWithName(teamName);
+            //myTeam = permManager.GetTeamWithName(teamName);
+            team = permManager.GetTeamWithName(teamName);
         }
         
     }
     [PunRPC]
     public void SetTeamNull() //Probably useless now
     {
-        myTeam = null;
+        //myTeam = null;
+        team = null;
     }
     
     [PunRPC]
