@@ -25,12 +25,14 @@ public class FloorOpacity : MonoBehaviour
     {
         if (currentFloor > newFloorLevel)
         {
-            _renderer.enabled = false;
+            _renderer.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.ShadowsOnly;
+            //_renderer.enabled = false;
             _collider.enabled = false;
         }
         else
         {
-            _renderer.enabled = true;
+            _renderer.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.On;
+            //_renderer.enabled = true;
             _collider.enabled = true;
         }
     }

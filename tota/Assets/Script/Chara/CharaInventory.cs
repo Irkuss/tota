@@ -280,21 +280,21 @@ public class CharaInventory : MonoBehaviour
     //RPC functions
 
     [PunRPC]
-    public void RemoveWithId(int id)
+    private void RemoveWithId(int id)
     {
         inventory.Remove(itemTable.GetItemWithId(id));
 
         UpdateUI();
     }
     [PunRPC]
-    public void AddWithId(int id)
+    private void AddWithId(int id)
     {
         inventory.Add(itemTable.GetItemWithId(id),1);
 
         UpdateUI();
     }
     [PunRPC]
-    public void ModifyCountWithId(int id, int countModifier)
+    private void ModifyCountWithId(int id, int countModifier)
     {
         inventory[itemTable.GetItemWithId(id)] += countModifier;
 

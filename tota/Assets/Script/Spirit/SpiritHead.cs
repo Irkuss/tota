@@ -7,6 +7,7 @@ public class SpiritHead : Photon.MonoBehaviour
 {
     //utilisé pour debugger (à swap avec un scriptable object des que possible)
     private string _charaPath = "CharaTanguy";
+    [SerializeField] private ItemRecipe bigAppleRecipe = null;
     [SerializeField] private ItemTable itemTable = null;
 
     [SerializeField] private GameObject _spiritCamera = null;
@@ -34,14 +35,25 @@ public class SpiritHead : Photon.MonoBehaviour
         //Right Left click check
         ClickUpdate();
 
+        //Do all test functions
+        TestAll();
+
+        //Keycode.E Check
+        InventoryUpdate();
+    }
+
+    private void TestAll()
+    {
         //Space Bar check
         TestCharaSpawn();
 
         //Keycode.I check
         TestInventoryAdd();
 
-        //Keycode.E Check
-        InventoryUpdate();
+        //Keycode.O check
+        TestCraftBigApple();
+
+        TestBuild();
     }
 
     private void TestCharaSpawn()
@@ -72,12 +84,78 @@ public class SpiritHead : Photon.MonoBehaviour
             
         }
     }
-
     private void TestInventoryAdd()
     {
         if (Input.GetKeyDown(KeyCode.I))
         {
-            TestAddToAll(itemTable.GetRandomItem());
+            Item item = itemTable.GetRandomItem();
+            foreach (GameObject Chara in _selectedList)
+            {
+                Chara.GetComponent<CharaInventory>().Add(item);
+            }
+        }
+    }
+    private void TestCraftBigApple()
+    {
+        if (Input.GetKeyDown(KeyCode.O))
+        {
+            foreach (GameObject Chara in _selectedList)
+            {
+                Debug.Log("TestCraftBigApple: Trying to craft bigApple");
+                CharaInventory charaInv = Chara.GetComponent<CharaInventory>();
+                if (bigAppleRecipe.CanBeCraftedWith(charaInv.inventory))
+                {
+                    Debug.Log("TestCraftBigApple: crafted bigApple");
+                    bigAppleRecipe.CraftWith(charaInv);
+                }
+                else
+                {
+                    Debug.Log("TestCraftBigApple: failed to craft bigApple");
+                }
+                
+            }
+        }
+    }
+    private GameObject currentBuild = null;
+    private Vector3 desiredBuildRotation;
+    private void TestBuild()
+    {
+        //Entree et sortie du buildMode
+        if (Input.GetKeyDown(KeyCode.B))
+        {
+            if (currentBuild == null)
+            {
+                currentBuild = Instantiate(Resources.Load<GameObject>("testWall"));
+                desiredBuildRotation = currentBuild.transform.rotation.eulerAngles;
+            }
+            else
+            {
+                Destroy(currentBuild);
+            }
+        }
+        //Gestion du buildMode
+        if (currentBuild != null)
+        {
+            //Deplacement du build
+            RaycastHit hit;
+
+            if (ClickedOnSomething(out hit))
+            {
+                currentBuild.transform.position = hit.point;
+            }
+            //Rotation du build
+            if (Input.GetKeyDown(KeyCode.Alpha1)) desiredBuildRotation = desiredBuildRotation + new Vector3(0, -90, 0);
+            if (Input.GetKeyDown(KeyCode.Alpha2)) desiredBuildRotation = desiredBuildRotation + new Vector3(0,  90, 0);
+
+            currentBuild.transform.rotation = Quaternion.Lerp(currentBuild.transform.rotation, Quaternion.Euler(desiredBuildRotation), 0.5f);
+
+            //Placer le bâtiment
+            if (Input.GetKeyDown(KeyCode.Alpha3))
+            {
+                currentBuild.GetComponent<VisuHandler>().EndVisualisation();
+                currentBuild.transform.rotation = Quaternion.Euler(desiredBuildRotation);
+                currentBuild = null;
+            }
         }
     }
 
@@ -269,15 +347,6 @@ public class SpiritHead : Photon.MonoBehaviour
                 //Chara.GetComponent<Inventory>().DisplayInventory();
                 Chara.GetComponent<CharaInventory>().ToggleInventory();
             }
-        }
-    }
-
-    private void TestAddToAll(Item item)
-    {
-        foreach (GameObject Chara in _selectedList)
-        {
-            //Chara.GetComponent<Inventory>().DisplayInventory();
-            Chara.GetComponent<CharaInventory>().Add(item);
         }
     }
 
