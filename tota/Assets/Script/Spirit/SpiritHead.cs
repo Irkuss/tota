@@ -12,6 +12,10 @@ public class SpiritHead : Photon.MonoBehaviour
 
     [SerializeField] private GameObject _spiritCamera = null;
 
+    [SerializeField] private GameObject _inventoryList = null;
+    private GameObject _charaLayout;
+    private GameObject _chara;
+
     //Le joueur qui contrôle ce Spirit (ne change pas)
     private PermissionsManager.Player _playerOwner = null;
 
@@ -28,6 +32,8 @@ public class SpiritHead : Photon.MonoBehaviour
         }
 
         _selectedList = new List<GameObject>();
+        _charaLayout = GameObject.FindGameObjectWithTag("CharaLayout");
+        _inventoryList = GameObject.FindGameObjectWithTag("InventoryLayout");
     }
 
     void Update()
@@ -69,11 +75,16 @@ public class SpiritHead : Photon.MonoBehaviour
             {
                 Debug.Log("SpiritHead: Instantiation du spirit (offline)");
                 go = Instantiate(Resources.Load<GameObject>(_charaPath), lowPosition, Quaternion.identity);
+                GameObject charaLayout = Instantiate(Resources.Load<GameObject>("CharaRef"));
+                charaLayout.GetComponent<LinkChara>().spirit = this;
+                charaLayout.GetComponent<LinkChara>().chara = go;
             }
             else
             {
                 Debug.Log("SpiritHead: Instantiation du spirit (online)");
                 go = PhotonNetwork.Instantiate(_charaPath, lowPosition, Quaternion.identity, 0);
+                _chara = go;
+                gameObject.GetComponent<PhotonView>().RPC("InstantiateCharaRef", PhotonTargets.AllBuffered);
             }
             
             //Met ce Chara dans notre équipe (par RPC)
@@ -84,6 +95,16 @@ public class SpiritHead : Photon.MonoBehaviour
             
         }
     }
+
+    [PunRPC]
+    private void InstantiateCharaRef()
+    {
+        GameObject charaLayout = Instantiate(Resources.Load<GameObject>("CharaRef"));
+        charaLayout.transform.SetParent(_charaLayout.transform,false);
+        charaLayout.GetComponent<LinkChara>().spirit = this;
+        charaLayout.GetComponent<LinkChara>().chara = _chara;
+    }
+
     private void TestInventoryAdd()
     {
         if (Input.GetKeyDown(KeyCode.I))
@@ -340,6 +361,8 @@ public class SpiritHead : Photon.MonoBehaviour
     {
         if (Input.GetKeyDown(KeyCode.E))
         {
+            _inventoryList.SetActive(!_inventoryList.activeSelf);
+
             //Toggle l'inventaire dans chaque Chara selectionné
             //(l'ouvre s'il est fermé, le ferme s'il est ouvert)
             foreach (GameObject Chara in _selectedList)

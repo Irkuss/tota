@@ -462,10 +462,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 40338071039051d4eb4c53c0624228d3, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  movement: {fileID: 7345311659181132483}
-  permissions: {fileID: 959565679408924997}
-  outline: {fileID: 674255432277023237}
-  permManager: {fileID: 0}
+  _movement: {fileID: 0}
+  _permissions: {fileID: 0}
+  _outline: {fileID: 0}
 --- !u!114 &7345311659181132483
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -479,6 +478,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   navMeshAgent: {fileID: 4048314250420294819}
+  character: {fileID: 0}
 --- !u!114 &674255432277023237
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -651,7 +651,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 891d75711ce9551479ee89aadd9df2a2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _canvas: {fileID: 8198228179191293658}
+  _canvas: {fileID: 7954770632000053668, guid: a13de8f0882a5b64bb3c486545a7e13f, type: 3}
+  _inventoryLayout: {fileID: 0}
   itemTable: {fileID: 11400000, guid: 53de43c060c7ffe459db8e15c09cd294, type: 2}
   _slotParent: {fileID: 2448645100976752443}
 --- !u!114 &8643176800385926171
