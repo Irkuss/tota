@@ -38,7 +38,7 @@ public class CharaHead : MonoBehaviour
         PermissionsManager.Team team = _permissions.GetTeam();
         if (team == null) return false;
 
-        if (_permissions.GetTeam().ContainsPlayer(playerWhoClickedUs))
+        if (team.ContainsPlayer(playerWhoClickedUs))
         {
             //Si le joueur qui a cliqué sur Chara appartient à notre équipe
             if (!_permissions.HasOwner())

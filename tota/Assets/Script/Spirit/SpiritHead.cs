@@ -17,6 +17,7 @@ public class SpiritHead : Photon.MonoBehaviour
     private GameObject _chara;
 
     //Le joueur qui contrôle ce Spirit (ne change pas)
+    private PermissionsManager _permission = PermissionsManager.Instance;
     private PermissionsManager.Player _playerOwner = null;
 
     //Liste des Chara selectionnées
@@ -33,7 +34,7 @@ public class SpiritHead : Photon.MonoBehaviour
 
         _selectedList = new List<GameObject>();
         _charaLayout = GameObject.FindGameObjectWithTag("CharaLayout");
-        _inventoryList = GameObject.FindGameObjectWithTag("InventoryLayout");
+        _inventoryList = GameObject.FindGameObjectWithTag("InventoryLayout");        
     }
 
     void Update()
@@ -83,8 +84,9 @@ public class SpiritHead : Photon.MonoBehaviour
             {
                 Debug.Log("SpiritHead: Instantiation du spirit (online)");
                 go = PhotonNetwork.Instantiate(_charaPath, lowPosition, Quaternion.identity, 0);
-                _chara = go;
-                gameObject.GetComponent<PhotonView>().RPC("InstantiateCharaRef", PhotonTargets.AllBuffered);
+                _chara = go;                
+                gameObject.GetComponent<PhotonView>().RPC("InstantiateCharaRef",PhotonTargets.AllBuffered, _playerOwner.Name);
+                
             }
             
             //Met ce Chara dans notre équipe (par RPC)
@@ -97,12 +99,18 @@ public class SpiritHead : Photon.MonoBehaviour
     }
 
     [PunRPC]
-    private void InstantiateCharaRef()
+    private void InstantiateCharaRef(string playerWhoSent)
     {
-        GameObject charaLayout = Instantiate(Resources.Load<GameObject>("CharaRef"));
-        charaLayout.transform.SetParent(_charaLayout.transform,false);
-        charaLayout.GetComponent<LinkChara>().spirit = this;
-        charaLayout.GetComponent<LinkChara>().chara = _chara;
+        Debug.Log("Send : " + playerWhoSent + "    Receive : " + _playerOwner.Name);
+        PermissionsManager.Team team = _permission.GetTeamWithName(_playerOwner.MyTeamName);
+
+        if (team.ContainsPlayer(_permission.GetPlayerWithName(playerWhoSent)))
+        {
+            GameObject charaLayout = Instantiate(Resources.Load<GameObject>("CharaRef"));
+            charaLayout.transform.SetParent(_charaLayout.transform, false);
+            charaLayout.GetComponent<LinkChara>().spirit = this;
+            charaLayout.GetComponent<LinkChara>().chara = _chara;
+        }              
     }
 
     private void TestInventoryAdd()
@@ -284,7 +292,7 @@ public class SpiritHead : Photon.MonoBehaviour
         {
             GameObject.Find("eCentralManager").GetComponent<CentralManager>().DeactivateToolTip();
 
-            //Debug.Log("SpiritHead: On a échoué ");
+            Debug.Log("SpiritHead: On a échoué ");
             if (_selectedList.Contains(chara))
             {
                 _selectedList.Remove(chara);
