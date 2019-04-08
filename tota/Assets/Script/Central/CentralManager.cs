@@ -13,6 +13,7 @@ public class CentralManager : Photon.MonoBehaviour
     public GameObject tempButton;
     public GameObject toolTip;
     public GameObject pauseMenu;
+    [SerializeField] private GameObject _charaRef = null;
 
     public static bool isPause = false;
 
@@ -151,5 +152,6 @@ public class CentralManager : Photon.MonoBehaviour
 
         //Enleve le bouton de spawn
         tempButton.SetActive(false);
+        _charaRef.SetActive(true);
     }
 }

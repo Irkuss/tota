@@ -98,7 +98,7 @@ public class CharaInventory : MonoBehaviour
 
     //Le gameObject canvas
     [SerializeField] private GameObject _canvas = null;
-
+    [SerializeField] private GameObject _inventoryLayout = null;
     //Database des items (pour avoir leur id, pour les update en rpc)
     [SerializeField] private ItemTable itemTable = null;
 
@@ -223,7 +223,8 @@ public class CharaInventory : MonoBehaviour
 
     public void CloseInventory()
     {
-        //Appelé RemoveInventoryOnDeselected() pour fermer l'inventaire quand un Chara est deselectionné
+        //Appelé CloseInventoryOnDeselected() pour fermer l'inventaire quand un Chara est deselectionné
+        
         _canvas.SetActive(false);
         Debug.Log("CharaInventory: closed Inventory after being deselected");
     }

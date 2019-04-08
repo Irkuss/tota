@@ -181,13 +181,13 @@ public class Launcher : Photon.PunBehaviour
         System.Random rnd = new System.Random();
         int rand = rnd.Next(PlayerListings.Count);
         PlayerLeftRoom(photonPlayer);
-        if (photonPlayer.IsMasterClient)
+        /*if (photonPlayer.IsMasterClient)
         {
             Debug.Log(PhotonNetwork.masterClient.NickName);
             PhotonNetwork.SetMasterClient(PlayerListings[rand].PhotonPlayer);
             Debug.Log(PhotonNetwork.masterClient.NickName);
             gameObject.GetComponent<PhotonView>().RPC("ActiveMasterButton", PhotonTargets.MasterClient);
-        }
+        }*/
         Debug.Log("OnPhotonPlayerDisconnected");
     }
 
@@ -319,8 +319,6 @@ public class Launcher : Photon.PunBehaviour
                 if (playerPerm != null && team.ContainsPlayer(playerPerm))
                 {
                     GameObject.Find("PermissionManager").GetComponent<PhotonView>().RPC("RemovePlayerFromTeam", PhotonTargets.AllBuffered, team.Name, playerPerm.Name);
-                    Debug.Log("C'est à cause de ça ! ");
-                    //return;
                 }
             }
             GameObject.Find("PermissionManager").GetComponent<PhotonView>().RPC("AddNewPlayerToTeam", PhotonTargets.AllBuffered, teamName, player.NickName,false);
