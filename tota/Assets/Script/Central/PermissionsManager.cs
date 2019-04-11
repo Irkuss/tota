@@ -68,6 +68,12 @@ public class PermissionsManager : MonoBehaviour
             get => _linkedColor;
         }
 
+        private Player _leaderTeam;
+        public Player leaderTeam
+        {
+            get { return _leaderTeam; }
+        }
+
         public Team(string name)
         {
             _name = name;
@@ -94,12 +100,14 @@ public class PermissionsManager : MonoBehaviour
         {
             if (ContainsPlayer(player)) return;
             _playerList.Add(player);
+            _leaderTeam = _playerList[0];
         }
 
         public void RemovePlayer(Player player)
         {
             if (!ContainsPlayer(player)) return;
             _playerList.Remove(player);
+            _leaderTeam = _playerList[0];
         }
 
         //Getter
@@ -148,6 +156,8 @@ public class PermissionsManager : MonoBehaviour
     //Unity Callbacks
 
     public static PermissionsManager Instance;
+
+    public int numberChara;
 
     private void Awake()
     {
@@ -235,7 +245,6 @@ public class PermissionsManager : MonoBehaviour
         {
             GameObject.Find("eLaucher").GetComponent<Launcher>().TeamListing(GetTeamWithName(teamName));
         }
-        
     }
 
     [PunRPC]

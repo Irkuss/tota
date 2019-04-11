@@ -13,6 +13,5 @@ public class Interactable : MonoBehaviour
     public virtual void Interact(CharaHead chara)
     {
         Debug.Log("Interactable: Interacting as " + chara.name);
-        //PickUp() provenant de itemPickUp.cs
     }
 }

@@ -114,13 +114,12 @@ public class OptionRoom : MonoBehaviour
         if (_maxInTeam == "") roomOptions.CustomRoomProperties.Add("maxInTeam", 4);
         else roomOptions.CustomRoomProperties.Add("maxInTeam", int.Parse(_maxInTeam));
 
-        //roomOptions.CustomRoomProperties.Add("charaPerTeam", randomChara.value);
+        PermissionsManager.Instance.numberChara = (int) randomChara.value;
 
         roomOptions.CustomRoomPropertiesForLobby = new string[]
         {
             "password",
             "maxInTeam",
-            "charaPerTeam"
         };
 
         if (roomName.text != "")

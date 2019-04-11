@@ -7,8 +7,6 @@ using UnityEngine.UI;
 public class Launcher : Photon.PunBehaviour
 {
     [SerializeField] private PhotonLogLevel Loglevel = PhotonLogLevel.Informational;
-    /*[Tooltip("The maximum number of players per room. When a room is full, it can't be joined by new players and so new room will be created")]
-    private byte MaxPlayersPerRoom = 4;*/
 
     [SerializeField] private GameObject photonConnectButton = null;
 
