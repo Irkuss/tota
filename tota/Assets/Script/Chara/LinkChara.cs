@@ -15,6 +15,7 @@ public class LinkChara : MonoBehaviour
 
     private void SelectChara()
     {
-        spirit.ClickOnChara(chara);
+        spirit.DeselectAllExcept(chara);
+        spirit.MoveCamera(chara.transform.position);
     }
 }
