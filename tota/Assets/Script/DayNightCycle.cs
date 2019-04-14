@@ -7,11 +7,24 @@ public class DayNightCycle : MonoBehaviour
     private Light _sun;
     public float speed;
     public float heure;
+    public int day = 1;
+    public Seasons season;
     private float _slider;
     private bool _changedHour;
 
     public delegate void TimerHour();
     public static event TimerHour onNewHour;
+
+    public delegate void NewSeason(Seasons saison);
+    public static event NewSeason onNewseason;
+
+    public enum Seasons
+    {
+        SUMMER = 0,
+        AUTUMM,
+        WINTER,
+        SPRING
+    }
 
     private void UpdateCallback()
     {
@@ -19,10 +32,18 @@ public class DayNightCycle : MonoBehaviour
         {
             onNewHour(); //Declenche le callback chez les spectateurs
         }
+
+        if (onNewseason != null) //Si une personne nous écoute
+        {
+            onNewseason(season); //Declenche le callback chez les spectateurs
+        }
     }
 
     void Start()
     {
+        season = Seasons.SUMMER;
+        UpdateCallback();
+        speed = 100f;
         _sun = GetComponent<Light>();
         transform.rotation = Quaternion.Euler(0, 60, 0);
         _slider = 0.5f;
@@ -31,9 +52,16 @@ public class DayNightCycle : MonoBehaviour
 
     void Update()
     {
+        Cycle();
+        NextSeason();
+    }
+
+    void Cycle()
+    {
         if (_slider >= 1.0)//Reset le slider à 0 pour faire un cycle
         {
             _slider = 0;
+            day++;
         }
 
         if (_changedHour)
@@ -56,6 +84,23 @@ public class DayNightCycle : MonoBehaviour
         else
         {
             _sun.color = new Color(1f, 0.9568627f, 0.8392157f, 1f);
+        }
+    }
+
+    void NextSeason()
+    {
+        if (day >= 20)
+        {
+            day = 1;
+            int next = ((int)season + 1) % 4;
+            switch (next)
+            {
+                case 0: season = Seasons.SUMMER; break;
+                case 1: season = Seasons.AUTUMM; break;
+                case 2: season = Seasons.WINTER; break;
+                case 3: season = Seasons.SPRING; break;
+            }
+            UpdateCallback();
         }
     }
 }
