@@ -226,7 +226,7 @@ public class CharaInventory : MonoBehaviour
         //Appelé CloseInventoryOnDeselected() pour fermer l'inventaire quand un Chara est deselectionné
         
         _canvas.SetActive(false);
-        Debug.Log("CharaInventory: closed Inventory after being deselected");
+        //Debug.Log("CharaInventory: closed Inventory after being deselected");
     }
     
     //Adding and removing item

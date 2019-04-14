@@ -33,7 +33,7 @@ public class CharaHead : MonoBehaviour
 
         if (playerWhoClickedUs == null) return false;
 
-        Debug.Log("Chara: I have been clicked by "+ playerWhoClickedUs.Name);
+        //Debug.Log("Chara: I have been clicked by "+ playerWhoClickedUs.Name);
 
         PermissionsManager.Team team = _permissions.GetTeam();
         if (team == null) return false;
@@ -44,7 +44,7 @@ public class CharaHead : MonoBehaviour
             if (!_permissions.HasOwner())
             {
                 //Si personne controle Chara, le joueur prend controle de Chara
-                Debug.Log("Chara: now controlled by "+ playerWhoClickedUs.Name + " (was empty)");
+                //Debug.Log("Chara: now controlled by "+ playerWhoClickedUs.Name + " (was empty)");
 
                 SelectAsPlayer(playerWhoClickedUs);
                 return true;
@@ -52,7 +52,7 @@ public class CharaHead : MonoBehaviour
             else if (_permissions.IsOwner(playerWhoClickedUs.Name))
             {
                 //Si le joueur qui nous controle a cliqué sur Chara -> deselect
-                Debug.Log("Chara:deselected by " + playerWhoClickedUs.Name);
+                //Debug.Log("Chara:deselected by " + playerWhoClickedUs.Name);
                 Deselect();
                 return false;
                 
@@ -66,7 +66,7 @@ public class CharaHead : MonoBehaviour
         else
         {
             //Si le joueur qui a cliqué sur Chara n'appartient pas à notre équipe
-            Debug.Log("Chara: Access Denied: " + playerWhoClickedUs.Name + " is not in team " + _permissions.GetTeam().Name);
+            //Debug.Log("Chara: Access Denied: " + playerWhoClickedUs.Name + " is not in team " + _permissions.GetTeam().Name);
             return false;
         }
     }
@@ -112,7 +112,7 @@ public class CharaHead : MonoBehaviour
     {
         //Appelé par Deselect()
         GetComponent<CharaInventory>().CloseInventory();
-        Debug.Log("CharaHead: closing inventory of a deselected Chara");
+        //Debug.Log("CharaHead: closing inventory of a deselected Chara");
     }
 
     //Focus on Interactable

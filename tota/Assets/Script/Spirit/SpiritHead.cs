@@ -39,8 +39,15 @@ public class SpiritHead : Photon.MonoBehaviour
 
     void Update()
     {
-        //Right Left click check
-        ClickUpdate();
+        if (currentBuild == null)
+        {
+            //Normal Right Left click check
+            ClickUpdate();
+        }
+        else
+        {
+            BuildUpdate();
+        }
 
         //Do all test functions
         TestAll();
@@ -155,6 +162,7 @@ public class SpiritHead : Photon.MonoBehaviour
             if (currentBuild == null)
             {
                 currentBuild = Instantiate(Resources.Load<GameObject>("testWall"));
+                currentBuild.GetComponent<VisuHandler>().StartVisualisation();
                 desiredBuildRotation = currentBuild.transform.rotation.eulerAngles;
             }
             else
@@ -162,27 +170,40 @@ public class SpiritHead : Photon.MonoBehaviour
                 Destroy(currentBuild);
             }
         }
-        //Gestion du buildMode
-        if (currentBuild != null)
+    }
+    private void BuildUpdate()
+    {
+        //Deplacement du build
+        RaycastHit hit;
+
+        if (ClickedOnSomething(out hit))
         {
-            //Deplacement du build
-            RaycastHit hit;
+            currentBuild.transform.position = hit.point;
+        }
+        //Rotation du build
+        if (Input.GetKeyDown(KeyCode.Alpha1)) desiredBuildRotation = desiredBuildRotation + new Vector3(0, -90, 0);
+        if (Input.GetKeyDown(KeyCode.Alpha2)) desiredBuildRotation = desiredBuildRotation + new Vector3(0, 90, 0);
+        currentBuild.transform.rotation = Quaternion.Lerp(currentBuild.transform.rotation, Quaternion.Euler(desiredBuildRotation), 0.5f);
 
-            if (ClickedOnSomething(out hit))
+        if (Input.GetMouseButtonDown(1))
+        {
+            if (!EventSystem.current.IsPointerOverGameObject())
             {
-                currentBuild.transform.position = hit.point;
+                //right click
+                //Sortie du mode building
+                Destroy(currentBuild);
+                currentBuild = null;
             }
-            //Rotation du build
-            if (Input.GetKeyDown(KeyCode.Alpha1)) desiredBuildRotation = desiredBuildRotation + new Vector3(0, -90, 0);
-            if (Input.GetKeyDown(KeyCode.Alpha2)) desiredBuildRotation = desiredBuildRotation + new Vector3(0,  90, 0);
-
-            currentBuild.transform.rotation = Quaternion.Lerp(currentBuild.transform.rotation, Quaternion.Euler(desiredBuildRotation), 0.5f);
-
-            //Placer le bâtiment
-            if (Input.GetKeyDown(KeyCode.Alpha3))
+        }
+        else if (Input.GetMouseButtonDown(0))
+        {
+            if (!EventSystem.current.IsPointerOverGameObject())
             {
+                //left click
+                //Placer le bâtiment
                 currentBuild.GetComponent<VisuHandler>().EndVisualisation();
                 currentBuild.transform.rotation = Quaternion.Euler(desiredBuildRotation);
+                GameObject.Find("eCentralManager").GetComponent<PropManager>().PlaceProp(currentBuild, currentBuild.transform.rotation.eulerAngles.y, "testWall");
                 currentBuild = null;
             }
         }

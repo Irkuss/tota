@@ -6,33 +6,57 @@ public class PropManager : MonoBehaviour
 {
     public class Prop
     {
+        //defining attributes to gameobject
         private Vector3 _propPosition;
-        private int _propRotation;
-
-        private GameObject go;
-
+        private float _propRotation;
+        private string _propName;
+        //the referenced gameobject
+        private GameObject _go;
+        //unique Id
         private int _id;
         public int Id => _id;
 
-        public Prop(Vector3 pos, int rot, int id)
+
+        //Constructeur
+        public Prop(Vector3 pos, float rot, int id, string name)
         {
             _propPosition = pos;
             _propRotation = rot;
+            _propName = name;
             _id = id;
+            _go = null;
         }
+        public Prop(GameObject go, int id)
+        {
+            _id = id;
+            _go = go;
+        }
+
+        //Updating the id
+        public void UpdateId(int id)
+        {
+            _id = id;
+            if (_go != null) _go.GetComponent<PropHandler>().SetId(_id);
+        }
+
+        //Instant et destroy
 
         public void InstantSelf()
         {
-            Instantiate()
+            if (_go != null) return;
+            Quaternion rotation = Quaternion.Euler(0, _propRotation, 0);
+            _go = Instantiate(Resources.Load<GameObject>(_propName), _propPosition, rotation);
+            _go.GetComponent<PropHandler>().SetId(_id);
         }
 
         public void DestroySelf()
         {
-
+            if (_go == null) return;
+            Destroy(_go);
         }
     }
 
-    private List<Prop> _props;
+    private static List<Prop> _props;
 
     private static int propCount;
 
@@ -56,24 +80,48 @@ public class PropManager : MonoBehaviour
         return null;
     }
 
-    private void RemoveProp(Prop prop)
+    private void UpdateAllId()
     {
-        _props.Remove(prop);
-
-
-        prop = null;
+        for (int i = 0; i < _props.Count; i++)
+        {
+            _props[i].UpdateId(0);
+        }
     }
 
-    //Public
+    //Public appelé par n'importe qui
 
-    public void PlaceProp(Vector3 pos, int rot)
+    public void PlaceProp(Vector3 pos, float rot, string name)
     {
-
+        //Make all players place the new prop
+        GetComponent<PhotonView>().RPC("RPC_PlaceProp", PhotonTargets.AllBuffered, pos.x, pos.y, pos.z, rot, name);
+    }
+    public void PlaceProp(GameObject go, float rot, string name)
+    {
+        //Make all other players place the new prop (locally update PropManager)
+        //create a new prop with correct parameters (NB: no need to update all Ids)
+        Prop prop = new Prop(go, _props.Count);
+        //Add the prop to the list
+        _props.Add(prop);
+        Vector3 pos = go.transform.position;
+        GetComponent<PhotonView>().RPC("RPC_PlaceProp", PhotonTargets.OthersBuffered, pos.x, pos.y, pos.z, rot, name);
     }
 
     public void DestroyProp(int id)
     {
         GetComponent<PhotonView>().RPC("RPC_DestroyProp", PhotonTargets.AllBuffered, id);
+    }
+
+    //RPCs
+    [PunRPC]
+    private void RPC_PlaceProp(float x, float y, float z, float rot, string name)
+    {
+        Debug.Log("RPC_PlaceProp: receiving a prop to place");
+        //create a new prop with correct parameters (NB: no need to update all Ids)
+        Prop prop = new Prop(new Vector3(x, y, z), rot, _props.Count, name);
+        //Add the prop to the list
+        _props.Add(prop);
+        //Update the gameobject
+        prop.InstantSelf();
     }
 
     [PunRPC] private void RPC_DestroyProp(int id)
@@ -82,7 +130,14 @@ public class PropManager : MonoBehaviour
 
         if (prop != null)
         {
-            RemoveProp(prop);
+            //Remove the prop from the list
+            _props.Remove(prop);
+            //Update all Ids
+            UpdateAllId();
+            //Update the gameobject
+            prop.DestroySelf();
+            //Make that reference null (?)
+            prop = null;
         }
     }
 }
