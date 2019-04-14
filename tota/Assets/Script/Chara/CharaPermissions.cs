@@ -5,7 +5,7 @@ using UnityEngine;
 public class CharaPermissions : MonoBehaviour
 {
     //Recuperer le permissions manager component
-    private PermissionsManager permManager;
+    private PermissionsManager permManager = null;
     private PermissionsManager.Player player = null;
     private PermissionsManager.Team team = null;
 
@@ -15,11 +15,6 @@ public class CharaPermissions : MonoBehaviour
 
         //teamNameRPC est initialisé par RPC des que Chara est instancié;
         //myTeam = permManager.GetTeamWithName(teamNameRPC);
-        player = permManager.GetPlayerWithName(PhotonNetwork.player.NickName);
-        if (player != null)
-        {
-            team = permManager.GetTeamWithPlayer(player);
-        }
 
         GetComponent<CharaOutline>().OnFinishedPermissions();
     }
@@ -45,8 +40,14 @@ public class CharaPermissions : MonoBehaviour
         {
             Debug.Log("CharaPermissions: Getting team: " + team.Name);
         }
+        else
+        {
+            if (teamNameRPC != null)
+            {
+                team = PermissionsManager.Instance.GetTeamWithName(teamNameRPC);
+            }            
+        }
         
-        //return myTeam;
         return team;
     }
 

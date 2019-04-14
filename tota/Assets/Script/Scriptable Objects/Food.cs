@@ -10,6 +10,6 @@ public class Food : Item
     public override void Use(GameObject refInventChara)
     {
         Debug.Log("Using food:" + this.nickName);
-        refInventChara.GetComponentInParent<CharaRpg>().Eat(foodValue); // On utilise l'item sur le bon chara par référence de son inventaire
+        refInventChara.GetComponent<CharaRpg>().Eat(foodValue); // On utilise l'item sur le bon chara par référence de son inventaire
     }
 }
