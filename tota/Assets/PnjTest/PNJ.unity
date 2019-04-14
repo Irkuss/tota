@@ -244,7 +244,7 @@ GameObject:
   - component: {fileID: 744944200}
   - component: {fileID: 744944199}
   - component: {fileID: 744944198}
-  m_Layer: 0
+  m_Layer: 10
   m_Name: Cube (2)
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -334,9 +334,10 @@ GameObject:
   - component: {fileID: 774907762}
   - component: {fileID: 774907761}
   - component: {fileID: 774907760}
-  - component: {fileID: 774907759}
   - component: {fileID: 774907758}
-  m_Layer: 9
+  - component: {fileID: 774907759}
+  - component: {fileID: 774907763}
+  m_Layer: 11
   m_Name: player (2)
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -365,8 +366,8 @@ NavMeshAgent:
   m_BaseOffset: 1
   m_WalkableMask: 4294967295
   m_ObstacleAvoidanceType: 4
---- !u!136 &774907759
-CapsuleCollider:
+--- !u!135 &774907759
+SphereCollider:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
@@ -375,9 +376,8 @@ CapsuleCollider:
   m_Material: {fileID: 0}
   m_IsTrigger: 0
   m_Enabled: 1
-  m_Radius: 0.5
-  m_Height: 2
-  m_Direction: 1
+  serializedVersion: 2
+  m_Radius: 1
   m_Center: {x: 0, y: 0, z: 0}
 --- !u!23 &774907760
 MeshRenderer:
@@ -438,6 +438,22 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 6
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!54 &774907763
+Rigidbody:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 774907757}
+  serializedVersion: 2
+  m_Mass: 1
+  m_Drag: 0
+  m_AngularDrag: 0.05
+  m_UseGravity: 1
+  m_IsKinematic: 0
+  m_Interpolate: 0
+  m_Constraints: 0
+  m_CollisionDetection: 0
 --- !u!1 &787681471
 GameObject:
   m_ObjectHideFlags: 0
@@ -449,15 +465,30 @@ GameObject:
   - component: {fileID: 787681477}
   - component: {fileID: 787681476}
   - component: {fileID: 787681475}
-  - component: {fileID: 787681474}
   - component: {fileID: 787681473}
-  m_Layer: 9
+  - component: {fileID: 787681474}
+  - component: {fileID: 787681472}
+  - component: {fileID: 787681478}
+  m_Layer: 11
   m_Name: player (1)
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
+--- !u!114 &787681472
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 787681471}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d76365a13412486468cbbc6c32b4d826, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  moveSpeed: 6
 --- !u!195 &787681473
 NavMeshAgent:
   m_ObjectHideFlags: 0
@@ -480,8 +511,8 @@ NavMeshAgent:
   m_BaseOffset: 1
   m_WalkableMask: 4294967295
   m_ObstacleAvoidanceType: 4
---- !u!136 &787681474
-CapsuleCollider:
+--- !u!135 &787681474
+SphereCollider:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
@@ -490,9 +521,8 @@ CapsuleCollider:
   m_Material: {fileID: 0}
   m_IsTrigger: 0
   m_Enabled: 1
-  m_Radius: 0.5
-  m_Height: 2
-  m_Direction: 1
+  serializedVersion: 2
+  m_Radius: 1
   m_Center: {x: 0, y: 0, z: 0}
 --- !u!23 &787681475
 MeshRenderer:
@@ -553,6 +583,22 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 5
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!54 &787681478
+Rigidbody:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 787681471}
+  serializedVersion: 2
+  m_Mass: 1
+  m_Drag: 0
+  m_AngularDrag: 0.05
+  m_UseGravity: 1
+  m_IsKinematic: 0
+  m_Interpolate: 0
+  m_Constraints: 0
+  m_CollisionDetection: 0
 --- !u!1 &1209207988
 GameObject:
   m_ObjectHideFlags: 0
@@ -719,13 +765,13 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1326352311}
-  m_LocalRotation: {x: -0.24383159, y: 0.7530584, z: -0.39091238, w: -0.46971998}
-  m_LocalPosition: {x: 16.62, y: 19.303, z: 8.378}
+  m_LocalRotation: {x: 0.7071068, y: 0, z: 0, w: 0.7071068}
+  m_LocalPosition: {x: 0, y: 30, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 0}
   m_RootOrder: 1
-  m_LocalEulerAnglesHint: {x: 48.24, y: 0, z: 0}
+  m_LocalEulerAnglesHint: {x: 90, y: 0, z: 0}
 --- !u!1 &1374648126
 GameObject:
   m_ObjectHideFlags: 0
@@ -829,7 +875,7 @@ GameObject:
   - component: {fileID: 1394471072}
   - component: {fileID: 1394471071}
   - component: {fileID: 1394471070}
-  m_Layer: 0
+  m_Layer: 10
   m_Name: Cube (3)
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -970,17 +1016,21 @@ MonoBehaviour:
   m_GameObject: {fileID: 1735130887}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: ccc1aaeba5996db4cae697d72cbf2e45, type: 3}
+  m_Script: {fileID: 11500000, guid: 4f5aa4ee4a1981f43be8e734044d75af, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  navMeshAgent: {fileID: 1735130889}
-  wanderRadius: 10
-  players:
-  - {fileID: 787681477}
-  - {fileID: 774907762}
-  fieldOfViewAngle: 60
+  navMeshAgent: {fileID: 0}
+  fieldOfViewAngle: 50
+  wanderRadius: 7
+  visibleTargets: []
+  _player: {fileID: 0}
   isInFov: 0
-  personalLastSighting: {x: 0, y: 0, z: 0}
+  targetMask:
+    serializedVersion: 2
+    m_Bits: 0
+  obstacleMask:
+    serializedVersion: 2
+    m_Bits: 0
 --- !u!195 &1735130889
 NavMeshAgent:
   m_ObjectHideFlags: 0
@@ -1089,7 +1139,7 @@ GameObject:
   - component: {fileID: 1971575653}
   - component: {fileID: 1971575652}
   - component: {fileID: 1971575651}
-  m_Layer: 0
+  m_Layer: 10
   m_Name: Cube (1)
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -1240,7 +1290,7 @@ GameObject:
   - component: {fileID: 2044528939}
   - component: {fileID: 2044528938}
   - component: {fileID: 2044528937}
-  m_Layer: 0
+  m_Layer: 10
   m_Name: Cube
   m_TagString: Untagged
   m_Icon: {fileID: 0}

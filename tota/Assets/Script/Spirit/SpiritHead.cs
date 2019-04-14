@@ -6,7 +6,7 @@ using UnityEngine.EventSystems;
 public class SpiritHead : Photon.MonoBehaviour
 {
     //utilisé pour debugger (à swap avec un scriptable object des que possible)
-    private string _charaPath = "CharaYayko";
+    private string _charaPath = "CharaJordan";
     [SerializeField] private ItemRecipe bigAppleRecipe = null;
     [SerializeField] private ItemTable itemTable = null;
 
