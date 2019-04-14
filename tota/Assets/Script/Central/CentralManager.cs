@@ -30,6 +30,9 @@ public class CentralManager : Photon.MonoBehaviour
     [SerializeField] private GameObject _charaLayout = null;
     public GameObject CharaLayout { get { return _charaLayout; } }
 
+    [SerializeField] private GameObject _furnitureInventory = null;
+    public GameObject FurnitureInventory { get { return _furnitureInventory; } }
+
     public void UpdateToolTip(string[] info)
     {
         toolTip.SetActive(true);

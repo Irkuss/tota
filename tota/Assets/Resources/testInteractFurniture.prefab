@@ -117,6 +117,8 @@ GameObject:
   - component: {fileID: 991325560378003824}
   - component: {fileID: 991325560378003831}
   - component: {fileID: 413982506359925092}
+  - component: {fileID: 2062833628537436929}
+  - component: {fileID: 2321548132533987262}
   m_Layer: 0
   m_Name: testInteractFurniture
   m_TagString: Interactable
@@ -214,6 +216,47 @@ MonoBehaviour:
   _interTransform: {fileID: 4059653830927699747}
   furniture: {fileID: 11400000, guid: 27dcd643c5d9d2b4380e9d58b4cc7918, type: 2}
   fill: {fileID: 6257223052304544654}
+--- !u!114 &2062833628537436929
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 991325560378003830}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 891d75711ce9551479ee89aadd9df2a2, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  itemTable: {fileID: 11400000, guid: 53de43c060c7ffe459db8e15c09cd294, type: 2}
+  _inventoryPrefab: {fileID: 7954770632000053668, guid: a13de8f0882a5b64bb3c486545a7e13f,
+    type: 3}
+--- !u!114 &2321548132533987262
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 991325560378003830}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: aa584fbee541324448dd18d8409c7a41, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  ownerId: 0
+  group: 0
+  OwnerShipWasTransfered: 0
+  prefixBackup: -1
+  synchronization: 0
+  onSerializeTransformOption: 3
+  onSerializeRigidBodyOption: 2
+  ownershipTransfer: 0
+  ObservedComponents: []
+  ObservedComponentsFoldoutOpen: 1
+  viewIdField: 0
+  instantiationId: -1
+  currentMasterID: -1
+  isRuntimeInstantiated: 0
 --- !u!1 &4834164892296921927
 GameObject:
   m_ObjectHideFlags: 0

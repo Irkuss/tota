@@ -96,14 +96,8 @@ public class CharaInventory : MonoBehaviour
         }
     }
 
-    //Le gameObject canvas
-    [SerializeField] private GameObject _canvas = null;
     //Database des items (pour avoir leur id, pour les update en rpc)
     [SerializeField] private ItemTable itemTable = null;
-
-    //Position et rotation (Tweakable)
-    private Vector3 _inventPosition = new Vector3(0, 3, 2);
-    private Quaternion _inventRotation = new Quaternion();
 
     //Dictionnaire représentant l'inventaire
     [HideInInspector]
@@ -123,13 +117,6 @@ public class CharaInventory : MonoBehaviour
     private Slot[] _slots;
 
     //Init
-    private void Start()
-    {
-        _canvas.SetActive(false);
-        //initialisation de la rotation à 90° du canvas (pour LateUpdate)
-        _inventRotation = (Quaternion.Euler(90, 0, 0));        
-        //InitSlots();
-    }
 
     private void InitSlots()
     {
@@ -159,6 +146,7 @@ public class CharaInventory : MonoBehaviour
         {
             _slotParent.transform.GetChild(i).gameObject.SetActive(false);
         }
+        UpdateUI();
     }
 
     public void UpdateUI()
@@ -199,39 +187,19 @@ public class CharaInventory : MonoBehaviour
 
     }
 
-    // Correction des coordonnées du canvas
-    void LateUpdate()
-    {
-        //Maintient une position et une rotation correcte pour le canvas
-        _canvas.transform.position = transform.position + _inventPosition;
-        _canvas.transform.rotation = _inventRotation;
-    }
-
     //Openning and closing Inventory (canvas)
     public void ToggleInventory(GameObject parent)
     {
-        //Appelé par SpiritHead après avoir appuyé sur E (si le Chara est selectionné)
-        /*if (_canvas.activeSelf)
-        {
-            _canvas.SetActive(false);
-        }
-        else
-        {
-            _canvas.SetActive(true);
-        }*/
-
         _inventory = Instantiate(_inventoryPrefab);
         _inventory.transform.SetParent(parent.transform, false);
         _slotParent = _inventory.transform.GetChild(0).GetChild(0).gameObject;
         InitSlots();
-
     }
 
     public void CloseInventory()
     {
         //Appelé CloseInventoryOnDeselected() pour fermer l'inventaire quand un Chara est deselectionné
         
-        _canvas.SetActive(false);
         if (_inventory != null)
         {
             Destroy(_inventory);

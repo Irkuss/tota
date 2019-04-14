@@ -7,6 +7,7 @@ public class LinkChara : MonoBehaviour
 {
     [HideInInspector] public SpiritHead spirit;
     [HideInInspector] public GameObject chara;
+    public Text Name;
 
     private void Start()
     {
@@ -14,8 +15,15 @@ public class LinkChara : MonoBehaviour
     }
 
     private void SelectChara()
-    {
-        spirit.DeselectAllExcept(chara);
-        spirit.MoveCamera(chara.transform.position);
+    {       
+        if (!spirit.ContainsChara(chara))
+        {
+            spirit.DeselectAllExcept(chara);
+            spirit.MoveCamera(chara.transform.position);
+        }
+        else
+        {
+            spirit.DeselectChara(chara);
+        }
     }
 }

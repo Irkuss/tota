@@ -123,6 +123,7 @@ public class SpiritHead : Photon.MonoBehaviour
             charaLayout.transform.SetParent(_charaLayout.transform, false);            
             charaLayout.GetComponent<LinkChara>().spirit = this;
             charaLayout.GetComponent<LinkChara>().chara = _chara;
+            charaLayout.GetComponent<LinkChara>().Name.text = _chara.GetComponent<CharaRpg>().FullName;
         }              
     }
 
@@ -349,6 +350,11 @@ public class SpiritHead : Photon.MonoBehaviour
         ClickOnChara(exception);
     }
 
+    public bool ContainsChara(GameObject chara)
+    {
+        return _selectedList.Contains(chara);
+    }
+
     //Private methods
 
     private void ActionMoveAllTo(Vector3 destination)
@@ -389,15 +395,27 @@ public class SpiritHead : Photon.MonoBehaviour
     {
         if (Input.GetKeyDown(KeyCode.E))
         {
-            _inventoryList.SetActive(!_inventoryList.activeSelf);
-            
+            _inventoryList.SetActive(!_inventoryList.activeSelf);            
+        }
+        if(_selectedList.Count == 0)
+        {
+            _inventoryList.SetActive(false);
         }
     }
 
     public void MoveCamera(Vector3 pos)
     {
+        float speed = 5;
+        float startTime = Time.time;
+        Vector3 start = gameObject.transform.position;
         Vector3 posxz = new Vector3(pos.x, gameObject.transform.position.y, pos.z);
-        gameObject.transform.position = posxz;
+        float journeyLength = Vector3.Distance(start, posxz);
+
+        float distCovered = (Time.time - startTime) * speed;
+        float fracJourney = distCovered / journeyLength;
+
+        gameObject.transform.position = Vector3.Lerp(start, posxz, fracJourney);
+
     }
 
 }

@@ -89,6 +89,7 @@ public class CharaHead : MonoBehaviour
         //NB: removed "if (!EventSystem.current.IsPointerOverGameObject())" and moved it to SpiritHead
         //RemoveInventoryOnDeselected(this.gameObject);
         CloseInventoryOnDeselected();
+        GameObject.Find("eCentralManager").GetComponent<CentralManager>().DeactivateToolTip();
     }
 
     //Clic Droit

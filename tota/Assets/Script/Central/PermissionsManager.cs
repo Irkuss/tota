@@ -107,7 +107,14 @@ public class PermissionsManager : MonoBehaviour
         {
             if (!ContainsPlayer(player)) return;
             _playerList.Remove(player);
-            _leaderTeam = _playerList[0];
+            if (_playerList.Count != 0)
+            {
+                _leaderTeam = _playerList[0];
+            }
+            else
+            {
+                _leaderTeam = null;
+            }
         }
 
         //Getter
@@ -253,12 +260,21 @@ public class PermissionsManager : MonoBehaviour
         Player player = GetPlayerWithName(playerName);
         Team team = GetTeamWithName(teamName); 
 
+        if (player == null || team == null)
+        {
+            return;
+        }
+
         team.RemovePlayer(player);
         GameObject.Find("eLaucher").GetComponent<Launcher>().PlayerLeftTeam(player);
         if (team.PlayerList.Count == 0)
         {
             GameObject.Find("eLaucher").GetComponent<Launcher>().TeamLeftRoom(team);
             TeamList.Remove(team);
+        }
+        else
+        {
+            GameObject.Find("eLaucher").GetComponent<Launcher>().TeamListing(team);
         }
         
     }
