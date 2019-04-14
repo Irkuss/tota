@@ -47,13 +47,26 @@ public class DayNightCycle : MonoBehaviour
         _sun = GetComponent<Light>();
         transform.rotation = Quaternion.Euler(0, 60, 0);
         _slider = 0.5f;
-
+        FindObjectOfType<AudioManager>().StartCoroutine("StartMusic", "Solitude");
     }
 
     void Update()
     {
         Cycle();
         NextSeason();
+        if (heure > 16f && heure < 17f && _changedHour)
+        {
+            Debug.Log("Night");
+            FindObjectOfType<AudioManager>().StartCoroutine("EndMusic", "Solitude");
+            FindObjectOfType<AudioManager>().StartCoroutine("StartMusic", "Nightwalk");
+        }
+        if (heure > 5f && heure < 6f && _changedHour)
+        {
+            Debug.Log("Day");
+            FindObjectOfType<AudioManager>().StartCoroutine("EndMusic", "Nightwalk");
+            FindObjectOfType<AudioManager>().StartCoroutine("StartMusic","Solitude");
+        }
+            
     }
 
     void Cycle()
