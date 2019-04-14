@@ -2,13 +2,13 @@
 using System.Collections;
 using UnityEditor;
 
-[CustomEditor(typeof(ZombieMouvement))]
+[CustomEditor(typeof(Zombie))]
 public class DrowFOV : Editor
 {
 
     void OnSceneGUI()
     {
-        ZombieMouvement fow = (ZombieMouvement)target;
+        Zombie fow = (Zombie)target;
         Handles.color = Color.black;
         Handles.DrawWireArc(fow.transform.position, Vector3.up, Vector3.forward, 360, fow.wanderRadius);
         Vector3 viewAngleA = fow.DirFromAngle(-fow.fieldOfViewAngle / 2, false);
