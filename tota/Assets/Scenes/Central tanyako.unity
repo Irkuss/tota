@@ -432,7 +432,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!65 &106366101
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -3371,12 +3371,14 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   surface: {fileID: 830072122}
+  propManager: {fileID: 1082215646}
   _table22: {fileID: 11400000, guid: e3db95216ea081947a77a06e8c696b99, type: 2}
   _table24: {fileID: 11400000, guid: b00cd341c197cb74a84fb61d94b7586d, type: 2}
   _table42left: {fileID: 11400000, guid: 3768bc61430946a45b99e8f7e5e61f0c, type: 2}
   _table42right: {fileID: 11400000, guid: 93453ca7ff46f0e4a9750fbbb6ac43a3, type: 2}
   _table44left: {fileID: 11400000, guid: 6f2fb9c86d0cf76428fb3778b0c26576, type: 2}
   _table44right: {fileID: 11400000, guid: 91e4d0b0dafda494eaf5c81da365ace4, type: 2}
+  _treeTable: {fileID: 11400000, guid: 7344d21d69d34aa4aaf4a9bd0f435230, type: 2}
   spawnPoint: 4
 --- !u!114 &1082215649
 MonoBehaviour:

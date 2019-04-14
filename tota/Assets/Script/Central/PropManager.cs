@@ -95,6 +95,7 @@ public class PropManager : MonoBehaviour
         //Make all players place the new prop
         GetComponent<PhotonView>().RPC("RPC_PlaceProp", PhotonTargets.AllBuffered, pos.x, pos.y, pos.z, rot, name);
     }
+
     public void PlaceProp(GameObject go, float rot, string name)
     {
         //Make all other players place the new prop (locally update PropManager)
@@ -105,15 +106,26 @@ public class PropManager : MonoBehaviour
         Vector3 pos = go.transform.position;
         GetComponent<PhotonView>().RPC("RPC_PlaceProp", PhotonTargets.OthersBuffered, pos.x, pos.y, pos.z, rot, name);
     }
-
+    public void MassPlaceProp(int length, Vector3[] pos, float[] rot, string[] name)
+    {
+        float[] xArray = new float[length];
+        float[] yArray = new float[length];
+        float[] zArray = new float[length];
+        for (int i = 0; i < length; i++)
+        {
+            xArray[i] = pos[i].x;
+            yArray[i] = pos[i].y;
+            zArray[i] = pos[i].z;
+        }
+        GetComponent<PhotonView>().RPC("RPC_MassPlaceProp", PhotonTargets.AllBuffered, length, xArray, yArray, zArray, rot, name);
+    }
     public void DestroyProp(int id)
     {
         GetComponent<PhotonView>().RPC("RPC_DestroyProp", PhotonTargets.AllBuffered, id);
     }
 
     //RPCs
-    [PunRPC]
-    private void RPC_PlaceProp(float x, float y, float z, float rot, string name)
+    [PunRPC] private void RPC_PlaceProp(float x, float y, float z, float rot, string name)
     {
         Debug.Log("RPC_PlaceProp: receiving a prop to place");
         //create a new prop with correct parameters (NB: no need to update all Ids)
@@ -123,7 +135,18 @@ public class PropManager : MonoBehaviour
         //Update the gameobject
         prop.InstantSelf();
     }
-
+    [PunRPC] private void RPC_MassPlaceProp(int length, float[] x, float[] y, float[] z, float[] rot, string[] name)
+    {
+        Prop prop;
+        for (int i = 0; i < length; i++)
+        {
+            prop = new Prop(new Vector3(x[i], y[i], z[i]), rot[i], _props.Count, name[i]);
+            //Add the prop to the list
+            _props.Add(prop);
+            //Update the gameobject
+            prop.InstantSelf();
+        }
+    }
     [PunRPC] private void RPC_DestroyProp(int id)
     {
         Prop prop = FindPropWithId(id);

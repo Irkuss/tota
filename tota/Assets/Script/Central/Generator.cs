@@ -1228,7 +1228,7 @@ public class Generator : MonoBehaviour
         }
 
         //Generation
-        public IEnumerator Generate()
+        public IEnumerator Generate(PropManager propManager)
         {
             isLoaded = true;
             GenerateFloor();
@@ -1262,8 +1262,52 @@ public class Generator : MonoBehaviour
 
             surface.BuildNavMesh();
             Debug.Log("Generate: Ending Navmesh at '" + x + "," + y + "'");
-            //worldNode.GetComponent<WorldNodeBehavior>().link1.UpdateLink();
-            //worldNode.GetComponent<WorldNodeBehavior>().link2.UpdateLink();
+            //Genere prop si master
+            if (PhotonNetwork.isMasterClient)
+            {
+                int treeAntiDensity = 200; //The bigger, the lesser tree
+                switch (_biome)
+                {
+                    case WorldBiome.Plain: treeAntiDensity = 2000; break;
+                    case WorldBiome.Arid: treeAntiDensity = 2500; break;
+                    case WorldBiome.Forest: treeAntiDensity = 600; break;
+                    case WorldBiome.DeepForest: treeAntiDensity = 300; break;
+                    default: treeAntiDensity = 500; break;
+                }
+
+                Debug.Log("Generate: Starting tree placement as MasterClient at '" + x + "," + y + "'");
+                Vector3 position;
+                List<Vector3> treePositions = new List<Vector3>();
+                int rng;
+                for (int i = 0; i < c_worldChunkLength; i++)
+                {
+                    for (int j = 0; j < c_worldChunkLength; j++)
+                    {
+                        rng = Random.Range(0, treeAntiDensity);
+                        if (rng == 0)
+                        {
+                            position = new Vector3(j + x * c_worldChunkLength, 0, i + y * c_worldChunkLength);
+
+                            if (IsOnGround(position, 2))
+                            {
+                                if (x == 4 && y == 4) Debug.Log("Generate: Placing a tree at '" + j + "," + i + "'");
+                                treePositions.Add(position);
+                                //MasterPlaceTree(propManager, position);
+                            }
+
+                        }
+                    }
+                    if (i % 100 == 0)
+                    {
+                        MasterMassPlaceTree(propManager, treePositions);
+                        yield return null;
+                        treePositions.Clear();
+                    }
+                }
+                MasterMassPlaceTree(propManager, treePositions);
+
+                Debug.Log("Generate: Ending tree placement as MasterClient at '" + x + "," + y + "'");
+            }
         }
         private void GenerateFloor()
         {
@@ -1439,6 +1483,41 @@ public class Generator : MonoBehaviour
                 }
             }
         }
+        //placement des props
+        private bool IsOnGround(Vector3 pos, float radius)
+        {
+            Collider[] hitColliders = Physics.OverlapSphere(pos, radius);
+            bool hitOneGround = false;
+
+            foreach(Collider hit in hitColliders)
+            {
+                if (!hit.transform.CompareTag("Floor"))
+                {
+                    return false;
+                }
+                hitOneGround = true;
+            }
+            return hitOneGround;
+        }
+        private void MasterPlaceTree(PropManager propManager, Vector3 pos)
+        {
+            propManager.PlaceProp(pos, Random.Range(0, 4) * 90, treeTable.GetRandomPath());
+        }
+        private void MasterMassPlaceTree(PropManager propManager, List<Vector3> treePositions)
+        {
+            int length = treePositions.Count;
+            Vector3[] pos = new Vector3[length];
+            float[] rots = new float[length];
+            string[] names = new string[length];
+
+            for (int i = 0; i < length; i++)
+            {
+                pos[i] = treePositions[i];
+                rots[i] = Random.Range(0, 4) * 90;
+                names[i] = treeTable.GetRandomPath();
+            }
+            propManager.MassPlaceProp(length, pos, rots, names);
+        }
     }
 
     public enum WorldBiome
@@ -1446,7 +1525,8 @@ public class Generator : MonoBehaviour
         Undecided = 0, //NB: l'index 0 est le seul biome temporaire
         Plain = 1,
         Forest = 2,
-        Arid = 3
+        DeepForest = 3,
+        Arid = 4
     }
     public enum WorldLayout
     {
@@ -1458,6 +1538,7 @@ public class Generator : MonoBehaviour
     
 
     public NavMeshSurface surface;
+    public PropManager propManager;
     //Constante de génération
     public const float c_voxChunkLength = 12.6f; //magic number with MagicaVoxel, tunk = technical chunk
     public const int c_voxChunkInDistrict = 5;
@@ -1468,22 +1549,22 @@ public class Generator : MonoBehaviour
     public const int c_randBigSquare = 5;
     public const int c_randExtendRoad = 5;
 
-
+    #region Table
     //Path and directories
-
     [SerializeField] private buildTable _table22 = null;
     [SerializeField] private buildTable _table24 = null;
     [SerializeField] private buildTable _table42left = null;
     [SerializeField] private buildTable _table42right = null;
     [SerializeField] private buildTable _table44left = null;
     [SerializeField] private buildTable _table44right = null;
-
     public static buildTable table22 = null;
     public static buildTable table24 = null;
     public static buildTable table42left = null;
     public static buildTable table42right = null;
     public static buildTable table44left = null;
     public static buildTable table44right = null;
+    [SerializeField] private TreeTable _treeTable = null;
+    public static TreeTable treeTable = null;
 
     private void InitBuildTable()
     {
@@ -1493,7 +1574,10 @@ public class Generator : MonoBehaviour
         table42right = _table42right;
         table44left = _table44left;
         table44right = _table44right;
+
+        treeTable = _treeTable;
     }
+    #endregion
 
     // --- IMPORTANT TIPS AND TRICKS ---
     //Quandd y augmente -> on va vers le Nord
@@ -1517,7 +1601,6 @@ public class Generator : MonoBehaviour
         //Tout le monde Initialise la matrice des WorldNode
         _world = new WorldNode[_worldLength, _worldLength];
         InitWorld();
-
         if (PhotonNetwork.isMasterClient)
         {
             //Au start le master decide le type des WorldNode
@@ -1525,7 +1608,7 @@ public class Generator : MonoBehaviour
             int[] worldTypeData = MasterGetWorldTypeData();
             //Le master envoie l'entiereté des infos et update la condition de réception
             MasterSendWorldType(worldTypeData);
-            StartCoroutine(OnWorldTypeReceived());//Temporaire
+            OnWorldTypeReceived();
         }
         else
         {
@@ -1839,34 +1922,34 @@ public class Generator : MonoBehaviour
             }
     //Get Data
     private int[] MasterGetWorldTypeData()
+    {
+        int[] package = new int[_worldLength * _worldLength * 2];
+
+        int index = 0;
+        for (int y = 0; y < _worldLength; y++)
+        {
+            for (int x = 0; x < _worldLength; x++)
             {
-                int[] package = new int[_worldLength * _worldLength * 2];
+                package[index] = (int)(_world[x,y].Biome);
+                package[index + 1] = (int)(_world[x, y].Layout);
 
-                int index = 0;
-                for (int y = 0; y < _worldLength; y++)
-                {
-                    for (int x = 0; x < _worldLength; x++)
-                    {
-                        package[index] = (int)(_world[x,y].Biome);
-                        package[index + 1] = (int)(_world[x, y].Layout);
-
-                        index += 2;
-                    }
-                }
-
-                return package;
+                index += 2;
             }
+        }
+
+        return package;
+    }
     //Master Send World Type
     private void MasterSendWorldType(int[] worldTypeData)
-            {
-                Debug.Log("MasterSendWorldType: Sending world type Data as master");
-                GetComponent<PhotonView>().RPC("MasterSendWorldTypeRPC", PhotonTargets.OthersBuffered, worldTypeData);
-            }
+    {
+        Debug.Log("MasterSendWorldType: Sending world type Data as master");
+        GetComponent<PhotonView>().RPC("MasterSendWorldTypeRPC", PhotonTargets.OthersBuffered, worldTypeData);
+    }
     [PunRPC] private void MasterSendWorldTypeRPC(int[] worldTypeData)
-            {
-                Debug.Log("MasterSendWorldTypeRPC: receiving world type Data");
-                StartCoroutine(WaitForWorldInit(worldTypeData));
-            }
+    {
+        Debug.Log("MasterSendWorldTypeRPC: receiving world type Data");
+        StartCoroutine(WaitForWorldInit(worldTypeData));
+    }
     #endregion
 
     //Coroutine du start des clients (lancé par le master)
@@ -1882,31 +1965,35 @@ public class Generator : MonoBehaviour
                 OnWorldTypeReceived();
             }
     private void ClientUpdateWorldType(int[] worldTypeData)
+    {
+        Debug.Log("ClientUpdateWorldType: Updating worldtype as client");
+        int index = 0;
+        for (int y = 0; y < _worldLength; y++)
+        {
+            for (int x = 0; x < _worldLength; x++)
             {
-                Debug.Log("ClientUpdateWorldType: Updating worldtype as client");
-                int index = 0;
-                for (int y = 0; y < _worldLength; y++)
-                {
-                    for (int x = 0; x < _worldLength; x++)
-                    {
-                        _world[x, y].UpdateType((WorldBiome)(worldTypeData[index]), (WorldLayout)(worldTypeData[index + 1]));
+                _world[x, y].UpdateType((WorldBiome)(worldTypeData[index]), (WorldLayout)(worldTypeData[index + 1]));
 
-                        index += 2;
-                    }
-                }
-            StartCoroutine(OnWorldTypeReceived());
+                index += 2;
             }
+        }
+        OnWorldTypeReceived();
+    }
     //Fin de l'init de WorldNode (TRUE START HERE)
-    private IEnumerator OnWorldTypeReceived()
+    private void OnWorldTypeReceived()
     {
         //The truest Start
-        //SafeLoadChunkAt(4, 4);
         LoadChunkAround(spawnPoint, spawnPoint);
         Debug.Log("Waiting for end of frame");
-        yield return new WaitForEndOfFrame();
-
-        OnGenerationEnded();
+        StartCoroutine(OnGenerationEnded());
+        if (testingWithSmallWorld)
+        {
+            chunkToLoad = 9;
+        }
     }
+    private bool testingWithSmallWorld = true; //Impact OnWorldTypeReceived et SafeLoadChunkAt
+    private static int chunkToLoad = 0;
+    private static int chunkLoaded = 0;
     
 
     //Debut de l'update permanente
@@ -1922,21 +2009,29 @@ public class Generator : MonoBehaviour
         {
             for (int j = -1; j < 2; j++)
             {
-                SafeLoadChunkAt(x + i, y + j);
-                yield return new WaitForSeconds(0.1f);
+                if (SafeLoadChunkAt(x + i, y + j))
+                {
+                    //Si on doit charger un chunk
+                    yield return new WaitForSeconds(1f);
+                }
             }
         }
     }
 
-    private void SafeLoadChunkAt(int x, int y)
+    private bool SafeLoadChunkAt(int x, int y)
     {
         if (x >= 0 && y >= 0 && x < _worldLength && y < _worldLength)
         {
+            //Debug.Log("SafeLoadChunkAt: trying at " + x + "," + y);
             if (!_world[x, y].isLoaded) //Changé au moment de Generate
             {
+                //Debug.Log("SafeLoadChunkAt: loading at " + x + "," + y);
+                if (!testingWithSmallWorld) chunkToLoad++;
                 ClientLoadChunk(x, y);
+                return true;
             }
         }
+        return false;
     }
     private void ClientLoadChunk(int x, int y)
     {
@@ -1965,11 +2060,11 @@ public class Generator : MonoBehaviour
     private IEnumerator MasterSendData(int x, int y, int[] roads, int[] builds, string[] buildPaths, int IdOfAsker)
     {
         GetComponent<PhotonView>().RPC("ClientUpdateRoadDataAt", PhotonPlayer.Find(IdOfAsker), x, y, roads);
-        yield return new WaitForSeconds(0.5f);
+        yield return new WaitForSeconds(0.1f);
         GetComponent<PhotonView>().RPC("ClientUpdateBuildDataAt", PhotonPlayer.Find(IdOfAsker), x, y, builds);
-        yield return new WaitForSeconds(0.5f);
+        yield return new WaitForSeconds(0.1f);
         GetComponent<PhotonView>().RPC("ClientUpdateBuildPathDataAt", PhotonPlayer.Find(IdOfAsker), x, y, buildPaths);
-        yield return new WaitForSeconds(0.5f);
+        yield return new WaitForSeconds(0.1f);
     }
     [PunRPC] private void ClientUpdateDataAt(int x, int y, int[] roads, int[] builds, string[] buildPaths)
     {
@@ -1977,7 +2072,7 @@ public class Generator : MonoBehaviour
         //Appelé après ClientLoadChunk (apres etre passé par MasterDataAskedHandler)
         _world[x, y].UpdateMasterData(roads, builds, buildPaths);
 
-        ClientGenerateAt(x, y);
+        StartCoroutine(ClientGenerateAt(x, y));
     }
     [PunRPC] private void ClientUpdateRoadDataAt(int x, int y, int[] roads)
     {
@@ -2002,23 +2097,27 @@ public class Generator : MonoBehaviour
     {
         if (_world[x,y].HasGenerationData() && !_world[x,y].isLoaded)
         {
-            ClientGenerateAt(x, y);
+            StartCoroutine(ClientGenerateAt(x, y));
         }
     }
-    private void ClientGenerateAt(int x, int y)
+    private IEnumerator ClientGenerateAt(int x, int y)
     {
         Debug.Log("ClientGenerateAt: Generating at " + x + "," + y);
-        StartCoroutine(_world[x, y].Generate());
+        yield return StartCoroutine(_world[x, y].Generate(propManager));
+        Debug.Log("ClientGenerateAt: Ended Generation at " + x + "," + y);
+        chunkLoaded++;
     }
 
 
     //Depre
-    private void OnGenerationEnded()
+    private IEnumerator OnGenerationEnded()
     {
-        //Update le NavMeshSurface entierement (fin)
-        //surface.BuildNavMesh();
+        yield return new WaitForSeconds(2f);
+        while (chunkToLoad > chunkLoaded)
+        {
+            yield return new WaitForSeconds(0.5f);
+        }
 
-        //Update le spawnpoint (temporaire)
         GetComponent<CentralManager>().OnGenerationFinished();
         GetComponent<CentralManager>().spawnPoint = new Vector3((spawnPoint + 0.5f) * c_worldChunkLength, CentralManager.cameraStartHeight, (spawnPoint + 0.5f) * c_worldChunkLength);
     }

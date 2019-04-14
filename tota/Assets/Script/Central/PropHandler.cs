@@ -11,4 +11,9 @@ public class PropHandler : MonoBehaviour
     {
         _id = id;
     }
+
+    public void DestroySelf()
+    {
+        GameObject.Find("eCentralManager").GetComponent<PropManager>().DestroyProp(_id);
+    }
 }
