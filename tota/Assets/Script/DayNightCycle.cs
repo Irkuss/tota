@@ -24,7 +24,7 @@ public class DayNightCycle : MonoBehaviour
     void Start()
     {
         _sun = GetComponent<Light>();
-        transform.rotation = Quaternion.Euler(0, -30, 0);
+        transform.rotation = Quaternion.Euler(0, 60, 0);
         _slider = 0.5f;
 
     }
@@ -42,7 +42,7 @@ public class DayNightCycle : MonoBehaviour
         }
 
         heure = _slider * 24;
-        _sun.transform.rotation = Quaternion.Euler((_slider * 360) - 90, 0, 0);
+        _sun.transform.rotation = Quaternion.Euler((_slider * 360) - 90, 60, 0);
         _slider = _slider + Time.deltaTime / speed;
 
         int newHeure = (int)(_slider * 24); //Calcule l'heure suivante
