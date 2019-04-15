@@ -22,6 +22,7 @@ public class Zombie : MonoBehaviour
     public LayerMask targetMask;
     public LayerMask obstacleMask;
 
+    private GameObject alert = null;
     // Start is called before the first frame update
     void Start()
     {
@@ -113,7 +114,16 @@ public class Zombie : MonoBehaviour
             yield return new WaitForSeconds(delay);
             if (FindVisibleTargets())
             {
+                if (alert == null)
+                {
+                    AudioManager.instance.Play("Ping");
+                    alert = new GameObject("Alert");
+                }
                 _wanderPoint = _player.position;
+            }
+            else
+            {
+                Destroy(alert);
             }
             WanderStop(_wanderPoint);
             if (_canMove || FindVisibleTargets())
