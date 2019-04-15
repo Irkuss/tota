@@ -9,7 +9,6 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 3963968466567242307}
-  - component: {fileID: 551147318983224224}
   - component: {fileID: 7774064097167762137}
   - component: {fileID: 5151837398872808980}
   - component: {fileID: 3253678654423224063}
@@ -36,18 +35,6 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &551147318983224224
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 8737004137068632175}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 70c9328f7956ec84cbd5ec683cda3a0d, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!114 &7774064097167762137
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -60,7 +47,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 968492edde335534b974e56a70648748, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _radius: 4
+  _radius: 5
   _interTransform: {fileID: 3963968466567242307}
   woodRaw: {fileID: 11400000, guid: 085b76ca16166be46b9f9c47cc39a241, type: 2}
 --- !u!208 &5151837398872808980

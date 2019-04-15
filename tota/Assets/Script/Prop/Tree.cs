@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class Tree : Interactable
+public class Tree : PropHandler
 {
     public Item woodRaw;
 
@@ -15,6 +15,6 @@ public class Tree : Interactable
             //chara.GetComponent<CharaInventory>().Add(woodRaw);
         }
         //Se détruit
-        GetComponent<PropHandler>().DestroySelf();
+        DestroySelf();
     }
 }

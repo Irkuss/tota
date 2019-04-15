@@ -55,6 +55,12 @@ public class PropManager : MonoBehaviour
             if (_go == null) return;
             Destroy(_go);
         }
+
+        //Sending special command
+        public void ReceivePropCommand(byte command)
+        {
+            if (_go != null) _go.GetComponent<PropHandler>().CommandReceive(command);
+        }
     }
 
     //Reference
@@ -203,6 +209,20 @@ public class PropManager : MonoBehaviour
             prop.DestroySelf();
             //Make that reference null (?)
             prop = null;
+        }
+    }
+
+    public void SendPropCommand(int id, byte command)
+    {
+        GetComponent<PhotonView>().RPC("RPC_SendPropCommand", PhotonTargets.AllBuffered, id, command);
+    }
+    [PunRPC] private void RPC_SendPropCommand(int id, byte command)
+    {
+        RealProp prop = FindPropWithId(id);
+
+        if (prop != null)
+        {
+            prop.ReceivePropCommand(command);
         }
     }
 }
