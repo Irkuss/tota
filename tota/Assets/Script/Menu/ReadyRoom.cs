@@ -26,11 +26,6 @@ public class ReadyRoom : MonoBehaviour
     private void Start()
     {
         launcher = GameObject.Find("eLaucher").GetComponent<Launcher>();
-        /*if (PhotonNetwork.masterClient.NickName == PhotonNetwork.player.NickName)
-        {
-            launchButton.SetActive(true);
-            forceLaunchButton.SetActive(true);
-        }*/
 
         GameObject settingObj = Instantiate(_settingPrefab);
         settingObj.transform.SetParent(_settings.transform, false);
@@ -46,7 +41,7 @@ public class ReadyRoom : MonoBehaviour
 
         GameObject charaPerTeam = Instantiate(_settingPrefab);
         charaPerTeam.transform.SetParent(_settings.transform, false);
-        charaPerTeam.GetComponentInChildren<Text>().text = "CharaPerTeam : " + PhotonNetwork.room.CustomProperties["charaPerTeam"];
+        charaPerTeam.GetComponentInChildren<Text>().text = "CharaPerTeam : " + PermissionsManager.Instance.numberChara;
     }
 
     public void LeaveRoom()
@@ -86,14 +81,7 @@ public class ReadyRoom : MonoBehaviour
     }
 
     public void Launch()
-    {
-        if(launcher.LaunchIfReady())
-        {
-            sliderObject.SetActive(true);
-            gameObject.SetActive(false);
-            PhotonNetwork.room.IsOpen = false;
-            PhotonNetwork.room.IsVisible = false;
-        }
+    {        
         GameObject launcherD = GameObject.Find("PermissionManager");
         PermissionsManager permissions = launcherD.GetComponent<PermissionsManager>();
         Debug.Log("Teams : ");
@@ -104,6 +92,13 @@ public class ReadyRoom : MonoBehaviour
             {
                 Debug.Log(player.Name);
             }
+        }
+        if (launcher.LaunchIfReady())
+        {
+            sliderObject.SetActive(true);
+            gameObject.SetActive(false);
+            PhotonNetwork.room.IsOpen = false;
+            PhotonNetwork.room.IsVisible = false;
         }
     }
 

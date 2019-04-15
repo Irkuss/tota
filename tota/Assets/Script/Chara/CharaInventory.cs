@@ -90,7 +90,7 @@ public class CharaInventory : MonoBehaviour
             // Si l'item est utilisable
             if (item.usable)
             {
-                item.Use(_linkedCharaInventory._slotParent); // On appelle la fonction virtual de l'item en prenant la référence de son parent
+                item.Use(_linkedCharaInventory.gameObject); // On appelle la fonction virtual de l'item en prenant la référence de son parent //_linkedCharaInventory._slotParent
                 OnRemoveButton();                            // On enleve l'item utilisé
             }
         }
@@ -98,7 +98,6 @@ public class CharaInventory : MonoBehaviour
 
     //Le gameObject canvas
     [SerializeField] private GameObject _canvas = null;
-    [SerializeField] private GameObject _inventoryLayout = null;
     //Database des items (pour avoir leur id, pour les update en rpc)
     [SerializeField] private ItemTable itemTable = null;
 
@@ -118,7 +117,9 @@ public class CharaInventory : MonoBehaviour
     public OnItemChanged onItemChangedCallback;
 
     //List and stuff (slots)
-    [SerializeField] private GameObject _slotParent = null;
+    private GameObject _slotParent;
+    [SerializeField] private GameObject _inventoryPrefab = null;
+    private GameObject _inventory = null;
     private Slot[] _slots;
 
     //Init
@@ -126,9 +127,8 @@ public class CharaInventory : MonoBehaviour
     {
         _canvas.SetActive(false);
         //initialisation de la rotation à 90° du canvas (pour LateUpdate)
-        _inventRotation = (Quaternion.Euler(90, 0, 0));
-
-        InitSlots();
+        _inventRotation = (Quaternion.Euler(90, 0, 0));        
+        //InitSlots();
     }
 
     private void InitSlots()
@@ -208,17 +208,23 @@ public class CharaInventory : MonoBehaviour
     }
 
     //Openning and closing Inventory (canvas)
-    public void ToggleInventory()
+    public void ToggleInventory(GameObject parent)
     {
         //Appelé par SpiritHead après avoir appuyé sur E (si le Chara est selectionné)
-        if (_canvas.activeSelf)
+        /*if (_canvas.activeSelf)
         {
             _canvas.SetActive(false);
         }
         else
         {
             _canvas.SetActive(true);
-        }
+        }*/
+
+        _inventory = Instantiate(_inventoryPrefab);
+        _inventory.transform.SetParent(parent.transform, false);
+        _slotParent = _inventory.transform.GetChild(0).GetChild(0).gameObject;
+        InitSlots();
+
     }
 
     public void CloseInventory()
@@ -226,7 +232,11 @@ public class CharaInventory : MonoBehaviour
         //Appelé CloseInventoryOnDeselected() pour fermer l'inventaire quand un Chara est deselectionné
         
         _canvas.SetActive(false);
-        //Debug.Log("CharaInventory: closed Inventory after being deselected");
+        if (_inventory != null)
+        {
+            Destroy(_inventory);
+        }
+        Debug.Log("CharaInventory: closed Inventory after being deselected");
     }
     
     //Adding and removing item

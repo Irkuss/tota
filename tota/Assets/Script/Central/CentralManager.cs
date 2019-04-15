@@ -26,6 +26,15 @@ public class CentralManager : Photon.MonoBehaviour
     private PermissionsManager.Team team = null;
     private PermissionsManager.Player player = null;
 
+    [SerializeField] private GameObject _inventoryList = null;
+    public GameObject InventoryList { get { return _inventoryList; }}
+
+    [SerializeField] private GameObject _inventoryLayout = null;
+    public GameObject InventoryLayout { get { return _inventoryLayout; } }
+
+    [SerializeField] private GameObject _charaLayout = null;
+    public GameObject CharaLayout { get { return _charaLayout; } }
+
     public void UpdateToolTip(string[] info)
     {
         toolTip.SetActive(true);
@@ -166,10 +175,19 @@ public class CentralManager : Photon.MonoBehaviour
         //L'attribue à notre spirit nouvellement crée
         spirit.GetComponent<SpiritHead>().InitPermissions(player);
 
-        Debug.Log("CentralManager: This spirit is named " + PhotonNetwork.playerName + " and is in team " + teamName);
+        Debug.Log("CentralManager: This spirit is named " + player.Name + " and is in team " + teamName);
 
         //Enleve le bouton de spawn
         tempButton.SetActive(false);
         _charaRef.SetActive(true);
+
+        if (player.IsEqual(permi.GetTeamWithPlayer(player).leaderTeam))
+        {
+            for (int i = 0; i < permi.numberChara; i++)
+            {
+                spirit.GetComponent<SpiritHead>().TryCharaSpawn(true,_charaLayout);
+            }
+        }
+        
     }
 }
