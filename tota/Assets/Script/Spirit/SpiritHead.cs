@@ -6,17 +6,24 @@ using UnityEngine.EventSystems;
 public class SpiritHead : Photon.MonoBehaviour
 {
     //utilisé pour debugger (à swap avec un scriptable object des que possible)
-    private string _charaPath = "CharaTanguy";
+    private string _charaPath = "CharaJordan";
     [SerializeField] private ItemRecipe bigAppleRecipe = null;
     [SerializeField] private ItemTable itemTable = null;
 
     [SerializeField] private GameObject _spiritCamera = null;
 
+    private GameObject _inventoryList;
+    private GameObject _inventoryLayout;
+    private GameObject _charaLayout;
+    private GameObject _chara;
+
     //Le joueur qui contrôle ce Spirit (ne change pas)
+    private PermissionsManager _permission = PermissionsManager.Instance;
     private PermissionsManager.Player _playerOwner = null;
 
     //Liste des Chara selectionnées
-    private List<GameObject> _selectedList;
+    private static List<GameObject> _selectedList;
+    public static List<GameObject> SelectedList => _selectedList; 
 
     //Unity Callback
     void Start()
@@ -28,12 +35,24 @@ public class SpiritHead : Photon.MonoBehaviour
         }
 
         _selectedList = new List<GameObject>();
+        CentralManager eManager = GameObject.Find("eCentralManager").GetComponent<CentralManager>();
+        _charaLayout = eManager.CharaLayout;
+        _inventoryLayout = eManager.InventoryLayout;
+        _inventoryList = eManager.InventoryList;
+
     }
 
     void Update()
     {
-        //Right Left click check
-        ClickUpdate();
+        if (currentBuild == null)
+        {
+            //Normal Right Left click check
+            ClickUpdate();
+        }
+        else
+        {
+            BuildUpdate();
+        }
 
         //Do all test functions
         TestAll();
@@ -45,7 +64,7 @@ public class SpiritHead : Photon.MonoBehaviour
     private void TestAll()
     {
         //Space Bar check
-        TestCharaSpawn();
+        TestCharaSpawn(false,null);
 
         //Keycode.I check
         TestInventoryAdd();
@@ -56,9 +75,14 @@ public class SpiritHead : Photon.MonoBehaviour
         TestBuild();
     }
 
-    private void TestCharaSpawn()
+    public void TryCharaSpawn(bool force,GameObject charaL)
     {
-        if (Input.GetKeyUp("space"))
+        TestCharaSpawn(force,charaL);
+    }
+
+    private void TestCharaSpawn(bool force,GameObject charaL)
+    {
+        if (Input.GetKeyUp("space") || force)
         {
             //Projection des positions sur le sol
             Vector3 lowPosition = new Vector3(gameObject.transform.position.x, 1, gameObject.transform.position.z);
@@ -69,11 +93,21 @@ public class SpiritHead : Photon.MonoBehaviour
             {
                 Debug.Log("SpiritHead: Instantiation du spirit (offline)");
                 go = Instantiate(Resources.Load<GameObject>(_charaPath), lowPosition, Quaternion.identity);
+                GameObject charaLayout = Instantiate(Resources.Load<GameObject>("CharaRef"));
+                charaLayout.GetComponent<LinkChara>().spirit = this;
+                charaLayout.GetComponent<LinkChara>().chara = go;
             }
             else
             {
                 Debug.Log("SpiritHead: Instantiation du spirit (online)");
                 go = PhotonNetwork.Instantiate(_charaPath, lowPosition, Quaternion.identity, 0);
+                _chara = go;        
+                if (_charaLayout == null)
+                {
+                    _charaLayout = charaL;
+                }
+                gameObject.GetComponent<PhotonView>().RPC("InstantiateCharaRef",PhotonTargets.AllBuffered, _playerOwner.Name);
+                
             }
             
             //Met ce Chara dans notre équipe (par RPC)
@@ -84,6 +118,23 @@ public class SpiritHead : Photon.MonoBehaviour
             
         }
     }
+
+    [PunRPC]
+    private void InstantiateCharaRef(string playerWhoSent)
+    {
+        //Debug.Log("Send : " + playerWhoSent + "    Receive : " + _playerOwner.Name);
+        PermissionsManager.Team team = _permission.GetTeamWithName(_playerOwner.MyTeamName);
+
+        if (team.ContainsPlayer(_permission.GetPlayerWithName(playerWhoSent)))
+        {
+            GameObject charaLayout = Instantiate(Resources.Load<GameObject>("CharaRef"));
+            charaLayout.transform.SetParent(_charaLayout.transform, false);            
+            charaLayout.GetComponent<LinkChara>().spirit = this;
+            charaLayout.GetComponent<LinkChara>().chara = _chara;
+            charaLayout.GetComponent<LinkChara>().Name.text = _chara.GetComponent<CharaRpg>().FullName;
+        }              
+    }
+
     private void TestInventoryAdd()
     {
         if (Input.GetKeyDown(KeyCode.I))
@@ -126,6 +177,7 @@ public class SpiritHead : Photon.MonoBehaviour
             if (currentBuild == null)
             {
                 currentBuild = Instantiate(Resources.Load<GameObject>("testWall"));
+                currentBuild.GetComponent<VisuHandler>().StartVisualisation();
                 desiredBuildRotation = currentBuild.transform.rotation.eulerAngles;
             }
             else
@@ -133,27 +185,40 @@ public class SpiritHead : Photon.MonoBehaviour
                 Destroy(currentBuild);
             }
         }
-        //Gestion du buildMode
-        if (currentBuild != null)
+    }
+    private void BuildUpdate()
+    {
+        //Deplacement du build
+        RaycastHit hit;
+
+        if (ClickedOnSomething(out hit))
         {
-            //Deplacement du build
-            RaycastHit hit;
+            currentBuild.transform.position = hit.point;
+        }
+        //Rotation du build
+        if (Input.GetKeyDown(KeyCode.Alpha1)) desiredBuildRotation = desiredBuildRotation + new Vector3(0, -90, 0);
+        if (Input.GetKeyDown(KeyCode.Alpha2)) desiredBuildRotation = desiredBuildRotation + new Vector3(0, 90, 0);
+        currentBuild.transform.rotation = Quaternion.Lerp(currentBuild.transform.rotation, Quaternion.Euler(desiredBuildRotation), 0.5f);
 
-            if (ClickedOnSomething(out hit))
+        if (Input.GetMouseButtonDown(1))
+        {
+            if (!EventSystem.current.IsPointerOverGameObject())
             {
-                currentBuild.transform.position = hit.point;
+                //right click
+                //Sortie du mode building
+                Destroy(currentBuild);
+                currentBuild = null;
             }
-            //Rotation du build
-            if (Input.GetKeyDown(KeyCode.Alpha1)) desiredBuildRotation = desiredBuildRotation + new Vector3(0, -90, 0);
-            if (Input.GetKeyDown(KeyCode.Alpha2)) desiredBuildRotation = desiredBuildRotation + new Vector3(0,  90, 0);
-
-            currentBuild.transform.rotation = Quaternion.Lerp(currentBuild.transform.rotation, Quaternion.Euler(desiredBuildRotation), 0.5f);
-
-            //Placer le bâtiment
-            if (Input.GetKeyDown(KeyCode.Alpha3))
+        }
+        else if (Input.GetMouseButtonDown(0))
+        {
+            if (!EventSystem.current.IsPointerOverGameObject())
             {
+                //left click
+                //Placer le bâtiment
                 currentBuild.GetComponent<VisuHandler>().EndVisualisation();
                 currentBuild.transform.rotation = Quaternion.Euler(desiredBuildRotation);
+                GameObject.Find("eCentralManager").GetComponent<PropManager>().PlaceAlreadyExistingProp(currentBuild, currentBuild.transform.rotation.eulerAngles.y, "testWall");
                 currentBuild = null;
             }
         }
@@ -210,12 +275,18 @@ public class SpiritHead : Photon.MonoBehaviour
                 {
                     DeselectAllExcept(hit.transform.gameObject);
                 }
-
-                ClickOnChara(hit.transform.gameObject);
+                else
+                {
+                    ClickOnChara(hit.transform.gameObject);
+                }
             }
             else
             {
-                GameObject.Find("eCentralManager").GetComponent<CentralManager>().DeactivateToolTip(); //pas beau
+                GameObject.Find("eCentralManager").GetComponent<CentralManager>().DeactivateToolTip();
+                foreach (Transform trans in _inventoryLayout.transform)
+                {
+                    Destroy(trans.gameObject);
+                }
                 DeselectAll();
             }
         }
@@ -224,20 +295,26 @@ public class SpiritHead : Photon.MonoBehaviour
     private void RightClickUpdate()
     {
         RaycastHit hit;
-
         if (ClickedOnSomething(out hit))
         {
+            Debug.Log("RightClickUpdate: clicked on something");
             if (hit.transform.CompareTag("Interactable"))
             {
                 Interactable inter = hit.collider.GetComponent<Interactable>();
                 if (inter != null)
                 {
+                    Debug.Log("RightClickUpdate: Setting focus");
                     SetFocusAll(inter);
                 }
             }
             else
             {
+                Debug.Log("RightClickUpdate: removing focus, pointing a destination to charas");
                 RemoveFocusAll();
+                foreach(Transform trans in _inventoryLayout.transform)
+                {
+                    Destroy(trans.gameObject);
+                }
                 ActionMoveAllTo(hit.point);
             }
         }
@@ -251,19 +328,24 @@ public class SpiritHead : Photon.MonoBehaviour
         //Debug.Log("SpiritHead: On essaye de selectionné chara");
         if (chara.GetComponent<CharaHead>().LeftClickedOn(_playerOwner))
         {
-            GameObject.Find("eCentralManager").GetComponent<CentralManager>().UpdateToolTip(chara.GetComponent<CharaRpg>().GetToolTipInfo());
-
-            //Debug.Log("SpiritHead: On a réussi ");
+            Debug.Log("SpiritHead: On a réussi ");
             if (!(_selectedList.Contains(chara)))
             {
                 _selectedList.Add(chara);
+                GameObject.Find("eCentralManager").GetComponent<CentralManager>().UpdateToolTip(chara.GetComponent<CharaRpg>().GetToolTipInfo());
+                chara.GetComponent<CharaInventory>().ToggleInterface(_inventoryLayout);
+            }
+            else
+            {
+                _selectedList.Remove(chara);
+                GameObject.Find("eCentralManager").GetComponent<CentralManager>().DeactivateToolTip();
             }
         }
         else
         {
             GameObject.Find("eCentralManager").GetComponent<CentralManager>().DeactivateToolTip();
 
-            //Debug.Log("SpiritHead: On a échoué ");
+            Debug.Log("SpiritHead: On a échoué ");
             if (_selectedList.Contains(chara))
             {
                 _selectedList.Remove(chara);
@@ -297,7 +379,12 @@ public class SpiritHead : Photon.MonoBehaviour
             }
         }
         _selectedList.Clear();
-        _selectedList.Add(exception);
+        ClickOnChara(exception);
+    }
+
+    public bool ContainsChara(GameObject chara)
+    {
+        return _selectedList.Contains(chara);
     }
 
     //Private methods
@@ -340,14 +427,29 @@ public class SpiritHead : Photon.MonoBehaviour
     {
         if (Input.GetKeyDown(KeyCode.E))
         {
-            //Toggle l'inventaire dans chaque Chara selectionné
-            //(l'ouvre s'il est fermé, le ferme s'il est ouvert)
-            foreach (GameObject Chara in _selectedList)
-            {
-                //Chara.GetComponent<Inventory>().DisplayInventory();
-                Chara.GetComponent<CharaInventory>().ToggleInventory();
-            }
+            _inventoryList.SetActive(!_inventoryList.activeSelf);            
         }
+        if(_inventoryLayout.transform.childCount == 0)
+        {
+            _inventoryList.SetActive(false);
+        }
+    }
+
+    public void MoveCamera(Vector3 pos)
+    {
+        float speed = 5;
+        float startTime = Time.time;
+        Vector3 start = new Vector3(gameObject.transform.position.x,
+            gameObject.transform.position.y, gameObject.transform.position.z);
+
+        Vector3 posxz = new Vector3(pos.x, gameObject.transform.position.y, pos.z);
+        float journeyLength = Vector3.Distance(start, posxz);
+
+        float distCovered = (Time.time - startTime) * speed;
+        float fracJourney = distCovered / journeyLength;
+
+        gameObject.transform.position = Vector3.Lerp(start, posxz,1/2);
+
     }
 
 }

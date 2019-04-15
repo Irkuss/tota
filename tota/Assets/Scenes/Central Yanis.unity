@@ -2525,7 +2525,6 @@ GameObject:
   - component: {fileID: 1082215651}
   - component: {fileID: 1082215650}
   - component: {fileID: 1082215648}
-  - component: {fileID: 1082215647}
   m_Layer: 0
   m_Name: eCentralManager
   m_TagString: Untagged
@@ -2547,18 +2546,6 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 5
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &1082215647
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1082215644}
-  m_Enabled: 0
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: d0a61f94f94c5c04087e5258344cd66b, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!114 &1082215648
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2572,12 +2559,11 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   surface: {fileID: 830072122}
-  nodeMiddleX: 0
-  nodeMiddleY: 0
-  table22: {fileID: 11400000, guid: e3db95216ea081947a77a06e8c696b99, type: 2}
-  table24: {fileID: 11400000, guid: b00cd341c197cb74a84fb61d94b7586d, type: 2}
-  table42left: {fileID: 11400000, guid: 3768bc61430946a45b99e8f7e5e61f0c, type: 2}
-  table42right: {fileID: 11400000, guid: 93453ca7ff46f0e4a9750fbbb6ac43a3, type: 2}
+  _table22: {fileID: 0}
+  _table24: {fileID: 0}
+  _table42left: {fileID: 0}
+  _table42right: {fileID: 0}
+  spawnPoint: 4
 --- !u!114 &1082215649
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2631,7 +2617,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   generator: {fileID: 1082215648}
   spawnPoint: {x: 0, y: 0, z: 0}
-  permissions: {fileID: 1082215647}
   tempButton: {fileID: 1848104836}
   toolTip: {fileID: 1619961016}
   pauseMenu: {fileID: 661074653}

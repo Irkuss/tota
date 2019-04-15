@@ -68,6 +68,12 @@ public class PermissionsManager : MonoBehaviour
             get => _linkedColor;
         }
 
+        private Player _leaderTeam;
+        public Player leaderTeam
+        {
+            get { return _leaderTeam; }
+        }
+
         public Team(string name)
         {
             _name = name;
@@ -94,12 +100,21 @@ public class PermissionsManager : MonoBehaviour
         {
             if (ContainsPlayer(player)) return;
             _playerList.Add(player);
+            _leaderTeam = _playerList[0];
         }
 
         public void RemovePlayer(Player player)
         {
             if (!ContainsPlayer(player)) return;
             _playerList.Remove(player);
+            if (_playerList.Count != 0)
+            {
+                _leaderTeam = _playerList[0];
+            }
+            else
+            {
+                _leaderTeam = null;
+            }
         }
 
         //Getter
@@ -148,6 +163,8 @@ public class PermissionsManager : MonoBehaviour
     //Unity Callbacks
 
     public static PermissionsManager Instance;
+
+    public int numberChara;
 
     private void Awake()
     {
@@ -235,7 +252,6 @@ public class PermissionsManager : MonoBehaviour
         {
             GameObject.Find("eLaucher").GetComponent<Launcher>().TeamListing(GetTeamWithName(teamName));
         }
-        
     }
 
     [PunRPC]
@@ -244,12 +260,21 @@ public class PermissionsManager : MonoBehaviour
         Player player = GetPlayerWithName(playerName);
         Team team = GetTeamWithName(teamName); 
 
+        if (player == null || team == null)
+        {
+            return;
+        }
+
         team.RemovePlayer(player);
         GameObject.Find("eLaucher").GetComponent<Launcher>().PlayerLeftTeam(player);
         if (team.PlayerList.Count == 0)
         {
             GameObject.Find("eLaucher").GetComponent<Launcher>().TeamLeftRoom(team);
             TeamList.Remove(team);
+        }
+        else
+        {
+            GameObject.Find("eLaucher").GetComponent<Launcher>().TeamListing(team);
         }
         
     }

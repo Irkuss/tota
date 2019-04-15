@@ -12,22 +12,26 @@ public class OptionRoom : MonoBehaviour
     private Toggle passwordToggle;
     private Toggle maxInRoomToggle;
     private Toggle maxInTeamToggle;
+    private Toggle heightMapToggle;
     private Slider randomChara;
 
     [SerializeField] private GameObject passwordObject = null;
     [SerializeField] private GameObject maxInRoom = null;
     [SerializeField] private GameObject maxInTeam = null;
+    [SerializeField] private GameObject heightMap = null;
 
     [SerializeField] private InputField passwordInput = null;
     [SerializeField] private Text maxInRoomInput = null;
     [SerializeField] private Text maxInTeamInput = null;
     [SerializeField] private InputField roomName = null;
+    [SerializeField] private InputField heightMapInput = null;
 
     [SerializeField] private GameObject randomCharacters = null;
 
     private string _password = "";
     private string _maxInRoom = "";
     private string _maxInTeam = "";
+    private string _heightMap = "";
     private int _randomChara = 0;
     private string _room = "";
 
@@ -36,6 +40,7 @@ public class OptionRoom : MonoBehaviour
         passwordToggle = passwordObject.GetComponentInChildren<Toggle>();
         maxInRoomToggle = maxInRoom.GetComponentInChildren<Toggle>();
         maxInTeamToggle = maxInTeam.GetComponentInChildren<Toggle>();
+        heightMapToggle = heightMap.GetComponentInChildren<Toggle>();
         randomChara = randomCharacters.GetComponentInChildren<Slider>();
     }
 
@@ -81,6 +86,20 @@ public class OptionRoom : MonoBehaviour
         }
     }
 
+    public void HeightMapToggle()
+    {
+        InputField input = heightMap.GetComponentInChildren<InputField>();
+        if (input.IsActive())
+        {
+            input.enabled = false;
+            input.text = "";
+        }
+        else
+        {
+            input.enabled = true;
+        }
+    }
+
     public void PasswordEnd()
     {
         _password = passwordInput.text;
@@ -98,7 +117,7 @@ public class OptionRoom : MonoBehaviour
 
     public void CreateRoom()
     {
-        //_randomChara = (int) randomChara.value;
+        if (heightMapInput.text == "") return;
 
         RoomOptions roomOptions = new RoomOptions();
 
@@ -114,13 +133,15 @@ public class OptionRoom : MonoBehaviour
         if (_maxInTeam == "") roomOptions.CustomRoomProperties.Add("maxInTeam", 4);
         else roomOptions.CustomRoomProperties.Add("maxInTeam", int.Parse(_maxInTeam));
 
-        //roomOptions.CustomRoomProperties.Add("charaPerTeam", randomChara.value);
+        roomOptions.CustomRoomProperties.Add("heightMap", int.Parse(heightMapInput.text));
+
+        PermissionsManager.Instance.numberChara = (int) randomChara.value;
 
         roomOptions.CustomRoomPropertiesForLobby = new string[]
         {
             "password",
             "maxInTeam",
-            "charaPerTeam"
+            "heightMap"
         };
 
         if (roomName.text != "")
@@ -128,6 +149,7 @@ public class OptionRoom : MonoBehaviour
             passwordObject.GetComponentInChildren<InputField>().text = "";
             maxInRoom.GetComponentInChildren<InputField>().text = "";
             maxInTeam.GetComponentInChildren<InputField>().text = "";
+            heightMapInput.text = "";
             randomChara.value = 0;
             _room = roomName.text;
             roomName.text = "";
@@ -140,6 +162,7 @@ public class OptionRoom : MonoBehaviour
         passwordObject.GetComponentInChildren<InputField>().text = "";
         maxInRoom.GetComponentInChildren<InputField>().text = "";
         maxInTeam.GetComponentInChildren<InputField>().text = "";
+        heightMapInput.text = "";
         randomChara.value = 0;
         roomName.text = "";
         current.SetActive(false);
