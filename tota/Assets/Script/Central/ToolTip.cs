@@ -9,7 +9,6 @@ public class ToolTip : MonoBehaviour
 
 
     //On recupere les Component Text qui seront modifiés
-    [SerializeField] private Text _nameText = null;
     [SerializeField] private Text _strengthText = null;
     [SerializeField] private Text _intelligenceText = null;
     [SerializeField] private Text _perceptionText = null;
@@ -35,8 +34,6 @@ public class ToolTip : MonoBehaviour
     //Appelé après avoir cliqué sur un Chara dans SpiritHead.cs/ClickOnChara()
     public void UpdateWith(string[] info)
     {
-        _nameText.text = "Name: " + info[0];
-
         _strengthText.text = "Strength: " + info[1];
         _intelligenceText.text = "Intelligence: " + info[2];
         _perceptionText.text = "Perception: " + info[3];
@@ -49,8 +46,6 @@ public class ToolTip : MonoBehaviour
 
     public void UpdateTool(string[] info)
     {
-        _nameText.text = "Name: " + info[0];
-
         _strengthSlider.value = int.Parse(info[1]);
         _intelligenceSlider.value = int.Parse(info[2]);
         _perceptionSlider.value = int.Parse(info[3]);

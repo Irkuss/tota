@@ -6,7 +6,7 @@ using UnityEngine.EventSystems;
 public class SpiritHead : Photon.MonoBehaviour
 {
     //utilisé pour debugger (à swap avec un scriptable object des que possible)
-    private string _charaPath = "CharaJordan";
+    private string _charaPath = "CharaYayko";
     [SerializeField] private ItemRecipe bigAppleRecipe = null;
     [SerializeField] private ItemTable itemTable = null;
 
@@ -311,10 +311,6 @@ public class SpiritHead : Photon.MonoBehaviour
             {
                 Debug.Log("RightClickUpdate: removing focus, pointing a destination to charas");
                 RemoveFocusAll();
-                foreach(Transform trans in _inventoryLayout.transform)
-                {
-                    Destroy(trans.gameObject);
-                }
                 ActionMoveAllTo(hit.point);
             }
         }
@@ -334,6 +330,7 @@ public class SpiritHead : Photon.MonoBehaviour
                 _selectedList.Add(chara);
                 GameObject.Find("eCentralManager").GetComponent<CentralManager>().UpdateToolTip(chara.GetComponent<CharaRpg>().GetToolTipInfo());
                 chara.GetComponent<CharaInventory>().ToggleInterface(_inventoryLayout);
+                chara.GetComponent<CharaInventory>().UpdateStats(chara.GetComponent<CharaRpg>().GetToolTipInfo());
             }
             else
             {

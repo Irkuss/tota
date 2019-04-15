@@ -14,13 +14,13 @@ public class PropHandler : Interactable
     }
 
     //Used to send special command to all gameobject of this id (ex: Add item to inventory)
-    public void CommandSend(byte command)
+    public void CommandSend(int[] command)
     {
         GameObject.Find("eCentralManager").GetComponent<PropManager>().SendPropCommand(_id, command);
     }
     //called by PropManager when receiving special command
     // !!! THE PARSING SHOULD OVERWRITE THIS FUNCTION !!!
-    public virtual void CommandReceive(byte command)
+    public virtual void CommandReceive(int[] command)
     {
         //overwrite to parse command
     }

@@ -57,7 +57,7 @@ public class PropManager : MonoBehaviour
         }
 
         //Sending special command
-        public void ReceivePropCommand(byte command)
+        public void ReceivePropCommand(int[] command)
         {
             if (_go != null) _go.GetComponent<PropHandler>().CommandReceive(command);
         }
@@ -212,11 +212,11 @@ public class PropManager : MonoBehaviour
         }
     }
 
-    public void SendPropCommand(int id, byte command)
+    public void SendPropCommand(int id, int[] command)
     {
         GetComponent<PhotonView>().RPC("RPC_SendPropCommand", PhotonTargets.AllBuffered, id, command);
     }
-    [PunRPC] private void RPC_SendPropCommand(int id, byte command)
+    [PunRPC] private void RPC_SendPropCommand(int id, int[] command)
     {
         RealProp prop = FindPropWithId(id);
 

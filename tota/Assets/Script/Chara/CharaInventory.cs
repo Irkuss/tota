@@ -213,6 +213,12 @@ public class CharaInventory : MonoBehaviour
         InitSlots();
     }
 
+    public void UpdateStats(string[] stats)
+    {
+        GameObject stat = _interface.transform.GetChild(0).GetChild(0).GetChild(0).GetChild(0).gameObject;
+        stat.GetComponent<ToolTip>().UpdateTool(stats);
+    }
+
     public void CloseInterface()
     {
         //Appelé CloseInventoryOnDeselected() pour fermer l'inventaire quand un Chara est deselectionné
