@@ -166,6 +166,8 @@ public class PermissionsManager : MonoBehaviour
 
     public int numberChara;
 
+    public int heightMap;
+
     private void Awake()
     {
         if (Instance == null)

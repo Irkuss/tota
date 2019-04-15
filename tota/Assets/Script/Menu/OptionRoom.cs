@@ -116,9 +116,7 @@ public class OptionRoom : MonoBehaviour
     }
 
     public void CreateRoom()
-    {
-        if (heightMapInput.text == "") return;
-
+    {   
         RoomOptions roomOptions = new RoomOptions();
 
         if (_maxInRoom == "") roomOptions.MaxPlayers = 4;
@@ -133,9 +131,18 @@ public class OptionRoom : MonoBehaviour
         if (_maxInTeam == "") roomOptions.CustomRoomProperties.Add("maxInTeam", 4);
         else roomOptions.CustomRoomProperties.Add("maxInTeam", int.Parse(_maxInTeam));
 
-        roomOptions.CustomRoomProperties.Add("heightMap", int.Parse(heightMapInput.text));
+        if (heightMapInput.text == "")
+        {
+            roomOptions.CustomRoomProperties.Add("heightMap", 1);
+            PermissionsManager.Instance.heightMap = 1;
+        }
+        else
+        {
+            roomOptions.CustomRoomProperties.Add("heightMap", int.Parse(heightMapInput.text));
+            PermissionsManager.Instance.heightMap = int.Parse(heightMapInput.text);
+        }
 
-        PermissionsManager.Instance.numberChara = (int) randomChara.value;
+        PermissionsManager.Instance.numberChara = (int) randomChara.value;        
 
         roomOptions.CustomRoomPropertiesForLobby = new string[]
         {
