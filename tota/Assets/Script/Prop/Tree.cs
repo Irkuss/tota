@@ -8,10 +8,11 @@ public class Tree : Interactable
 
     public override void Interact(CharaHead chara)
     {
+        Debug.Log("Tree: Interacting");
         //ajoute du bois au joueur
         for (int i = 0; i < Random.Range(4, 7); i++)
         {
-            chara.GetComponent<CharaInventory>().Add(woodRaw);
+            //chara.GetComponent<CharaInventory>().Add(woodRaw);
         }
         //Se détruit
         GetComponent<PropHandler>().DestroySelf();

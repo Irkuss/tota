@@ -203,7 +203,7 @@ public class SpiritHead : Photon.MonoBehaviour
                 //Placer le bâtiment
                 currentBuild.GetComponent<VisuHandler>().EndVisualisation();
                 currentBuild.transform.rotation = Quaternion.Euler(desiredBuildRotation);
-                GameObject.Find("eCentralManager").GetComponent<PropManager>().PlaceProp(currentBuild, currentBuild.transform.rotation.eulerAngles.y, "testWall");
+                GameObject.Find("eCentralManager").GetComponent<PropManager>().PlaceAlreadyExistingProp(currentBuild, currentBuild.transform.rotation.eulerAngles.y, "testWall");
                 currentBuild = null;
             }
         }
@@ -274,19 +274,21 @@ public class SpiritHead : Photon.MonoBehaviour
     private void RightClickUpdate()
     {
         RaycastHit hit;
-
         if (ClickedOnSomething(out hit))
         {
+            Debug.Log("RightClickUpdate: clicked on something");
             if (hit.transform.CompareTag("Interactable"))
             {
                 Interactable inter = hit.collider.GetComponent<Interactable>();
                 if (inter != null)
                 {
+                    Debug.Log("RightClickUpdate: Setting focus");
                     SetFocusAll(inter);
                 }
             }
             else
             {
+                Debug.Log("RightClickUpdate: removing focus, pointing a destination to charas");
                 RemoveFocusAll();
                 ActionMoveAllTo(hit.point);
             }

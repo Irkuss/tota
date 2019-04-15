@@ -122,7 +122,8 @@ public class CharaHead : MonoBehaviour
 
     public void SetFocus(Interactable inter)
     {
-         _focus = inter;
+
+        _focus = inter;
         _movement.MoveToInter(_focus);
 
         _checkCor = CheckDistanceInter();
@@ -136,6 +137,7 @@ public class CharaHead : MonoBehaviour
             StopCoroutine(_checkCor);
             //Reset le focus
             _focus = null;
+            //Arret l'agent
             _movement.StopAgent();
         }
     }
@@ -146,6 +148,7 @@ public class CharaHead : MonoBehaviour
         {
             yield return new WaitForSeconds(0.5f);
         }
+        Debug.Log("CharaHead: reached Inter");
         //Interragis avec l'Interactable une fois proche
         _focus.Interact(this);
 

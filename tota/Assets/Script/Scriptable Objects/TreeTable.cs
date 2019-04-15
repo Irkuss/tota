@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-[CreateAssetMenu(menuName = "TreeTable")]
+[CreateAssetMenu(menuName = "Prop/TreeTable")]
 public class TreeTable : ScriptableObject
 {
     public string pathTreeFolder;

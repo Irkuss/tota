@@ -1268,44 +1268,41 @@ public class Generator : MonoBehaviour
                 int treeAntiDensity = 200; //The bigger, the lesser tree
                 switch (_biome)
                 {
-                    case WorldBiome.Plain: treeAntiDensity = 2000; break;
-                    case WorldBiome.Arid: treeAntiDensity = 2500; break;
-                    case WorldBiome.Forest: treeAntiDensity = 600; break;
-                    case WorldBiome.DeepForest: treeAntiDensity = 300; break;
+                    case WorldBiome.Plain: treeAntiDensity = 600; break;
+                    case WorldBiome.Arid: treeAntiDensity = 800; break;
+                    case WorldBiome.Forest: treeAntiDensity = 200; break;
+                    case WorldBiome.DeepForest: treeAntiDensity = 100; break;
                     default: treeAntiDensity = 500; break;
                 }
 
                 Debug.Log("Generate: Starting tree placement as MasterClient at '" + x + "," + y + "'");
-                Vector3 position;
-                List<Vector3> treePositions = new List<Vector3>();
+                (int, int) position;
+                List<(int,int)> treePositions = new List<(int, int)>();
                 int rng;
-                for (int i = 0; i < c_worldChunkLength; i++)
+                for (int i = 0; i < c_worldChunkLength; i += 3)
                 {
-                    for (int j = 0; j < c_worldChunkLength; j++)
+                    for (int j = 0; j < c_worldChunkLength; j += 3)
                     {
                         rng = Random.Range(0, treeAntiDensity);
                         if (rng == 0)
                         {
-                            position = new Vector3(j + x * c_worldChunkLength, 0, i + y * c_worldChunkLength);
-
-                            if (IsOnGround(position, 2))
-                            {
-                                if (x == 4 && y == 4) Debug.Log("Generate: Placing a tree at '" + j + "," + i + "'");
-                                treePositions.Add(position);
-                                //MasterPlaceTree(propManager, position);
-                            }
-
+                            //MasterLightPlaceTree(propManager, j + x * Mathf.FloorToInt(c_worldChunkLength), i + y * Mathf.FloorToInt(c_worldChunkLength));
+                            
+                            position = (j + x * Mathf.FloorToInt(c_worldChunkLength), i + y * Mathf.FloorToInt(c_worldChunkLength));
+                            if (IsOnGround(new Vector3(position.Item1,0, position.Item2), 2)) treePositions.Add(position);
+                            
                         }
                     }
+                    if (i % 10 == 0) yield return null;
+                    /*
                     if (i % 100 == 0)
                     {
-                        MasterMassPlaceTree(propManager, treePositions);
-                        yield return null;
+                        MasterMassLightPlaceTree(propManager, treePositions);
+                        yield return new WaitForSeconds(0.1f);
                         treePositions.Clear();
-                    }
+                    }*/
                 }
-                MasterMassPlaceTree(propManager, treePositions);
-
+                MasterMassLightPlaceTree(propManager, treePositions);
                 Debug.Log("Generate: Ending tree placement as MasterClient at '" + x + "," + y + "'");
             }
         }
@@ -1499,24 +1496,31 @@ public class Generator : MonoBehaviour
             }
             return hitOneGround;
         }
-        private void MasterPlaceTree(PropManager propManager, Vector3 pos)
+        private void MasterLightPlaceTree(PropManager propManager, int x, int y)
         {
-            propManager.PlaceProp(pos, Random.Range(0, 4) * 90, treeTable.GetRandomPath());
+            Prop randTree = propTable.GetRandomPropWithType(PropTable.PropType.Tree);
+            propManager.LightPlaceProp(x, y, (byte)Random.Range(0, 4), propTable.GetIdWithProp(randTree));
         }
-        private void MasterMassPlaceTree(PropManager propManager, List<Vector3> treePositions)
+        private void MasterMassLightPlaceTree(PropManager propManager, List<(int, int)> pos)
         {
-            int length = treePositions.Count;
-            Vector3[] pos = new Vector3[length];
-            float[] rots = new float[length];
-            string[] names = new string[length];
+            int length = pos.Count;
+            int[] x = new int[length];
+            int[] y = new int[length];
+            byte[] rot = new byte[length];
+            int[] propIds = new int[length];
 
+            Prop randTree;
             for (int i = 0; i < length; i++)
             {
-                pos[i] = treePositions[i];
-                rots[i] = Random.Range(0, 4) * 90;
-                names[i] = treeTable.GetRandomPath();
+                x[i] = pos[i].Item1;
+                y[i] = pos[i].Item2;
+                rot[i] = (byte)Random.Range(0, 4);
+
+                randTree = propTable.GetRandomPropWithType(PropTable.PropType.Tree);
+                propIds[i] = propTable.GetIdWithProp(randTree);
             }
-            propManager.MassPlaceProp(length, pos, rots, names);
+            
+            propManager.MassLightPlaceProp(length, x, y, rot, propIds);
         }
     }
 
@@ -1563,8 +1567,10 @@ public class Generator : MonoBehaviour
     public static buildTable table42right = null;
     public static buildTable table44left = null;
     public static buildTable table44right = null;
-    [SerializeField] private TreeTable _treeTable = null;
-    public static TreeTable treeTable = null;
+    [SerializeField] private PropTable _propTable = null;
+    public static PropTable propTable = null;
+    //[SerializeField] private TreeTable _treeTable = null;
+    //public static TreeTable treeTable = null;
 
     private void InitBuildTable()
     {
@@ -1575,7 +1581,8 @@ public class Generator : MonoBehaviour
         table44left = _table44left;
         table44right = _table44right;
 
-        treeTable = _treeTable;
+        //treeTable = _treeTable;
+        propTable = _propTable;
     }
     #endregion
 
@@ -1985,15 +1992,14 @@ public class Generator : MonoBehaviour
         //The truest Start
         LoadChunkAround(spawnPoint, spawnPoint);
         Debug.Log("Waiting for end of frame");
+        
+        chunkLeftToLoad = 9;
+
         StartCoroutine(OnGenerationEnded());
-        if (testingWithSmallWorld)
-        {
-            chunkToLoad = 9;
-        }
     }
-    private bool testingWithSmallWorld = true; //Impact OnWorldTypeReceived et SafeLoadChunkAt
-    private static int chunkToLoad = 0;
-    private static int chunkLoaded = 0;
+
+    private int chunkLeftToLoad;
+    private bool loadingChunk = false;
     
 
     //Debut de l'update permanente
@@ -2009,30 +2015,28 @@ public class Generator : MonoBehaviour
         {
             for (int j = -1; j < 2; j++)
             {
-                if (SafeLoadChunkAt(x + i, y + j))
+                if (ChunkHasToBeLoaded(x + i, y + j))
                 {
-                    //Si on doit charger un chunk
+                    while (loadingChunk) yield return null;
+                    loadingChunk = true;
+                    ClientLoadChunk(x + i, y + j);
                     yield return new WaitForSeconds(1f);
                 }
             }
         }
     }
-
-    private bool SafeLoadChunkAt(int x, int y)
+    private bool ChunkHasToBeLoaded(int x, int y)
     {
         if (x >= 0 && y >= 0 && x < _worldLength && y < _worldLength)
         {
-            //Debug.Log("SafeLoadChunkAt: trying at " + x + "," + y);
-            if (!_world[x, y].isLoaded) //Changé au moment de Generate
+            if (!_world[x, y].isLoaded)
             {
-                //Debug.Log("SafeLoadChunkAt: loading at " + x + "," + y);
-                if (!testingWithSmallWorld) chunkToLoad++;
-                ClientLoadChunk(x, y);
                 return true;
             }
         }
         return false;
     }
+    
     private void ClientLoadChunk(int x, int y)
     {
         //Debug.Log("ClientLoadChunk: Asking to master WorldNode Data");
@@ -2105,18 +2109,17 @@ public class Generator : MonoBehaviour
         Debug.Log("ClientGenerateAt: Generating at " + x + "," + y);
         yield return StartCoroutine(_world[x, y].Generate(propManager));
         Debug.Log("ClientGenerateAt: Ended Generation at " + x + "," + y);
-        chunkLoaded++;
+
+        //
+        chunkLeftToLoad--;
+        loadingChunk = false;
     }
 
 
     //Depre
     private IEnumerator OnGenerationEnded()
     {
-        yield return new WaitForSeconds(2f);
-        while (chunkToLoad > chunkLoaded)
-        {
-            yield return new WaitForSeconds(0.5f);
-        }
+        while (loadingChunk || chunkLeftToLoad > 0) yield return null;
 
         GetComponent<CentralManager>().OnGenerationFinished();
         GetComponent<CentralManager>().spawnPoint = new Vector3((spawnPoint + 0.5f) * c_worldChunkLength, CentralManager.cameraStartHeight, (spawnPoint + 0.5f) * c_worldChunkLength);
