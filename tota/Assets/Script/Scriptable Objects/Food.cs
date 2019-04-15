@@ -9,7 +9,17 @@ public class Food : Item
     
     public override void Use(GameObject refInventChara)
     {
-        Debug.Log("Using food:" + this.nickName);
-        refInventChara.GetComponent<CharaRpg>().Eat(foodValue); // On utilise l'item sur le bon chara par référence de son inventaire
+        if (refInventChara.GetComponent<CharaRpg>() != null)
+        {
+            Debug.Log("Using food:" + this.nickName);
+            refInventChara.GetComponentInParent<CharaRpg>().Eat(foodValue); // On utilise l'item sur le bon chara par référence de son inventaire
+        }
+        else
+        {
+            if (SpiritHead.SelectedList.Count != 0)
+            {
+                SpiritHead.SelectedList[0].GetComponent<CharaInventory>().Add(this);
+            }
+        }
     }
 }

@@ -113,13 +113,17 @@ public class CharaInventory : MonoBehaviour
     //List and stuff (slots)
     private GameObject _slotParent;
     [SerializeField] private GameObject _inventoryPrefab = null;
+    [SerializeField] private GameObject _interfacePrefab = null;
     private GameObject _inventory = null;
+    private GameObject _interface = null;
     private Slot[] _slots;
 
     //Init
 
     private void InitSlots()
     {
+        if (_slotParent == null) return;
+
         int childrenCount = _slotParent.transform.childCount;
 
         _slots = new Slot[_inventorySpace];
@@ -188,23 +192,44 @@ public class CharaInventory : MonoBehaviour
     }
 
     //Openning and closing Inventory (canvas)
-    public void ToggleInventory(GameObject parent)
+    public void ToggleInterface(GameObject parent)
     {
+        _interface = Instantiate(_interfacePrefab);
+        _interface.transform.SetParent(parent.transform, false);
+        _interface.transform.GetChild(1).GetChild(0).GetComponent<Text>().text = gameObject.GetComponent<CharaRpg>().FullName;
+
         _inventory = Instantiate(_inventoryPrefab);
-        _inventory.transform.SetParent(parent.transform, false);
+        _inventory.transform.SetParent(_interface.transform.GetChild(0).GetChild(3).GetChild(0), false);
         _slotParent = _inventory.transform.GetChild(0).GetChild(0).gameObject;
         InitSlots();
     }
 
-    public void CloseInventory()
+    public void ToggleInventory(GameObject parent)
+    {
+        _inventory = Instantiate(_inventoryPrefab);
+        _inventory.transform.SetParent(parent.transform, false);
+        _inventory.GetComponent<Image>().color = new Color(212, 210, 97, 100);
+        _slotParent = _inventory.transform.GetChild(0).GetChild(0).gameObject;
+        InitSlots();
+    }
+
+    public void CloseInterface()
     {
         //Appelé CloseInventoryOnDeselected() pour fermer l'inventaire quand un Chara est deselectionné
         
-        if (_inventory != null)
+        if (_interface != null)
+        {
+            Destroy(_interface);
+        }
+        Debug.Log("CharaInventory: closed Inventory after being deselected");
+    }
+
+    public void CloseInventory()
+    {
+        if(_inventory != null)
         {
             Destroy(_inventory);
         }
-        Debug.Log("CharaInventory: closed Inventory after being deselected");
     }
     
     //Adding and removing item
@@ -232,7 +257,7 @@ public class CharaInventory : MonoBehaviour
             Debug.Log("CharaInventory: Item was not present");
             //Si l'item n'était pas dans l'inventaire, ajoute un exemplaire de cet item
             //inventory.Add(item, 1);
-            GetComponent<PhotonView>().RPC("AddWithId", PhotonTargets.AllBuffered, itemTable.GetIdWithItem(item));
+            gameObject.GetComponent<PhotonView>().RPC("AddWithId", PhotonTargets.AllBuffered, itemTable.GetIdWithItem(item));
         }
         Debug.Log("CharaInventory: Item has been added");
         //Appelle le Callback en s'assurant que quelqu'un écoute
@@ -245,7 +270,7 @@ public class CharaInventory : MonoBehaviour
 
     public void Remove(Item item)
     {
-        GetComponent<PhotonView>().RPC("RemoveWithId", PhotonTargets.AllBuffered, itemTable.GetIdWithItem(item));
+        gameObject.GetComponent<PhotonView>().RPC("RemoveWithId", PhotonTargets.AllBuffered, itemTable.GetIdWithItem(item));
 
         //inventory.Remove(item);
         //UpdateUI();
@@ -253,7 +278,7 @@ public class CharaInventory : MonoBehaviour
 
     public void ModifyCount(Item item, int countModifier)
     {
-        GetComponent<PhotonView>().RPC("ModifyCountWithId", PhotonTargets.AllBuffered, itemTable.GetIdWithItem(item), countModifier);
+        gameObject.GetComponent<PhotonView>().RPC("ModifyCountWithId", PhotonTargets.AllBuffered, itemTable.GetIdWithItem(item), countModifier);
     }
 
     //RPC functions

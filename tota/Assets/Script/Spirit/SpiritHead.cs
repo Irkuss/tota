@@ -22,7 +22,8 @@ public class SpiritHead : Photon.MonoBehaviour
     private PermissionsManager.Player _playerOwner = null;
 
     //Liste des Chara selectionnées
-    private List<GameObject> _selectedList;
+    private static List<GameObject> _selectedList;
+    public static List<GameObject> SelectedList => _selectedList; 
 
     //Unity Callback
     void Start()
@@ -260,7 +261,11 @@ public class SpiritHead : Photon.MonoBehaviour
             }
             else
             {
-                GameObject.Find("eCentralManager").GetComponent<CentralManager>().DeactivateToolTip(); //pas beau
+                GameObject.Find("eCentralManager").GetComponent<CentralManager>().DeactivateToolTip();
+                foreach (Transform trans in _inventoryLayout.transform)
+                {
+                    Destroy(trans.gameObject);
+                }
                 DeselectAll();
             }
         }
@@ -283,6 +288,10 @@ public class SpiritHead : Photon.MonoBehaviour
             else
             {
                 RemoveFocusAll();
+                foreach(Transform trans in _inventoryLayout.transform)
+                {
+                    Destroy(trans.gameObject);
+                }
                 ActionMoveAllTo(hit.point);
             }
         }
@@ -301,7 +310,7 @@ public class SpiritHead : Photon.MonoBehaviour
             {
                 _selectedList.Add(chara);
                 GameObject.Find("eCentralManager").GetComponent<CentralManager>().UpdateToolTip(chara.GetComponent<CharaRpg>().GetToolTipInfo());
-                chara.GetComponent<CharaInventory>().ToggleInventory(_inventoryLayout);
+                chara.GetComponent<CharaInventory>().ToggleInterface(_inventoryLayout);
             }
             else
             {
@@ -397,7 +406,7 @@ public class SpiritHead : Photon.MonoBehaviour
         {
             _inventoryList.SetActive(!_inventoryList.activeSelf);            
         }
-        if(_selectedList.Count == 0)
+        if(_inventoryLayout.transform.childCount == 0)
         {
             _inventoryList.SetActive(false);
         }
@@ -407,14 +416,16 @@ public class SpiritHead : Photon.MonoBehaviour
     {
         float speed = 5;
         float startTime = Time.time;
-        Vector3 start = gameObject.transform.position;
+        Vector3 start = new Vector3(gameObject.transform.position.x,
+            gameObject.transform.position.y, gameObject.transform.position.z);
+
         Vector3 posxz = new Vector3(pos.x, gameObject.transform.position.y, pos.z);
         float journeyLength = Vector3.Distance(start, posxz);
 
         float distCovered = (Time.time - startTime) * speed;
         float fracJourney = distCovered / journeyLength;
 
-        gameObject.transform.position = Vector3.Lerp(start, posxz, fracJourney);
+        gameObject.transform.position = Vector3.Lerp(start, posxz,1/2);
 
     }
 

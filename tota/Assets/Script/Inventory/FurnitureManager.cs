@@ -16,12 +16,12 @@ public class FurnitureManager : Interactable
 
         while (fill.fillAmount < 1)
         {
-            fill.fillAmount += Time.deltaTime / 60;            
+            fill.fillAmount += Time.deltaTime / 3600;            
         }
         if (furniture.usable)
         {
             fill.color = Color.green;
-            furniture.Interact(chara,GameObject.Find("eCentralManager").GetComponent<CentralManager>().FurnitureInventory,this);
+            furniture.Interact(chara,GameObject.Find("eCentralManager").GetComponent<CentralManager>().InventoryLayout,this);
         }
         else
         {

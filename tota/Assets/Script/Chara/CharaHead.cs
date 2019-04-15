@@ -112,7 +112,7 @@ public class CharaHead : MonoBehaviour
     private void CloseInventoryOnDeselected()
     {
         //Appelé par Deselect()
-        GetComponent<CharaInventory>().CloseInventory();
+        GetComponent<CharaInventory>().CloseInterface();
         Debug.Log("CharaHead: closing inventory of a deselected Chara");
     }
 

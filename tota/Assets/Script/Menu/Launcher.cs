@@ -311,7 +311,7 @@ public class Launcher : Photon.PunBehaviour
     public void AddTeam(string teamName)
     {
         PermissionsManager permissions = PermissionsManager.Instance;
-        if (permissions.GetTeamWithName(teamName) != null && permissions.GetTeamWithPlayer(permissions.GetPlayerWithName(PhotonNetwork.player.NickName)) != null)
+        if (permissions.GetTeamWithName(teamName) != null)//&& permissions.GetTeamWithPlayer(permissions.GetPlayerWithName(PhotonNetwork.player.NickName)) != null
         {
             return;
         }
@@ -324,6 +324,8 @@ public class Launcher : Photon.PunBehaviour
         PermissionsManager permissions = PermissionsManager.Instance;
         PermissionsManager.Player playerPerm = permissions.GetPlayerWithName(player.NickName);
 
+        if (permissions.GetTeamWithName(teamName) == null) return;
+
         if (playerPerm != null && permissions.GetTeamWithName(teamName) != null)
         {
             if (permissions.GetTeamWithName(teamName) == permissions.GetTeamWithPlayer(playerPerm)) return;
@@ -332,12 +334,15 @@ public class Launcher : Photon.PunBehaviour
         int playersInTeam = permissions.GetTeamWithName(teamName).PlayerList.Count;
         if (playersInTeam < (int) PhotonNetwork.room.CustomProperties["maxInTeam"])
         {
-            foreach (var team in permissions.TeamList)
+            int i = 0;
+            while (i < permissions.TeamList.Count)
             {
+                PermissionsManager.Team team = permissions.TeamList[i];
                 if (playerPerm != null && team.ContainsPlayer(playerPerm))
                 {
                     GameObject.Find("PermissionManager").GetComponent<PhotonView>().RPC("RemovePlayerFromTeam", PhotonTargets.AllBuffered, team.Name, playerPerm.Name);
                 }
+                i += 1;
             }
             GameObject.Find("PermissionManager").GetComponent<PhotonView>().RPC("AddNewPlayerToTeam", PhotonTargets.AllBuffered, teamName, player.NickName,false);
             gameObject.GetComponent<PhotonView>().RPC("PlayerLeftNoTeam", PhotonTargets.AllBuffered, player);

@@ -231,6 +231,8 @@ MonoBehaviour:
   itemTable: {fileID: 11400000, guid: 53de43c060c7ffe459db8e15c09cd294, type: 2}
   _inventoryPrefab: {fileID: 7954770632000053668, guid: a13de8f0882a5b64bb3c486545a7e13f,
     type: 3}
+  _interfacePrefab: {fileID: 3179820777865773430, guid: f0c0e915b62a47644b4d813f26fda3bf,
+    type: 3}
 --- !u!114 &2321548132533987262
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -247,11 +249,12 @@ MonoBehaviour:
   group: 0
   OwnerShipWasTransfered: 0
   prefixBackup: -1
-  synchronization: 0
+  synchronization: 3
   onSerializeTransformOption: 3
   onSerializeRigidBodyOption: 2
   ownershipTransfer: 0
-  ObservedComponents: []
+  ObservedComponents:
+  - {fileID: 0}
   ObservedComponentsFoldoutOpen: 1
   viewIdField: 0
   instantiationId: -1
