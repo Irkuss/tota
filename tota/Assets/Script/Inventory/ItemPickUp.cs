@@ -34,7 +34,14 @@ public class ItemPickUp : Interactable
         //NB: dans le cas où le Chara n'a plus de place, Add() a retourné false
         if (pickedUp)
         {
-            Destroy(gameObject);
+            GetComponent<PhotonView>().RPC("MasterDestroySelf", PhotonTargets.MasterClient);
+            //Destroy(gameObject);
         }
+    }
+
+    [PunRPC] private void MasterDestroySelf()
+    {
+        Debug.Log("Confirmed received RPC MasterDestroySelf");
+        //PhotonNetwork.Destroy(gameObject);
     }
 }

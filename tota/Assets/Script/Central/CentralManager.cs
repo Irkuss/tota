@@ -6,8 +6,13 @@ using UnityEngine.UI;
 
 public class CentralManager : Photon.MonoBehaviour
 {
+    //Generation, spirit spawn et camera Start
+
     public Generator generator;
     public Vector3 spawnPoint;
+
+    public const float cameraStartHeight = 800;
+    public float cameraStartDownAngle = 90f;
     
     //Bouton et interface
     public GameObject tempButton;
@@ -39,6 +44,8 @@ public class CentralManager : Photon.MonoBehaviour
     {
         toolTip.SetActive(false);
     }
+    
+
 
     //Unity Callbacks
     private void Awake()
@@ -54,6 +61,17 @@ public class CentralManager : Photon.MonoBehaviour
 
     private void Start()
     {
+        int spawnPoint = generator.spawnPoint;
+
+        Transform cameraTransform = Camera.main.gameObject.transform;
+
+        cameraTransform.position = 
+            new Vector3(
+                (spawnPoint + 0.5f) * Generator.c_worldChunkLength, 
+                cameraStartHeight, 
+                (spawnPoint + 0.5f) * Generator.c_worldChunkLength);
+        cameraTransform.rotation = Quaternion.Euler(new Vector3(cameraStartDownAngle,0,0));
+        
         tempButton.SetActive(false);
     }
 

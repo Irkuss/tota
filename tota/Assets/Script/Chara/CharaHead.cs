@@ -33,7 +33,7 @@ public class CharaHead : MonoBehaviour
 
         if (playerWhoClickedUs == null) return false;
 
-        Debug.Log("Chara: I have been clicked by "+ playerWhoClickedUs.Name);
+        //Debug.Log("Chara: I have been clicked by "+ playerWhoClickedUs.Name);
 
         PermissionsManager.Team team = _permissions.GetTeam();
         if (team == null) return false;
@@ -44,7 +44,7 @@ public class CharaHead : MonoBehaviour
             if (!_permissions.HasOwner())
             {
                 //Si personne controle Chara, le joueur prend controle de Chara
-                Debug.Log("Chara: now controlled by "+ playerWhoClickedUs.Name + " (was empty)");
+                //Debug.Log("Chara: now controlled by "+ playerWhoClickedUs.Name + " (was empty)");
 
                 SelectAsPlayer(playerWhoClickedUs);
                 return true;
@@ -52,7 +52,7 @@ public class CharaHead : MonoBehaviour
             else if (_permissions.IsOwner(playerWhoClickedUs.Name))
             {
                 //Si le joueur qui nous controle a cliqué sur Chara -> deselect
-                Debug.Log("Chara:deselected by " + playerWhoClickedUs.Name);
+                //Debug.Log("Chara:deselected by " + playerWhoClickedUs.Name);
                 Deselect();
                 return false;
                 
@@ -66,7 +66,7 @@ public class CharaHead : MonoBehaviour
         else
         {
             //Si le joueur qui a cliqué sur Chara n'appartient pas à notre équipe
-            Debug.Log("Chara: Access Denied: " + playerWhoClickedUs.Name + " is not in team " + _permissions.GetTeam().Name);
+            //Debug.Log("Chara: Access Denied: " + playerWhoClickedUs.Name + " is not in team " + _permissions.GetTeam().Name);
             return false;
         }
     }
@@ -111,7 +111,6 @@ public class CharaHead : MonoBehaviour
 
     private void CloseInventoryOnDeselected()
     {
-        //Appelé par Deselect()
         GetComponent<CharaInventory>().CloseInterface();
         Debug.Log("CharaHead: closing inventory of a deselected Chara");
     }
@@ -123,7 +122,8 @@ public class CharaHead : MonoBehaviour
 
     public void SetFocus(Interactable inter)
     {
-         _focus = inter;
+
+        _focus = inter;
         _movement.MoveToInter(_focus);
 
         _checkCor = CheckDistanceInter();
@@ -137,6 +137,7 @@ public class CharaHead : MonoBehaviour
             StopCoroutine(_checkCor);
             //Reset le focus
             _focus = null;
+            //Arret l'agent
             _movement.StopAgent();
         }
     }
@@ -147,6 +148,7 @@ public class CharaHead : MonoBehaviour
         {
             yield return new WaitForSeconds(0.5f);
         }
+        Debug.Log("CharaHead: reached Inter");
         //Interragis avec l'Interactable une fois proche
         _focus.Interact(this);
 
