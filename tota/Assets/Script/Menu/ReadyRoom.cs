@@ -23,33 +23,47 @@ public class ReadyRoom : MonoBehaviour
 
     private Launcher launcher;
 
-    private void Start()
+    private GameObject settingObj = null;
+    private GameObject settingObject = null;
+    private GameObject settingObje = null;
+    private GameObject heightMap = null;
+    private GameObject charaPerTeam = null;
+
+    public void Set()
     {
         launcher = GameObject.Find("eLaucher").GetComponent<Launcher>();
 
-        GameObject settingObj = Instantiate(_settingPrefab);
+        Room room = PhotonNetwork.room;
+
+        settingObj = Instantiate(_settingPrefab);
         settingObj.transform.SetParent(_settings.transform, false);
-        settingObj.GetComponentInChildren<Text>().text = "Password : " + PhotonNetwork.room.CustomProperties["password"];
+        settingObj.GetComponentInChildren<Text>().text = "Password : " + room.CustomProperties["password"];
 
-        GameObject settingObject = Instantiate(_settingPrefab);
+        settingObject = Instantiate(_settingPrefab);
         settingObject.transform.SetParent(_settings.transform, false);
-        settingObject.GetComponentInChildren<Text>().text = "MaxInRoom : " + PhotonNetwork.room.MaxPlayers;
+        settingObject.GetComponentInChildren<Text>().text = "MaxInRoom : " + room.MaxPlayers;
 
-        GameObject settingObje = Instantiate(_settingPrefab);
+        settingObje = Instantiate(_settingPrefab);
         settingObje.transform.SetParent(_settings.transform, false);
-        settingObje.GetComponentInChildren<Text>().text = "MaxInTeam : " + PhotonNetwork.room.CustomProperties["maxInTeam"];
+        settingObje.GetComponentInChildren<Text>().text = "MaxInTeam : " + room.CustomProperties["maxInTeam"];
 
-        GameObject charaPerTeam = Instantiate(_settingPrefab);
+        heightMap = Instantiate(_settingPrefab);
+        heightMap.transform.SetParent(_settings.transform, false);
+        heightMap.GetComponentInChildren<Text>().text = "Height of the map : " + room.CustomProperties["heightMap"];
+
+        charaPerTeam = Instantiate(_settingPrefab);
         charaPerTeam.transform.SetParent(_settings.transform, false);
         charaPerTeam.GetComponentInChildren<Text>().text = "CharaPerTeam : " + PermissionsManager.Instance.numberChara;
     }
 
     public void LeaveRoom()
     {
-        for(int i = 1; i < _settings.transform.childCount; i++)
-        {
-            Destroy(_settings.transform.GetChild(i).gameObject);
-        }
+        Destroy(settingObj);
+        Destroy(settingObject);
+        Destroy(settingObje);
+        Destroy(heightMap);
+        Destroy(charaPerTeam);
+
         teamName.text = "";
 
         GameObject launcherD = GameObject.Find("eLaucher");
@@ -62,7 +76,7 @@ public class ReadyRoom : MonoBehaviour
         if (player != null && team != null)
         {
             string playerName = player.Name;
-            string teamname = player.MyTeamName; 
+            string teamname = team.Name;
        
             permission.GetComponent<PhotonView>().RPC("RemovePlayerFromTeam", PhotonTargets.AllBuffered, teamname, playerName);            
         }

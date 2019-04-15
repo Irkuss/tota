@@ -89,6 +89,7 @@ public class CharaHead : MonoBehaviour
         //NB: removed "if (!EventSystem.current.IsPointerOverGameObject())" and moved it to SpiritHead
         //RemoveInventoryOnDeselected(this.gameObject);
         CloseInventoryOnDeselected();
+        GameObject.Find("eCentralManager").GetComponent<CentralManager>().DeactivateToolTip();
     }
 
     //Clic Droit
@@ -110,9 +111,8 @@ public class CharaHead : MonoBehaviour
 
     private void CloseInventoryOnDeselected()
     {
-        //Appelé par Deselect()
-        GetComponent<CharaInventory>().CloseInventory();
-        //Debug.Log("CharaHead: closing inventory of a deselected Chara");
+        GetComponent<CharaInventory>().CloseInterface();
+        Debug.Log("CharaHead: closing inventory of a deselected Chara");
     }
 
     //Focus on Interactable

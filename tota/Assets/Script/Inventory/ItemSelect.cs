@@ -5,7 +5,7 @@ using UnityEngine.EventSystems;
 
 public class ItemSelect : MonoBehaviour, IBeginDragHandler, IEndDragHandler, IDragHandler
 {
-    public Item item;
+    //public Item item;
     public static GameObject itemBeingDragged;
     Vector3 startPosition;
     Transform startParent; 

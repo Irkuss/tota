@@ -33,7 +33,7 @@ public class CentralManager : Photon.MonoBehaviour
     public GameObject InventoryLayout { get { return _inventoryLayout; } }
 
     [SerializeField] private GameObject _charaLayout = null;
-    public GameObject CharaLayout { get { return _charaLayout; } }
+    public GameObject CharaLayout { get { return _charaLayout; } }    
 
     public void UpdateToolTip(string[] info)
     {

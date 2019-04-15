@@ -11,6 +11,8 @@ public class PlayerListing : MonoBehaviour
 
     public GameObject toggle;
 
+    public GameObject kick;
+
     [SerializeField] private Text _playerName = null;
     private Text PlayerName
     {

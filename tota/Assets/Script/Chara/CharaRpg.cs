@@ -7,6 +7,12 @@ public class CharaRpg : MonoBehaviour
     //Character
     private string _nameFirst = "John";
     private string _nameLast = "McCree";
+
+    public string FullName
+    {
+        get { return _nameFirst + _nameLast; }
+    }
+
     //Stats
     private int _strength;
     public int Strength
