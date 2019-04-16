@@ -1,5 +1,6 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+using System.IO;
 using UnityEngine;
 
 public class CharaRpg : MonoBehaviour
@@ -7,6 +8,9 @@ public class CharaRpg : MonoBehaviour
     //Character
     private string _nameFirst = "John";
     private string _nameLast = "McCree";
+
+    public static StreamReader prenoms = new StreamReader("Assets/Resources/Database/prenoms.txt");
+    public static StreamReader noms = new StreamReader("Assets/Resources/Database/noms.txt");
 
     public string FullName
     {
@@ -110,5 +114,31 @@ public class CharaRpg : MonoBehaviour
     public void UseItem()
     {
 
+    }
+
+    public static string GetRandomFirstName()
+    {
+        using (prenoms)
+        {
+            int index = Random.Range(1, 12437) + 1;
+            for(int i = 0; i < index; i++)
+            {
+                prenoms.ReadLine();
+            }
+            return prenoms.ReadLine();
+        }
+    }
+
+    public static string GetRandomLastName()
+    {
+        using (noms)
+        {
+            int index = Random.Range(1, 1000) + 1;
+            for (int i = 0; i < index; i++)
+            {
+                noms.ReadLine();
+            }
+            return noms.ReadLine();
+        }
     }
 }

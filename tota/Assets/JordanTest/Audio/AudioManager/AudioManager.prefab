@@ -1,6 +1,6 @@
 %YAML 1.1
 %TAG !u! tag:unity3d.com,2011:
---- !u!1 &1140154048653374104
+--- !u!1 &9107797128218558285
 GameObject:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -8,8 +8,8 @@ GameObject:
   m_PrefabAsset: {fileID: 0}
   serializedVersion: 6
   m_Component:
-  - component: {fileID: 2758511516494290036}
-  - component: {fileID: 8331553101892080254}
+  - component: {fileID: 4993839628377315974}
+  - component: {fileID: 3434896686372832953}
   m_Layer: 0
   m_Name: AudioManager
   m_TagString: Untagged
@@ -17,13 +17,13 @@ GameObject:
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!4 &2758511516494290036
+--- !u!4 &4993839628377315974
 Transform:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1140154048653374104}
+  m_GameObject: {fileID: 9107797128218558285}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: -1.1804268, y: 0.31700903, z: -0.4695111}
   m_LocalScale: {x: 1, y: 1, z: 1}
@@ -31,13 +31,13 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &8331553101892080254
+--- !u!114 &3434896686372832953
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1140154048653374104}
+  m_GameObject: {fileID: 9107797128218558285}
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: b5cceb993a3e6f346ba5008a7a0aa43e, type: 3}
@@ -45,12 +45,33 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   mixerGroup: {fileID: 0}
   sounds:
-  - name: 
-    clip: {fileID: 0}
-    volume: 0
+  - name: Nightwalk
+    clip: {fileID: 8300000, guid: fd9476d81cab9094c979e7ee635101b8, type: 3}
+    volume: 1
     volumeVariance: 0
-    pitch: 0.1
+    pitch: 1
     pitchVariance: 0
     loop: 1
-    mixerGroup: {fileID: 0}
+    mixerGroup: {fileID: 243726388085237624, guid: a5e321c97a9ecb04198471b904cb349f,
+      type: 2}
+    source: {fileID: 0}
+  - name: Solitude
+    clip: {fileID: 8300000, guid: 9fe156305188f9b4383a96037b120dd1, type: 3}
+    volume: 1
+    volumeVariance: 0
+    pitch: 1
+    pitchVariance: 0
+    loop: 1
+    mixerGroup: {fileID: 243566181060303406, guid: a5e321c97a9ecb04198471b904cb349f,
+      type: 2}
+    source: {fileID: 0}
+  - name: Ping
+    clip: {fileID: 8300000, guid: 50245b78df8c99b4c96702b2334790fe, type: 3}
+    volume: 1
+    volumeVariance: 0
+    pitch: 1
+    pitchVariance: 0
+    loop: 0
+    mixerGroup: {fileID: 243729142527533418, guid: a5e321c97a9ecb04198471b904cb349f,
+      type: 2}
     source: {fileID: 0}
