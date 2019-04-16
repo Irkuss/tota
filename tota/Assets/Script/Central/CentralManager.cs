@@ -9,9 +9,8 @@ public class CentralManager : Photon.MonoBehaviour
     //Generation, spirit spawn et camera Start
 
     public Generator generator;
-    public Vector3 spawnPoint;
 
-    public const float cameraStartHeight = 800;
+    public const float c_cameraStartHeight = 800;
     public float cameraStartDownAngle = 90f;
     
     //Bouton et interface
@@ -61,18 +60,19 @@ public class CentralManager : Photon.MonoBehaviour
 
     private void Start()
     {
-        int spawnPoint = generator.spawnPoint;
+        tempButton.SetActive(false);
+    }
 
+    public void PlaceCameraAbove(int x, int y)
+    {
         Transform cameraTransform = Camera.main.gameObject.transform;
 
-        cameraTransform.position = 
+        cameraTransform.position =
             new Vector3(
-                (spawnPoint + 0.5f) * Generator.c_worldChunkLength, 
-                cameraStartHeight, 
-                (spawnPoint + 0.5f) * Generator.c_worldChunkLength);
-        cameraTransform.rotation = Quaternion.Euler(new Vector3(cameraStartDownAngle,0,0));
-        
-        tempButton.SetActive(false);
+                (x + 0.5f) * Generator.c_worldChunkLength,
+                c_cameraStartHeight,
+                (y + 0.5f) * Generator.c_worldChunkLength);
+        cameraTransform.rotation = Quaternion.Euler(new Vector3(cameraStartDownAngle, 0, 0));
     }
 
     private void Update()
@@ -145,13 +145,15 @@ public class CentralManager : Photon.MonoBehaviour
 
         //Instantiate the spirit
         GameObject spirit;
+        float spawnValue = (generator.SpawnPoint + 0.5f) * Generator.c_worldChunkLength;
+        Vector3 spawnPosition = new Vector3(spawnValue,0,spawnValue);
         if (PhotonNetwork.offlineMode)
         {
-            spirit = Instantiate(Resources.Load<GameObject>("Spirit"), spawnPoint, Quaternion.identity);
+            spirit = Instantiate(Resources.Load<GameObject>("Spirit"), spawnPosition, Quaternion.identity);
         }
         else
         {
-            spirit = PhotonNetwork.Instantiate("Spirit", spawnPoint, Quaternion.identity, 0);
+            spirit = PhotonNetwork.Instantiate("Spirit", spawnPosition, Quaternion.identity, 0);
         }
 
         //Initialise le Spirit

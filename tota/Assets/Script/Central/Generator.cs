@@ -1275,7 +1275,7 @@ public class Generator : MonoBehaviour
                     default: treeAntiDensity = 500; break;
                 }
 
-                Debug.Log("Generate: Starting tree placement as MasterClient at '" + x + "," + y + "'");
+                Debug.Log("Generate: Starting tree generation as MasterClient at '" + x + "," + y + "'");
                 (int, int) position;
                 List<(int,int)> treePositions = new List<(int, int)>();
                 int rng;
@@ -1293,7 +1293,7 @@ public class Generator : MonoBehaviour
                             
                         }
                     }
-                    if (i % 10 == 0) yield return null;
+                    //if (i % 10 == 0) yield return null;
                     /*
                     if (i % 100 == 0)
                     {
@@ -1302,8 +1302,9 @@ public class Generator : MonoBehaviour
                         treePositions.Clear();
                     }*/
                 }
+                Debug.Log("Generate: Starting tree placement as MasterClient at '" + x + "," + y + "'");
                 MasterMassLightPlaceTree(propManager, treePositions);
-                Debug.Log("Generate: Ending tree placement as MasterClient at '" + x + "," + y + "'");
+                Debug.Log("Generate: Ending tree generation as MasterClient at '" + x + "," + y + "'");
             }
         }
         private void GenerateFloor()
@@ -1592,9 +1593,11 @@ public class Generator : MonoBehaviour
 
     //Attribut du World
     private WorldNode[,] _world = null;
-    private int _worldLength = 10;
-    //Public spawnPoint (utilisé au Start de centralManager pour la camera)
-    public int spawnPoint = 4;
+
+    //Caractéristique de la génération
+    private int _worldLength;
+    private int _spawnPoint;
+    public int SpawnPoint => _spawnPoint;
 
     //Init les buildTable en tant que static (pour les rendre accessible par CityNode)
     private void Awake()
@@ -1605,15 +1608,21 @@ public class Generator : MonoBehaviour
 
     private void Start()
     {
+        //Init de worldLength et de spawnpoint
+        _worldLength = PermissionsManager.Instance.heightMap;
+        _spawnPoint = (_worldLength - 1) / 2;//(milieu de la map dans la matrice), 10 -> (10-1)/2 -> 4, 2 -> (2-1)/2-> 0, 1 -> (1-1)/2 -> 0
         //Tout le monde Initialise la matrice des WorldNode
         _world = new WorldNode[_worldLength, _worldLength];
         InitWorld();
+        
         if (PhotonNetwork.isMasterClient)
         {
+            Debug.Log("Generator: Starting Init of WorldType as masterClient");
             //Au start le master decide le type des WorldNode
             MasterInitWorldType();
             int[] worldTypeData = MasterGetWorldTypeData();
             //Le master envoie l'entiereté des infos et update la condition de réception
+            Debug.Log("Generator: Sending WorldType as masterClient");
             MasterSendWorldType(worldTypeData);
             OnWorldTypeReceived();
         }
@@ -1635,298 +1644,301 @@ public class Generator : MonoBehaviour
     #region InitWorld Master Decide World Type
     //Master Decide World Type
     private void MasterInitWorldType()
-        {
-            Debug.Log("MasterInitWorldType: Deciding biomes");
-            MasterInitBiome();
-            Debug.Log("MasterInitWorldType: Deciding layout");
-            MasterInitLayout();
-            Debug.Log("MasterInitWorldType: Deciding Roads");
-            MasterInitRoads();
-        }
+    {
+        Debug.Log("MasterInitWorldType: Deciding biomes");
+        MasterInitBiome();
+        Debug.Log("MasterInitWorldType: Deciding layout");
+        MasterInitLayout();
+        Debug.Log("MasterInitWorldType: Deciding Roads");
+        MasterInitRoads();
+    }
     //Init Biome
     private void MasterInitBiome()
-        {
-            WorldBiome[,] worldBiomes = new WorldBiome[_worldLength, _worldLength];
-            InitWorldBiomes(worldBiomes); //Remplis de Undecided
-            Debug.Log("MasterInitBiome: Placing Origin");
-            InitWorldBiomesOrigin(worldBiomes); //Marque certain endroit d'origine de biome
-            //TestPrintBiomes(worldBiomes);
-            Debug.Log("MasterInitBiome: Starting Expansion");
-            InitWorldBiomesExpansion(worldBiomes); //Cycle through every biomeOrigin and expand until no one can expand anymore)
-            //TestPrintBiomes(worldBiomes);
-            InitWorldBiomesCopy(worldBiomes); //Copy worldBiome biomes into world
-        }
+    {
+        WorldBiome[,] worldBiomes = new WorldBiome[_worldLength, _worldLength];
+        InitWorldBiomes(worldBiomes); //Remplis de Undecided
+        Debug.Log("MasterInitBiome: Placing Origin");
+        InitWorldBiomesOrigin(worldBiomes); //Marque certain endroit d'origine de biome
+        TestPrintBiomes(worldBiomes);
+        Debug.Log("MasterInitBiome: Starting Expansion");
+        InitWorldBiomesExpansion(worldBiomes); //Cycle through every biomeOrigin and expand until no one can expand anymore)
+        TestPrintBiomes(worldBiomes);
+        InitWorldBiomesCopy(worldBiomes); //Copy worldBiome biomes into world
+    }
     private void InitWorldBiomes(WorldBiome[,] worldBiomes)
+    {
+        for (int i = 0; i < _worldLength; i++)
         {
-            for (int i = 0; i < _worldLength; i++)
+            for (int j = 0; j < _worldLength; j++)
             {
-                for (int j = 0; j < _worldLength; j++)
-                {
-                    worldBiomes[i, j] = WorldBiome.Undecided;
-                }
+                worldBiomes[i, j] = WorldBiome.Undecided;
             }
         }
+    }
     private void InitWorldBiomesOrigin(WorldBiome[,] worldBiomes)
+    {
+        bool placedAtLeastOneBiome = false;
+        for (int i = 0; i < _worldLength; i++)
         {
-            for (int i = 0; i < _worldLength; i++)
+            for (int j = 0; j < _worldLength; j++)
             {
-                for (int j = 0; j < _worldLength; j++)
+                if (Random.Range(0,100) < 10)
                 {
-                    if (Random.Range(0,100) < 10)
-                    {
-                        worldBiomes[i, j] = GetRandomBiome();
-                    }
+                    worldBiomes[i, j] = GetRandomBiome();
+                    placedAtLeastOneBiome = true;
                 }
             }
         }
+        if (!placedAtLeastOneBiome) worldBiomes[0, 0] = GetRandomBiome();
+    }
     private WorldBiome GetRandomBiome()
-        {
-            int biomeCount = System.Enum.GetNames(typeof(WorldBiome)).Length;
+    {
+        int biomeCount = System.Enum.GetNames(typeof(WorldBiome)).Length;
         
-            return (WorldBiome)(Random.Range(1, biomeCount)); //1 à 5 pour count = 6
-        }
+        return (WorldBiome)(Random.Range(1, biomeCount)); //1 à 5 pour count = 6
+    }
     private void InitWorldBiomesExpansion(WorldBiome[,] worldBiomes)
+    {
+        bool undecidedLeft = true;
+        WorldBiome biomeOrigin;
+        while (undecidedLeft)
         {
-            bool undecidedLeft = true;
-            WorldBiome biomeOrigin;
-            while (undecidedLeft)
-            {
-                WorldBiome[,] worldBiomesCopy = GetCopyWorldBiomes(worldBiomes);
-                undecidedLeft = false;
-                for (int i = 0; i < _worldLength; i++)
-                {
-                    for (int j = 0; j < _worldLength; j++)
-                    {
-                        if (worldBiomesCopy[i, j] == WorldBiome.Undecided)
-                        {
-                            //Il reste des endroits à remplir
-                            undecidedLeft = true;
-                        }
-                        else
-                        {
-                            biomeOrigin = worldBiomes[i, j];
-                            InitWorldBiomesTryReplace(worldBiomes, i + 1, j, biomeOrigin);
-                            InitWorldBiomesTryReplace(worldBiomes, i - 1, j, biomeOrigin);
-                            InitWorldBiomesTryReplace(worldBiomes, i, j + 1, biomeOrigin);
-                            InitWorldBiomesTryReplace(worldBiomes, i, j - 1, biomeOrigin);
-                        }
-                    }
-                }
-            }
-        }
-    private WorldBiome[,] GetCopyWorldBiomes(WorldBiome[,] worldBiomes)
-        {
-            WorldBiome[,] worldBiomesCopy = new WorldBiome[_worldLength, _worldLength];
-
+            WorldBiome[,] worldBiomesCopy = GetCopyWorldBiomes(worldBiomes);
+            undecidedLeft = false;
             for (int i = 0; i < _worldLength; i++)
             {
                 for (int j = 0; j < _worldLength; j++)
                 {
-                    worldBiomesCopy[i, j] = worldBiomes[i, j];
-                }
-            }
-
-            return worldBiomesCopy;
-        }
-    private bool InitWorldBiomesTryReplace(WorldBiome[,] worldBiomes, int x, int y, WorldBiome newBiome)
-        {
-            if (x >= 0 && y >= 0 && x < _worldLength && y < _worldLength)
-            {
-                if (worldBiomes[x,y] == WorldBiome.Undecided)
-                {
-                    worldBiomes[x, y] = newBiome;
-                    return true;
-                }
-            }
-            return false;
-        }
-    private void InitWorldBiomesCopy(WorldBiome[,] worldBiomes)
-        {
-            for (int y = 0; y < _worldLength; y++)
-            {
-                for (int x = 0; x < _worldLength; x++)
-                {
-                    _world[x, y].SetBiome(worldBiomes[x, y]);
-                }
-            }
-        }
-    private void TestPrintBiomes(WorldBiome[,] worldBiomes)
-        {
-            string line = "";
-            for (int i = 0; i < _worldLength; i++)
-            {
-                for (int j = 0; j < _worldLength; j++)
-                {
-                    line += (int)(worldBiomes[i, j]);
-                    line += "    ";
-                }
-                line += "\n";
-            }
-            Debug.Log(line);
-        }
-    //Init Layout
-    private void MasterInitLayout()
-            {
-                int rng;
-                for (int y = 0; y < _worldLength; y++)
-                {
-                    for (int x = 0; x < _worldLength; x++)
+                    if (worldBiomesCopy[i, j] == WorldBiome.Undecided)
                     {
-                        rng = Random.Range(0, 10);
-                        if (rng == 0)
-                        {
-                            _world[x, y].SetLayout(WorldLayout.City);
-                        }
-                        else if (rng == 1)
-                        {
-                            _world[x, y].SetLayout(WorldLayout.Village);
-                        }
-                        else
-                        {
-                            _world[x, y].SetLayout(WorldLayout.Empty);
-                        }
-            }
-                }
-                MasterForceLayoutAtSpawnPoint();
-            }
-    private void MasterForceLayoutAtSpawnPoint()
-            {
-                _world[spawnPoint, spawnPoint].SetLayout(WorldLayout.City);
-            }
-    //Init Roads
-    private void MasterInitRoads()
-            {
-                MasterConnectCities();
-            }
-    private List<WorldNode> MasterFindPath(WorldNode node1, WorldNode node2)
-            {
-                List<WorldNode> path = new List<WorldNode>();
-                //Current X and Y
-                int currX = node1.x;
-                int currY = node1.y;
-                //Destination X and Y
-                int destX = node2.x;
-                int destY = node2.y;
-                //Distance between Destination and Current
-                int distX; //Si distX positif, la destination est à l'Est
-                int distY; //Si distY positif, la destination est au Nord
-
-                int absDistX;
-                int absDistY;
-
-                while (currX != destX || currY != destY)
-                {
-                    //On ajoute la node là où on se trouve
-                    path.Add(_world[currX, currY]);
-                    //On met à jour la distance
-                    distX = destX - currX;
-                    distY = destY - currY;
-                    //On met à jour la distance absolu
-                    absDistX = (distX > 0) ? distX : -distX;
-                    absDistY = (distY > 0) ? distY : -distY;
-                    //Choisir l'axe de déplacement
-                    if (absDistX > absDistY)
-                    {
-                        if (distX > 0)
-                        {
-                            currX++; //On se déplace à l'Est
-                        }
-                        else
-                        {
-                            currX--; //On se déplace à l'Ouest
-                        }
+                        //Il reste des endroits à remplir
+                        undecidedLeft = true;
                     }
                     else
                     {
-                        if (distY > 0)
-                        {
-                            currY++;  //On se déplace au Nord
-                        }
-                        else
-                        {
-                            currY--;  //On se déplace au Sud
-                        }
+                        biomeOrigin = worldBiomes[i, j];
+                        InitWorldBiomesTryReplace(worldBiomes, i + 1, j, biomeOrigin);
+                        InitWorldBiomesTryReplace(worldBiomes, i - 1, j, biomeOrigin);
+                        InitWorldBiomesTryReplace(worldBiomes, i, j + 1, biomeOrigin);
+                        InitWorldBiomesTryReplace(worldBiomes, i, j - 1, biomeOrigin);
                     }
-                    //Fin de la boucle, on a mis à jour les coordonnées suivantes
                 }
-                //Il manque la destination dans path
-                path.Add(_world[destX, destY]);
-
-                return path;
             }
+        }
+    }
+    private WorldBiome[,] GetCopyWorldBiomes(WorldBiome[,] worldBiomes)
+    {
+        WorldBiome[,] worldBiomesCopy = new WorldBiome[_worldLength, _worldLength];
+
+        for (int i = 0; i < _worldLength; i++)
+        {
+            for (int j = 0; j < _worldLength; j++)
+            {
+                worldBiomesCopy[i, j] = worldBiomes[i, j];
+            }
+        }
+
+        return worldBiomesCopy;
+    }
+    private bool InitWorldBiomesTryReplace(WorldBiome[,] worldBiomes, int x, int y, WorldBiome newBiome)
+    {
+        if (x >= 0 && y >= 0 && x < _worldLength && y < _worldLength)
+        {
+            if (worldBiomes[x,y] == WorldBiome.Undecided)
+            {
+                worldBiomes[x, y] = newBiome;
+                return true;
+            }
+        }
+        return false;
+    }
+    private void InitWorldBiomesCopy(WorldBiome[,] worldBiomes)
+    {
+        for (int y = 0; y < _worldLength; y++)
+        {
+            for (int x = 0; x < _worldLength; x++)
+            {
+                _world[x, y].SetBiome(worldBiomes[x, y]);
+            }
+        }
+    }
+    private void TestPrintBiomes(WorldBiome[,] worldBiomes)
+    {
+        string line = "";
+        for (int i = 0; i < _worldLength; i++)
+        {
+            for (int j = 0; j < _worldLength; j++)
+            {
+                line += (int)(worldBiomes[i, j]);
+                line += "    ";
+            }
+            line += "\n";
+        }
+        Debug.Log(line);
+    }
+    //Init Layout
+    private void MasterInitLayout()
+    {
+        int rng;
+        for (int y = 0; y < _worldLength; y++)
+        {
+            for (int x = 0; x < _worldLength; x++)
+            {
+                rng = Random.Range(0, 10);
+                if (rng == 0)
+                {
+                    _world[x, y].SetLayout(WorldLayout.City);
+                }
+                else if (rng == 1)
+                {
+                    _world[x, y].SetLayout(WorldLayout.Village);
+                }
+                else
+                {
+                    _world[x, y].SetLayout(WorldLayout.Empty);
+                }
+            }
+        }
+        MasterForceLayoutAtSpawnPoint();
+    }
+    private void MasterForceLayoutAtSpawnPoint()
+    {
+        _world[_spawnPoint, _spawnPoint].SetLayout(WorldLayout.City);
+    }
+    //Init Roads
+    private void MasterInitRoads()
+    {
+        MasterConnectCities();
+    }
+    private List<WorldNode> MasterFindPath(WorldNode node1, WorldNode node2)
+    {
+        List<WorldNode> path = new List<WorldNode>();
+        //Current X and Y
+        int currX = node1.x;
+        int currY = node1.y;
+        //Destination X and Y
+        int destX = node2.x;
+        int destY = node2.y;
+        //Distance between Destination and Current
+        int distX; //Si distX positif, la destination est à l'Est
+        int distY; //Si distY positif, la destination est au Nord
+
+        int absDistX;
+        int absDistY;
+
+        while (currX != destX || currY != destY)
+        {
+            //On ajoute la node là où on se trouve
+            path.Add(_world[currX, currY]);
+            //On met à jour la distance
+            distX = destX - currX;
+            distY = destY - currY;
+            //On met à jour la distance absolu
+            absDistX = (distX > 0) ? distX : -distX;
+            absDistY = (distY > 0) ? distY : -distY;
+            //Choisir l'axe de déplacement
+            if (absDistX > absDistY)
+            {
+                if (distX > 0)
+                {
+                    currX++; //On se déplace à l'Est
+                }
+                else
+                {
+                    currX--; //On se déplace à l'Ouest
+                }
+            }
+            else
+            {
+                if (distY > 0)
+                {
+                    currY++;  //On se déplace au Nord
+                }
+                else
+                {
+                    currY--;  //On se déplace au Sud
+                }
+            }
+            //Fin de la boucle, on a mis à jour les coordonnées suivantes
+        }
+        //Il manque la destination dans path
+        path.Add(_world[destX, destY]);
+
+        return path;
+    }
     private void MasterConnectWorldNode(List<WorldNode> path)
-            {
-                if (path.Count == 0)
-                {
-                    Debug.Log("MasterConnectPoint: path is empty");
-                    return;
-                }
+    {
+        if (path.Count == 0)
+        {
+            Debug.Log("MasterConnectPoint: path is empty");
+            return;
+        }
 
-                WorldNode previousNode = path[0];
+        WorldNode previousNode = path[0];
 
-                for (int i = 1; i < path.Count; i++)
-                {
-                    previousNode.OpenTo(path[i],Random.Range(5,10));
-                    previousNode = path[i];
-                }
-            }
+        for (int i = 1; i < path.Count; i++)
+        {
+            previousNode.OpenTo(path[i],Random.Range(5,10));
+            previousNode = path[i];
+        }
+    }
     private void MasterCreateRoad(WorldNode node1, WorldNode node2)
-            {
-                MasterConnectWorldNode(MasterFindPath(node1, node2));
-            }
+    {
+        MasterConnectWorldNode(MasterFindPath(node1, node2));
+    }
     private List<WorldNode> MasterFindNonEmpty(WorldNode nodeCenter, int radius)
+    {
+        int searchSquareLength = radius * 2 + 1;
+        List<WorldNode> closeNodes = new List<WorldNode>();
+        WorldNode tempNode;
+        for (int y = nodeCenter.y - radius; y <= nodeCenter.y + radius; y++)
+        {
+            for (int x = nodeCenter.x - radius; x <= nodeCenter.x + radius; x++)
             {
-                int searchSquareLength = radius * 2 + 1;
-                List<WorldNode> closeNodes = new List<WorldNode>();
-                WorldNode tempNode;
-                for (int y = nodeCenter.y - radius; y <= nodeCenter.y + radius; y++)
+                tempNode = MasterCheckNonEmpty(x, y);
+                if (tempNode != null)
                 {
-                    for (int x = nodeCenter.x - radius; x <= nodeCenter.x + radius; x++)
-                    {
-                        tempNode = MasterCheckNonEmpty(x, y);
-                        if (tempNode != null)
-                        {
-                            closeNodes.Add(tempNode);
-                        }
-                    }
+                    closeNodes.Add(tempNode);
                 }
-                return closeNodes;
             }
+        }
+        return closeNodes;
+    }
     private WorldNode MasterCheckNonEmpty(int x, int y)
+    {
+        if (x >= 0 && y >= 0 && x < _worldLength && y < _worldLength)
+        {
+            if (_world[x, y].Layout != WorldLayout.Empty)
             {
-                if (x >= 0 && y >= 0 && x < _worldLength && y < _worldLength)
-                {
-                    if (_world[x, y].Layout != WorldLayout.Empty)
-                    {
-                        return _world[x, y];
-                    }
-                }
-                return null;
+                return _world[x, y];
             }
+        }
+        return null;
+    }
     private void MasterConnectToNodeList(WorldNode nodeCenter, List<WorldNode> nodeList)
-            {
-                foreach(WorldNode node in nodeList)
-                {
-                    MasterCreateRoad(nodeCenter, node);
-                }
-            }
+    {
+        foreach(WorldNode node in nodeList)
+        {
+            MasterCreateRoad(nodeCenter, node);
+        }
+    }
     private void MasterConnectToCloseNode(WorldNode nodeCenter)
-            {
-                MasterConnectToNodeList(nodeCenter, MasterFindNonEmpty(nodeCenter, 2));
-            }
+    {
+        MasterConnectToNodeList(nodeCenter, MasterFindNonEmpty(nodeCenter, 2));
+    }
     private void MasterConnectCities()
+    {
+        for (int y = 0; y < _worldLength; y++)
+        {
+            for (int x = 0; x < _worldLength; x++)
             {
-                for (int y = 0; y < _worldLength; y++)
+                if(_world[x,y].Layout == WorldLayout.City)
                 {
-                    for (int x = 0; x < _worldLength; x++)
-                    {
-                        if(_world[x,y].Layout == WorldLayout.City)
-                        {
-                            MasterConnectToCloseNode(_world[x, y]);
-                        }
-                    }
+                    MasterConnectToCloseNode(_world[x, y]);
                 }
             }
+        }
+    }
     //Get Data
     private int[] MasterGetWorldTypeData()
     {
@@ -1990,11 +2002,15 @@ public class Generator : MonoBehaviour
     private void OnWorldTypeReceived()
     {
         //The truest Start
-        LoadChunkAround(spawnPoint, spawnPoint);
-        Debug.Log("Waiting for end of frame");
-        
-        chunkLeftToLoad = 9;
+        ////LoadChunkAround(_spawnPoint, _spawnPoint);
 
+        //numbers of chunk left to generate (decrements when a chunk finishes to load)
+        chunkLeftToLoad = _worldLength * _worldLength;
+        Debug.Log("OnWorldTypeReceived: chunkLeftToLoad " + chunkLeftToLoad);
+        //Start the generation of all chunk
+        StartCoroutine(LoadAllChunk());
+
+        //Wait for end of generation
         StartCoroutine(OnGenerationEnded());
     }
 
@@ -2003,6 +2019,18 @@ public class Generator : MonoBehaviour
     
 
     //Debut de l'update permanente
+    private IEnumerator LoadAllChunk()
+    {
+        for (int y = 0; y < _worldLength; y++)
+        {
+            for (int x = 0; x < _worldLength; x++)
+            {
+                while (loadingChunk) yield return new WaitForSeconds(0.5f);
+                loadingChunk = true;
+                ClientLoadChunk(x, y);
+            }
+        }
+    }
 
     private void LoadChunkAround(int x, int y)
     {
@@ -2037,8 +2065,10 @@ public class Generator : MonoBehaviour
         return false;
     }
     
+    //Sending and receiving generation data
     private void ClientLoadChunk(int x, int y)
     {
+        GetComponent<CentralManager>().PlaceCameraAbove(x, y);
         //Debug.Log("ClientLoadChunk: Asking to master WorldNode Data");
         //Un client demande la génération d'un chunk au master
         GetComponent<PhotonView>().RPC("MasterDataAskedHandler", PhotonTargets.MasterClient, x, y, PhotonNetwork.player.ID);
@@ -2110,7 +2140,7 @@ public class Generator : MonoBehaviour
         yield return StartCoroutine(_world[x, y].Generate(propManager));
         Debug.Log("ClientGenerateAt: Ended Generation at " + x + "," + y);
 
-        //
+        //One chunk has finished to generate
         chunkLeftToLoad--;
         loadingChunk = false;
     }
@@ -2119,9 +2149,12 @@ public class Generator : MonoBehaviour
     //Depre
     private IEnumerator OnGenerationEnded()
     {
-        while (loadingChunk || chunkLeftToLoad > 0) yield return null;
+        while (loadingChunk || chunkLeftToLoad > 0) yield return new WaitForSeconds(0.5f);
 
-        GetComponent<CentralManager>().OnGenerationFinished();
-        GetComponent<CentralManager>().spawnPoint = new Vector3((spawnPoint + 0.5f) * c_worldChunkLength, CentralManager.cameraStartHeight, (spawnPoint + 0.5f) * c_worldChunkLength);
+        Debug.Log("OnGenerationEnded: Generation finished");
+        CentralManager cm = GetComponent<CentralManager>();
+
+        cm.PlaceCameraAbove(_spawnPoint, _spawnPoint);
+        cm.OnGenerationFinished();
     }
 }
