@@ -192,16 +192,19 @@ public class CharaInventory : MonoBehaviour
     }
 
     //Openning and closing Inventory (canvas)
-    public void ToggleInterface(GameObject parent)
+    public void ToggleInterface(GameObject parent, string[] stats)
     {
         _interface = Instantiate(_interfacePrefab);
         _interface.transform.SetParent(parent.transform, false);
         _interface.transform.GetChild(1).GetChild(0).GetComponent<Text>().text = gameObject.GetComponent<CharaRpg>().FullName;
+        _interface.GetComponent<InterfaceManager>().InstantiateCraft();
 
         _inventory = Instantiate(_inventoryPrefab);
         _inventory.transform.SetParent(_interface.transform.GetChild(0).GetChild(3).GetChild(0), false);
         _slotParent = _inventory.transform.GetChild(0).GetChild(0).gameObject;
+
         InitSlots();
+        UpdateStats(stats);
     }
 
     public void ToggleInventory(GameObject parent)
@@ -215,7 +218,7 @@ public class CharaInventory : MonoBehaviour
 
     public void UpdateStats(string[] stats)
     {
-        GameObject stat = _interface.transform.GetChild(0).GetChild(0).GetChild(0).GetChild(0).gameObject;
+        GameObject stat = _interface.gameObject.GetComponent<InterfaceManager>().tooltip;
         stat.GetComponent<ToolTip>().UpdateTool(stats);
     }
 

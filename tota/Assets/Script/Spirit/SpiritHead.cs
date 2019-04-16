@@ -329,8 +329,7 @@ public class SpiritHead : Photon.MonoBehaviour
             {
                 _selectedList.Add(chara);
                 GameObject.Find("eCentralManager").GetComponent<CentralManager>().UpdateToolTip(chara.GetComponent<CharaRpg>().GetToolTipInfo());
-                chara.GetComponent<CharaInventory>().ToggleInterface(_inventoryLayout);
-                chara.GetComponent<CharaInventory>().UpdateStats(chara.GetComponent<CharaRpg>().GetToolTipInfo());
+                chara.GetComponent<CharaInventory>().ToggleInterface(_inventoryLayout, chara.GetComponent<CharaRpg>().GetToolTipInfo());                
             }
             else
             {
