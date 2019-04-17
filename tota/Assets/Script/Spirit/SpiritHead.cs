@@ -23,14 +23,14 @@ public class SpiritHead : Photon.MonoBehaviour
 
     //Liste des Chara selectionnées
     private static List<GameObject> _selectedList;
-    public static List<GameObject> SelectedList => _selectedList; 
+    public static List<GameObject> SelectedList => _selectedList;
 
     //Unity Callback
     void Start()
     {
         if (!photonView.isMine)
         {
-            
+
             this.enabled = false;
         }
 
@@ -44,14 +44,10 @@ public class SpiritHead : Photon.MonoBehaviour
 
     void Update()
     {
-        if (currentBuild == null)
+        if (!_isInBuildMode)
         {
             //Normal Right Left click check
             ClickUpdate();
-        }
-        else
-        {
-            BuildUpdate();
         }
 
         //Do all test functions
@@ -60,11 +56,11 @@ public class SpiritHead : Photon.MonoBehaviour
         //Keycode.E Check
         InventoryUpdate();
     }
-
+    //TestFunction
     private void TestAll()
     {
         //Space Bar check
-        TestCharaSpawn(false,null);
+        TestCharaSpawn(false, null);
 
         //Keycode.I check
         TestInventoryAdd();
@@ -72,15 +68,15 @@ public class SpiritHead : Photon.MonoBehaviour
         //Keycode.O check
         TestCraftBigApple();
 
-        TestBuild();
+        TestBuildInput();
     }
 
-    public void TryCharaSpawn(bool force,GameObject charaL)
+    public void TryCharaSpawn(bool force, GameObject charaL)
     {
-        TestCharaSpawn(force,charaL);
+        TestCharaSpawn(force, charaL);
     }
 
-    private void TestCharaSpawn(bool force,GameObject charaL)
+    private void TestCharaSpawn(bool force, GameObject charaL)
     {
         if (Input.GetKeyUp("space") || force)
         {
@@ -101,21 +97,21 @@ public class SpiritHead : Photon.MonoBehaviour
             {
                 Debug.Log("SpiritHead: Instantiation du spirit (online)");
                 go = PhotonNetwork.Instantiate(_charaPath, lowPosition, Quaternion.identity, 0);
-                _chara = go;        
+                _chara = go;
                 if (_charaLayout == null)
                 {
                     _charaLayout = charaL;
                 }
-                gameObject.GetComponent<PhotonView>().RPC("InstantiateCharaRef",PhotonTargets.AllBuffered, _playerOwner.Name);
-                
+                gameObject.GetComponent<PhotonView>().RPC("InstantiateCharaRef", PhotonTargets.AllBuffered, _playerOwner.Name);
+
             }
-            
+
             //Met ce Chara dans notre équipe (par RPC)
             if (_playerOwner != null)
             {
                 go.GetComponent<CharaPermissions>().GetComponent<PhotonView>().RPC("SetTeam", PhotonTargets.AllBuffered, _playerOwner.MyTeamName);
             }
-            
+
         }
     }
 
@@ -128,11 +124,11 @@ public class SpiritHead : Photon.MonoBehaviour
         if (team.ContainsPlayer(_permission.GetPlayerWithName(playerWhoSent)))
         {
             GameObject charaLayout = Instantiate(Resources.Load<GameObject>("CharaRef"));
-            charaLayout.transform.SetParent(_charaLayout.transform, false);            
+            charaLayout.transform.SetParent(_charaLayout.transform, false);
             charaLayout.GetComponent<LinkChara>().spirit = this;
             charaLayout.GetComponent<LinkChara>().chara = _chara;
             charaLayout.GetComponent<LinkChara>().Name.text = _chara.GetComponent<CharaRpg>().FullName;
-        }              
+        }
     }
 
     private void TestInventoryAdd()
@@ -163,64 +159,99 @@ public class SpiritHead : Photon.MonoBehaviour
                 {
                     Debug.Log("TestCraftBigApple: failed to craft bigApple");
                 }
-                
+
             }
         }
     }
-    private GameObject currentBuild = null;
-    private Vector3 desiredBuildRotation;
-    private void TestBuild()
+
+    //BuildSystem
+    private bool _isInBuildMode = false;
+    public bool IsInBuildMode => _isInBuildMode;
+    private IEnumerator _currentBuildModeCor;
+    private GameObject _currentBuild = null;
+
+    private void TestBuildInput()
     {
         //Entree et sortie du buildMode
         if (Input.GetKeyDown(KeyCode.B))
         {
-            if (currentBuild == null)
+            if (_isInBuildMode)
             {
-                currentBuild = Instantiate(Resources.Load<GameObject>("testWall"));
-                currentBuild.GetComponent<VisuHandler>().StartVisualisation();
-                desiredBuildRotation = currentBuild.transform.rotation.eulerAngles;
+                ForceExitBuildMode();
             }
             else
             {
-                Destroy(currentBuild);
+                EnterBuildMode("testWall");
             }
         }
     }
-    private void BuildUpdate()
+
+    //Public Build, entrée et sortie du buildmode
+    public void EnterBuildMode(string buildPath)
     {
-        //Deplacement du build
-        RaycastHit hit;
-
-        if (ClickedOnSomething(out hit))
+        if (_isInBuildMode)
         {
-            currentBuild.transform.position = hit.point;
+            ForceExitBuildMode();
         }
-        //Rotation du build
-        if (Input.GetKeyDown(KeyCode.Alpha1)) desiredBuildRotation = desiredBuildRotation + new Vector3(0, -90, 0);
-        if (Input.GetKeyDown(KeyCode.Alpha2)) desiredBuildRotation = desiredBuildRotation + new Vector3(0, 90, 0);
-        currentBuild.transform.rotation = Quaternion.Lerp(currentBuild.transform.rotation, Quaternion.Euler(desiredBuildRotation), 0.5f);
-
-        if (Input.GetMouseButtonDown(1))
+        //Debut de l'entrée du buildMode
+        _isInBuildMode = true;
+        //Init le go
+        _currentBuild = Instantiate(Resources.Load<GameObject>(buildPath));
+        _currentBuild.GetComponent<VisuHandler>().StartVisualisation();
+        Vector3 desiredRotation = _currentBuild.transform.rotation.eulerAngles;
+        //Init la coroutine
+        _currentBuildModeCor = BuildMode(buildPath, desiredRotation);
+        StartCoroutine(_currentBuildModeCor);
+    }
+    public void ForceExitBuildMode()
+    {
+        //Debut de la sortie du buildMode
+        _isInBuildMode = false;
+        //Detruit le go
+        Destroy(_currentBuild);
+        _currentBuild = null;
+        //Stop la coroutine
+        StopCoroutine(_currentBuildModeCor);
+    }
+    //Private Build, boucle du buildMode
+    private IEnumerator BuildMode(string buildPath, Vector3 desiredRotation)
+    {
+        while(_isInBuildMode)
         {
+            //Deplacement du build
+            RaycastHit hit;
+            if (ClickedOnSomething(out hit)) _currentBuild.transform.position = hit.point;
+            //Rotation du build
+            if (Input.GetKeyDown(KeyCode.Alpha1)) desiredRotation = desiredRotation + new Vector3(0, -90, 0);
+            if (Input.GetKeyDown(KeyCode.Alpha2)) desiredRotation = desiredRotation + new Vector3(0, 90, 0);
+            _currentBuild.transform.rotation = Quaternion.Lerp(_currentBuild.transform.rotation, Quaternion.Euler(desiredRotation), 0.5f);
+            
             if (!EventSystem.current.IsPointerOverGameObject())
             {
-                //right click
-                //Sortie du mode building
-                Destroy(currentBuild);
-                currentBuild = null;
+                //Clic droit, quitter le buildMode
+                if (Input.GetMouseButtonDown(1)) ForceExitBuildMode();
+                //Clic gauche, placez le currentBuild
+                else if (Input.GetMouseButtonDown(0))
+                {
+                    _currentBuild.transform.rotation = Quaternion.Euler(desiredRotation);
+                    if (_currentBuild.GetComponent<VisuHandler>().IsReadyToPlace())
+                    {
+                        Debug.Log("BuildMode: Placing object");
+                        _currentBuild.GetComponent<VisuHandler>().EndVisualisation();
+                        GameObject.Find("eCentralManager").
+                            GetComponent<PropManager>().
+                            PlaceAlreadyExistingProp(_currentBuild, _currentBuild.transform.rotation.eulerAngles.y, buildPath);
+                        //Met fin proprement
+                        _isInBuildMode = false;
+                        _currentBuild = null;
+                    }
+                    else
+                    {
+                        Debug.Log("BuildMode: Failed to place object");
+                    }
+                }
             }
-        }
-        else if (Input.GetMouseButtonDown(0))
-        {
-            if (!EventSystem.current.IsPointerOverGameObject())
-            {
-                //left click
-                //Placer le bâtiment
-                currentBuild.GetComponent<VisuHandler>().EndVisualisation();
-                currentBuild.transform.rotation = Quaternion.Euler(desiredBuildRotation);
-                GameObject.Find("eCentralManager").GetComponent<PropManager>().PlaceAlreadyExistingProp(currentBuild, currentBuild.transform.rotation.eulerAngles.y, "testWall");
-                currentBuild = null;
-            }
+            yield return null;
         }
     }
 
@@ -235,27 +266,17 @@ public class SpiritHead : Photon.MonoBehaviour
 
     private void ClickUpdate()
     {
-
-        if (Input.GetMouseButtonDown(0))
+        if (!EventSystem.current.IsPointerOverGameObject())
         {
-            if (!EventSystem.current.IsPointerOverGameObject())
-            {
-                LeftClickUpdate();
-            }
-        }
-        if (Input.GetMouseButtonDown(1))
-        {
-            if (!EventSystem.current.IsPointerOverGameObject())
-            {
-                RightClickUpdate();
-            }
+            if (Input.GetMouseButtonDown(0)) LeftClickUpdate();
+            if (Input.GetMouseButtonDown(1)) RightClickUpdate();
         }
     }
 
     private bool ClickedOnSomething(out RaycastHit hit)
     {
+        //Useful function for the rest of SpiritHead
         Ray ray = _spiritCamera.GetComponent<Camera>().ScreenPointToRay(Input.mousePosition);
-
         if (Physics.Raycast(ray, out hit))
         {
             return true;
@@ -269,8 +290,10 @@ public class SpiritHead : Photon.MonoBehaviour
 
         if (ClickedOnSomething(out hit))
         {
+            //Si on clique gauche sur qqchose
             if (hit.transform.CompareTag("Chara"))
             {
+                //Si on clique gauche sur un Chara
                 if (!(Input.GetKey(KeyCode.LeftShift)))
                 {
                     DeselectAllExcept(hit.transform.gameObject);
@@ -282,6 +305,7 @@ public class SpiritHead : Photon.MonoBehaviour
             }
             else
             {
+                //Si on ne clique gauche par sur un Chara
                 GameObject.Find("eCentralManager").GetComponent<CentralManager>().DeactivateToolTip();
                 foreach (Transform trans in _inventoryLayout.transform)
                 {
@@ -387,17 +411,14 @@ public class SpiritHead : Photon.MonoBehaviour
         return _selectedList.Contains(chara);
     }
 
-    //Private methods
+    //Charas order to selected chara
 
     private void ActionMoveAllTo(Vector3 destination)
     {
-        float stopDistance = 0.2f + (_selectedList.Count - 1) * 0.4f;
-
-
-        //Debug.Log("SpiritHead: moving every chara to destination ("+selectedList.Count+")");
+        //Deplace tous les charas selectionnés à une position donnée
+        float stopDistance = 0.2f + (_selectedList.Count - 1) * 0.4f; //Temporaire
         foreach (GameObject Chara in _selectedList)
         {
-            //Debug.Log("SpiritHead: moving one Chara");
             Chara.GetComponent<CharaHead>().SetDestination(destination);
             Chara.GetComponent<CharaHead>().SetStopDistance(stopDistance);
         }
@@ -405,18 +426,18 @@ public class SpiritHead : Photon.MonoBehaviour
 
     private void SetFocusAll(Interactable inter)
     {
+        //Focus tous les charas selectionnés sur un objet interactible
         foreach (GameObject Chara in _selectedList)
         {
-            //Debug.Log("SpiritHead: moving one Chara");
             Chara.GetComponent<CharaHead>().SetFocus(inter);
         }
     }
 
     private void RemoveFocusAll()
     {
+        //Enleve le focus tous les charas selectionnés
         foreach (GameObject Chara in _selectedList)
         {
-            //Debug.Log("SpiritHead: moving one Chara");
             Chara.GetComponent<CharaHead>().RemoveFocus();
         }
     }

@@ -146,7 +146,7 @@ public class CentralManager : Photon.MonoBehaviour
         //Instantiate the spirit
         GameObject spirit;
         float spawnValue = (generator.SpawnPoint + 0.5f) * Generator.c_worldChunkLength;
-        Vector3 spawnPosition = new Vector3(spawnValue,0,spawnValue);
+        Vector3 spawnPosition = new Vector3(spawnValue, c_cameraStartHeight, spawnValue);
         if (PhotonNetwork.offlineMode)
         {
             spirit = Instantiate(Resources.Load<GameObject>("Spirit"), spawnPosition, Quaternion.identity);

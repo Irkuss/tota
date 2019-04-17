@@ -43,7 +43,6 @@ public class DayNightCycle : MonoBehaviour
     {
         season = Seasons.SUMMER;
         UpdateCallback();
-        speed = 100f;
         _sun = GetComponent<Light>();
         transform.rotation = Quaternion.Euler(0, 60, 0);
         _slider = 0.5f;

@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-[CreateAssetMenu(menuName ="buildTable")]
+[CreateAssetMenu(menuName = "Generation/buildTable")]
 public class buildTable : ScriptableObject
 {
     //ScriptableObject contenant les chemins possibles d'un type de bâtiment.

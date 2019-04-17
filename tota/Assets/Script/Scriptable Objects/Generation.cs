@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-[CreateAssetMenu(menuName = "Generation")]
+[CreateAssetMenu(menuName = "Generation/Generation")]
 public class Generation : ScriptableObject
 {
     public int worldLength = 0;

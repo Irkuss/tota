@@ -90,8 +90,8 @@ public class CharaInventory : MonoBehaviour
             // Si l'item est utilisable
             if (item.usable)
             {
-                item.Use(_linkedCharaInventory.gameObject); // On appelle la fonction virtual de l'item en prenant la référence de son parent //_linkedCharaInventory._slotParent
-                OnRemoveButton();                            // On enleve l'item utilisé
+                bool itemUsed = item.Use(_linkedCharaInventory.gameObject); // On appelle la fonction virtual de l'item en prenant la référence de son parent //_linkedCharaInventory._slotParent
+                if (itemUsed) OnRemoveButton();                            // On enleve l'item utilisé
             }
         }
     }

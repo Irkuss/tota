@@ -35,14 +35,20 @@ public class ItemRecipe : ScriptableObject
         return true;
     }
 
-    public void CraftWith(CharaInventory charaInventory)
+    public void RemoveNeededItems(CharaInventory charaInventory)
     {
-        //Warning, should only be used after using CanBeCraftedWith
+        //Used in CraftWith but also when building from a blueprint
         for (int i = 0; i < neededItem.Length; i++)
         {
             //Diminue la quantité (ne devrait pas passé en dessous
             charaInventory.ModifyCount(neededItem[i], -neededItemCount[i]);
         }
+    }
+
+    public void CraftWith(CharaInventory charaInventory)
+    {
+        //Warning, should only be used after using CanBeCraftedWith
+        RemoveNeededItems(charaInventory);
 
         for (int j = 0; j < resultCount; j++)
         {
