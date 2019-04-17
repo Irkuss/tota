@@ -6,4 +6,10 @@ using UnityEngine;
 public class RecipeTable : ScriptableObject
 {
     public ItemRecipe[] recipes;
+    public enum RecipeType
+    {
+        Base,
+        Lock,
+        Cond
+    }
 }

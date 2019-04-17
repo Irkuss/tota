@@ -122,8 +122,8 @@ public class SpiritHead : Photon.MonoBehaviour
     [PunRPC]
     private void InstantiateCharaRef(string playerWhoSent)
     {
-        //Debug.Log("Send : " + playerWhoSent + "    Receive : " + _playerOwner.Name);
-        PermissionsManager.Team team = _permission.GetTeamWithName(_playerOwner.MyTeamName);
+        PermissionsManager.Player player = _permission.GetPlayerWithName(PhotonNetwork.player.NickName);
+        PermissionsManager.Team team = _permission.GetTeamWithName(player.MyTeamName);
 
         if (team.ContainsPlayer(_permission.GetPlayerWithName(playerWhoSent)))
         {
@@ -333,6 +333,7 @@ public class SpiritHead : Photon.MonoBehaviour
             }
             else
             {
+                Debug.Log("Was remove from selected");
                 _selectedList.Remove(chara);
                 GameObject.Find("eCentralManager").GetComponent<CentralManager>().DeactivateToolTip();
             }

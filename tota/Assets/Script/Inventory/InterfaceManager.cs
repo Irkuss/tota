@@ -20,7 +20,7 @@ public class InterfaceManager : MonoBehaviour
             _recipe = Instantiate(_slot, _craft.transform.GetChild(0));
             _recipe.transform.GetChild(0).GetComponent<Image>().sprite = recipe.result.icon;
             _recipe.transform.GetChild(2).GetComponent<Text>().text = recipe.resultCount.ToString();
-            if (recipe.type != "base")
+            if (recipe.type != RecipeTable.RecipeType.Base)
             {
                 _recipe.transform.GetChild(3).gameObject.SetActive(true);
             }
