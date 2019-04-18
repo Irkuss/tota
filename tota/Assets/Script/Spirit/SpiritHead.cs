@@ -6,7 +6,7 @@ using UnityEngine.EventSystems;
 public class SpiritHead : Photon.MonoBehaviour
 {
     //utilisé pour debugger (à swap avec un scriptable object des que possible)
-    private string _charaPath = "CharaJordan";
+    private string _charaPath = "CharaYayko";
     [SerializeField] private ItemRecipe bigAppleRecipe = null;
     [SerializeField] private ItemTable itemTable = null;
 
@@ -122,8 +122,8 @@ public class SpiritHead : Photon.MonoBehaviour
     [PunRPC]
     private void InstantiateCharaRef(string playerWhoSent)
     {
-        //Debug.Log("Send : " + playerWhoSent + "    Receive : " + _playerOwner.Name);
-        PermissionsManager.Team team = _permission.GetTeamWithName(_playerOwner.MyTeamName);
+        PermissionsManager.Player player = _permission.GetPlayerWithName(PhotonNetwork.player.NickName);
+        PermissionsManager.Team team = _permission.GetTeamWithName(player.MyTeamName);
 
         if (team.ContainsPlayer(_permission.GetPlayerWithName(playerWhoSent)))
         {
@@ -311,10 +311,6 @@ public class SpiritHead : Photon.MonoBehaviour
             {
                 Debug.Log("RightClickUpdate: removing focus, pointing a destination to charas");
                 RemoveFocusAll();
-                foreach(Transform trans in _inventoryLayout.transform)
-                {
-                    Destroy(trans.gameObject);
-                }
                 ActionMoveAllTo(hit.point);
             }
         }
@@ -333,10 +329,11 @@ public class SpiritHead : Photon.MonoBehaviour
             {
                 _selectedList.Add(chara);
                 GameObject.Find("eCentralManager").GetComponent<CentralManager>().UpdateToolTip(chara.GetComponent<CharaRpg>().GetToolTipInfo());
-                chara.GetComponent<CharaInventory>().ToggleInterface(_inventoryLayout);
+                chara.GetComponent<CharaInventory>().ToggleInterface(_inventoryLayout, chara.GetComponent<CharaRpg>().GetToolTipInfo());                
             }
             else
             {
+                Debug.Log("Was remove from selected");
                 _selectedList.Remove(chara);
                 GameObject.Find("eCentralManager").GetComponent<CentralManager>().DeactivateToolTip();
             }
