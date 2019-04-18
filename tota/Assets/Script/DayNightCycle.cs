@@ -55,13 +55,13 @@ public class DayNightCycle : MonoBehaviour
         NextSeason();
         if (heure > 16f && heure < 17f && _changedHour)
         {
-            Debug.Log("Night");
+            Debug.Log("DayNightCycle: Night");
             AudioManager.instance.StartCoroutine("EndMusic", "Solitude");
             AudioManager.instance.StartCoroutine("StartMusic", "Nightwalk");
         }
         if (heure > 5f && heure < 6f && _changedHour)
         {
-            Debug.Log("Day");
+            Debug.Log("DayNightCycle: Day");
             AudioManager.instance.StartCoroutine("EndMusic", "Nightwalk");
             AudioManager.instance.StartCoroutine("StartMusic","Solitude");
         }

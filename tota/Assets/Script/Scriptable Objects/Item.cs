@@ -17,6 +17,7 @@ public class Item : ScriptableObject
     }*/
 
     public string nickName = "Item Name"; //Nom de l'item
+    public string description = "Item description here";
     public Sprite icon = null; //Icon de l'item
     public int stack = 1; //Nombre d'exemplaire maximum dans un slot de l'inventaire
     public int weight = 0; //Poids dans l'inventaire
