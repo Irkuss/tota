@@ -17,14 +17,13 @@ public class CharaRpg : MonoBehaviour
     public string NameFull => _nameFirst + " " + _nameLast;
     //Age
     private int _age;
-    //Stats
-    public enum Stat
 
     //Character
     public static StreamReader prenoms = new StreamReader("Assets/Resources/Database/prenoms.txt");
     public static StreamReader noms = new StreamReader("Assets/Resources/Database/noms.txt");
 
-    public string FullName
+    //Stats
+    public enum Stat    
     {
         //Main stats (de 1 à 100)
         ms_strength,
@@ -144,17 +143,12 @@ public class CharaRpg : MonoBehaviour
         _bodyParts.Add(new Leg("Right leg"));
     }
 
-    private void Awake()
-    {
-        _nameFirst = GetRandomFirstName();
-        _nameLast = GetRandomLastName();
-        Debug.Log("DONE");
-    }
-
     //Init Awake
     private void Awake()
     {
         quirkTable = _quirkTable;
+        _nameFirst = GetRandomFirstName();
+        _nameLast = GetRandomLastName();
     }
 
     //Init
