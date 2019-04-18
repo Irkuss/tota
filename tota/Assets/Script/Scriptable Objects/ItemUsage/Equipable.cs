@@ -35,6 +35,8 @@ public class Equipable : Item
     public float remoteRange = 0;
     public int remoteDamage = 0;
     public int remoteAccuracyModifier = 0;
+    public bool useAmmo = false;
+    public Item ammo = null;
 
     public override bool Use(GameObject refInventChara)
     {

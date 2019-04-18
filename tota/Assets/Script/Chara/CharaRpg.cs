@@ -6,6 +6,7 @@ public class CharaRpg : MonoBehaviour
 {
     //Ref
     [SerializeField] private QuirkTable _quirkTable;
+    private static QuirkTable quirkTable;
     private CentralManager _cm;
     //Name
     private string _nameFirst = "John";
@@ -69,17 +70,78 @@ public class CharaRpg : MonoBehaviour
     private Stats _baseStat;
     private Stats _statModifiers;
     private List<Quirk> _quirks;
-    //Status
+    
+    //Status Santé WIP
     private int _hunger;
     private int _maxHunger = 100;
 
+    private float _consciousness = 100f; //if reaches 0, die
+    private float _movement = 100f; //
+    private float _totalPain = 10f;
+    private List<BodyPart> _bodyParts;
+
+
+    public class Wound
+    {
+        public enum WoundType
+        {
+            Burn,   //treated by burn cream (infect)
+            Break,  //treated by a split (attelle)
+            Bruise, //treated by cream
+            Bite,   //treated by bandage (bleed) (infect)
+            GunShot,//have to be operated (bleed) (infect)
+            Cut,    // (bleed) (infect)
+            Stab,   //(bleed) (infect)
+        }
+        public enum WoundSeverity
+        {
+            minor,
+            moderate,
+            serious,
+            severe,
+            critical,
+            maximal
+
+        }
+        private WoundType _woundType;
+
+        public Wound(WoundType woundType)
+        {
+            _woundType = woundType;
+        }
+    }
+
+    public class BodyPart
+    {
+        private List<Wound> _wounds;
+        private string _partName;
+
+        public BodyPart(string name)
+        {
+            _partName = name;
+            _wounds = new List<Wound>();
+        }
+    }
+
+    public class Leg : BodyPart
+    {
+        public Leg(string name) : base(name)
+        {
+            
+        }
+    }
+
+    public void InitHealth()
+    {
+        _bodyParts = new List<BodyPart>();
+        _bodyParts.Add(new Leg("Right leg"));
+    }
+
+
+    //Init Awake
     private void Awake()
     {
-        if (!PhotonNetwork.isMasterClient)
-        {
-            Debug.Log("Chara: Adding self to CharaManager");
-            //GameObject.Find("eCentralManager").GetComponent<CharaManager>().AddToTeam(this.gameObject);
-        }
+        quirkTable = _quirkTable;
     }
 
     //Init
@@ -89,48 +151,7 @@ public class CharaRpg : MonoBehaviour
         
         InitStatus();
     }
-    //masterclient init
-    public void Init()
-    {
-        InitStat();
-        InitQuirks();
-    }
-    private void InitQuirks()
-    {
-        _quirks = new List<Quirk>();
-        //Decide les quirks
-        SetQuirks();
-        //Apply quirks
-        ApplyQuirks();
-        //DEBUG
-        string quirkList = "";
-        foreach (Quirk quirk in _quirks)
-        {
-            quirkList += quirk.quirkName + ", ";
-        }
-        Debug.Log("InitQuirks: This new chara possesses those quirks: " + quirkList);
-        quirkList = "";
-        for (int i = 0; i < 5; i++)
-        {
-            quirkList += GetCurrentStat((Stat)i) + ", ";
-        }
-        Debug.Log("Stats: " + quirkList);
-    }
-    private void SetQuirks()
-    {
-        //Decide quirk number
-        int numberPhysical = Random.Range(1, 4); //1 à 3
-        int numberMental = Random.Range(2, 5);  //2 à 4
-        int numberJob = Random.Range(0, 2);     //0 à 1
-        int numberApocExp = Random.Range(0, 2); //0 à 1
-        //add Quirk
-        _quirkTable.GetRandomQuirksOfType(Quirk.QuirkType.Physical, numberPhysical, _quirks);
-        _quirkTable.GetRandomQuirksOfType(Quirk.QuirkType.Mental, numberMental, _quirks);
-        _quirkTable.GetRandomQuirksOfType(Quirk.QuirkType.OldJob, numberJob, _quirks);
-        _quirkTable.GetRandomQuirksOfType(Quirk.QuirkType.ApocalypseExp, numberApocExp, _quirks);
-    }
-
-    //client init
+    //client init (appelé par CharaManager)
     public void Init(int[] quirks)
     {
         InitStat();

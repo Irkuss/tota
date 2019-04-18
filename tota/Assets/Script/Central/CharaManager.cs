@@ -5,9 +5,13 @@ using UnityEngine;
 public class CharaManager : MonoBehaviour
 {
     private string _charaPath = "CharaTanguy"; //TEMP
+    //Ref
+    [SerializeField] private QuirkTable _quirkTable;
 
+    //List All chara (added when they spawn)
     private List<GameObject> _allCharas;
 
+    //Awake
     private void Awake()
     {
         _allCharas = new List<GameObject>();
@@ -16,25 +20,10 @@ public class CharaManager : MonoBehaviour
     //Spawn a Chara
     public void SpawnChara(Vector3 pos, string teamName)
     {
-        GetComponent<PhotonView>().RPC("RPC_MasterSpawnChara", PhotonTargets.MasterClient, pos.x, pos.y, pos.z, teamName);
+        int[] quirks = GetNewSerializedQuirks();
+        GetComponent<PhotonView>().RPC("RPC_SpawnChara", PhotonTargets.AllBuffered, pos.x, pos.y, pos.z, teamName, quirks);
     }
-    [PunRPC] private void RPC_MasterSpawnChara(float x, float y, float z, string teamName)
-    {
-        //Instancie sur le PhotonNetwork le Chara
-        Vector3 pos = new Vector3(x, y, z);
-        GameObject chara = Instantiate(Resources.Load<GameObject>(_charaPath), pos, Quaternion.identity);
-        //Ajoute le chara dans la liste des charas
-        _allCharas.Add(chara);
-        //Initialise la team du chara (sur le network)
-        chara.GetComponent<CharaPermissions>().SetTeam(teamName);
-        //Initialise les stats du chara
-        CharaRpg charRpg = chara.GetComponent<CharaRpg>();
-        charRpg.Init();
-        int[] quirks = charRpg.SerializeQuirks();
-        //Finalise le chara chez les clients (rpg et liste)
-        GetComponent<PhotonView>().RPC("RPC_ClientSpawnChara", PhotonTargets.OthersBuffered, x, y, z, teamName, quirks);
-    }
-    [PunRPC] private void RPC_ClientSpawnChara(float x, float y, float z, string teamName, int[] quirks)
+    [PunRPC] private void RPC_SpawnChara(float x, float y, float z, string teamName, int[] quirks)
     {
         //Instancie sur le PhotonNetwork le Chara
         Vector3 pos = new Vector3(x, y, z);
@@ -46,6 +35,28 @@ public class CharaManager : MonoBehaviour
         //Initialise les stats du chara
         chara.GetComponent<CharaRpg>().Init(quirks);
 
+    }
+    //Init static
+    public int[] GetNewSerializedQuirks()
+    {
+        List<Quirk> quirks = new List<Quirk>();
+        //Decide quirk number
+        int numberPhysical = Random.Range(1, 4); //1 à 3
+        int numberMental = Random.Range(2, 5);  //2 à 4
+        int numberJob = Random.Range(0, 2);     //0 à 1
+        int numberApocExp = Random.Range(0, 2); //0 à 1
+        //add Quirk
+        _quirkTable.GetRandomQuirksOfType(Quirk.QuirkType.Physical, numberPhysical, quirks);
+        _quirkTable.GetRandomQuirksOfType(Quirk.QuirkType.Mental, numberMental, quirks);
+        _quirkTable.GetRandomQuirksOfType(Quirk.QuirkType.OldJob, numberJob, quirks);
+        _quirkTable.GetRandomQuirksOfType(Quirk.QuirkType.ApocalypseExp, numberApocExp, quirks);
+        //Serialize
+        int[] serialized = new int[quirks.Count];
+        for (int i = 0; i < quirks.Count; i++)
+        {
+            serialized[i] = _quirkTable.QuirkToId(quirks[i]);
+        }
+        return serialized;
     }
     //When a chara spawns under a non masterclient
     public void AddToTeam(GameObject chara)

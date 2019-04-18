@@ -1268,10 +1268,10 @@ public class Generator : MonoBehaviour
                 int treeAntiDensity = 200; //The bigger, the lesser tree
                 switch (_biome)
                 {
-                    case WorldBiome.Plain: treeAntiDensity = 600; break;
-                    case WorldBiome.Arid: treeAntiDensity = 800; break;
-                    case WorldBiome.Forest: treeAntiDensity = 200; break;
-                    case WorldBiome.DeepForest: treeAntiDensity = 100; break;
+                    case WorldBiome.Plain: treeAntiDensity = 300; break;
+                    case WorldBiome.Arid: treeAntiDensity = 400; break;
+                    case WorldBiome.Forest: treeAntiDensity = 100; break;
+                    case WorldBiome.DeepForest: treeAntiDensity = 60; break;
                     default: treeAntiDensity = 500; break;
                 }
 
@@ -1286,21 +1286,11 @@ public class Generator : MonoBehaviour
                         rng = Random.Range(0, treeAntiDensity);
                         if (rng == 0)
                         {
-                            //MasterLightPlaceTree(propManager, j + x * Mathf.FloorToInt(c_worldChunkLength), i + y * Mathf.FloorToInt(c_worldChunkLength));
-                            
                             position = (j + x * Mathf.FloorToInt(c_worldChunkLength), i + y * Mathf.FloorToInt(c_worldChunkLength));
                             if (IsOnGround(new Vector3(position.Item1,0, position.Item2), 2)) treePositions.Add(position);
                             
                         }
                     }
-                    //if (i % 10 == 0) yield return null;
-                    /*
-                    if (i % 100 == 0)
-                    {
-                        MasterMassLightPlaceTree(propManager, treePositions);
-                        yield return new WaitForSeconds(0.1f);
-                        treePositions.Clear();
-                    }*/
                 }
                 Debug.Log("Generate: Starting tree placement as MasterClient at '" + x + "," + y + "'");
                 MasterMassLightPlaceTree(propManager, treePositions);
@@ -1609,6 +1599,8 @@ public class Generator : MonoBehaviour
     private void Start()
     {
         //Init de worldLength et de spawnpoint
+        _worldLength = (int)PhotonNetwork.room.CustomProperties["heightMap"];
+        Debug.Log(_worldLength);
         _worldLength = PermissionsManager.Instance.heightMap;
         _spawnPoint = (_worldLength - 1) / 2;//(milieu de la map dans la matrice), 10 -> (10-1)/2 -> 4, 2 -> (2-1)/2-> 0, 1 -> (1-1)/2 -> 0
         //Tout le monde Initialise la matrice des WorldNode
