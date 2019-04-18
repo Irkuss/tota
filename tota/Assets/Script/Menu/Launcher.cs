@@ -134,6 +134,12 @@ public class Launcher : Photon.PunBehaviour
         forceLaunchButton.SetActive(true);
     }
 
+    private void RemoveMasterButton()
+    {
+        launchButton.SetActive(false);
+        forceLaunchButton.SetActive(false);
+    }
+
     public override void OnJoinedRoom()
     {
         roomList.SetActive(false);
@@ -179,16 +185,8 @@ public class Launcher : Photon.PunBehaviour
     //Called by photon when a player leaves the room.
     public override void OnPhotonPlayerDisconnected(PhotonPlayer photonPlayer)
     {
-        System.Random rnd = new System.Random();
-        int rand = rnd.Next(PlayerListings.Count);
         PlayerLeftRoom(photonPlayer);
-        /*if (photonPlayer.IsMasterClient)
-        {
-            Debug.Log(PhotonNetwork.masterClient.NickName);
-            PhotonNetwork.SetMasterClient(PlayerListings[rand].PhotonPlayer);
-            Debug.Log(PhotonNetwork.masterClient.NickName);
-            gameObject.GetComponent<PhotonView>().RPC("ActiveMasterButton", PhotonTargets.MasterClient);
-        }*/
+        gameObject.GetComponent<PhotonView>().RPC("ActiveMasterButton", PhotonNetwork.masterClient);
         Debug.Log("OnPhotonPlayerDisconnected");
     }
 
@@ -505,15 +503,16 @@ public class Launcher : Photon.PunBehaviour
 
     public void BackToMenu()
     {
+        PhotonNetwork.Destroy(gameObject);
+        PhotonNetwork.Destroy(PermissionsManager.Instance.gameObject);
         SceneManager.LoadScene(0);
-        if (PhotonNetwork.connected) PhotonNetwork.Disconnect();
     }
 
     public override void OnLeftRoom()
     {
         //Origin: LeaveRoom()
         //SceneManager.LoadScene(2);
-
+        RemoveMasterButton();
         currentRoom.SetActive(false);
         roomList.SetActive(true);
         Debug.Log("Left a room");        

@@ -47,9 +47,6 @@ public class Mode : MonoBehaviour
         else SceneManager.LoadScene(3);
     }
 
-    public void BackMenu()
-    {
-        SceneManager.LoadScene(0);
-    }
+    
 
 }

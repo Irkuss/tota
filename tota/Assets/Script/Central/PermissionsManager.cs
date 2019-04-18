@@ -164,9 +164,8 @@ public class PermissionsManager : MonoBehaviour
 
     public static PermissionsManager Instance;
 
-    public int numberChara;
-
-    public int heightMap;
+    [HideInInspector] public int numberChara;
+    [HideInInspector] public int heightMap;
 
     private void Awake()
     {
