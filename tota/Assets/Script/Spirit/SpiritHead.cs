@@ -82,7 +82,8 @@ public class SpiritHead : Photon.MonoBehaviour
         {
             //Projection des positions sur le sol
             Vector3 lowPosition = new Vector3(gameObject.transform.position.x, 1, gameObject.transform.position.z);
-
+            GameObject.Find("eCentralManager").GetComponent<CharaManager>().SpawnChara(lowPosition, _playerOwner.MyTeamName);
+            /*
             //Instantiation de Chara
             GameObject go;
             if (PhotonNetwork.offlineMode)
@@ -109,8 +110,8 @@ public class SpiritHead : Photon.MonoBehaviour
             //Met ce Chara dans notre équipe (par RPC)
             if (_playerOwner != null)
             {
-                go.GetComponent<CharaPermissions>().GetComponent<PhotonView>().RPC("SetTeam", PhotonTargets.AllBuffered, _playerOwner.MyTeamName);
-            }
+                go.GetComponent<CharaPermissions>().SetTeam(_playerOwner.MyTeamName);
+            }*/
 
         }
     }
@@ -127,7 +128,7 @@ public class SpiritHead : Photon.MonoBehaviour
             charaLayout.transform.SetParent(_charaLayout.transform, false);
             charaLayout.GetComponent<LinkChara>().spirit = this;
             charaLayout.GetComponent<LinkChara>().chara = _chara;
-            charaLayout.GetComponent<LinkChara>().Name.text = _chara.GetComponent<CharaRpg>().FullName;
+            charaLayout.GetComponent<LinkChara>().Name.text = _chara.GetComponent<CharaRpg>().NameFull;
         }
     }
 
@@ -356,7 +357,9 @@ public class SpiritHead : Photon.MonoBehaviour
             if (!(_selectedList.Contains(chara)))
             {
                 _selectedList.Add(chara);
-                GameObject.Find("eCentralManager").GetComponent<CentralManager>().UpdateToolTip(chara.GetComponent<CharaRpg>().GetToolTipInfo());
+                //GameObject.Find("eCentralManager").GetComponent<CentralManager>().UpdateToolTip(chara.GetComponent<CharaRpg>().GetToolTipInfo());
+                chara.GetComponent<CharaRpg>().UpdateToolTip();
+
                 chara.GetComponent<CharaInventory>().ToggleInterface(_inventoryLayout);
             }
             else

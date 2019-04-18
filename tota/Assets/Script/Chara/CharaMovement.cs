@@ -31,22 +31,49 @@ public class CharaMovement : MonoBehaviour
     //Deplacement clic droit
     public void MoveTo(Vector3 position)
     {
-        navMeshAgent.SetDestination(position);
+        SetDestination(position);
     }
 
     public void SetStoppingDistance(float newStop)
     {
+        GetComponent<CharaConnect>().SendMsg(CharaConnect.CharaCommand.RPC_SetStoppingDistance, null, null, new float[1] { newStop });
+        //GetComponent<PhotonView>().RPC("RPC_SetStoppingDistance", PhotonTargets.AllBuffered, newStop);
+    }
+    public void RPC_SetStoppingDistance(float newStop)
+    {
         navMeshAgent.stoppingDistance = newStop;
     }
+    /*[PunRPC] private void RPC_SetStoppingDistance(float newStop)
+    {
+        navMeshAgent.stoppingDistance = newStop;
+    }*/
 
     //Deplacement vers un Interactable
     public void MoveToInter(Interactable inter)
     {
-        navMeshAgent.SetDestination(inter.InterTransform.position);
+        SetDestination(inter.InterTransform.position);
     }
 
     public void StopAgent()
     {
-        navMeshAgent.SetDestination(transform.position);
+        SetDestination(transform.position);
     }
+
+    //Update to network
+    //Update current destination
+
+    private void SetDestination(Vector3 dest)
+    {
+        GetComponent<CharaConnect>().SendMsg(CharaConnect.CharaCommand.RPC_SetDestination, null, null, new float[3] { dest.x, dest.y, dest.z });
+        //GetComponent<PhotonView>().RPC("RPC_SetDestination", PhotonTargets.AllBuffered, dest.x, dest.y, dest.z);
+    }
+    public void RPC_SetDestination(float x, float y, float z)
+    {
+        navMeshAgent.SetDestination(new Vector3(x, y, z));
+    }
+    /*
+    [PunRPC] private void RPC_SetDestination(float x, float y, float z)
+    {
+        navMeshAgent.SetDestination(new Vector3(x, y, z));
+    }*/
 }

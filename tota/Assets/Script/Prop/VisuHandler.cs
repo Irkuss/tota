@@ -5,31 +5,34 @@ using UnityEngine.AI;
 
 public class VisuHandler : MonoBehaviour
 {
+    //VisuHandler: has to be placed on a blueprint construction
+    [TextArea]
+    [SerializeField] private string _note = "VisuHandler: has to be placed on a blueprint construction";
+    //[Header("VisuHandler: has to be placed on a blueprint construction")]
+    //Half of the box check dimension
+    [Header("Half of the box check dimension")]
+    [SerializeField] private float checkX = 0;
+    [SerializeField] private float checkY = 0;
+    [SerializeField] private float checkZ = 0;
+    //Material for valid and filled space
+    [Header("Material for valid and filled space(in Material/Visualisation)")]
+    [SerializeField] private Material validMat = null;
+    [SerializeField] private Material fillMat = null;
+    
     private List<Collider> invaderColliders;
     private int originLayer;
-    [SerializeField] private float checkX;
-    [SerializeField] private float checkY;
-    [SerializeField] private float checkZ;
     private Vector3 halfDir;
-    private Material[] materials;
     private Renderer[] renderers;
     private bool hadValidSpace = true;
     private IEnumerator updateColorCor;
 
-    [SerializeField] private Material validMat;
-    [SerializeField] private Material fillMat;
-
-    private Color validColor;
-    private Color fillColor;
-
-    public string path;
+    //Path for the construction created with this blueprint (from Resources)
+    [Header("Path for the construction created with this blueprint (from Resources)")]
+    [SerializeField] private string path;
 
     //Init
-
     private void Awake()
     {
-        validColor = Color.cyan;// new Color(114, 255, 255);
-        fillColor = Color.red;// new Color(255, 16, 16);
         invaderColliders = new List<Collider>();
         halfDir = new Vector3(checkX/2, checkY/2, checkZ/2);
     }
@@ -37,7 +40,7 @@ public class VisuHandler : MonoBehaviour
     {
         originLayer = gameObject.layer;
         renderers = GetComponentsInChildren<Renderer>();
-        materials = new Material[renderers.Length];
+        Material[] materials = new Material[renderers.Length];
         for (int i = 0; i < renderers.Length; i++)
         {
             materials[i] = renderers[i].material;
@@ -48,7 +51,16 @@ public class VisuHandler : MonoBehaviour
         StartCoroutine(updateColorCor);
 
     }
-    //Update
+
+    //Brouillon debug
+    void OnDrawGizmosSelected()
+    {
+        // Draw a semitransparent blue cube at the transforms position
+        Gizmos.color = new Color(1, 1, 0, 0.5f);
+        Gizmos.DrawWireCube(new Vector3(transform.position.x, transform.position.y + checkY / 2, transform.position.z), halfDir * 2);
+    }
+
+    //Update material (between valid and filled space)
     private IEnumerator UpdateColor()
     {
         while(true)
@@ -72,7 +84,6 @@ public class VisuHandler : MonoBehaviour
             yield return null;
         }
     }
-
     public void ForceUpdateColor()
     {
         if (IsReadyToPlace())
@@ -86,12 +97,12 @@ public class VisuHandler : MonoBehaviour
             ChangeMatColor(fillMat);
         }
     }
-
-    void OnDrawGizmosSelected()
+    private void ChangeMatColor(Material mat)
     {
-        // Draw a semitransparent blue cube at the transforms position
-        Gizmos.color = new Color(1, 1, 0, 0.5f);
-        Gizmos.DrawWireCube(new Vector3(transform.position.x, transform.position.y + checkY / 2, transform.position.z), halfDir*2);
+        foreach (Renderer rend in renderers)
+        {
+            rend.material = mat;
+        }
     }
 
     //Entree et sortie de la visualisation
@@ -103,7 +114,6 @@ public class VisuHandler : MonoBehaviour
         GetComponent<NavMeshObstacle>().enabled = false;
         foreach (Collider coll in GetComponentsInChildren<Collider>()) coll.enabled = false;
     }
-
     public void EndVisualisation()
     {
         //Things to do when placing the blueprint (NB: it has to return to the Start state)
@@ -113,21 +123,6 @@ public class VisuHandler : MonoBehaviour
         gameObject.layer = originLayer; //Set layer to layer before it was changed
         GetComponent<NavMeshObstacle>().enabled = true;
         foreach (Collider coll in GetComponentsInChildren<Collider>()) coll.enabled = true;
-    }
-
-    private void ChangeMatColor(Color col)
-    {
-        foreach (Material mat in materials)
-        {
-            mat.color = col;
-        }
-    }
-    private void ChangeMatColor(Material mat)
-    {
-        foreach(Renderer rend in renderers)
-        {
-            rend.material = mat;
-        }
     }
 
     //Verification de l'espace de placement

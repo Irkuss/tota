@@ -4,111 +4,248 @@ using UnityEngine;
 
 public class CharaRpg : MonoBehaviour
 {
-    //Character
+    //Ref
+    [SerializeField] private QuirkTable _quirkTable;
+    private CentralManager _cm;
+    //Name
     private string _nameFirst = "John";
+    public string NameFirst => _nameFirst;
     private string _nameLast = "McCree";
-
-    public string FullName
-    {
-        get { return _nameFirst + _nameLast; }
-    }
-
+    public string NameLast => _nameLast;
+    public string NameFull => _nameFirst + " " + _nameLast;
+    //Age
+    private int _age;
     //Stats
-    private int _strength;
-    public int Strength
+    public enum Stat
     {
-        get => _strength;
+        //Main stats (de 1 à 100)
+        ms_strength,
+        ms_intelligence,
+        ms_perception,
+        ms_mental,
+        ms_social,
+        //Skills (-1 à 10) (0 de base) (-1 desactive les actions liées) 
+        sk_doctor,
+        sk_farmer,
+        sk_carpenter,
+        sk_scavenger,
+        sk_electrician,
+        sk_marksman,
+        //Stats Level
+        lv_stamina,
     }
-    private int _intelligence;
-    public int Intelligence
+    public const int c_statNumber = 12; //TO UPDATE WHEN ADDING NEW STATS
+    public struct Stats
     {
-        get => _intelligence;
-    }
-    private int _perception;
-    public int Perception
-    {
-        get => _perception;
-    }
-    private int _mental;
-    public int Mental
-    {
-        get => _mental;
-    }
-    private int _social;
-    public int Social
-    {
-        get => _social;
-    }
+        //Array de stat
+        private int[] _stats;
 
-
+        //Constructor
+        public Stats(int[] stats)
+        {
+            _stats = stats;
+        }
+        //Getters
+        public int GetStat(CharaRpg.Stat stat)
+        {
+            return _stats[(int)stat];
+        }
+        //Addition
+        public void Add(Stats addedStats)
+        {
+            for (int i = 0; i < _stats.Length; i++)
+            {
+                _stats[i] += addedStats._stats[i];
+            }
+        }
+        public void Remove(Stats addedStats)
+        {
+            for (int i = 0; i < _stats.Length; i++)
+            {
+                _stats[i] -= addedStats._stats[i];
+            }
+        }
+    }
+    private Stats _baseStat;
+    private Stats _statModifiers;
+    private List<Quirk> _quirks;
     //Status
     private int _hunger;
     private int _maxHunger = 100;
-    //UnityCallback
-    void Start()
+
+    private void Awake()
     {
-        InitStat();
-
-        InitStatus();
-
+        if (!PhotonNetwork.isMasterClient)
+        {
+            Debug.Log("Chara: Adding self to CharaManager");
+            //GameObject.Find("eCentralManager").GetComponent<CharaManager>().AddToTeam(this.gameObject);
+        }
     }
 
+    //Init
+    void Start()
+    {
+        _cm = GameObject.Find("eCentralManager").GetComponent<CentralManager>();
+        
+        InitStatus();
+    }
+    //masterclient init
+    public void Init()
+    {
+        InitStat();
+        InitQuirks();
+    }
+    private void InitQuirks()
+    {
+        _quirks = new List<Quirk>();
+        //Decide les quirks
+        SetQuirks();
+        //Apply quirks
+        ApplyQuirks();
+        //DEBUG
+        string quirkList = "";
+        foreach (Quirk quirk in _quirks)
+        {
+            quirkList += quirk.quirkName + ", ";
+        }
+        Debug.Log("InitQuirks: This new chara possesses those quirks: " + quirkList);
+        quirkList = "";
+        for (int i = 0; i < 5; i++)
+        {
+            quirkList += GetCurrentStat((Stat)i) + ", ";
+        }
+        Debug.Log("Stats: " + quirkList);
+    }
+    private void SetQuirks()
+    {
+        //Decide quirk number
+        int numberPhysical = Random.Range(1, 4); //1 à 3
+        int numberMental = Random.Range(2, 5);  //2 à 4
+        int numberJob = Random.Range(0, 2);     //0 à 1
+        int numberApocExp = Random.Range(0, 2); //0 à 1
+        //add Quirk
+        _quirkTable.GetRandomQuirksOfType(Quirk.QuirkType.Physical, numberPhysical, _quirks);
+        _quirkTable.GetRandomQuirksOfType(Quirk.QuirkType.Mental, numberMental, _quirks);
+        _quirkTable.GetRandomQuirksOfType(Quirk.QuirkType.OldJob, numberJob, _quirks);
+        _quirkTable.GetRandomQuirksOfType(Quirk.QuirkType.ApocalypseExp, numberApocExp, _quirks);
+    }
+
+    //client init
+    public void Init(int[] quirks)
+    {
+        InitStat();
+        InitQuirks(quirks);
+    }
+    private void InitQuirks(int[] quirks)
+    {
+        _quirks = new List<Quirk>();
+        //Deserialize quirks
+        foreach(int id in quirks)
+        {
+            _quirks.Add(_quirkTable.IdToQuirk(id));
+        }
+        //Apply quirks
+        ApplyQuirks();
+    }
+
+    //common part of init
     private void InitStat()
     {
-        _strength = Random.Range(1, 20) * 5;
-        _intelligence = Random.Range(1, 20) * 5;
-        _perception = Random.Range(1, 20) * 5;
-        _mental = Random.Range(1, 20) * 5;
-        _social = Random.Range(1, 20) * 5;
+        //Stat de base
+        int[] baseStat = new int[c_statNumber];
+        for (int i = 0; i < 5; i++) baseStat[i] = 50;
+        for (int i = 5; i < c_statNumber; i++) baseStat[i] = 0;
+        _baseStat = new Stats(baseStat);
+        //Stat modifiante
+        int[] modifStat = new int[c_statNumber];
+        for (int j = 0; j < c_statNumber; j++) modifStat[j] = 0;
+        _statModifiers = new Stats(modifStat);
+    }
+    private void ApplyQuirks()
+    {
+        //Apply quirks
+        foreach (Quirk quirk in _quirks)
+        {
+            _baseStat.Add(quirk.GetStats());
+        }
     }
     private void InitStatus()
     {
         _hunger = _maxHunger / 2;
     }
-    //Public Getters
-    public string GetFullName()
+    //Serialize
+    public int[] SerializeQuirks()
     {
-        return _nameFirst + " " + _nameLast;
-    }
-    public string[] GetToolTipInfo()
-    {
-        return new string[8] 
+        int[] serialized = new int[_quirks.Count];
+        for (int i = 0; i < _quirks.Count; i++)
         {
-            GetFullName(),
-            _strength.ToString(),
-            _intelligence.ToString(),
-            _perception.ToString(),
-            _mental.ToString(),
-            _social.ToString(),
-            _hunger.ToString(),
-            _maxHunger.ToString()
-        };
+            serialized[i] = _quirkTable.QuirkToId(_quirks[i]);
+        }
+        return serialized;
     }
 
-    [PunRPC]
-    public void SendToolTipInfo(string[] info)
+
+
+    //Getters
+    public int GetCurrentStat(Stat stat)
     {
-        _strength = int.Parse(info[1]);
-        _intelligence = int.Parse(info[2]);
-        _perception = int.Parse(info[3]);
-        _mental = int.Parse(info[4]);
-        _social = int.Parse(info[5]);
-        _hunger = int.Parse(info[6]);
-        _maxHunger = int.Parse(info[7]);
+        return _baseStat.GetStat(stat) + _statModifiers.GetStat(stat);
     }
 
+    //Random Getters
+    public bool GetCheck(Stat ms)
+    {
+        //Lance un dé à 100 faces (de 1 à 100)
+        //Si la stat concerné est supérieur ou égal au résultat, alors c'est un réussite, sinon c'est un échec
+        return Random.Range(1, 101) <= GetCurrentStat(ms);
+    }
+
+    //Action
     public void Eat(int food)
     {
         if (_hunger < _maxHunger)
         {
             _hunger += food;
-            GameObject.Find("eCentralManager").GetComponent<CentralManager>().UpdateToolTip(GetToolTipInfo()); // On appelle l'update du tooltip
+            UpdateToolTip(); // On appelle l'update du tooltip
             //GetComponent<PhotonView>().RPC("SendToolTipInfo", PhotonTargets.AllBuffered, GetToolTipInfo());
         }
     }
-
     public void UseItem()
     {
 
     }
+
+    //ToolTip
+    public void UpdateToolTip()
+    {
+        _cm.UpdateToolTip(GetToolTipInfo());
+    }
+    private string[] GetToolTipInfo()
+    {
+        return new string[8]
+        {
+            NameFull,
+            GetCurrentStat(Stat.ms_strength).ToString(),
+            GetCurrentStat(Stat.ms_intelligence).ToString(),
+            GetCurrentStat(Stat.ms_perception).ToString(),
+            GetCurrentStat(Stat.ms_mental).ToString(),
+            GetCurrentStat(Stat.ms_social).ToString(),
+            _hunger.ToString(),
+            _maxHunger.ToString()
+        };
+    }
+    /*
+    [PunRPC]
+    public void SendToolTipInfo(string[] info)
+    {
+        Strength = int.Parse(info[1]);
+        Intelligence = int.Parse(info[2]);
+        Perception = int.Parse(info[3]);
+        Mental = int.Parse(info[4]);
+        Social = int.Parse(info[5]);
+        _hunger = int.Parse(info[6]);
+        _maxHunger = int.Parse(info[7]);
+    }*/
+
+
 }

@@ -25,8 +25,9 @@ GameObject:
   - component: {fileID: 8957068351661252777}
   - component: {fileID: 6518921374920007314}
   - component: {fileID: 3646719238385825721}
+  - component: {fileID: 3169067157287339475}
   m_Layer: 0
-  m_Name: CharaYayko
+  m_Name: CharaTanguy
   m_TagString: Chara
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -135,6 +136,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 66bb833b01d02754895e72f9edbcb1a6, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  _quirkTable: {fileID: 11400000, guid: b0878f919758b654191e554b8bdfdd22, type: 2}
 --- !u!114 &3140698998155076899
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -267,13 +269,12 @@ MonoBehaviour:
   group: 0
   OwnerShipWasTransfered: 0
   prefixBackup: -1
-  synchronization: 3
+  synchronization: 0
   onSerializeTransformOption: 3
   onSerializeRigidBodyOption: 2
   ownershipTransfer: 0
   ObservedComponents:
-  - {fileID: 6518921374920007314}
-  - {fileID: 3646719238385825721}
+  - {fileID: 0}
   ObservedComponentsFoldoutOpen: 1
   viewIdField: 0
   instantiationId: -1
@@ -399,6 +400,18 @@ MonoBehaviour:
   m_SynchronizeLayers:
   - SynchronizeType: 2
     LayerIndex: 0
+--- !u!114 &3169067157287339475
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1628933777899855607}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 46c599547a98b4f44b245831189b4bd6, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1001 &5204163093903766200
 PrefabInstance:
   m_ObjectHideFlags: 0

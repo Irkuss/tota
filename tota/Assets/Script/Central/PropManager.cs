@@ -155,7 +155,7 @@ public class PropManager : MonoBehaviour
     }
     [PunRPC] private void RPC_PlaceProp(float x, float y, float z, float rot, string name)
     {
-        Debug.Log("RPC_PlaceProp: receiving a prop to place");
+        //Debug.Log("RPC_PlaceProp: receiving a prop to place");
         //create a new prop with correct parameters (NB: no need to update all Ids)
         RealProp prop = new RealProp(new Vector3(x, y, z), rot, _props.Count, name);
         //Add the prop to the list

@@ -5,7 +5,7 @@ using UnityEngine.UI;
 using UnityEngine.EventSystems;
 
 
-public class CharaHead : MonoBehaviour
+public class CharaHead : Photon.PunBehaviour
 {
     //Chara Family (Component attaché à Chara)
     [SerializeField] private CharaMovement _movement = null;
@@ -73,18 +73,24 @@ public class CharaHead : MonoBehaviour
 
     private void SelectAsPlayer(PermissionsManager.Player player)
     {
-        _permissions.GetComponent<PhotonView>().RPC("SetOwner", PhotonTargets.AllBuffered, player.Name);
+        GetComponent<CharaConnect>().SendMsg(CharaConnect.CharaCommand.SetOwner, null, new string[1]{ player.Name}, null);
+        //_permissions.GetComponent<PhotonView>().RPC("SetOwner", PhotonTargets.AllBuffered, player.Name);
 
-        _outline.GetComponent<PhotonView>().RPC("SetOutlineToSelected", PhotonTargets.AllBuffered);
-        _outline.GetComponent<PhotonView>().RPC("ChangeColorTo", PhotonTargets.AllBuffered, player.LinkedColor);
+
+        GetComponent<CharaConnect>().SendMsg(CharaConnect.CharaCommand.SetOutlineToSelected, null, null, null);
+        GetComponent<CharaConnect>().SendMsg(CharaConnect.CharaCommand.ChangeColorTo, player.LinkedColor, null, null);
+        //_outline.GetComponent<PhotonView>().RPC("SetOutlineToSelected", PhotonTargets.AllBuffered);
+        //_outline.GetComponent<PhotonView>().RPC("ChangeColorTo", PhotonTargets.AllBuffered, player.LinkedColor);
     }
 
     public void Deselect()
     {
         //Appelé par SpiritHead (par une des 3 fonctions Deselect: DeselectChara(), DeselectAll(), DeselectAllExcept())
-        _permissions.GetComponent<PhotonView>().RPC("SetOwnerNull", PhotonTargets.AllBuffered);
+        GetComponent<CharaConnect>().SendMsg(CharaConnect.CharaCommand.SetOwnerNull, null, null, null);
+        //_permissions.GetComponent<PhotonView>().RPC("SetOwnerNull", PhotonTargets.AllBuffered);
 
-        _outline.GetComponent<PhotonView>().RPC("SetOutlineToNotSelected", PhotonTargets.AllBuffered);
+        GetComponent<CharaConnect>().SendMsg(CharaConnect.CharaCommand.SetOutlineToNotSelected, null, null, null);
+        //_outline.GetComponent<PhotonView>().RPC("SetOutlineToNotSelected", PhotonTargets.AllBuffered);
 
         //NB: removed "if (!EventSystem.current.IsPointerOverGameObject())" and moved it to SpiritHead
         //RemoveInventoryOnDeselected(this.gameObject);

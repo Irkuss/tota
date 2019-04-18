@@ -1631,6 +1631,7 @@ public class Generator : MonoBehaviour
             //Les clients attendent les infos du master (Coroutine lancé par le master)
         }
     }
+    //InitWorld
     private void InitWorld()
     {
         for (int y = 0; y < _worldLength; y++)
@@ -1962,10 +1963,14 @@ public class Generator : MonoBehaviour
     private void MasterSendWorldType(int[] worldTypeData)
     {
         Debug.Log("MasterSendWorldType: Sending world type Data as master");
-        GetComponent<PhotonView>().RPC("MasterSendWorldTypeRPC", PhotonTargets.OthersBuffered, worldTypeData);
+        GetComponent<PhotonView>().RPC("MasterSendWorldTypeRPC", PhotonTargets.OthersBuffered, _worldLength, worldTypeData);
     }
-    [PunRPC] private void MasterSendWorldTypeRPC(int[] worldTypeData)
+    [PunRPC] private void MasterSendWorldTypeRPC(int worldLength, int[] worldTypeData)
     {
+        _worldLength = worldLength;
+        _spawnPoint = (_worldLength - 1) / 2;
+        _world = new WorldNode[_worldLength, _worldLength];
+        InitWorld();
         Debug.Log("MasterSendWorldTypeRPC: receiving world type Data");
         StartCoroutine(WaitForWorldInit(worldTypeData));
     }
@@ -1973,16 +1978,16 @@ public class Generator : MonoBehaviour
 
     //Coroutine du start des clients (lancé par le master)
     public IEnumerator WaitForWorldInit(int[] worldTypeData)
-            {
-                while(_world == null)
-                {
-                    Debug.Log("WaitForWorldInit: waiting for _world to Init");
-                    yield return new WaitForSeconds(1);
-                }
-                //Les clients recoivent l'entiereté des infos
-                ClientUpdateWorldType(worldTypeData);
-                OnWorldTypeReceived();
-            }
+    {
+        while(_world == null)
+        {
+            Debug.Log("WaitForWorldInit: waiting for _world to Init");
+            yield return new WaitForSeconds(1);
+        }
+        //Les clients recoivent l'entiereté des infos
+        ClientUpdateWorldType(worldTypeData);
+        OnWorldTypeReceived();
+    }
     private void ClientUpdateWorldType(int[] worldTypeData)
     {
         Debug.Log("ClientUpdateWorldType: Updating worldtype as client");
@@ -2089,16 +2094,6 @@ public class Generator : MonoBehaviour
         int[] builds = worldTarget.buildData;
         string[] buildPaths = worldTarget.buildPathData;
         GetComponent<PhotonView>().RPC("ClientUpdateDataAt", PhotonPlayer.Find(IdOfAsker), x, y, roads, builds, buildPaths);
-        //StartCoroutine(MasterSendData(x, y, roads, builds, buildPaths, IdOfAsker));
-    }
-    private IEnumerator MasterSendData(int x, int y, int[] roads, int[] builds, string[] buildPaths, int IdOfAsker)
-    {
-        GetComponent<PhotonView>().RPC("ClientUpdateRoadDataAt", PhotonPlayer.Find(IdOfAsker), x, y, roads);
-        yield return new WaitForSeconds(0.1f);
-        GetComponent<PhotonView>().RPC("ClientUpdateBuildDataAt", PhotonPlayer.Find(IdOfAsker), x, y, builds);
-        yield return new WaitForSeconds(0.1f);
-        GetComponent<PhotonView>().RPC("ClientUpdateBuildPathDataAt", PhotonPlayer.Find(IdOfAsker), x, y, buildPaths);
-        yield return new WaitForSeconds(0.1f);
     }
     [PunRPC] private void ClientUpdateDataAt(int x, int y, int[] roads, int[] builds, string[] buildPaths)
     {
@@ -2107,32 +2102,6 @@ public class Generator : MonoBehaviour
         _world[x, y].UpdateMasterData(roads, builds, buildPaths);
 
         StartCoroutine(ClientGenerateAt(x, y));
-    }
-    [PunRPC] private void ClientUpdateRoadDataAt(int x, int y, int[] roads)
-    {
-        Debug.Log("Generating: Updating Roads Data at " + x + "," + y + " as " + PhotonNetwork.player.NickName);
-        _world[x, y].UpdateRoadData(roads);
-        ClientTryGenerateAt(x, y);
-    }
-    [PunRPC] private void ClientUpdateBuildDataAt(int x, int y, int[] builds)
-    {
-        Debug.Log("Generating: Updating Builds Data at " + x + "," + y + " as " + PhotonNetwork.player.NickName);
-        _world[x, y].UpdateBuildData(builds);
-        ClientTryGenerateAt(x, y);
-    }
-    [PunRPC] private void ClientUpdateBuildPathDataAt(int x, int y, string[] buildPaths)
-    {
-        Debug.Log("Generating: Updating BuildPaths Data at " + x + "," + y + " as " + PhotonNetwork.player.NickName);
-        _world[x, y].UpdateBuildPathData(buildPaths);
-        ClientTryGenerateAt(x, y);
-    }
-
-    private void ClientTryGenerateAt(int x, int y)
-    {
-        if (_world[x,y].HasGenerationData() && !_world[x,y].isLoaded)
-        {
-            StartCoroutine(ClientGenerateAt(x, y));
-        }
     }
     private IEnumerator ClientGenerateAt(int x, int y)
     {

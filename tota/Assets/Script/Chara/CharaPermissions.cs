@@ -62,8 +62,17 @@ public class CharaPermissions : MonoBehaviour
     
 
     //Setters RPC
-    [PunRPC]
     public void SetTeam(string teamName)
+    {
+        GetComponent<CharaConnect>().SendMsg(CharaConnect.CharaCommand.RPC_SetTeam, null, new string[1] { teamName }, null);
+        //GetComponent<PhotonView>().RPC("RPC_SetTeam", PhotonTargets.AllBuffered, teamName);
+    }
+    public void SetTeamNull()
+    {
+        GetComponent<CharaConnect>().SendMsg(CharaConnect.CharaCommand.RPC_SetTeamNull, null, null, null);
+        //GetComponent<PhotonView>().RPC("RPC_SetTeamNull", PhotonTargets.AllBuffered);
+    }
+    /*[PunRPC] private*/ public void RPC_SetTeam(string teamName)
     {
         Debug.Log("CharaPermissions: Setting Team to: " + teamName);
 
@@ -78,20 +87,20 @@ public class CharaPermissions : MonoBehaviour
         }
         
     }
-    [PunRPC]
-    public void SetTeamNull() //Probably useless now
+    /*[PunRPC] private*/
+    public void RPC_SetTeamNull() //Probably useless now
     {
         //myTeam = null;
         team = null;
     }
-    
-    [PunRPC]
+
+    /*[PunRPC]*/
     public void SetOwner(string newOwnerName)
     {
         //Change la personne qui a le controle de Chara
         ownerName = newOwnerName;
     }
-    [PunRPC]
+    /*[PunRPC]*/
     public void SetOwnerNull()
     {
         ownerName = null;

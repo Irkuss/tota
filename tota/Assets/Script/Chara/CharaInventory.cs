@@ -196,7 +196,7 @@ public class CharaInventory : MonoBehaviour
     {
         _interface = Instantiate(_interfacePrefab);
         _interface.transform.SetParent(parent.transform, false);
-        _interface.transform.GetChild(1).GetChild(0).GetComponent<Text>().text = gameObject.GetComponent<CharaRpg>().FullName;
+        _interface.transform.GetChild(1).GetChild(0).GetComponent<Text>().text = gameObject.GetComponent<CharaRpg>().NameFull;
 
         _inventory = Instantiate(_inventoryPrefab);
         _inventory.transform.SetParent(_interface.transform.GetChild(0).GetChild(3).GetChild(0), false);
@@ -257,7 +257,8 @@ public class CharaInventory : MonoBehaviour
             Debug.Log("CharaInventory: Item was not present");
             //Si l'item n'était pas dans l'inventaire, ajoute un exemplaire de cet item
             //inventory.Add(item, 1);
-            gameObject.GetComponent<PhotonView>().RPC("AddWithId", PhotonTargets.AllBuffered, itemTable.GetIdWithItem(item));
+            GetComponent<CharaConnect>().SendMsg(CharaConnect.CharaCommand.AddWithId, new int[1] { itemTable.GetIdWithItem(item) }, null, null);
+            //gameObject.GetComponent<PhotonView>().RPC("AddWithId", PhotonTargets.AllBuffered, itemTable.GetIdWithItem(item));
         }
         Debug.Log("CharaInventory: Item has been added");
         //Appelle le Callback en s'assurant que quelqu'un écoute
@@ -270,7 +271,8 @@ public class CharaInventory : MonoBehaviour
 
     public void Remove(Item item)
     {
-        gameObject.GetComponent<PhotonView>().RPC("RemoveWithId", PhotonTargets.AllBuffered, itemTable.GetIdWithItem(item));
+        GetComponent<CharaConnect>().SendMsg(CharaConnect.CharaCommand.RemoveWithId, new int[1] { itemTable.GetIdWithItem(item) }, null, null);
+        //gameObject.GetComponent<PhotonView>().RPC("RemoveWithId", PhotonTargets.AllBuffered, itemTable.GetIdWithItem(item));
 
         //inventory.Remove(item);
         //UpdateUI();
@@ -278,27 +280,28 @@ public class CharaInventory : MonoBehaviour
 
     public void ModifyCount(Item item, int countModifier)
     {
-        gameObject.GetComponent<PhotonView>().RPC("ModifyCountWithId", PhotonTargets.AllBuffered, itemTable.GetIdWithItem(item), countModifier);
+        GetComponent<CharaConnect>().SendMsg(CharaConnect.CharaCommand.ModifyCountWithId, new int[2] { itemTable.GetIdWithItem(item), countModifier }, null, null);
+        //gameObject.GetComponent<PhotonView>().RPC("ModifyCountWithId", PhotonTargets.AllBuffered, itemTable.GetIdWithItem(item), countModifier);
     }
 
     //RPC functions
 
-    [PunRPC]
-    private void RemoveWithId(int id)
+    /*[PunRPC]
+    private */ public void RemoveWithId(int id)
     {
         inventory.Remove(itemTable.GetItemWithId(id));
 
         UpdateUI();
     }
-    [PunRPC]
-    private void AddWithId(int id)
+    /*[PunRPC]
+    private */ public void AddWithId(int id)
     {
         inventory.Add(itemTable.GetItemWithId(id),1);
 
         UpdateUI();
     }
-    [PunRPC]
-    private void ModifyCountWithId(int id, int countModifier)
+    /*[PunRPC]
+    private*/ public void ModifyCountWithId(int id, int countModifier)
     {
         inventory[itemTable.GetItemWithId(id)] += countModifier;
 

@@ -12,7 +12,7 @@ public class CharaOutline : MonoBehaviour
     //-Les Charas sans équipe (controlé par l'IA) n'ont pas d'Outline
 
     //Recuperer le permissions manager component
-    private PermissionsManager permManager;
+    private PermissionsManager permManager = PermissionsManager.Instance;
 
     //Recuperer le Outline Component attaché au Chara
     [SerializeField] private Outline outline = null;
@@ -34,14 +34,14 @@ public class CharaOutline : MonoBehaviour
 
         permManager = PermissionsManager.Instance;
 
-        
 
-        GetComponent<PhotonView>().RPC("UpdateTeamColor", PhotonTargets.AllBuffered);
+        GetComponent<CharaConnect>().SendMsg(CharaConnect.CharaCommand.UpdateTeamColor, null, null, null);
+        //GetComponent<PhotonView>().RPC("UpdateTeamColor", PhotonTargets.AllBuffered);
     }
 
     //Init Team Color
-    [PunRPC]
-    private void UpdateTeamColor()
+    //[PunRPC]
+    public void UpdateTeamColor()
     {
         PermissionsManager.Team team = GetComponent<CharaPermissions>().GetTeam();
 
@@ -73,7 +73,7 @@ public class CharaOutline : MonoBehaviour
     }
 
     //Public Methods
-    [PunRPC]
+    //[PunRPC]
     public void ChangeColorTo(int[] color)
     {
         if (_clientIsInOurTeam)
@@ -82,7 +82,7 @@ public class CharaOutline : MonoBehaviour
         }
     }
 
-    [PunRPC]
+    //[PunRPC]
     public void SetOutlineToSelected()
     {
         if (_clientIsInOurTeam)
@@ -92,7 +92,7 @@ public class CharaOutline : MonoBehaviour
         
     }
 
-    [PunRPC]
+    //[PunRPC]
     public void SetOutlineToNotSelected()
     {
         if (_clientIsInOurTeam)
