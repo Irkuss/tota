@@ -7,7 +7,7 @@ public class ToolTip : MonoBehaviour
 {
     //Temporaire
 
-
+    [SerializeField] private Text _name = null;
     //On recupere les Component Text qui seront modifiés
     [SerializeField] private Text _strengthText = null;
     [SerializeField] private Text _intelligenceText = null;
@@ -46,6 +46,10 @@ public class ToolTip : MonoBehaviour
 
     public void UpdateTool(string[] info)
     {
+        if (_name != null)
+        {
+            _name.text = "Name : " + info[0];
+        }
         _strengthSlider.value = int.Parse(info[1]);
         _intelligenceSlider.value = int.Parse(info[2]);
         _perceptionSlider.value = int.Parse(info[3]);

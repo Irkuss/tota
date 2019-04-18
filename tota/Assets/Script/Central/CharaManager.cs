@@ -18,12 +18,12 @@ public class CharaManager : MonoBehaviour
     }
 
     //Spawn a Chara
-    public void SpawnChara(Vector3 pos, string teamName)
+    public void SpawnChara(Vector3 pos, string teamName, string playerName)
     {
         int[] quirks = GetNewSerializedQuirks();
-        GetComponent<PhotonView>().RPC("RPC_SpawnChara", PhotonTargets.AllBuffered, pos.x, pos.y, pos.z, teamName, quirks);
+        GetComponent<PhotonView>().RPC("RPC_SpawnChara", PhotonTargets.AllBuffered, pos.x, pos.y, pos.z, teamName, quirks, playerName);
     }
-    [PunRPC] private void RPC_SpawnChara(float x, float y, float z, string teamName, int[] quirks)
+    [PunRPC] private void RPC_SpawnChara(float x, float y, float z, string teamName, int[] quirks, string playerName)
     {
         //Instancie sur le PhotonNetwork le Chara
         Vector3 pos = new Vector3(x, y, z);
@@ -35,7 +35,10 @@ public class CharaManager : MonoBehaviour
         //Initialise les stats du chara
         chara.GetComponent<CharaRpg>().Init(quirks);
 
+        PermissionsManager.Instance.spirit.InstantiateCharaRef(playerName, chara);
+
     }
+
     //Init static
     public int[] GetNewSerializedQuirks()
     {

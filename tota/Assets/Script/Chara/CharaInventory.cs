@@ -94,7 +94,7 @@ public class CharaInventory : MonoBehaviour
                 if (itemUsed) OnRemoveButton();                            // On enleve l'item utilisé
             }
         }
-    }
+    }    
 
     //Database des items (pour avoir leur id, pour les update en rpc)
     [SerializeField] private ItemTable itemTable = null;
@@ -189,6 +189,12 @@ public class CharaInventory : MonoBehaviour
             _slots[i].ClearSlot();
         }
 
+        if(_interface != null)
+        {
+            _interface.GetComponent<InterfaceManager>().UpdateCraft(this);
+            UpdateWeight();
+        }
+
     }
 
     //Openning and closing Inventory (canvas)
@@ -197,7 +203,7 @@ public class CharaInventory : MonoBehaviour
         _interface = Instantiate(_interfacePrefab);
         _interface.transform.SetParent(parent.transform, false);
         _interface.transform.GetChild(1).GetChild(0).GetComponent<Text>().text = gameObject.GetComponent<CharaRpg>().NameFull;
-        _interface.GetComponent<InterfaceManager>().InstantiateCraft();
+        _interface.GetComponent<InterfaceManager>().InstantiateCraft(this);
 
         _inventory = Instantiate(_inventoryPrefab);
         _inventory.transform.SetParent(_interface.transform.GetChild(0).GetChild(3).GetChild(0), false);
@@ -211,9 +217,24 @@ public class CharaInventory : MonoBehaviour
     {
         _inventory = Instantiate(_inventoryPrefab);
         _inventory.transform.SetParent(parent.transform, false);
-        _inventory.GetComponent<Image>().color = new Color(212, 210, 97, 100);
+        _inventory.GetComponent<Image>().color = Color.blue;
         _slotParent = _inventory.transform.GetChild(0).GetChild(0).gameObject;
         InitSlots();
+    }
+
+    public int UpdateWeight()
+    {
+        if (_inventory == null) return -1;
+        int sum = 0;
+
+        foreach(var item in inventory)
+        {
+            sum += item.Key.weight * item.Value;
+        }
+
+        _inventory.transform.GetChild(1).GetComponent<Text>().text = "Poids actuel : " + sum + " || Poids max : " + gameObject.GetComponent<CharaRpg>().GetCurrentStat(CharaRpg.Stat.ms_strength)/5;
+
+        return sum;
     }
 
     public void UpdateStats(string[] stats)
@@ -247,6 +268,7 @@ public class CharaInventory : MonoBehaviour
         //Le booléen retourné représente la réussite de l'ajout de l'item
         Debug.Log("CharaInventory: Checking space");
         if (inventory.Count >= _inventorySpace || 
+            UpdateWeight() + item.weight > (gameObject.GetComponent<CharaRpg>().GetCurrentStat(CharaRpg.Stat.ms_strength) / 5) ||
             _slots[_inventorySpace-1].isEmpty == false && 
             (_slots[_inventorySpace - 1].itemCount == item.stack || _slots[_inventorySpace - 1].item != item)) // Du spaghetti comme on aime
         {
@@ -314,7 +336,14 @@ public class CharaInventory : MonoBehaviour
     {
         inventory[itemTable.GetItemWithId(id)] += countModifier;
 
-        UpdateUI();
+        if (inventory[itemTable.GetItemWithId(id)] == 0)
+        {
+            RemoveWithId(id);
+        }
+        else
+        {
+            UpdateUI();
+        }        
     }
 
 }

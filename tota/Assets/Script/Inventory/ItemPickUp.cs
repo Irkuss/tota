@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class ItemPickUp : Interactable
 {
@@ -13,19 +14,8 @@ public class ItemPickUp : Interactable
     {
         PickUp(chara.gameObject);
     }
-    
 
     //Unity callbacks
-    public void OnTriggerEnter(Collider other)
-    {
-        //Appelé quand un Gameobject entre en collision avec nous
-        if (other.tag == "Player")
-        {
-            PickUp(other.gameObject);
-            this.GetComponent<Collider>().isTrigger = false;
-        }
-    }
-
     void PickUp(GameObject chara)
     {
         bool pickedUp = chara.GetComponent<CharaInventory>().Add(item);
