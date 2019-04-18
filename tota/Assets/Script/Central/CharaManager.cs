@@ -58,11 +58,6 @@ public class CharaManager : MonoBehaviour
         }
         return serialized;
     }
-    //When a chara spawns under a non masterclient
-    public void AddToTeam(GameObject chara)
-    {
-        _allCharas.Add(chara);
-    }
 
     //Get a Chara
     public int GetIdWithChara(GameObject chara)

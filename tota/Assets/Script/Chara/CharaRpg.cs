@@ -21,9 +21,9 @@ public class CharaRpg : MonoBehaviour
     //Character
     public static StreamReader prenoms = new StreamReader("Assets/Resources/Database/prenoms.txt");
     public static StreamReader noms = new StreamReader("Assets/Resources/Database/noms.txt");
-
+    
     //Stats
-    public enum Stat    
+    public enum Stat
     {
         //Main stats (de 1 à 100)
         ms_strength,
@@ -76,73 +76,6 @@ public class CharaRpg : MonoBehaviour
     private Stats _baseStat;
     private Stats _statModifiers;
     private List<Quirk> _quirks;
-    
-    //Status Santé WIP
-    private int _hunger;
-    private int _maxHunger = 100;
-
-    private float _consciousness = 100f; //if reaches 0, die
-    private float _movement = 100f; //
-    private float _totalPain = 10f;
-    private List<BodyPart> _bodyParts;
-
-
-    public class Wound
-    {
-        public enum WoundType
-        {
-            Burn,   //treated by burn cream (infect)
-            Break,  //treated by a split (attelle)
-            Bruise, //treated by cream
-            Bite,   //treated by bandage (bleed) (infect)
-            GunShot,//have to be operated (bleed) (infect)
-            Cut,    // (bleed) (infect)
-            Stab,   //(bleed) (infect)
-        }
-        public enum WoundSeverity
-        {
-            minor,
-            moderate,
-            serious,
-            severe,
-            critical,
-            maximal
-
-        }
-        private WoundType _woundType;
-
-        public Wound(WoundType woundType)
-        {
-            _woundType = woundType;
-        }
-    }
-
-    public class BodyPart
-    {
-        private List<Wound> _wounds;
-        private string _partName;
-
-        public BodyPart(string name)
-        {
-            _partName = name;
-            _wounds = new List<Wound>();
-        }
-    }
-
-    public class Leg : BodyPart
-    {
-        public Leg(string name) : base(name)
-        {
-            
-        }
-    }
-
-    public void InitHealth()
-    {
-        _bodyParts = new List<BodyPart>();
-        _bodyParts.Add(new Leg("Right leg"));
-    }
-
     //Init Awake
     private void Awake()
     {
@@ -163,6 +96,7 @@ public class CharaRpg : MonoBehaviour
     {
         InitStat();
         InitQuirks(quirks);
+        InitHealth();
     }
     private void InitQuirks(int[] quirks)
     {
@@ -175,7 +109,7 @@ public class CharaRpg : MonoBehaviour
         //Apply quirks
         ApplyQuirks();
     }
-
+    
     //common part of init
     private void InitStat()
     {
@@ -211,9 +145,6 @@ public class CharaRpg : MonoBehaviour
         }
         return serialized;
     }
-
-
-
     //Getters
     public int GetCurrentStat(Stat stat)
     {
@@ -227,6 +158,370 @@ public class CharaRpg : MonoBehaviour
         //Si la stat concerné est supérieur ou égal au résultat, alors c'est un réussite, sinon c'est un échec
         return Random.Range(1, 101) <= GetCurrentStat(ms);
     }
+
+
+
+    //Health Attribute
+    private int _hunger;
+    private int _maxHunger = 100;
+
+    private int maxBloodStock = 3000;
+    private int bloodStockGain = 30;
+    private int bloodStock;
+    private float _consciousness = 100f; //if reaches 0, die
+    private float _movement = 1f; //walk speed, = min(feet1, leg1) + min(feet2, leg2)
+    private List<BodyPart> _bodyParts;
+
+    //Health class and enum
+    public enum WoundType
+    {
+        Fracture,  //treated by a split
+        Bruise, //treated by cream1
+        Burn,   //treated by cream2
+        FrostBite,//treated by FIRE
+        Bleeding//treated by bandage
+    }
+    public enum BodyType
+    {
+        Head,
+        Torso,
+        Leg,
+        Feet,
+        Shoulder,
+        Arm,
+        Hand,
+    }
+    public static Dictionary<WoundType, string> WoundTypeToString = new Dictionary<WoundType, string>()
+    {
+        { WoundType.Fracture, "Fracture" },
+        { WoundType.Bruise, "Bruise" },
+        { WoundType.Burn, "Burn" },
+        { WoundType.FrostBite, "FrostBite" },
+        { WoundType.Bleeding, "Bleeding" }
+    };
+    public static Dictionary<WoundType, bool> WoundTypeToIsBleed = new Dictionary<WoundType, bool>()
+    {
+        { WoundType.Fracture, false },
+        { WoundType.Bruise, false },
+        { WoundType.Burn, false },
+        { WoundType.FrostBite, false },
+        { WoundType.Bleeding, true }
+    };
+    public class Wound
+    {
+        //Inititial attribute
+        public WoundType type;
+        public int damage;
+        public bool isTreated = false;
+        public int bloodLose = 0;
+        //Constructeur
+        public Wound(WoundType type, int initialDamage)
+        {
+            this.type = type;
+            damage = initialDamage;
+            if (WoundTypeToIsBleed[type])
+            {
+                bloodLose = initialDamage;
+            }
+        }
+        //Treating the wound
+        public void Update(bool isResting = false)
+        {
+            if (bloodLose != 0)
+            {
+                damage--;
+                if (isTreated) damage--;
+                if (isResting) damage -= 2;
+            }
+        }
+        public void Treat()
+        {
+            isTreated = true;
+            bloodLose = 0;
+        }
+        //End COndition
+        public bool IsHealed()
+        {
+            return damage <= 0 && bloodLose <= 0;
+        }
+        //OtherGetters
+        public string GetWoundInfo()
+        {
+            string info = WoundTypeToString[type] + " (" + damage + ")";
+            if (bloodLose != 0) info += " (bleeding: " + bloodLose + ")";
+            return info;
+        }
+    }
+    public class BodyPart
+    {
+        //Defining
+        public string name;
+        public BodyType bodyType;
+        public int maxHp;
+        //Wounds
+        public List<Wound> wounds;
+        public bool isDestroyed = false;
+        //Constructor
+        public BodyPart(string name, BodyType bodyType, int maxHp)
+        {
+            this.name = name;
+            this.bodyType = bodyType;
+            this.maxHp = maxHp;
+            wounds = new List<Wound>();
+        }
+        //Adding wound
+        public void AddWound(Wound wound)
+        {
+            wounds.Add(wound);
+        }
+        //Updating wound
+        public void Update(bool isRested)
+        {
+            foreach (Wound wound in wounds)
+            {
+                wound.Update(isRested);
+                if (wound.IsHealed())
+                {
+                    wounds.Remove(wound);
+                }
+            }
+        }
+        public void TreatAllWoundsOfType(WoundType type)
+        {
+            foreach (Wound wound in wounds)
+            {
+                if (wound.type == type)
+                {
+                    wound.Treat();
+                }
+            }
+        }
+        //End Condition
+        public bool IsDestroyed()
+        {
+            if (isDestroyed)
+            {
+                return true;
+            }
+            else
+            {
+                int totalDmg = 0;
+                foreach (Wound wound in wounds)
+                {
+                    totalDmg += wound.damage;
+                }
+                if (totalDmg >= maxHp)
+                {
+                    isDestroyed = true;
+                    return true;
+                }
+                return false;
+            }
+        }
+        public bool IsFullyHealed()
+        {
+            return GetTotalDamage() == 0;
+        }
+        //OtherGetters
+        public int GetTotalBloodLose()
+        {
+            int totalBloodLose = 0;
+            foreach (Wound wound in wounds)
+            {
+                totalBloodLose += wound.bloodLose;
+            }
+            return totalBloodLose;
+        }
+        //Info Getters
+        private int GetTotalDamage()
+        {
+            int totalDamage = 0;
+            foreach (Wound wound in wounds)
+            {
+                totalDamage += wound.damage;
+            }
+            return totalDamage;
+        }
+        public string GetPartInfo()
+        {
+            return name + "(" + GetTotalDamage() + "/" + maxHp + ")";
+        }
+        public string[] GetWoundsInfo()
+        {
+            string[] woundsInfo = new string[wounds.Count];
+            Wound wound;
+            for (int i = 0; i < wounds.Count; i++)
+            {
+                woundsInfo[i] = wounds[i].GetWoundInfo();
+            }
+            return woundsInfo;
+        }
+        public string GetMissingInfo()
+        {
+            return name + " has been destroyed";
+        }
+    }
+    //Health Main
+    public void InitHealth()
+    {
+        _bodyParts = new List<BodyPart>();
+        _bodyParts.Add(new BodyPart("Head", BodyType.Head, 50));
+        _bodyParts.Add(new BodyPart("Upper Torso", BodyType.Torso, 500));
+        _bodyParts.Add(new BodyPart("Lower Torso", BodyType.Torso, 500));
+        _bodyParts.Add(new BodyPart("Right Leg", BodyType.Leg, 300));
+        _bodyParts.Add(new BodyPart("Left Leg", BodyType.Leg, 300));
+        _bodyParts.Add(new BodyPart("Right Feet", BodyType.Feet, 200));
+        _bodyParts.Add(new BodyPart("Left Feet", BodyType.Feet, 200));
+        _bodyParts.Add(new BodyPart("Shoulder", BodyType.Shoulder, 400));
+        _bodyParts.Add(new BodyPart("Right Arm", BodyType.Arm, 300));
+        _bodyParts.Add(new BodyPart("Left Arm", BodyType.Arm, 300));
+        _bodyParts.Add(new BodyPart("Right Hand", BodyType.Hand, 200));
+        _bodyParts.Add(new BodyPart("Left Hand", BodyType.Hand, 200));
+
+        bloodStock = maxBloodStock;
+
+        StartCoroutine(Cor_UpdateHealth());
+    }
+    public IEnumerator Cor_UpdateHealth()
+    {
+        while(true)
+        {
+            UpdateHealth();
+            yield return new WaitForSeconds(5);
+        }
+    }
+    public void UpdateHealth(bool isRested = false)
+    {
+        int totalBloodLose = 0;
+        //Main Update
+        foreach (BodyPart bodyPart in _bodyParts)
+        {
+            bodyPart.Update(isRested);
+            totalBloodLose += bodyPart.GetTotalBloodLose();
+        }
+        //Blood lose
+        if (totalBloodLose == 0)
+        {
+            bloodStock += bloodStockGain;
+            if (bloodStock > maxBloodStock) bloodStock = maxBloodStock;
+        }
+        else
+        {
+            bloodStock -= totalBloodLose;
+        }
+        //Check Death
+        if (CheckDeath())
+        {
+            Die();
+            return;
+        }
+        //Update Stats
+
+        //Debug:
+        Debug.Log("CharaRpg: Blood Lost " + totalBloodLose + ", " + bloodStock + " left");
+        DebugWounds();
+    }
+    public bool CheckDeath()
+    {
+        //Destroyed BodyPart
+        if (_bodyParts[0].IsDestroyed() || _bodyParts[1].IsDestroyed() || _bodyParts[2].IsDestroyed())
+        {
+            return true;
+        }
+        //BloodLose
+        if (bloodStock <= 0)
+        {
+            return true;
+        }
+        return false;
+    }
+    public void Die()
+    {
+        //Chara dies
+        Debug.Log("======================= CharaRpg: " + NameFull + " has died =======================");
+    }
+
+    public List<BodyPart> FindPartWithType(BodyType type)
+    {
+        List<BodyPart> bodyPartWithType = new List<BodyPart>();
+
+        foreach (BodyPart bodyPart in _bodyParts)
+        {
+            if (bodyPart.bodyType == type)
+            {
+                bodyPartWithType.Add(bodyPart);
+            }
+        }
+        return bodyPartWithType;
+    }
+    public BodyPart FindPartWithName(string name)
+    {
+        foreach (BodyPart bodyPart in _bodyParts)
+        {
+            if (bodyPart.name == name)
+            {
+                return bodyPart;
+            }
+        }
+        return null;
+    }
+
+    public void AddWound(Wound wound, BodyPart bodyPart)
+    {
+        bodyPart.AddWound(wound);
+    }
+    public void AddWound(Wound wound, string bodyPartName)
+    {
+        FindPartWithName(bodyPartName).AddWound(wound);
+    }
+
+    //Health Info
+    public string[] GetWoundsInfo()
+    {
+        List<string> woundsInfo = new List<string>();
+        List<string> missingInfo = new List<string>();
+        //Get l'information
+        //Wounds
+        foreach (BodyPart bp in _bodyParts)
+        {
+            if (!bp.IsFullyHealed() && !bp.IsDestroyed())
+            {
+                woundsInfo.Add(bp.GetPartInfo());
+                foreach (string s in bp.GetWoundsInfo())
+                {
+                    woundsInfo.Add(s);
+                }
+            }
+        }
+        //Missing
+        foreach (BodyPart bp in _bodyParts)
+        {
+            if (bp.IsDestroyed())
+            {
+                missingInfo.Add(bp.GetMissingInfo());
+            }
+        }
+        //Parse en array
+        string[] woundsInfoArray = new string[woundsInfo.Count];
+        for (int i = 0; i < woundsInfo.Count; i++)
+        {
+            woundsInfoArray[i] = woundsInfo[i];
+        }
+        return woundsInfoArray;
+    }
+    public void DebugWounds()
+    {
+        string debug = "";
+        foreach (string s in GetWoundsInfo())
+        {
+            debug += s;
+        }
+        Debug.Log("DebugWounds: " + debug);
+    }
+
+
+
+
 
     //Action
     public void Eat(int food)
