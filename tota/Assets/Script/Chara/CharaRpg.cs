@@ -6,8 +6,8 @@ using UnityEngine;
 public class CharaRpg : MonoBehaviour
 {
     //Character
-    private string _nameFirst = "John";
-    private string _nameLast = "McCree";
+    private string _nameFirst;
+    private string _nameLast;
 
     public static StreamReader prenoms = new StreamReader("Assets/Resources/Database/prenoms.txt");
     public static StreamReader noms = new StreamReader("Assets/Resources/Database/noms.txt");
@@ -44,6 +44,12 @@ public class CharaRpg : MonoBehaviour
         get => _social;
     }
 
+    private void Awake()
+    {
+        _nameFirst = GetRandomFirstName();
+        _nameLast = GetRandomLastName();
+        Debug.Log("DONE");
+    }
 
     //Status
     private int _hunger;
