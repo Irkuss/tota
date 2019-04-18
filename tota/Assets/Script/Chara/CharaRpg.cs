@@ -228,6 +228,7 @@ public class CharaRpg : MonoBehaviour
         {
             _hunger += food;
             UpdateToolTip(); // On appelle l'update du tooltip
+            gameObject.GetComponent<CharaInventory>().UpdateStats(GetToolTipInfo());
             //GetComponent<PhotonView>().RPC("SendToolTipInfo", PhotonTargets.AllBuffered, GetToolTipInfo());
         }
     }
@@ -241,7 +242,7 @@ public class CharaRpg : MonoBehaviour
     {
         _cm.UpdateToolTip(GetToolTipInfo());
     }
-    private string[] GetToolTipInfo()
+    public string[] GetToolTipInfo()
     {
         return new string[8]
         {

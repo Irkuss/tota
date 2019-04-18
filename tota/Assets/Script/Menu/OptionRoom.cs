@@ -142,13 +142,15 @@ public class OptionRoom : MonoBehaviour
             PermissionsManager.Instance.heightMap = int.Parse(heightMapInput.text);
         }
 
+        roomOptions.CustomRoomProperties.Add("numberChara", (int)randomChara.value);
         PermissionsManager.Instance.numberChara = (int) randomChara.value;        
 
         roomOptions.CustomRoomPropertiesForLobby = new string[]
         {
             "password",
             "maxInTeam",
-            "heightMap"
+            "heightMap",
+            "numberChara"
         };
 
         if (roomName.text != "")

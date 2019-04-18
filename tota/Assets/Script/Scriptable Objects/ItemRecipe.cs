@@ -14,6 +14,8 @@ public class ItemRecipe : ScriptableObject
     public Item[] neededItem;
     public int[] neededItemCount;
 
+    public RecipeTable.RecipeType type = RecipeTable.RecipeType.Base;
+
     public bool CanBeCraftedWith(Dictionary<Item, int> inventory)
     {
         for (int i = 0; i < neededItem.Length; i++)

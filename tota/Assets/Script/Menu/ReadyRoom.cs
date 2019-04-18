@@ -53,7 +53,7 @@ public class ReadyRoom : MonoBehaviour
 
         charaPerTeam = Instantiate(_settingPrefab);
         charaPerTeam.transform.SetParent(_settings.transform, false);
-        charaPerTeam.GetComponentInChildren<Text>().text = "CharaPerTeam : " + PermissionsManager.Instance.numberChara;
+        charaPerTeam.GetComponentInChildren<Text>().text = "CharaPerTeam : " + room.CustomProperties["numberChara"];
     }
 
     public void LeaveRoom()

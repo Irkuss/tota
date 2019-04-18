@@ -15,8 +15,6 @@ public class Furniture : ScriptableObject
 
     public void Interact(CharaHead chara, GameObject parent, FurnitureManager manager)
     {
-        //GameObject go = Instantiate(_inventory);
-        //go.transform.SetParent(parent.transform.GetChild(0).GetChild(0), false);
         parent.SetActive(true);
         CharaInventory furniture = manager.gameObject.GetComponent<CharaInventory>();
         
