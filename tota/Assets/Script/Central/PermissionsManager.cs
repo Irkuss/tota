@@ -166,6 +166,7 @@ public class PermissionsManager : MonoBehaviour
 
     [HideInInspector] public int numberChara;
     [HideInInspector] public int heightMap;
+    [HideInInspector] public SpiritHead spirit;
 
     private void Awake()
     {
