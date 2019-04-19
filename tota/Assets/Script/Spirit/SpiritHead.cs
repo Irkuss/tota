@@ -26,6 +26,10 @@ public class SpiritHead : Photon.MonoBehaviour
     private static List<GameObject> _selectedList;
     public static List<GameObject> SelectedList => _selectedList;
 
+    private void Awake()
+    {
+        PermissionsManager.Instance.spirit = this;
+    }
     //Unity Callback
     void Start()
     {
@@ -83,7 +87,7 @@ public class SpiritHead : Photon.MonoBehaviour
         {
             //Projection des positions sur le sol
             Vector3 lowPosition = new Vector3(gameObject.transform.position.x, 1, gameObject.transform.position.z);
-            GameObject.Find("eCentralManager").GetComponent<CharaManager>().SpawnChara(lowPosition, _playerOwner.MyTeamName);
+            GameObject.Find("eCentralManager").GetComponent<CharaManager>().SpawnChara(lowPosition, _playerOwner.MyTeamName,_playerOwner.Name);
             /*
             //Instantiation de Chara
             GameObject go;
@@ -117,8 +121,7 @@ public class SpiritHead : Photon.MonoBehaviour
         }
     }
 
-    [PunRPC]
-    private void InstantiateCharaRef(string playerWhoSent)
+    public void InstantiateCharaRef(string playerWhoSent,GameObject chara)
     {
         PermissionsManager.Player player = _permission.GetPlayerWithName(PhotonNetwork.player.NickName);
         PermissionsManager.Team team = _permission.GetTeamWithName(player.MyTeamName);
@@ -128,8 +131,8 @@ public class SpiritHead : Photon.MonoBehaviour
             GameObject charaLayout = Instantiate(Resources.Load<GameObject>("CharaRef"));
             charaLayout.transform.SetParent(_charaLayout.transform, false);
             charaLayout.GetComponent<LinkChara>().spirit = this;
-            charaLayout.GetComponent<LinkChara>().chara = _chara;
-            charaLayout.GetComponent<LinkChara>().Name.text = _chara.GetComponent<CharaRpg>().NameFull;
+            charaLayout.GetComponent<LinkChara>().chara = chara;
+            charaLayout.GetComponent<LinkChara>().Name.text = chara.GetComponent<CharaRpg>().NameFull;
         }
     }
 
@@ -342,7 +345,7 @@ public class SpiritHead : Photon.MonoBehaviour
         }
 
     }
-    
+
     //Public methods
 
     public void ClickOnChara(GameObject chara)

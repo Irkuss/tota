@@ -247,7 +247,7 @@ public class CharaRpg : MonoBehaviour
     //ToolTip
     public void UpdateToolTip()
     {
-        _cm.UpdateToolTip(GetToolTipInfo());
+        GameObject.Find("eCentralManager").GetComponent<CentralManager>().UpdateToolTip(GetToolTipInfo());
     }
     public string[] GetToolTipInfo()
     {
