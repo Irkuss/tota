@@ -347,11 +347,13 @@ MonoBehaviour:
   m_Value: 0
   m_Options:
     m_Options:
-    - m_Text: Option A
+    - m_Text: Mode
       m_Image: {fileID: 0}
-    - m_Text: Option B
+    - m_Text: Solo
       m_Image: {fileID: 0}
-    - m_Text: Option C
+    - m_Text: Cold
+      m_Image: {fileID: 0}
+    - m_Text: Other
       m_Image: {fileID: 0}
   m_OnValueChanged:
     m_PersistentCalls:
@@ -7768,6 +7770,7 @@ MonoBehaviour:
   roomName: {fileID: 197957036}
   heightMapInput: {fileID: 1444421937}
   randomCharacters: {fileID: 340386426}
+  _dropdown: {fileID: 56085716}
 --- !u!1 &1529974632
 GameObject:
   m_ObjectHideFlags: 0
@@ -10507,13 +10510,13 @@ MonoBehaviour:
     m_BestFit: 0
     m_MinSize: 10
     m_MaxSize: 40
-    m_Alignment: 3
+    m_Alignment: 4
     m_AlignByGeometry: 0
     m_RichText: 1
     m_HorizontalOverflow: 0
     m_VerticalOverflow: 0
     m_LineSpacing: 1
-  m_Text: Option A
+  m_Text: Mode
 --- !u!222 &1959552868
 CanvasRenderer:
   m_ObjectHideFlags: 0

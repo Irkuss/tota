@@ -47,7 +47,7 @@ public class Equipable : Item
     public float remoteMaxRange = 0;
     public bool useAmmo = false;
     public Item ammo = null;
-
+   
     //Use (Equip)
     public override bool Use(GameObject refInventChara)
     {
@@ -59,7 +59,32 @@ public class Equipable : Item
         //    equip this weapon to chara
         //    return true
         //return false;
-        return false;
+
+        CharaInventory inv = refInventChara.GetComponent<CharaInventory>();
+
+        if(equipSpace == EquipSpace.OneHanded)
+        {
+            if (inv.equipments[0] != null && inv.equipments[1] == null)
+            {
+                inv.equipments[1] = this;
+            }
+            else
+            {
+                inv.equipments[0] = this;
+            }
+        }
+        else
+        {
+            inv.equipments[0] = this;
+            inv.equipments[1] = this;
+        }
+
+        GameObject _interface = inv.GetInterface();
+        if (_interface == null) return false;
+        _interface.GetComponent<InterfaceManager>().UpdateEquipment(inv);
+
+
+        return true;
     }
     public override bool Unequip(GameObject refInventChara)
     {
@@ -68,6 +93,7 @@ public class Equipable : Item
         //if inventory has enough space (1)
         //    return true
         //return false
+
         return false;
     }
     //Should be check before attacking

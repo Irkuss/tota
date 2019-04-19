@@ -103,6 +103,9 @@ public class CharaInventory : MonoBehaviour
     [HideInInspector]
     public Dictionary<Item, int> inventory = new Dictionary<Item, int>();
 
+    [HideInInspector] public Wearable[] wearables = new Wearable[4];
+    [HideInInspector] public Equipable[] equipments = new Equipable[2];
+
     //Nombre d'emplacement (Tweakable)
     private int _inventorySpace = 12;
 
@@ -192,6 +195,7 @@ public class CharaInventory : MonoBehaviour
         if(_interface != null)
         {
             _interface.GetComponent<InterfaceManager>().UpdateCraft(this);
+            _interface.GetComponent<InterfaceManager>().UpdateEquipment(this);
             UpdateWeight();
         }
 
@@ -204,6 +208,7 @@ public class CharaInventory : MonoBehaviour
         _interface.transform.SetParent(parent.transform, false);
         _interface.transform.GetChild(1).GetChild(0).GetComponent<Text>().text = gameObject.GetComponent<CharaRpg>().NameFull;
         _interface.GetComponent<InterfaceManager>().InstantiateCraft(this);
+        _interface.GetComponent<InterfaceManager>().InstantiateEquipment();
 
         _inventory = Instantiate(_inventoryPrefab);
         _inventory.transform.SetParent(_interface.transform.GetChild(0).GetChild(3).GetChild(0), false);
@@ -220,6 +225,11 @@ public class CharaInventory : MonoBehaviour
         _inventory.GetComponent<Image>().color = Color.blue;
         _slotParent = _inventory.transform.GetChild(0).GetChild(0).gameObject;
         InitSlots();
+    }
+
+    public GameObject GetInterface()
+    {
+        return _interface;
     }
 
     public int UpdateWeight()
@@ -242,6 +252,7 @@ public class CharaInventory : MonoBehaviour
         GameObject stat = _interface.gameObject.GetComponent<InterfaceManager>().tooltip;
         stat.GetComponent<ToolTip>().UpdateTool(stats);
     }
+
 
     public void CloseInterface()
     {

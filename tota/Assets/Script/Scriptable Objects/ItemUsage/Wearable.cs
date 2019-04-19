@@ -31,7 +31,32 @@ public class Wearable : Item
         //    return true
         //return false;
 
-        return false;
+        CharaInventory inv = refInventChara.GetComponent<CharaInventory>();
+        switch (inventorySpotTaken)
+        {
+            case BodyInvSpace.Head:
+                inv.wearables[0] = this;
+                break;
+            case BodyInvSpace.Torso:
+                if (inv.wearables[1] != null && inv.wearables[2] == null)
+                {
+                    inv.wearables[2] = this;
+                }
+                else
+                {
+                    inv.wearables[1] = this;
+                }
+                break;
+            case BodyInvSpace.Leg:
+                inv.wearables[3] = this;
+                break;
+        }
+
+        GameObject _interface = inv.GetInterface();
+        if (_interface == null) return false;
+        _interface.GetComponent<InterfaceManager>().UpdateEquipment(inv);
+
+        return true;
     }
     public override bool Unequip(GameObject refInventChara)
     {

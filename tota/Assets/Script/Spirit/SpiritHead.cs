@@ -17,6 +17,7 @@ public class SpiritHead : Photon.MonoBehaviour
     private GameObject _inventoryLayout;
     private GameObject _charaLayout;
     private GameObject _chara;
+    private GameObject _channel;
 
     //Le joueur qui contrôle ce Spirit (ne change pas)
     private PermissionsManager _permission = PermissionsManager.Instance;
@@ -29,6 +30,13 @@ public class SpiritHead : Photon.MonoBehaviour
     private void Awake()
     {
         PermissionsManager.Instance.spirit = this;
+
+        _selectedList = new List<GameObject>();
+        CentralManager eManager = GameObject.Find("eCentralManager").GetComponent<CentralManager>();
+        _charaLayout = eManager.CharaLayout;
+        _inventoryLayout = eManager.InventoryLayout;
+        _inventoryList = eManager.InventoryList;
+        _channel = eManager.Channel;
     }
     //Unity Callback
     void Start()
@@ -38,13 +46,6 @@ public class SpiritHead : Photon.MonoBehaviour
 
             this.enabled = false;
         }
-
-        _selectedList = new List<GameObject>();
-        CentralManager eManager = GameObject.Find("eCentralManager").GetComponent<CentralManager>();
-        _charaLayout = eManager.CharaLayout;
-        _inventoryLayout = eManager.InventoryLayout;
-        _inventoryList = eManager.InventoryList;
-
     }
 
     void Update()
@@ -60,6 +61,8 @@ public class SpiritHead : Photon.MonoBehaviour
 
         //Keycode.E Check
         InventoryUpdate();
+
+        DisplayChannel();
     }
     //TestFunction
     private void TestAll()
@@ -473,8 +476,16 @@ public class SpiritHead : Photon.MonoBehaviour
         float distCovered = (Time.time - startTime) * speed;
         float fracJourney = distCovered / journeyLength;
 
-        gameObject.transform.position = Vector3.Lerp(start, posxz,1/2);
+        gameObject.transform.position = Vector3.Lerp(start, posxz,1);
 
+    }
+
+    private void DisplayChannel()
+    {
+        if (Input.GetKeyDown(KeyCode.C))
+        {
+            _channel.SetActive(!_channel.activeSelf);
+        }
     }
 
 }
