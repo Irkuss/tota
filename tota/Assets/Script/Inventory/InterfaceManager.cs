@@ -10,6 +10,8 @@ public class InterfaceManager : MonoBehaviour
     [SerializeField] private GameObject _tooltip = null;
     [SerializeField] private RecipeTable _data = null;
     [SerializeField] private GameObject _equipment = null;
+    [SerializeField] private GameObject _injuries = null;
+
     private GameObject _recipe;
 
     public GameObject tooltip => _tooltip;
@@ -116,5 +118,15 @@ public class InterfaceManager : MonoBehaviour
             right.transform.GetChild(0).GetComponent<Image>().sprite = charaInventory.equipments[1].icon;
             right.transform.GetChild(0).GetComponent<Button>().onClick.AddListener(() => charaInventory.equipments[1].Unequip(charaInventory.gameObject));
         }
+    }
+
+    public void UpdateInjuries(string[] injuries)
+    {
+        string inj = "Injuries :\n";
+        foreach(var str in injuries)
+        {
+            inj += str + "\n";
+        }
+        _injuries.GetComponent<Text>().text = inj;
     }
 }

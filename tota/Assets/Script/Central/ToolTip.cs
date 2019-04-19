@@ -9,12 +9,13 @@ public class ToolTip : MonoBehaviour
 
     [SerializeField] private Text _name = null;
     //On recupere les Component Text qui seront modifiés
-    [SerializeField] private Text _strengthText = null;
-    [SerializeField] private Text _intelligenceText = null;
-    [SerializeField] private Text _perceptionText = null;
-    [SerializeField] private Text _mentalText = null;
-    [SerializeField] private Text _socialText = null;
-    [SerializeField] private Text _hungerText = null;
+    [SerializeField] private Text _carpenter = null;
+    [SerializeField] private Text _doctor = null;
+    [SerializeField] private Text _electrician = null;
+    [SerializeField] private Text _farmer = null;
+    [SerializeField] private Text _marksman = null;
+    [SerializeField] private Text _scavenger = null;
+    [SerializeField] private Text _stamina = null;
 
 
     [SerializeField] private Slider _strengthSlider = null;
@@ -32,15 +33,15 @@ public class ToolTip : MonoBehaviour
     [SerializeField] private Image _hungerFill = null;
 
     //Appelé après avoir cliqué sur un Chara dans SpiritHead.cs/ClickOnChara()
-    public void UpdateWith(string[] info)
+    public void UpdateSkills(string[] info)
     {
-        _strengthText.text = "Strength: " + info[1];
-        _intelligenceText.text = "Intelligence: " + info[2];
-        _perceptionText.text = "Perception: " + info[3];
-        _mentalText.text = "Mental: " + info[4];
-        _socialText.text = "Social: " + info[5];
-
-        _hungerText.text = "Hunger: " + info[6] + "/" + info[7];
+        _carpenter.text = "Carpenter : " + info[0] + " / 10";
+        _doctor.text = "Doctor : " + info[1] + " / 10";
+        _electrician.text = "Electrician : " + info[2] + " / 10";
+        _farmer.text = "Farmer : " + info[3] + " / 10";
+        _marksman.text = "Marksman : " + info[4] + " / 10";
+        _scavenger.text = "Scavenger : " + info[5] + " / 10";
+        _stamina.text = "Stamina : " + info[6] + " / 10";
     }
 
 
