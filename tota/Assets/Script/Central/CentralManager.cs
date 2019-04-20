@@ -32,16 +32,32 @@ public class CentralManager : Photon.MonoBehaviour
     public GameObject InventoryLayout { get { return _inventoryLayout; } }
 
     [SerializeField] private GameObject _charaLayout = null;
-    public GameObject CharaLayout { get { return _charaLayout; } }    
+    public GameObject CharaLayout { get { return _charaLayout; } }
+
+    [SerializeField] private GameObject _channel = null;
+    public GameObject Channel { get { return _channel; } }
+
+    [SerializeField] private GameObject _tooltipL = null;
 
     public void UpdateToolTip(string[] info)
     {
         toolTip.SetActive(true);
         toolTip.GetComponent<ToolTip>().UpdateTool(info);
     }
+
+    public void UpdateSkills(string[] info)
+    {
+        toolTip.GetComponent<ToolTip>().UpdateSkills(info);
+    }
+
     public void DeactivateToolTip()
     {
         toolTip.SetActive(false);
+    }
+
+    public void ClipDown()
+    {
+        _tooltipL.SetActive(!_tooltipL.activeSelf);
     }
     
 

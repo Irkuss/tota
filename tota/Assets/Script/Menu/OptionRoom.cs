@@ -28,6 +28,8 @@ public class OptionRoom : MonoBehaviour
 
     [SerializeField] private GameObject randomCharacters = null;
 
+    [SerializeField] private GameObject _dropdown = null;
+
     private string _password = "";
     private string _maxInRoom = "";
     private string _maxInTeam = "";
@@ -152,6 +154,20 @@ public class OptionRoom : MonoBehaviour
             "heightMap",
             "numberChara"
         };
+
+        switch (_dropdown.GetComponent<Dropdown>().value)
+        {
+            case 0:
+            case 1:
+                Mode.Instance.Solo();
+                break;
+            case 2:
+                Mode.Instance.Cold();
+                break;
+            case 3:
+                Mode.Instance.Other();
+                break;
+        }
 
         if (roomName.text != "")
         {
