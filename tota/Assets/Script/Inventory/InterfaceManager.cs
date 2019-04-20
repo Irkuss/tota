@@ -75,6 +75,11 @@ public class InterfaceManager : MonoBehaviour
         //_equipment.transform.GetChild(3).GetChild(0).GetComponent<Image>().sprite = ; METTRE FIST
     }
 
+    private void Active(GameObject obj)
+    {
+        obj.SetActive(!obj.activeSelf);
+    }
+
     public void UpdateEquipment(CharaInventory charaInventory)
     {
         if (charaInventory.wearables[0] != null)
@@ -82,6 +87,8 @@ public class InterfaceManager : MonoBehaviour
             GameObject head = _equipment.transform.GetChild(0).gameObject;
             head.transform.GetChild(0).GetComponent<Image>().sprite = charaInventory.wearables[0].icon;
             head.transform.GetChild(0).GetComponent<Button>().onClick.AddListener(() => charaInventory.wearables[0].Unequip(charaInventory.gameObject));
+            head.transform.GetChild(4).GetChild(0).GetComponent<Text>().text = charaInventory.wearables[0].description;
+            head.transform.GetChild(5).GetComponent<Button>().onClick.AddListener(() => Active(head.transform.GetChild(4).gameObject));
         }
 
         if (charaInventory.wearables[1] != null)
@@ -89,6 +96,8 @@ public class InterfaceManager : MonoBehaviour
             GameObject torso = _equipment.transform.GetChild(1).gameObject;
             torso.transform.GetChild(0).GetComponent<Image>().sprite = charaInventory.wearables[1].icon;
             torso.transform.GetChild(0).GetComponent<Button>().onClick.AddListener(() => charaInventory.wearables[1].Unequip(charaInventory.gameObject));
+            torso.transform.GetChild(4).GetChild(0).GetComponent<Text>().text = charaInventory.wearables[1].description;
+            torso.transform.GetChild(5).GetComponent<Button>().onClick.AddListener(() => Active(torso.transform.GetChild(4).gameObject));
         }
 
         if (charaInventory.wearables[2] != null)
@@ -96,6 +105,8 @@ public class InterfaceManager : MonoBehaviour
             GameObject torso = _equipment.transform.GetChild(2).gameObject;
             torso.transform.GetChild(0).GetComponent<Image>().sprite = charaInventory.wearables[2].icon;
             torso.transform.GetChild(0).GetComponent<Button>().onClick.AddListener(() => charaInventory.wearables[2].Unequip(charaInventory.gameObject));
+            torso.transform.GetChild(4).GetChild(0).GetComponent<Text>().text = charaInventory.wearables[2].description;
+            torso.transform.GetChild(5).GetComponent<Button>().onClick.AddListener(() => Active(torso.transform.GetChild(4).gameObject));
         }
 
         if(charaInventory.wearables[3] != null)
@@ -103,6 +114,8 @@ public class InterfaceManager : MonoBehaviour
             GameObject leg = _equipment.transform.GetChild(5).gameObject;
             leg.transform.GetChild(0).GetComponent<Image>().sprite = charaInventory.wearables[3].icon;
             leg.transform.GetChild(0).GetComponent<Button>().onClick.AddListener(() => charaInventory.wearables[3].Unequip(charaInventory.gameObject));
+            leg.transform.GetChild(4).GetChild(0).GetComponent<Text>().text = charaInventory.wearables[3].description;
+            leg.transform.GetChild(5).GetComponent<Button>().onClick.AddListener(() => Active(leg.transform.GetChild(4).gameObject));
         }
 
         if (charaInventory.equipments[0] != null)
@@ -110,6 +123,8 @@ public class InterfaceManager : MonoBehaviour
             GameObject left = _equipment.transform.GetChild(3).gameObject;
             left.transform.GetChild(0).GetComponent<Image>().sprite = charaInventory.equipments[0].icon;
             left.transform.GetChild(0).GetComponent<Button>().onClick.AddListener(() => charaInventory.equipments[0].Unequip(charaInventory.gameObject));
+            left.transform.GetChild(4).GetChild(0).GetComponent<Text>().text = charaInventory.equipments[0].description;
+            left.transform.GetChild(5).GetComponent<Button>().onClick.AddListener(() => Active(left.transform.GetChild(4).gameObject));
         }
 
         if (charaInventory.equipments[1] != null)
@@ -117,6 +132,8 @@ public class InterfaceManager : MonoBehaviour
             GameObject right = _equipment.transform.GetChild(4).gameObject;
             right.transform.GetChild(0).GetComponent<Image>().sprite = charaInventory.equipments[1].icon;
             right.transform.GetChild(0).GetComponent<Button>().onClick.AddListener(() => charaInventory.equipments[1].Unequip(charaInventory.gameObject));
+            right.transform.GetChild(4).GetChild(0).GetComponent<Text>().text = charaInventory.equipments[1].description;
+            right.transform.GetChild(5).GetComponent<Button>().onClick.AddListener(() => Active(right.transform.GetChild(4).gameObject));
         }
     }
 
