@@ -47,8 +47,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 968492edde335534b974e56a70648748, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _radius: 5
+  isMoving: 0
   _interTransform: {fileID: 3963968466567242307}
+  _radius: 5
+  _possibleActionNames:
+  - '"Cut tree"'
+  _isDistanceAction: 00
+  _isDoWhileAction: 00
   woodRaw: {fileID: 11400000, guid: 085b76ca16166be46b9f9c47cc39a241, type: 2}
 --- !u!208 &5151837398872808980
 NavMeshObstacle:

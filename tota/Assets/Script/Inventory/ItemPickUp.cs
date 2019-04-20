@@ -10,7 +10,7 @@ public class ItemPickUp : Interactable
     //L'item qui est au sol (représenté par un Scriptable Object)
     public Item item;
   
-    public override void Interact(CharaHead chara)
+    public override void Interact(CharaHead chara, int actionIndex)
     {
         PickUp(chara.gameObject);
     }

@@ -285,7 +285,28 @@ public class CharaInventory : MonoBehaviour
             Destroy(_inventory);
         }
     }
-    
+
+    //Resistance getters
+
+    public int GetTotalSharpResistance()
+    {
+        int totalSharpResistance = 0;
+        foreach(Wearable equipment in wearables)
+        {
+            totalSharpResistance += equipment.sharpResistance;
+        }
+        return totalSharpResistance;
+    }
+    public int GetTotalMaceResistance()
+    {
+        int totalMaceResistance = 0;
+        foreach (Wearable equipment in wearables)
+        {
+            totalMaceResistance += equipment.maceResistance;
+        }
+        return totalMaceResistance;
+    }
+
     //Adding and removing item
     public bool Add(Item item)
     {

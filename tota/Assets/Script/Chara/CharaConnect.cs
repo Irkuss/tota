@@ -20,7 +20,8 @@ public class CharaConnect : MonoBehaviour
         SetOwnerNull,
         RemoveWithId,
         AddWithId,
-        ModifyCountWithId
+        ModifyCountWithId,
+        ReceiveAddWound
     }
     // Start is called before the first frame update
     void Awake()
@@ -48,6 +49,7 @@ public class CharaConnect : MonoBehaviour
             case CharaCommand.RemoveWithId: GetComponent<CharaInventory>().RemoveWithId(i[0]); break;
             case CharaCommand.AddWithId: GetComponent<CharaInventory>().AddWithId(i[0]); break;
             case CharaCommand.ModifyCountWithId: GetComponent<CharaInventory>().ModifyCountWithId(i[0],i[1]); break;
+            case CharaCommand.ReceiveAddWound: GetComponent<CharaRpg>().ReceiveAddWound(i[0], i[1], s[0], s[1]); break;
         }
     }
 }

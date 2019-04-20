@@ -330,15 +330,14 @@ public class SpiritHead : Photon.MonoBehaviour
         if (ClickedOnSomething(out hit))
         {
             Debug.Log("RightClickUpdate: clicked on something");
-            if (hit.transform.CompareTag("Interactable"))
-            {
+            //if (hit.transform.CompareTag("Interactable")) -> les charas doivent etre interactable
+            //
                 Interactable inter = hit.collider.GetComponent<Interactable>();
-                if (inter != null)
+                if (inter != null) //la verif se fait donc là
                 {
-                    Debug.Log("RightClickUpdate: Setting focus");
-                    SetFocusAll(inter);
+                    GeneralActionHandler(inter);
                 }
-            }
+            //}
             else
             {
                 Debug.Log("RightClickUpdate: removing focus, pointing a destination to charas");
@@ -418,7 +417,7 @@ public class SpiritHead : Photon.MonoBehaviour
         return _selectedList.Contains(chara);
     }
 
-    //Charas order to selected chara
+    //Charas order to selected chara (Right Click action)
 
     private void ActionMoveAllTo(Vector3 destination)
     {
@@ -431,12 +430,56 @@ public class SpiritHead : Photon.MonoBehaviour
         }
     }
 
-    private void SetFocusAll(Interactable inter)
+    private void GeneralActionHandler(Interactable inter)
+    {
+        //Processus de décision l'index d'action
+        //Ouvre le dropDown Menu
+        //Récupére les noms d'actions des strings (l'index du nom correspond à l'index d'action)
+        //Vérifie que les actions sont available à tous les charas selectionnés (IsActionIndexAvailableByAll déjà implémenté juste en dessous)
+        //Si une action n'est pas available à au moins un Chara selectionné, elle est grisée,
+        //sinon elle est disponible
+        //Appelle IndexActionHandler avec inter et l'index d'action choisi par le joueur
+    }
+    public bool IsActionIndexAvailableByAll(Interactable inter, int actionIndex)
+    {
+        foreach (GameObject Chara in _selectedList)
+        {
+            if(!inter.CheckAvailability(Chara.GetComponent<CharaHead>(),actionIndex))
+            {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    public void IndexActionHandler(Interactable inter, int actionIndex)
+    {
+        Debug.Log("IndexActionHandler: Index chosen, giving order to all charas");
+        if(inter.IsDistanceAction[actionIndex]) //Si l'action en question est une action à distance (on a déjà verifié qu'elle était available)
+        {
+            SetInteractAll(inter, actionIndex);
+        }
+        else
+        {
+            SetFocusAll(inter, actionIndex);
+        }
+
+    }
+
+    private void SetFocusAll(Interactable inter, int actionIndex)
     {
         //Focus tous les charas selectionnés sur un objet interactible
         foreach (GameObject Chara in _selectedList)
         {
-            Chara.GetComponent<CharaHead>().SetFocus(inter);
+            Chara.GetComponent<CharaHead>().SetFocus(inter, actionIndex);
+        }
+    }
+    private void SetInteractAll(Interactable inter, int actionIndex)
+    {
+        //Fais interragir tous les charas selectionnés sur un objet interactible
+        foreach (GameObject Chara in _selectedList)
+        {
+            inter.Interact(Chara.GetComponent<CharaHead>(), actionIndex);
         }
     }
 

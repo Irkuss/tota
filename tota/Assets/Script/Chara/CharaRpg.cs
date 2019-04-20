@@ -438,7 +438,7 @@ public class CharaRpg : MonoBehaviour
         while(true)
         {
             UpdateHealth();
-            yield return new WaitForSeconds(5);
+            yield return new WaitForSeconds(10);
         }
     }
 
@@ -567,19 +567,31 @@ public class CharaRpg : MonoBehaviour
     //Wound
     public void AddWound(Wound wound, BodyPart bodyPart)
     {
-        bodyPart.AddWound(wound);
+        AddWound(wound, bodyPart.name);
     }
     public void AddWound(Wound wound, string bodyPartName)
     {
-        FindPartWithName(bodyPartName).AddWound(wound);
+        SendAddWound((int)wound.type, wound.damage, bodyPartName, wound.origin);
     }
-
+    public void SendAddWound(int woundType, int initialDamage, string bodyPartName, string origin)
+    {
+        GetComponent<CharaConnect>().SendMsg(
+            CharaConnect.CharaCommand.ReceiveAddWound,
+            new int[2] { woundType , initialDamage },
+            new string[2] { bodyPartName, origin },
+            null);
+    }
     public void ReceiveAddWound(int woundType, int initialDamage, string bodyPartName, string origin)
     {
         _tempPain += initialDamage;
         FindPartWithName(bodyPartName).AddWound(new Wound((WoundType)woundType, initialDamage, origin));
     }
     //Combat handler
+    public void DebugGetRandomDamage(int woundType)
+    {
+        Debug.Log("DebugGetRandomDamage: attack successful");
+        SendAddWound(woundType, Random.Range(1, 10), _bodyParts[Random.Range(1, 13)].name, "DEBUGDAMAGE");
+    }
     public void GetAttackedWith(Equipable weapon, int damage)
     {
         int bodyPart = Random.Range(1, 13); //1-12
@@ -588,21 +600,23 @@ public class CharaRpg : MonoBehaviour
         switch(weapon.dmgType)
         {
             case Equipable.DamageType.Mace:
-                //damage -= protectionPourDamageDeTypeMace
+                damage -= GetComponent<CharaInventory>().GetTotalMaceResistance();
                 type = damage > 40 ? WoundType.Fracture : WoundType.Bruise;
                 break;
             case Equipable.DamageType.Sharp:
-                //damage -= protectionPourDamageDeTypeSharp
+                damage -= GetComponent<CharaInventory>().GetTotalSharpResistance();
                 type = WoundType.Bleeding;
                 break;
             default:
                 type = WoundType.Bruise;
                 break;
         }
+        if (damage > 0)
+        {
+            Wound wound = new Wound(type, damage, weapon.nickName);
 
-        Wound wound = new Wound(type, damage, weapon.nickName);
-
-        AddWound(wound, _bodyParts[bodyPart]);
+            AddWound(wound, _bodyParts[bodyPart]);
+        }
     }
 
     //Health Info

@@ -10,7 +10,7 @@ public class FurnitureManager : Interactable
     [SerializeField] private Image fill = null;
     [SerializeField] private GameObject _drop = null;
     
-    public override void Interact(CharaHead chara)
+    public override void Interact(CharaHead chara, int actionIndex)
     {
         fill.gameObject.SetActive(true);
         // utiliser les compétences pour pouvoir ouvrir

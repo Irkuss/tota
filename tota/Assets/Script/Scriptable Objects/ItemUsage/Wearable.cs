@@ -19,7 +19,7 @@ public class Wearable : Item
     //Attribut du wearable
     public int sharpResistance = 0;
     public int maceResistance = 0;
-    public int maxTempModifier = 0;
+    public int minTempModifier = 0;
 
     //Use (Equip)
     public override bool Use(GameObject refInventChara)

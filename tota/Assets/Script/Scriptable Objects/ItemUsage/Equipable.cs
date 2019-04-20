@@ -34,7 +34,7 @@ public class Equipable : Item
     public EquipSpace equipSpace = EquipSpace.OneHanded;
     public SpecificType specificType = SpecificType.Unspecific;
     [Header("Common melee/remote attribute")]
-    public float damage = 0;
+    public int damage = 0;
     public int accuracyModifier = 0;
     public float attackSpeedModifier = 1f;
     [Header("Melee attribute")]

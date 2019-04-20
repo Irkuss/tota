@@ -121,5 +121,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 70c9328f7956ec84cbd5ec683cda3a0d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _radius: 3
+  isMoving: 0
   _interTransform: {fileID: 3963968466567242307}
+  _radius: 3
+  _possibleActionNames:
+  - '"test action 1"'
+  - '"test action 2"'
+  - '"test distance 1"'
+  _isDistanceAction: 000001
+  _isDoWhileAction: 000000

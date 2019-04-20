@@ -1,11 +1,13 @@
-﻿using System.Collections;
+﻿using UnityEngine;
+using System.Collections;
 using System.Collections.Generic;
-using UnityEngine;
 
 public class FieldOfView : MonoBehaviour
 {
-    private float viewRadius = 30;
-    private float viewAngle = 360;
+
+    public float viewRadius;
+    [Range(0, 360)]
+    public float viewAngle;
 
     public LayerMask targetMask;
     public LayerMask obstacleMask;
@@ -16,8 +18,6 @@ public class FieldOfView : MonoBehaviour
     public float meshResolution;
     public int edgeResolveIterations;
     public float edgeDstThreshold;
-
-    public float maskCutawayDst = .1f;
 
     public MeshFilter viewMeshFilter;
     Mesh viewMesh;
@@ -107,7 +107,7 @@ public class FieldOfView : MonoBehaviour
         vertices[0] = Vector3.zero;
         for (int i = 0; i < vertexCount - 1; i++)
         {
-            vertices[i + 1] = transform.InverseTransformPoint(viewPoints[i]) + Vector3.forward * maskCutawayDst;
+            vertices[i + 1] = transform.InverseTransformPoint(viewPoints[i]);
 
             if (i < vertexCount - 2)
             {
@@ -205,4 +205,5 @@ public class FieldOfView : MonoBehaviour
             pointB = _pointB;
         }
     }
+
 }
