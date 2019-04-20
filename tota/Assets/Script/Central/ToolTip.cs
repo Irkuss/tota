@@ -9,12 +9,13 @@ public class ToolTip : MonoBehaviour
 
     [SerializeField] private Text _name = null;
     //On recupere les Component Text qui seront modifiés
-    [SerializeField] private Text _strengthText = null;
-    [SerializeField] private Text _intelligenceText = null;
-    [SerializeField] private Text _perceptionText = null;
-    [SerializeField] private Text _mentalText = null;
-    [SerializeField] private Text _socialText = null;
-    [SerializeField] private Text _hungerText = null;
+    [SerializeField] private Text _carpenter = null;
+    [SerializeField] private Text _doctor = null;
+    [SerializeField] private Text _electrician = null;
+    [SerializeField] private Text _farmer = null;
+    [SerializeField] private Text _marksman = null;
+    [SerializeField] private Text _scavenger = null;
+    [SerializeField] private Slider _stamina = null;
 
 
     [SerializeField] private Slider _strengthSlider = null;
@@ -32,15 +33,24 @@ public class ToolTip : MonoBehaviour
     [SerializeField] private Image _hungerFill = null;
 
     //Appelé après avoir cliqué sur un Chara dans SpiritHead.cs/ClickOnChara()
-    public void UpdateWith(string[] info)
+    public void UpdateSkills(string[] info)
     {
-        _strengthText.text = "Strength: " + info[1];
-        _intelligenceText.text = "Intelligence: " + info[2];
-        _perceptionText.text = "Perception: " + info[3];
-        _mentalText.text = "Mental: " + info[4];
-        _socialText.text = "Social: " + info[5];
+        _carpenter.text = "Carpenter : " + info[0] + " / 10";
+        _doctor.text = "Doctor : " + info[1] + " / 10";
+        _electrician.text = "Electrician : " + info[2] + " / 10";
+        _farmer.text = "Farmer : " + info[3] + " / 10";
+        _marksman.text = "Marksman : " + info[4] + " / 10";
+        _scavenger.text = "Scavenger : " + info[5] + " / 10";
 
-        _hungerText.text = "Hunger: " + info[6] + "/" + info[7];
+        if (_stamina != null) return;
+        _stamina.value = int.Parse(info[6]);
+
+        switch (_stamina.value)
+        {
+            case -2: case -1: _stamina.gameObject.transform.GetChild(1).GetChild(0).GetComponent<Image>().color = Color.red; break;
+            case 0: _stamina.gameObject.transform.GetChild(1).GetChild(0).GetComponent<Image>().color = Color.yellow; break;
+            case 1: case 2:  _stamina.gameObject.transform.GetChild(1).GetChild(0).GetComponent<Image>().color = Color.green; break;
+        }
     }
 
 
@@ -48,7 +58,7 @@ public class ToolTip : MonoBehaviour
     {
         if (_name != null)
         {
-            _name.text = "Name : " + info[0];
+            _name.text = info[0];
         }
         _strengthSlider.value = int.Parse(info[1]);
         _intelligenceSlider.value = int.Parse(info[2]);
@@ -58,9 +68,9 @@ public class ToolTip : MonoBehaviour
         _hungerSlider.maxValue = int.Parse(info[7]);
         _hungerSlider.value = int.Parse(info[6]);
 
-        List<Slider> sliders = new List<Slider> { _strengthSlider, _intelligenceSlider, _perceptionSlider, _perceptionSlider, _socialSlider, _hungerSlider };
-        List<Image> fill = new List<Image> { _strengthFill, _intelligenceFill, _perceptionFill, _perceptionFill, _socialFill, _hungerFill };
-        for(int i = 0; i < fill.Count; i++)
+        List<Slider> sliders = new List<Slider> { _strengthSlider, _intelligenceSlider, _perceptionSlider, _mentalSlider, _socialSlider, _hungerSlider };
+        List<Image> fill = new List<Image> { _strengthFill, _intelligenceFill, _perceptionFill, _mentalFill, _socialFill, _hungerFill };
+        for(int i = 0; i < fill.Count - 1; i++)
         {
             if (sliders[i].value < 20)
             {
@@ -74,6 +84,20 @@ public class ToolTip : MonoBehaviour
             {
                 fill[i].color = Color.green;
             }        
+        }
+        int max = (int) _hungerSlider.maxValue / 3;
+
+        if (_hungerSlider.value < max)
+        {
+            _hungerFill.color = Color.red;
+        }
+        else if (_hungerSlider.value >= max && _hungerSlider.value < _hungerSlider.maxValue - 30 )
+        {
+            _hungerFill.color = Color.yellow;
+        }
+        else
+        {
+            _hungerFill.color = Color.green;
         }
     }
 }

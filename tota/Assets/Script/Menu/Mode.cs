@@ -29,22 +29,19 @@ public class Mode : MonoBehaviour
     public void Solo()
     {
         _mode = "solo";
-        if (online) SceneManager.LoadScene(2);
-        else SceneManager.LoadScene(3);
+        if (!online) SceneManager.LoadScene(3);
     }   
 
     public void Cold()
     {
         _mode = "cold";
-        if (online) SceneManager.LoadScene(2);
-        else SceneManager.LoadScene(3);
+        if (!online) SceneManager.LoadScene(3);
     }
 
     public void Other()
     {
         _mode = "other";
-        if (online) SceneManager.LoadScene(2);
-        else SceneManager.LoadScene(3);
+        if (!online) SceneManager.LoadScene(3);
     }
 
     

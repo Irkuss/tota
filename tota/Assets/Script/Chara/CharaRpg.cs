@@ -647,6 +647,12 @@ public class CharaRpg : MonoBehaviour
             debug += s;
         }
         Debug.Log("DebugWounds: " + debug);
+
+        GameObject _interface = gameObject.GetComponent<CharaInventory>().GetInterface();
+        if (_interface != null)
+        {
+            _interface.GetComponent<InterfaceManager>().UpdateInjuries(GetWoundsInfo());
+        }
     }
 
 
@@ -673,7 +679,9 @@ public class CharaRpg : MonoBehaviour
     public void UpdateToolTip()
     {
         GameObject.Find("eCentralManager").GetComponent<CentralManager>().UpdateToolTip(GetToolTipInfo());
+        GameObject.Find("eCentralManager").GetComponent<CentralManager>().UpdateSkills(GetSkillInfo());
     }
+
     public string[] GetToolTipInfo()
     {
         return new string[8]
@@ -688,6 +696,22 @@ public class CharaRpg : MonoBehaviour
             _maxHunger.ToString()
         };
     }
+
+    public string[] GetSkillInfo()
+    {
+        return new string[7]
+        {
+            GetCurrentStat(Stat.sk_carpenter).ToString(),
+            GetCurrentStat(Stat.sk_doctor).ToString(),
+            GetCurrentStat(Stat.sk_electrician).ToString(),
+            GetCurrentStat(Stat.sk_farmer).ToString(),
+            GetCurrentStat(Stat.sk_marksman).ToString(),
+            GetCurrentStat(Stat.sk_scavenger).ToString(),
+            GetCurrentStat(Stat.lv_stamina).ToString(),
+        };
+    }
+
+
     /*
     [PunRPC]
     public void SendToolTipInfo(string[] info)
