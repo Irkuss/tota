@@ -16,12 +16,13 @@ public class CharaInventory : MonoBehaviour
         private Image _icon;
         private Button _removeButton;
         private Button _itemButton;
+        private Button _info;
         private GameObject _counter;
 
         private Dictionary<Item, int> _linkedInventory;
         private CharaInventory _linkedCharaInventory;
 
-        public Slot(CharaInventory charaInventory,Dictionary<Item, int> inventory,Image icon, Button removeButton, Button itemButton, GameObject counter, bool pos)
+        public Slot(CharaInventory charaInventory,Dictionary<Item, int> inventory,Image icon, Button removeButton, Button itemButton, Button info, GameObject counter, bool pos)
         {
             //Reference au CharaInventory pour appeler UpdateUI (SPAGHETTI BOIII)
             _linkedCharaInventory = charaInventory;
@@ -32,10 +33,12 @@ public class CharaInventory : MonoBehaviour
             _icon = icon;
             _removeButton = removeButton;
             _itemButton = itemButton;
+            _info = info;
             _counter = counter;
             //Initialisation du bouton (appelle OnRemoveButton quand il est cliqué)
             _removeButton.onClick.AddListener(OnRemoveButton);
             _itemButton.onClick.AddListener(OnClickButton);
+            _info.onClick.AddListener(Pop);
             //L'emplacement est initialisé vide
             ClearSlot();
         }
@@ -54,6 +57,8 @@ public class CharaInventory : MonoBehaviour
             //RemoveButton is now active
             _removeButton.interactable = true;
             isEmpty = false;
+
+            _itemButton.transform.parent.GetChild(4).GetChild(0).GetComponent<Text>().text = _item.description;
         }
 
         public void ClearSlot()
@@ -68,6 +73,8 @@ public class CharaInventory : MonoBehaviour
             //deactivate RemoveButton=
             _removeButton.interactable = false;
             isEmpty = true;
+
+            _itemButton.transform.parent.GetChild(4).GetChild(0).GetComponent<Text>().text = "";
         }
 
         public void OnRemoveButton()
@@ -94,7 +101,12 @@ public class CharaInventory : MonoBehaviour
                 if (itemUsed) OnRemoveButton();                            // On enleve l'item utilisé
             }
         }
-    }    
+
+        private void Pop()
+        {
+            _itemButton.transform.parent.GetChild(4).gameObject.SetActive(!_itemButton.transform.parent.GetChild(4).gameObject.activeSelf);            
+        }
+    }
 
     //Database des items (pour avoir leur id, pour les update en rpc)
     [SerializeField] private ItemTable itemTable = null;
@@ -141,10 +153,11 @@ public class CharaInventory : MonoBehaviour
             //pas ultra beau mais arrive que lors de l'init (pas mal spaghetti même)
             _slots[i] = new Slot(
                 this,
-                inventory, 
-                child.transform.GetChild(0).GetComponent<Image>(), 
+                inventory,
+                child.transform.GetChild(0).GetComponent<Image>(),
                 child.transform.GetChild(1).GetComponent<Button>(),
                 child.transform.GetChild(0).GetComponent<Button>(),
+                child.transform.GetChild(5).GetComponent<Button>(),
                 child.transform.GetChild(2).gameObject,
                 true);
         }
@@ -242,7 +255,7 @@ public class CharaInventory : MonoBehaviour
             sum += item.Key.weight * item.Value;
         }
 
-        _inventory.transform.GetChild(1).GetComponent<Text>().text = "Poids actuel : " + sum + " || Poids max : " + gameObject.GetComponent<CharaRpg>().GetCurrentStat(CharaRpg.Stat.ms_strength)/5;
+        _inventory.transform.GetChild(1).GetComponent<Text>().text = "Poids actuel : " + sum + " || Poids max : " + gameObject.GetComponent<CharaRpg>().GetCurrentStat(CharaRpg.Stat.ms_strength)/2;
 
         return sum;
     }
@@ -279,7 +292,7 @@ public class CharaInventory : MonoBehaviour
         //Le booléen retourné représente la réussite de l'ajout de l'item
         Debug.Log("CharaInventory: Checking space");
         if (inventory.Count >= _inventorySpace || 
-            UpdateWeight() + item.weight > (gameObject.GetComponent<CharaRpg>().GetCurrentStat(CharaRpg.Stat.ms_strength) / 5) ||
+            UpdateWeight() + item.weight > (gameObject.GetComponent<CharaRpg>().GetCurrentStat(CharaRpg.Stat.ms_strength) / 2) ||
             _slots[_inventorySpace-1].isEmpty == false && 
             (_slots[_inventorySpace - 1].itemCount == item.stack || _slots[_inventorySpace - 1].item != item)) // Du spaghetti comme on aime
         {
