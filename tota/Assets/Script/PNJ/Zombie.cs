@@ -39,7 +39,7 @@ public class Zombie : MonoBehaviour
     
     void WanderStop(Vector3 destination)//Stop when arrived at destination
     {
-        if (Vector3.Distance(transform.position, destination) < 2f)
+        if (Vector3.Distance(transform.position, destination) <= _agent.stoppingDistance + 1f)
         {
             Debug.Log("Zombie: Arrived");
             _wanderPoint = RandomWanderPoint();
@@ -123,6 +123,11 @@ public class Zombie : MonoBehaviour
                 }                
                 _wanderPoint = _player.position;
                 _agent.SetDestination(_wanderPoint);
+                float distance = Vector3.Distance(_player.position, transform.position);
+                if (distance < 2f)
+                {
+                    Debug.Log("Zombie: ATTACC");
+                }
             }
             else
             {
@@ -141,7 +146,7 @@ public class Zombie : MonoBehaviour
     IEnumerator MovingDelay()
     {
         _canMove = false;
-        yield return new WaitForSeconds(4f);
+        yield return new WaitForSeconds(2f);
         _canMove = true;
     }
 
