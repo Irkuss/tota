@@ -58,7 +58,6 @@ public class AudioManager : MonoBehaviour
             oldSound.volume -= 0.01f;
             yield return new WaitForSeconds(.05f);
         }
-        Debug.Log("Stoped");
         oldSound.Stop();
     }
 
@@ -72,7 +71,5 @@ public class AudioManager : MonoBehaviour
             sound.source.volume += 0.01f;
             yield return new WaitForSeconds(.1f);
         }
-        Debug.Log("FINISH");
-
     }
 }

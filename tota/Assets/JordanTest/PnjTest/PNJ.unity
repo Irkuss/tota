@@ -376,7 +376,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4270e47b2dac188499826ad578d835a5, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  speed: 0
+  speed: 500
   heure: 0
   day: 1
   season: 0
@@ -882,7 +882,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4f5aa4ee4a1981f43be8e734044d75af, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  navMeshAgent: {fileID: 0}
   fieldOfViewAngle: 90
   wanderRadius: 7
   visibleTargets: []
@@ -890,10 +889,10 @@ MonoBehaviour:
   isInFov: 0
   targetMask:
     serializedVersion: 2
-    m_Bits: 2048
+    m_Bits: 0
   obstacleMask:
     serializedVersion: 2
-    m_Bits: 1024
+    m_Bits: 0
 --- !u!195 &1735130889
 NavMeshAgent:
   m_ObjectHideFlags: 0
