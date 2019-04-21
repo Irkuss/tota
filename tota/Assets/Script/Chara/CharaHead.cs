@@ -126,13 +126,13 @@ public class CharaHead : Photon.PunBehaviour
     private Interactable _focus;
     private IEnumerator _checkCor;
 
-    public void SetFocus(Interactable inter)
+    public void SetFocus(Interactable inter, int actionIndex)
     {
 
         _focus = inter;
         _movement.MoveToInter(_focus);
 
-        _checkCor = CheckDistanceInter();
+        _checkCor = CheckDistanceInter(actionIndex);
         StartCoroutine(_checkCor);
     }
 
@@ -148,15 +148,16 @@ public class CharaHead : Photon.PunBehaviour
         }
     }
 
-    private IEnumerator CheckDistanceInter()
+    private IEnumerator CheckDistanceInter(int actionIndex)
     {
         while (Vector3.Distance(transform.position, _focus.InterTransform.position) > _focus.Radius * 0.8f)
         {
+            if(_focus.isMoving) _movement.MoveToInter(_focus); //Update les positions si on sait qu'il bouge
             yield return new WaitForSeconds(0.5f);
         }
         Debug.Log("CharaHead: reached Inter");
         //Interragis avec l'Interactable une fois proche
-        _focus.Interact(this);
+        _focus.Interact(this, actionIndex);
 
         //Reset le focus
         _focus = null;

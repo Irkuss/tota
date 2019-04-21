@@ -17,6 +17,7 @@ public class SpiritHead : Photon.MonoBehaviour
     private GameObject _inventoryLayout;
     private GameObject _charaLayout;
     private GameObject _chara;
+    private GameObject _channel;
 
     //Le joueur qui contrôle ce Spirit (ne change pas)
     private PermissionsManager _permission = PermissionsManager.Instance;
@@ -26,6 +27,17 @@ public class SpiritHead : Photon.MonoBehaviour
     private static List<GameObject> _selectedList;
     public static List<GameObject> SelectedList => _selectedList;
 
+    private void Awake()
+    {
+        PermissionsManager.Instance.spirit = this;
+
+        _selectedList = new List<GameObject>();
+        CentralManager eManager = GameObject.Find("eCentralManager").GetComponent<CentralManager>();
+        _charaLayout = eManager.CharaLayout;
+        _inventoryLayout = eManager.InventoryLayout;
+        _inventoryList = eManager.InventoryList;
+        _channel = eManager.Channel;
+    }
     //Unity Callback
     void Start()
     {
@@ -34,13 +46,6 @@ public class SpiritHead : Photon.MonoBehaviour
 
             this.enabled = false;
         }
-
-        _selectedList = new List<GameObject>();
-        CentralManager eManager = GameObject.Find("eCentralManager").GetComponent<CentralManager>();
-        _charaLayout = eManager.CharaLayout;
-        _inventoryLayout = eManager.InventoryLayout;
-        _inventoryList = eManager.InventoryList;
-
     }
 
     void Update()
@@ -56,6 +61,8 @@ public class SpiritHead : Photon.MonoBehaviour
 
         //Keycode.E Check
         InventoryUpdate();
+
+        DisplayChannel();
     }
     //TestFunction
     private void TestAll()
@@ -83,7 +90,7 @@ public class SpiritHead : Photon.MonoBehaviour
         {
             //Projection des positions sur le sol
             Vector3 lowPosition = new Vector3(gameObject.transform.position.x, 1, gameObject.transform.position.z);
-            GameObject.Find("eCentralManager").GetComponent<CharaManager>().SpawnChara(lowPosition, _playerOwner.MyTeamName);
+            GameObject.Find("eCentralManager").GetComponent<CharaManager>().SpawnChara(lowPosition, _playerOwner.MyTeamName,_playerOwner.Name);
             /*
             //Instantiation de Chara
             GameObject go;
@@ -117,8 +124,7 @@ public class SpiritHead : Photon.MonoBehaviour
         }
     }
 
-    [PunRPC]
-    private void InstantiateCharaRef(string playerWhoSent)
+    public void InstantiateCharaRef(string playerWhoSent,GameObject chara)
     {
         PermissionsManager.Player player = _permission.GetPlayerWithName(PhotonNetwork.player.NickName);
         PermissionsManager.Team team = _permission.GetTeamWithName(player.MyTeamName);
@@ -128,8 +134,8 @@ public class SpiritHead : Photon.MonoBehaviour
             GameObject charaLayout = Instantiate(Resources.Load<GameObject>("CharaRef"));
             charaLayout.transform.SetParent(_charaLayout.transform, false);
             charaLayout.GetComponent<LinkChara>().spirit = this;
-            charaLayout.GetComponent<LinkChara>().chara = _chara;
-            charaLayout.GetComponent<LinkChara>().Name.text = _chara.GetComponent<CharaRpg>().NameFull;
+            charaLayout.GetComponent<LinkChara>().chara = chara;
+            charaLayout.GetComponent<LinkChara>().Name.text = chara.GetComponent<CharaRpg>().NameFull;
         }
     }
 
@@ -324,15 +330,14 @@ public class SpiritHead : Photon.MonoBehaviour
         if (ClickedOnSomething(out hit))
         {
             Debug.Log("RightClickUpdate: clicked on something");
-            if (hit.transform.CompareTag("Interactable"))
-            {
+            //if (hit.transform.CompareTag("Interactable")) -> les charas doivent etre interactable
+            //
                 Interactable inter = hit.collider.GetComponent<Interactable>();
-                if (inter != null)
+                if (inter != null) //la verif se fait donc là
                 {
-                    Debug.Log("RightClickUpdate: Setting focus");
-                    SetFocusAll(inter);
+                    GeneralActionHandler(inter);
                 }
-            }
+            //}
             else
             {
                 Debug.Log("RightClickUpdate: removing focus, pointing a destination to charas");
@@ -342,7 +347,7 @@ public class SpiritHead : Photon.MonoBehaviour
         }
 
     }
-    
+
     //Public methods
 
     public void ClickOnChara(GameObject chara)
@@ -412,7 +417,7 @@ public class SpiritHead : Photon.MonoBehaviour
         return _selectedList.Contains(chara);
     }
 
-    //Charas order to selected chara
+    //Charas order to selected chara (Right Click action)
 
     private void ActionMoveAllTo(Vector3 destination)
     {
@@ -425,12 +430,56 @@ public class SpiritHead : Photon.MonoBehaviour
         }
     }
 
-    private void SetFocusAll(Interactable inter)
+    private void GeneralActionHandler(Interactable inter)
+    {
+        //Processus de décision l'index d'action
+        //Ouvre le dropDown Menu
+        //Récupére les noms d'actions des strings (l'index du nom correspond à l'index d'action)
+        //Vérifie que les actions sont available à tous les charas selectionnés (IsActionIndexAvailableByAll déjà implémenté juste en dessous)
+        //Si une action n'est pas available à au moins un Chara selectionné, elle est grisée,
+        //sinon elle est disponible
+        //Appelle IndexActionHandler avec inter et l'index d'action choisi par le joueur
+    }
+    public bool IsActionIndexAvailableByAll(Interactable inter, int actionIndex)
+    {
+        foreach (GameObject Chara in _selectedList)
+        {
+            if(!inter.CheckAvailability(Chara.GetComponent<CharaHead>(),actionIndex))
+            {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    public void IndexActionHandler(Interactable inter, int actionIndex)
+    {
+        Debug.Log("IndexActionHandler: Index chosen, giving order to all charas");
+        if(inter.IsDistanceAction[actionIndex]) //Si l'action en question est une action à distance (on a déjà verifié qu'elle était available)
+        {
+            SetInteractAll(inter, actionIndex);
+        }
+        else
+        {
+            SetFocusAll(inter, actionIndex);
+        }
+
+    }
+
+    private void SetFocusAll(Interactable inter, int actionIndex)
     {
         //Focus tous les charas selectionnés sur un objet interactible
         foreach (GameObject Chara in _selectedList)
         {
-            Chara.GetComponent<CharaHead>().SetFocus(inter);
+            Chara.GetComponent<CharaHead>().SetFocus(inter, actionIndex);
+        }
+    }
+    private void SetInteractAll(Interactable inter, int actionIndex)
+    {
+        //Fais interragir tous les charas selectionnés sur un objet interactible
+        foreach (GameObject Chara in _selectedList)
+        {
+            inter.Interact(Chara.GetComponent<CharaHead>(), actionIndex);
         }
     }
 
@@ -470,8 +519,16 @@ public class SpiritHead : Photon.MonoBehaviour
         float distCovered = (Time.time - startTime) * speed;
         float fracJourney = distCovered / journeyLength;
 
-        gameObject.transform.position = Vector3.Lerp(start, posxz,1/2);
+        gameObject.transform.position = Vector3.Lerp(start, posxz,1);
 
+    }
+
+    private void DisplayChannel()
+    {
+        if (Input.GetKeyDown(KeyCode.C))
+        {
+            _channel.SetActive(!_channel.activeSelf);
+        }
     }
 
 }

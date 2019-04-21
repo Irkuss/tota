@@ -5,19 +5,23 @@ using UnityEngine;
 [CreateAssetMenu(menuName = "Inventory/Item/Wearable")]
 public class Wearable : Item
 {
-    public enum BodyPart
+    public enum BodyInvSpace
     {
+        Head,
         Torso,
-        Legs,
-        Head
+        Leg
     }
-
+    //peut etre rajouté une reference au model 3d (voir avec marc?)
+    [Header("Wearable attribute")]
     //Type de wearable
-    public BodyPart bodyPart = BodyPart.Torso;
+    public BodyInvSpace inventorySpotTaken = BodyInvSpace.Torso;
+    public CharaRpg.BodyType[] zoneProtected = null;
     //Attribut du wearable
+    public int sharpResistance = 0;
+    public int maceResistance = 0;
+    public int minTempModifier = 0;
 
-
-
+    //Use (Equip)
     public override bool Use(GameObject refInventChara)
     {
         //Equip the wearable, process as follows:
@@ -27,6 +31,40 @@ public class Wearable : Item
         //    return true
         //return false;
 
+        CharaInventory inv = refInventChara.GetComponent<CharaInventory>();
+        switch (inventorySpotTaken)
+        {
+            case BodyInvSpace.Head:
+                inv.wearables[0] = this;
+                break;
+            case BodyInvSpace.Torso:
+                if (inv.wearables[1] != null && inv.wearables[2] == null)
+                {
+                    inv.wearables[2] = this;
+                }
+                else
+                {
+                    inv.wearables[1] = this;
+                }
+                break;
+            case BodyInvSpace.Leg:
+                inv.wearables[3] = this;
+                break;
+        }
+
+        GameObject _interface = inv.GetInterface();
+        if (_interface == null) return false;
+        _interface.GetComponent<InterfaceManager>().UpdateEquipment(inv);
+
+        return true;
+    }
+    public override bool Unequip(GameObject refInventChara)
+    {
+        //Unequip the weapon, process as follows:
+
+        //if inventory has enough space (1)
+        //    return true
+        //return false
         return false;
     }
 }

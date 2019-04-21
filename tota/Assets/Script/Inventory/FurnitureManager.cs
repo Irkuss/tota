@@ -8,8 +8,9 @@ public class FurnitureManager : Interactable
     public Furniture furniture;
 
     [SerializeField] private Image fill = null;
+    [SerializeField] private GameObject _drop = null;
     
-    public override void Interact(CharaHead chara)
+    public override void Interact(CharaHead chara, int actionIndex)
     {
         fill.gameObject.SetActive(true);
         // utiliser les compétences pour pouvoir ouvrir
@@ -22,6 +23,8 @@ public class FurnitureManager : Interactable
         {
             fill.color = Color.green;
             furniture.Interact(chara,GameObject.Find("eCentralManager").GetComponent<CentralManager>().InventoryLayout,this);
+            fill.enabled = false;
+            _drop.SetActive(true);
         }
         else
         {

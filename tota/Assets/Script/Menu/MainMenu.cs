@@ -18,9 +18,8 @@ public class MainMenu : MonoBehaviour
     public void MultGame()
     {
         PhotonNetwork.offlineMode = false;
-        _modes.SetActive(true);
         Mode.Instance.online = true;
-        gameObject.SetActive(false);
+        SceneManager.LoadScene(2);
     }
 
     public void QuitGame()

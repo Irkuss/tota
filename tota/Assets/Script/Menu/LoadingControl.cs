@@ -31,7 +31,7 @@ public class LoadingControl : MonoBehaviour
         {
             float progress = Mathf.Clamp01(operation.progress / .9f);
             SliderLoad.value = progress;
-            LoadingSlider.text = progress * 100f + "%";
+            LoadingSlider.text = (int) progress * 100f + "%";
 
             yield return null;
             

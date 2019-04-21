@@ -16,12 +16,13 @@ public class CharaInventory : MonoBehaviour
         private Image _icon;
         private Button _removeButton;
         private Button _itemButton;
+        private Button _info;
         private GameObject _counter;
 
         private Dictionary<Item, int> _linkedInventory;
         private CharaInventory _linkedCharaInventory;
 
-        public Slot(CharaInventory charaInventory,Dictionary<Item, int> inventory,Image icon, Button removeButton, Button itemButton, GameObject counter, bool pos)
+        public Slot(CharaInventory charaInventory,Dictionary<Item, int> inventory,Image icon, Button removeButton, Button itemButton, Button info, GameObject counter, bool pos)
         {
             //Reference au CharaInventory pour appeler UpdateUI (SPAGHETTI BOIII)
             _linkedCharaInventory = charaInventory;
@@ -32,10 +33,12 @@ public class CharaInventory : MonoBehaviour
             _icon = icon;
             _removeButton = removeButton;
             _itemButton = itemButton;
+            _info = info;
             _counter = counter;
             //Initialisation du bouton (appelle OnRemoveButton quand il est cliqué)
             _removeButton.onClick.AddListener(OnRemoveButton);
             _itemButton.onClick.AddListener(OnClickButton);
+            _info.onClick.AddListener(Pop);
             //L'emplacement est initialisé vide
             ClearSlot();
         }
@@ -54,6 +57,8 @@ public class CharaInventory : MonoBehaviour
             //RemoveButton is now active
             _removeButton.interactable = true;
             isEmpty = false;
+
+            _itemButton.transform.parent.GetChild(4).GetChild(0).GetComponent<Text>().text = _item.description;
         }
 
         public void ClearSlot()
@@ -68,6 +73,8 @@ public class CharaInventory : MonoBehaviour
             //deactivate RemoveButton=
             _removeButton.interactable = false;
             isEmpty = true;
+
+            _itemButton.transform.parent.GetChild(4).GetChild(0).GetComponent<Text>().text = "";
         }
 
         public void OnRemoveButton()
@@ -94,6 +101,11 @@ public class CharaInventory : MonoBehaviour
                 if (itemUsed) OnRemoveButton();                            // On enleve l'item utilisé
             }
         }
+
+        private void Pop()
+        {
+            _itemButton.transform.parent.GetChild(4).gameObject.SetActive(!_itemButton.transform.parent.GetChild(4).gameObject.activeSelf);            
+        }
     }
 
     //Database des items (pour avoir leur id, pour les update en rpc)
@@ -102,6 +114,9 @@ public class CharaInventory : MonoBehaviour
     //Dictionnaire représentant l'inventaire
     [HideInInspector]
     public Dictionary<Item, int> inventory = new Dictionary<Item, int>();
+
+    [HideInInspector] public Wearable[] wearables = new Wearable[4];
+    [HideInInspector] public Equipable[] equipments = new Equipable[2];
 
     //Nombre d'emplacement (Tweakable)
     private int _inventorySpace = 12;
@@ -138,10 +153,11 @@ public class CharaInventory : MonoBehaviour
             //pas ultra beau mais arrive que lors de l'init (pas mal spaghetti même)
             _slots[i] = new Slot(
                 this,
-                inventory, 
-                child.transform.GetChild(0).GetComponent<Image>(), 
+                inventory,
+                child.transform.GetChild(0).GetComponent<Image>(),
                 child.transform.GetChild(1).GetComponent<Button>(),
                 child.transform.GetChild(0).GetComponent<Button>(),
+                child.transform.GetChild(5).GetComponent<Button>(),
                 child.transform.GetChild(2).gameObject,
                 true);
         }
@@ -189,6 +205,13 @@ public class CharaInventory : MonoBehaviour
             _slots[i].ClearSlot();
         }
 
+        if(_interface != null)
+        {
+            _interface.GetComponent<InterfaceManager>().UpdateCraft(this);
+            _interface.GetComponent<InterfaceManager>().UpdateEquipment(this);
+            UpdateWeight();
+        }
+
     }
 
     //Openning and closing Inventory (canvas)
@@ -197,7 +220,8 @@ public class CharaInventory : MonoBehaviour
         _interface = Instantiate(_interfacePrefab);
         _interface.transform.SetParent(parent.transform, false);
         _interface.transform.GetChild(1).GetChild(0).GetComponent<Text>().text = gameObject.GetComponent<CharaRpg>().NameFull;
-        _interface.GetComponent<InterfaceManager>().InstantiateCraft();
+        _interface.GetComponent<InterfaceManager>().InstantiateCraft(this);
+        _interface.GetComponent<InterfaceManager>().InstantiateEquipment();
 
         _inventory = Instantiate(_inventoryPrefab);
         _inventory.transform.SetParent(_interface.transform.GetChild(0).GetChild(3).GetChild(0), false);
@@ -211,9 +235,29 @@ public class CharaInventory : MonoBehaviour
     {
         _inventory = Instantiate(_inventoryPrefab);
         _inventory.transform.SetParent(parent.transform, false);
-        _inventory.GetComponent<Image>().color = new Color(212, 210, 97, 100);
+        _inventory.GetComponent<Image>().color = Color.blue;
         _slotParent = _inventory.transform.GetChild(0).GetChild(0).gameObject;
         InitSlots();
+    }
+
+    public GameObject GetInterface()
+    {
+        return _interface;
+    }
+
+    public int UpdateWeight()
+    {
+        if (_inventory == null) return -1;
+        int sum = 0;
+
+        foreach(var item in inventory)
+        {
+            sum += item.Key.weight * item.Value;
+        }
+
+        _inventory.transform.GetChild(1).GetComponent<Text>().text = "Poids actuel : " + sum + " || Poids max : " + gameObject.GetComponent<CharaRpg>().GetCurrentStat(CharaRpg.Stat.ms_strength)/2;
+
+        return sum;
     }
 
     public void UpdateStats(string[] stats)
@@ -221,6 +265,7 @@ public class CharaInventory : MonoBehaviour
         GameObject stat = _interface.gameObject.GetComponent<InterfaceManager>().tooltip;
         stat.GetComponent<ToolTip>().UpdateTool(stats);
     }
+
 
     public void CloseInterface()
     {
@@ -240,13 +285,35 @@ public class CharaInventory : MonoBehaviour
             Destroy(_inventory);
         }
     }
-    
+
+    //Resistance getters
+
+    public int GetTotalSharpResistance()
+    {
+        int totalSharpResistance = 0;
+        foreach(Wearable equipment in wearables)
+        {
+            totalSharpResistance += equipment.sharpResistance;
+        }
+        return totalSharpResistance;
+    }
+    public int GetTotalMaceResistance()
+    {
+        int totalMaceResistance = 0;
+        foreach (Wearable equipment in wearables)
+        {
+            totalMaceResistance += equipment.maceResistance;
+        }
+        return totalMaceResistance;
+    }
+
     //Adding and removing item
     public bool Add(Item item)
     {
         //Le booléen retourné représente la réussite de l'ajout de l'item
         Debug.Log("CharaInventory: Checking space");
         if (inventory.Count >= _inventorySpace || 
+            UpdateWeight() + item.weight > (gameObject.GetComponent<CharaRpg>().GetCurrentStat(CharaRpg.Stat.ms_strength) / 2) ||
             _slots[_inventorySpace-1].isEmpty == false && 
             (_slots[_inventorySpace - 1].itemCount == item.stack || _slots[_inventorySpace - 1].item != item)) // Du spaghetti comme on aime
         {
@@ -314,7 +381,14 @@ public class CharaInventory : MonoBehaviour
     {
         inventory[itemTable.GetItemWithId(id)] += countModifier;
 
-        UpdateUI();
+        if (inventory[itemTable.GetItemWithId(id)] == 0)
+        {
+            RemoveWithId(id);
+        }
+        else
+        {
+            UpdateUI();
+        }        
     }
 
 }

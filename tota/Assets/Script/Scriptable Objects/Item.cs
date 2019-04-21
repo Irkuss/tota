@@ -15,7 +15,7 @@ public class Item : ScriptableObject
         Equipable,
         Wearable,
     }*/
-
+    [Header("General attribute")]
     public string nickName = "Item Name"; //Nom de l'item
     public string description = "Item description here";
     public Sprite icon = null; //Icon de l'item
@@ -50,4 +50,9 @@ public class Item : ScriptableObject
         return true;
     }
 
+    public virtual bool Unequip(GameObject refInventChara)
+    {
+        //Only overriden by Equipable and Wearable
+        return false;
+    }
 }

@@ -6,7 +6,7 @@ public class Tree : PropHandler
 {
     public Item woodRaw;
 
-    public override void Interact(CharaHead chara)
+    public override void Interact(CharaHead chara, int actionIndex)
     {
         Debug.Log("Tree: Interacting");
         //ajoute du bois au joueur
