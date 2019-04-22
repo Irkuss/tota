@@ -212,8 +212,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6e4c5bc35cf55a643953443951564d34, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  isMoving: 0
   _interTransform: {fileID: 4059653830927699747}
   _radius: 5
+  _possibleActionNames:
+  - '"DEBUG-FURNITURE"'
+  _isDistanceAction: 00
+  _isDoWhileAction: 00
   furniture: {fileID: 11400000, guid: 27dcd643c5d9d2b4380e9d58b4cc7918, type: 2}
   fill: {fileID: 6257223052304544654}
   _drop: {fileID: 8316911732837496598}
@@ -230,6 +235,14 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   itemTable: {fileID: 11400000, guid: 53de43c060c7ffe459db8e15c09cd294, type: 2}
+  wearables:
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  equipments:
+  - {fileID: 0}
+  - {fileID: 0}
   _inventoryPrefab: {fileID: 7954770632000053668, guid: a13de8f0882a5b64bb3c486545a7e13f,
     type: 3}
   _interfacePrefab: {fileID: 3179820777865773430, guid: f0c0e915b62a47644b4d813f26fda3bf,

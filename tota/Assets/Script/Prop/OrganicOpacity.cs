@@ -53,7 +53,8 @@ public class OrganicOpacity : MonoBehaviour
     //Updating opacity (constantly)
     private IEnumerator Cor_UpdateRenderer()
     {
-        while(true)
+        UpdateRenderer();
+        while (true)
         {
             if(transform.position.y != _previousY)
             {
@@ -75,6 +76,8 @@ public class OrganicOpacity : MonoBehaviour
             {
                 rend.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.ShadowsOnly;
             }
+            Renderer selfRender = GetComponent<Renderer>();
+            if(selfRender!=null) selfRender.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.ShadowsOnly;
             _collider.enabled = false;
         }
         else
@@ -84,6 +87,8 @@ public class OrganicOpacity : MonoBehaviour
             {
                 rend.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.On;
             }
+            Renderer selfRender = GetComponent<Renderer>();
+            if (selfRender != null) selfRender.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.On;
             _collider.enabled = true;
         }
     }
