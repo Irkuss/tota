@@ -444,6 +444,9 @@ public class SpiritHead : Photon.MonoBehaviour
         //sinon elle est disponible
         //Appelle IndexActionHandler avec inter et l'index d'action choisi par le joueur        
 
+        IndexActionHandler(inter, 0);
+
+        /*
         Dropdown drop = inter.gameObject.transform.GetChild(0).GetChild(0).GetComponent<Dropdown>();
         drop.gameObject.SetActive(true);
 
@@ -467,7 +470,7 @@ public class SpiritHead : Photon.MonoBehaviour
                 drop.itemImage.color = Color.grey;
             }
             
-        });
+        });*/
     }
 
 

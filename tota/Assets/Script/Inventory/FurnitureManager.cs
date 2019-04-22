@@ -12,6 +12,7 @@ public class FurnitureManager : Interactable
     
     public override void Interact(CharaHead chara, int actionIndex)
     {
+        Debug.Log("Interacting with furniture managere");
         fill.gameObject.SetActive(true);
         // utiliser les compétences pour pouvoir ouvrir
 

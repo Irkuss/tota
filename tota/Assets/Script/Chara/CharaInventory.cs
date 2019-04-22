@@ -233,7 +233,7 @@ public class CharaInventory : MonoBehaviour
     {
         _inventory = Instantiate(_inventoryPrefab);
         _inventory.transform.SetParent(parent.transform, false);
-        _inventory.GetComponent<Image>().color = Color.blue;
+        _inventory.GetComponent<Image>().color = Color.gray;
         _slotParent = _inventory.transform.GetChild(0).GetChild(0).gameObject;
         InitSlots();
     }
@@ -365,7 +365,15 @@ public class CharaInventory : MonoBehaviour
             Debug.Log("CharaInventory: Item was not present");
             //Si l'item n'était pas dans l'inventaire, ajoute un exemplaire de cet item
             //inventory.Add(item, 1);
-            GetComponent<CharaConnect>().SendMsg(CharaConnect.CharaCommand.AddWithId, new int[1] { itemTable.GetIdWithItem(item) }, null, null);
+            CharaConnect conn = GetComponent<CharaConnect>();
+            if (conn != null)
+            {
+                conn.SendMsg(CharaConnect.CharaCommand.AddWithId, new int[1] { itemTable.GetIdWithItem(item) }, null, null);
+            }
+            else
+            {
+                GetComponent<PropHandler>().CommandSend(new int[2] { (int)PropFurniture.FurnitureCommand.Add, itemTable.GetIdWithItem(item) });
+            }
             //gameObject.GetComponent<PhotonView>().RPC("AddWithId", PhotonTargets.AllBuffered, itemTable.GetIdWithItem(item));
         }
         Debug.Log("CharaInventory: Item has been added");
@@ -379,7 +387,16 @@ public class CharaInventory : MonoBehaviour
 
     public void Remove(Item item)
     {
-        GetComponent<CharaConnect>().SendMsg(CharaConnect.CharaCommand.RemoveWithId, new int[1] { itemTable.GetIdWithItem(item) }, null, null);
+        CharaConnect conn = GetComponent<CharaConnect>();
+        if (conn != null)
+        {
+            conn.SendMsg(CharaConnect.CharaCommand.RemoveWithId, new int[1] { itemTable.GetIdWithItem(item) }, null, null);
+        }
+        else
+        {
+            GetComponent<PropHandler>().CommandSend(new int[2] { (int)PropFurniture.FurnitureCommand.Remove, itemTable.GetIdWithItem(item) });
+        }
+        
         //gameObject.GetComponent<PhotonView>().RPC("RemoveWithId", PhotonTargets.AllBuffered, itemTable.GetIdWithItem(item));
 
         //inventory.Remove(item);
@@ -388,7 +405,15 @@ public class CharaInventory : MonoBehaviour
 
     public void ModifyCount(Item item, int countModifier)
     {
-        GetComponent<CharaConnect>().SendMsg(CharaConnect.CharaCommand.ModifyCountWithId, new int[2] { itemTable.GetIdWithItem(item), countModifier }, null, null);
+        CharaConnect conn = GetComponent<CharaConnect>();
+        if (conn != null)
+        {
+            conn.SendMsg(CharaConnect.CharaCommand.ModifyCountWithId, new int[2] { itemTable.GetIdWithItem(item), countModifier }, null, null);
+        }
+        else
+        {
+            GetComponent<PropHandler>().CommandSend(new int[3] { (int)PropFurniture.FurnitureCommand.Modify, itemTable.GetIdWithItem(item), countModifier });
+        }
         //gameObject.GetComponent<PhotonView>().RPC("ModifyCountWithId", PhotonTargets.AllBuffered, itemTable.GetIdWithItem(item), countModifier);
     }
 
