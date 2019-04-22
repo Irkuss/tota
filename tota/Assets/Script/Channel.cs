@@ -14,6 +14,8 @@ public class Channel : MonoBehaviour
     private PermissionsManager.Team _team;
     private string _teamName = "" ;
 
+    public static bool isWriting;
+
     private void Awake()
     {
         _permission = PermissionsManager.Instance;
@@ -25,6 +27,18 @@ public class Channel : MonoBehaviour
             {
                 _teamName = _team.Name;
             }
+        }
+    }
+
+    private void Update()
+    {
+        if (_input.GetComponent<InputField>().isFocused)
+        {
+            isWriting = true;
+        }
+        else
+        {
+            isWriting = false;
         }
     }
 

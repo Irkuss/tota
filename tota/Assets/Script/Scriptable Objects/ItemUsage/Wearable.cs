@@ -35,6 +35,10 @@ public class Wearable : Item
         switch (inventorySpotTaken)
         {
             case BodyInvSpace.Head:
+                if (inv.wearables[0] != null)
+                {
+                    inv.Add(inv.wearables[0]);
+                }
                 inv.wearables[0] = this;
                 break;
             case BodyInvSpace.Torso:
@@ -44,10 +48,19 @@ public class Wearable : Item
                 }
                 else
                 {
+                    if (inv.wearables[2] != null)
+                    {
+                        inv.Add(inv.wearables[2]);
+                    }
+                    inv.wearables[2] = inv.wearables[1];
                     inv.wearables[1] = this;
                 }
                 break;
             case BodyInvSpace.Leg:
+                if (inv.wearables[3] != null)
+                {
+                    inv.Add(inv.wearables[3]);
+                }
                 inv.wearables[3] = this;
                 break;
         }
@@ -65,7 +78,9 @@ public class Wearable : Item
         //if inventory has enough space (1)
         //    return true
         //return false
-        return false;
+
+        CharaInventory inv = refInventChara.GetComponent<CharaInventory>();
+        return inv.Add(this);
     }
 
     //Getters
