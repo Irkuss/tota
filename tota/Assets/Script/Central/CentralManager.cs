@@ -123,9 +123,10 @@ public class CentralManager : Photon.MonoBehaviour
 
     public void LoadMenu()
     {
+        PhotonNetwork.Destroy(gameObject);
+        PhotonNetwork.Destroy(PermissionsManager.Instance.gameObject);
+        PhotonNetwork.Destroy(Mode.Instance.gameObject);
         SceneManager.LoadScene(2);
-        //PhotonNetwork.Destroy(photonview);
-        PhotonNetwork.Disconnect();
     }
 
     public void Options()

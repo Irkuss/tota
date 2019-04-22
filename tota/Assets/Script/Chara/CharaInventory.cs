@@ -207,7 +207,6 @@ public class CharaInventory : MonoBehaviour
         if(_interface != null)
         {
             _interface.GetComponent<InterfaceManager>().UpdateCraft(this);
-            _interface.GetComponent<InterfaceManager>().UpdateEquipment(this);
             UpdateWeight();
         }
 
