@@ -49,7 +49,7 @@ public class Equipable : Item
     public Item ammo = null;
    
     //Use (Equip)
-    public override bool Use(GameObject refInventChara)
+    protected override bool UseAsChara(GameObject refInventChara)
     {
         //Equip the weapon, process as follows:
 

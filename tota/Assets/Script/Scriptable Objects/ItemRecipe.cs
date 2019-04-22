@@ -5,10 +5,12 @@ using UnityEngine;
 [CreateAssetMenu(fileName = "new Recipe",menuName = "Recipe")]
 public class ItemRecipe : ScriptableObject
 {
+    [Header("Recipe result (if it has one)")]
     //Item donné par le craft
-    public Item result;
+    public Item result = null;
     public int resultCount;
 
+    [Header("Recipe needed items")]
     //A chaque index des deux arrays se trouvent un Item requis et la quantité de cet Item requise
     //NB: les dictionnary marchent pas avec les Scriptables Objects du coup on bidouille deso
     public Item[] neededItem;

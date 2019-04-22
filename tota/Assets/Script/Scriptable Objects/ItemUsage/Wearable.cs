@@ -22,7 +22,7 @@ public class Wearable : Item
     public int minTempModifier = 0;
 
     //Use (Equip)
-    public override bool Use(GameObject refInventChara)
+    protected override bool UseAsChara(GameObject refInventChara)
     {
         //Equip the wearable, process as follows:
 

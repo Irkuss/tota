@@ -47,7 +47,7 @@ public class PropManager : MonoBehaviour
             if (_go != null) return;
             Quaternion rotation = Quaternion.Euler(0, _propRotation, 0);
             _go = Instantiate(Resources.Load<GameObject>(_propName), _propPosition, rotation);
-            _go.GetComponent<PropHandler>().SetId(_id);
+            _go.GetComponentInChildren<PropHandler>().SetId(_id);
         }
 
         public void DestroySelf()
@@ -59,7 +59,7 @@ public class PropManager : MonoBehaviour
         //Sending special command
         public void ReceivePropCommand(int[] command)
         {
-            if (_go != null) _go.GetComponent<PropHandler>().CommandReceive(command);
+            if (_go != null) _go.GetComponentInChildren<PropHandler>().CommandReceive(command);
         }
     }
 

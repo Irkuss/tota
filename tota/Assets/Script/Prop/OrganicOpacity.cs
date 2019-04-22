@@ -4,7 +4,11 @@ using UnityEngine;
 
 public class OrganicOpacity : MonoBehaviour
 {
+    public bool isMoving = false;
+    private bool _wasAboveFloorLevel;
+
     private Renderer[] _renderers;
+    private Renderer _renderer;
     private Collider _collider;
 
     private int currentFloorLevel;
@@ -17,19 +21,23 @@ public class OrganicOpacity : MonoBehaviour
     {
         _renderers = GetComponentsInChildren<Renderer>();
         _collider = GetComponent<Collider>();
-
-        if(_renderers.Length > 0 && _collider != null)
+        _renderer = GetComponent<Renderer>();
+        if (_renderers.Length > 0 && _collider != null)
         {
             FloorManager.onFloorLevelChanged += UpdateFloorLevel;
         }
 
         //Init le floor level (pas ouf mais n'arrive qu'une fois par organic)
         currentFloorLevel = GameObject.Find("eCentralManager").GetComponent<FloorManager>().GetFloorLevel();
+        _wasAboveFloorLevel = IsAboveFloorLevel(currentFloorLevel);
+        UpdateRenderer();
+        if (isMoving)
+        {
+            _cor_updateRender = Cor_UpdateRenderer();
 
-        _cor_updateRender = Cor_UpdateRenderer();
-
-        _previousY = transform.position.y;
-        StartCoroutine(_cor_updateRender);
+            _previousY = transform.position.y;
+            StartCoroutine(_cor_updateRender);
+        }
     }
 
     private void OnDestroy()
@@ -39,13 +47,16 @@ public class OrganicOpacity : MonoBehaviour
             //Unsubscribe to prevent memory leak
             FloorManager.onFloorLevelChanged -= UpdateFloorLevel;
         }
-
-        StopCoroutine(_cor_updateRender);
+        if(_cor_updateRender != null)
+        {
+            StopCoroutine(_cor_updateRender);
+        }
     }
 
     //Updating opacity (by callback)
     private void UpdateFloorLevel(int newFloorLevel)
     {
+        _wasAboveFloorLevel = IsAboveFloorLevel(currentFloorLevel);
         currentFloorLevel = newFloorLevel;
 
         UpdateRenderer();
@@ -53,7 +64,6 @@ public class OrganicOpacity : MonoBehaviour
     //Updating opacity (constantly)
     private IEnumerator Cor_UpdateRenderer()
     {
-        UpdateRenderer();
         while (true)
         {
             if(transform.position.y != _previousY)
@@ -69,26 +79,25 @@ public class OrganicOpacity : MonoBehaviour
     private void UpdateRenderer()
     {
         Debug.Log("OrganicOpacity: Updating Renderer");
-        if (IsAboveFloorLevel(currentFloorLevel))
+        bool currentAbove = IsAboveFloorLevel(currentFloorLevel);
+        if (currentAbove && !_wasAboveFloorLevel)
         {
             Debug.Log("OrganicOpacity: Setting to invisible");
             foreach (Renderer rend in _renderers)
             {
                 rend.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.ShadowsOnly;
             }
-            Renderer selfRender = GetComponent<Renderer>();
-            if(selfRender!=null) selfRender.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.ShadowsOnly;
+            if(_renderer!=null) _renderer.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.ShadowsOnly;
             _collider.enabled = false;
         }
-        else
+        else if(!currentAbove && _wasAboveFloorLevel)
         {
             Debug.Log("OrganicOpacity: Setting to visible");
             foreach (Renderer rend in _renderers)
             {
                 rend.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.On;
             }
-            Renderer selfRender = GetComponent<Renderer>();
-            if (selfRender != null) selfRender.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.On;
+            if (_renderer != null) _renderer.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.On;
             _collider.enabled = true;
         }
     }
