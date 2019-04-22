@@ -287,6 +287,18 @@ public class CharaInventory : MonoBehaviour
 
     //Resistance getters
 
+    public int GetBodyPartSharpResistance(CharaRpg.BodyType type)
+    {
+        int bodyPartSharpResistance = 0;
+        foreach (Wearable equipment in wearables)
+        {
+            if(equipment.ContainsBodyType(type))
+            {
+                bodyPartSharpResistance += equipment.sharpResistance;
+            }
+        }
+        return bodyPartSharpResistance;
+    }
     public int GetTotalSharpResistance()
     {
         int totalSharpResistance = 0;
@@ -295,6 +307,18 @@ public class CharaInventory : MonoBehaviour
             totalSharpResistance += equipment.sharpResistance;
         }
         return totalSharpResistance;
+    }
+    public int GetBodyPartMaceResistance(CharaRpg.BodyType type)
+    {
+        int bodyPartMaceResistance = 0;
+        foreach (Wearable equipment in wearables)
+        {
+            if (equipment.ContainsBodyType(type))
+            {
+                bodyPartMaceResistance += equipment.maceResistance;
+            }
+        }
+        return bodyPartMaceResistance;
     }
     public int GetTotalMaceResistance()
     {

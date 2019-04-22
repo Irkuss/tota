@@ -10,9 +10,13 @@ public class CharaMovement : MonoBehaviour
     public NavMeshAgent navMeshAgent;
     public ThirdPersonCharacter character;
 
+    private float _baseAgentSpeed;
+    private float _baseAgentAngularSpeed;
+
     private void Start()
     {
-        
+        _baseAgentSpeed = navMeshAgent.speed;
+        _baseAgentAngularSpeed = navMeshAgent.angularSpeed;
     }
 
     private void Update()
@@ -47,6 +51,13 @@ public class CharaMovement : MonoBehaviour
     {
         navMeshAgent.stoppingDistance = newStop;
     }*/
+
+    //Modification depuis CharaRpg
+    public void ModifyAgentSpeed(float speedModifier)
+    {
+        navMeshAgent.speed = _baseAgentSpeed * speedModifier;
+        navMeshAgent.angularSpeed = _baseAgentAngularSpeed * speedModifier;
+    }
 
     //Deplacement vers un Interactable
     public void MoveToInter(Interactable inter)

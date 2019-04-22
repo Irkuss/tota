@@ -67,10 +67,10 @@ NavMeshAgent:
   m_AutoTraverseOffMeshLink: 1
   m_AutoBraking: 1
   m_AutoRepath: 1
-  m_Height: 1
+  m_Height: 2
   m_BaseOffset: 0
   m_WalkableMask: 4294967295
-  m_ObstacleAvoidanceType: 0
+  m_ObstacleAvoidanceType: 2
 --- !u!114 &6841929755254683463
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -245,7 +245,7 @@ CapsuleCollider:
   m_Radius: 0.5
   m_Height: 1.5
   m_Direction: 1
-  m_Center: {x: 0, y: 0.8, z: 0}
+  m_Center: {x: 0, y: 1.5, z: 0}
 --- !u!54 &5267074254773121640
 Rigidbody:
   m_ObjectHideFlags: 0
@@ -434,8 +434,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b43961bd5634f5f459d16d7826b73a79, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  isMoving: 0
   _interTransform: {fileID: 9180920927353207022}
   _radius: 5
+  _possibleActionNames: []
+  _isDistanceAction: 
+  _isDoWhileAction: 
 --- !u!1001 &5204163093903766200
 PrefabInstance:
   m_ObjectHideFlags: 0

@@ -82,4 +82,17 @@ public class Wearable : Item
         CharaInventory inv = refInventChara.GetComponent<CharaInventory>();
         return inv.Add(this);
     }
+
+    //Getters
+    public bool ContainsBodyType(CharaRpg.BodyType type)
+    {
+        foreach(CharaRpg.BodyType bodyType in zoneProtected)
+        {
+            if(bodyType == type)
+            {
+                return true;
+            }
+        }
+        return false;
+    }
 }
