@@ -1,13 +1,14 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 using UnityEngine.EventSystems;
 
 public class SpiritHead : Photon.MonoBehaviour
 {
     //utilisé pour debugger (à swap avec un scriptable object des que possible)
 
-    private string _charaPath = "CharaTanguy";
+    private string _charaPath = "CharaTanyako";
     [SerializeField] private ItemRecipe bigAppleRecipe = null;
     [SerializeField] private ItemTable itemTable = null;
 
@@ -50,6 +51,8 @@ public class SpiritHead : Photon.MonoBehaviour
 
     void Update()
     {
+        if (Channel.isWriting) return;
+
         if (!_isInBuildMode)
         {
             //Normal Right Left click check
@@ -332,11 +335,11 @@ public class SpiritHead : Photon.MonoBehaviour
             Debug.Log("RightClickUpdate: clicked on something");
             //if (hit.transform.CompareTag("Interactable")) -> les charas doivent etre interactable
             //
-                Interactable inter = hit.collider.GetComponent<Interactable>();
-                if (inter != null) //la verif se fait donc là
-                {
-                    GeneralActionHandler(inter);
-                }
+            Interactable inter = hit.collider.GetComponent<Interactable>();
+            if (inter != null) //la verif se fait donc là
+            {
+                GeneralActionHandler(inter);
+            }
             //}
             else
             {
@@ -439,8 +442,35 @@ public class SpiritHead : Photon.MonoBehaviour
         //Vérifie que les actions sont available à tous les charas selectionnés (IsActionIndexAvailableByAll déjà implémenté juste en dessous)
         //Si une action n'est pas available à au moins un Chara selectionné, elle est grisée,
         //sinon elle est disponible
-        //Appelle IndexActionHandler avec inter et l'index d'action choisi par le joueur
+        //Appelle IndexActionHandler avec inter et l'index d'action choisi par le joueur        
+
+        Dropdown drop = inter.gameObject.transform.GetChild(0).GetChild(0).GetComponent<Dropdown>();
+        drop.gameObject.SetActive(true);
+
+        drop.ClearOptions();
+        List<string> actions = new List<string> ();
+        foreach (var action in inter.PossibleActionNames)
+        {
+            actions.Add(action);
+        }
+        drop.AddOptions(actions);
+
+        drop.onValueChanged.AddListener(delegate
+        {
+            if (IsActionIndexAvailableByAll(inter, drop.value))
+            {
+                IndexActionHandler(inter, drop.value);
+                drop.gameObject.SetActive(false);
+            }
+            else
+            {
+                drop.itemImage.color = Color.grey;
+            }
+            
+        });
     }
+
+
     public bool IsActionIndexAvailableByAll(Interactable inter, int actionIndex)
     {
         foreach (GameObject Chara in _selectedList)
