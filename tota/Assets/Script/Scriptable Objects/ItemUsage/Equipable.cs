@@ -64,17 +64,43 @@ public class Equipable : Item
 
         if(equipSpace == EquipSpace.OneHanded)
         {
-            if (inv.equipments[0] != null && inv.equipments[1] == null)
+            if(inv.equipments[0].equipSpace == EquipSpace.TwoHanded)
             {
+                inv.Add(inv.equipments[0]);
+                inv.Add(inv.equipments[1]);
+
+                inv.equipments[0] = this;
                 inv.equipments[1] = this;
             }
             else
             {
-                inv.equipments[0] = this;
-            }
+                if (inv.equipments[0] != null && inv.equipments[1] == null)
+                {
+                    inv.equipments[1] = this;
+                }
+                else
+                {
+                    if (inv.equipments[1] != null)
+                    {
+                        inv.Add(inv.equipments[1]);
+                    }
+                    inv.equipments[1] = inv.equipments[0];
+                    inv.equipments[0] = this;
+                }
+            }            
         }
         else
         {
+            if (inv.equipments[0] != null)
+            {
+                inv.Add(inv.equipments[0]);
+            }
+
+            if (inv.equipments[1] != null)
+            {
+                inv.Add(inv.equipments[1]);
+            }
+
             inv.equipments[0] = this;
             inv.equipments[1] = this;
         }
@@ -82,7 +108,6 @@ public class Equipable : Item
         GameObject _interface = inv.GetInterface();
         if (_interface == null) return false;
         _interface.GetComponent<InterfaceManager>().UpdateEquipment(inv);
-
 
         return true;
     }
@@ -94,7 +119,8 @@ public class Equipable : Item
         //    return true
         //return false
 
-        return false;
+        CharaInventory inv = refInventChara.GetComponent<CharaInventory>();
+        return inv.Add(this);
     }
     //Should be check before attacking
     public bool CanAttack(CharaInventory inv)
