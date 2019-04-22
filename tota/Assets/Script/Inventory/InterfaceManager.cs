@@ -131,9 +131,20 @@ public class InterfaceManager : MonoBehaviour
         {
             GameObject right = _equipment.transform.GetChild(4).gameObject;
             right.transform.GetChild(0).GetComponent<Image>().sprite = charaInventory.equipments[1].icon;
-            right.transform.GetChild(0).GetComponent<Button>().onClick.AddListener(() => charaInventory.equipments[1].Unequip(charaInventory.gameObject));
+            if (charaInventory.equipments[0].equipSpace == Equipable.EquipSpace.TwoHanded)
+            {
+                right.transform.GetChild(3).gameObject.SetActive(true);
+                right.transform.GetChild(0).GetComponent<Button>().interactable = false;
+                _equipment.transform.GetChild(3).GetChild(0).GetComponent<Button>().onClick.AddListener(() => charaInventory.equipments[1].Unequip(charaInventory.gameObject));
+            }
+            else
+            {
+                right.transform.GetChild(0).GetComponent<Button>().onClick.AddListener(() => charaInventory.equipments[1].Unequip(charaInventory.gameObject));                
+            }
+
             right.transform.GetChild(4).GetChild(0).GetComponent<Text>().text = charaInventory.equipments[1].description;
             right.transform.GetChild(5).GetComponent<Button>().onClick.AddListener(() => Active(right.transform.GetChild(4).gameObject));
+
         }
     }
 
