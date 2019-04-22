@@ -1523,6 +1523,24 @@ public class Generator : MonoBehaviour
         DeepForest = 3,
         Arid = 4
     }
+    private Dictionary<WorldBiome, int> _baseBiomeTemperatureModifier = new Dictionary<WorldBiome, int>()
+    {
+        {WorldBiome.Undecided, 0 },
+        {WorldBiome.Plain, 0 },
+        {WorldBiome.Forest, 0 },
+        {WorldBiome.DeepForest, 0 },
+        {WorldBiome.Arid, +5 }
+    };
+    public int GetPosTempModifier(Vector3 pos)
+    {
+        //Trouve les coords dans la matrice de world
+        int x = Mathf.FloorToInt(pos.x / c_worldChunkLength);
+        int y = Mathf.FloorToInt(pos.y / c_worldChunkLength);
+        //Recupere le biome a ces coordonnées
+        WorldBiome posBiome = _world[x, y].Biome;
+        //Return le modifier de temperature specifique à ce biome
+        return _baseBiomeTemperatureModifier[posBiome];
+    }
     public enum WorldLayout
     {
         Undecided = 0,

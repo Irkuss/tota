@@ -12,7 +12,9 @@ public class CentralManager : Photon.MonoBehaviour
 
     public const float c_cameraStartHeight = 800;
     public float cameraStartDownAngle = 90f;
-    
+
+    //reference
+    private DayNightCycle dayNightCycle = null;
     //Bouton et interface
     public GameObject tempButton;
     public GameObject toolTip;
@@ -77,6 +79,7 @@ public class CentralManager : Photon.MonoBehaviour
     private void Start()
     {
         tempButton.SetActive(false);
+        dayNightCycle = GameObject.Find("Directional Light").GetComponent<DayNightCycle>();
     }
 
     public void PlaceCameraAbove(int x, int y)
@@ -134,7 +137,12 @@ public class CentralManager : Photon.MonoBehaviour
     {
         Application.Quit();
     }
-
+    //Temperature getters
+    public int GetTemperatureAtCoord(Vector3 pos)
+    {
+        //Called by charaRpg
+        return dayNightCycle.GetCurrentSeasonTemperature() + GetComponent<Generator>().GetPosTempModifier(pos);
+    }
 
     //Special Callbacks
     public void OnGenerationFinished()

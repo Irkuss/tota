@@ -8,7 +8,7 @@ public class DayNightCycle : MonoBehaviour
     public float speed;
     public float heure;
     public int day = 1;
-    public Seasons season;
+    private Seasons _season;
     private float _slider;
     private bool _changedHour;
 
@@ -25,6 +25,17 @@ public class DayNightCycle : MonoBehaviour
         WINTER,
         SPRING
     }
+    private Dictionary<Seasons, int> _baseSeasonTemperature = new Dictionary<Seasons, int>()
+    {
+        {Seasons.SUMMER, 25 },
+        {Seasons.AUTUMM, 10 },
+        {Seasons.WINTER, -5 },
+        {Seasons.SPRING, 15 }
+    };
+    public int GetCurrentSeasonTemperature()
+    {
+        return _baseSeasonTemperature[_season];
+    }
 
     private void UpdateCallback()
     {
@@ -35,13 +46,13 @@ public class DayNightCycle : MonoBehaviour
 
         if (onNewseason != null) //Si une personne nous écoute
         {
-            onNewseason(season); //Declenche le callback chez les spectateurs
+            onNewseason(_season); //Declenche le callback chez les spectateurs
         }
     }
 
     void Start()
     {
-        season = Seasons.SUMMER;
+        _season = Seasons.SUMMER;
         UpdateCallback();
         _sun = GetComponent<Light>();
         transform.rotation = Quaternion.Euler(0, 60, 0);
@@ -104,13 +115,13 @@ public class DayNightCycle : MonoBehaviour
         if (day >= 20)
         {
             day = 1;
-            int next = ((int)season + 1) % 4;
+            int next = ((int)_season + 1) % 4;
             switch (next)
             {
-                case 0: season = Seasons.SUMMER; break;
-                case 1: season = Seasons.AUTUMM; break;
-                case 2: season = Seasons.WINTER; break;
-                case 3: season = Seasons.SPRING; break;
+                case 0: _season = Seasons.SUMMER; break;
+                case 1: _season = Seasons.AUTUMM; break;
+                case 2: _season = Seasons.WINTER; break;
+                case 3: _season = Seasons.SPRING; break;
             }
             UpdateCallback();
         }

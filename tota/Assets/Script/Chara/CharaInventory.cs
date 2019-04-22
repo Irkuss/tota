@@ -331,6 +331,16 @@ public class CharaInventory : MonoBehaviour
         return totalMaceResistance;
     }
 
+    public int GetMinTemperatureModifier()
+    {
+        int minTempModifier = 0;
+        foreach(Wearable wearable in wearables)
+        {
+            minTempModifier += wearable.minTempModifier;
+        }
+        return minTempModifier;
+    }
+
     //Adding and removing item
     public bool Add(Item item)
     {

@@ -55,7 +55,7 @@ public class CharaRpg : MonoBehaviour
         {
             return _stats[(int)stat];
         }
-        //Addition
+        //Addition of Stats
         public void Add(Stats addedStats)
         {
             for (int i = 0; i < _stats.Length; i++)
@@ -70,6 +70,29 @@ public class CharaRpg : MonoBehaviour
                 _stats[i] -= addedStats._stats[i];
             }
         }
+        //Addition of to specific stats
+        public void AddSpecific(Stat specifiedStat, int modifier)
+        {
+            _stats[(int)specifiedStat] += modifier;
+        }
+        //Lanbda multiply
+        public void MultiplyAll(float modifier)
+        {
+            for (int i = 0; i < _stats.Length; i++)
+            {
+                _stats[i] = Mathf.FloorToInt(_stats[i] * modifier);
+            }
+        }
+        public static Stats GetMultiplyResult(Stats stats, float modifier)
+        {
+            int[] newStat = stats._stats;
+            for (int i = 0; i < newStat.Length; i++)
+            {
+                newStat[i] = Mathf.FloorToInt(newStat[i] * modifier);
+            }
+
+            return new Stats(newStat);
+        }
     }
     private Stats _baseStat;
     private Stats _statModifiers;
@@ -80,12 +103,13 @@ public class CharaRpg : MonoBehaviour
         quirkTable = _quirkTable;
         _nameFirst = GetRandomFirstName();
         _nameLast = GetRandomLastName();
+        _cm = GameObject.Find("eCentralManager").GetComponent<CentralManager>();
     }
 
     //Init
     private void Start()
     {
-        _cm = GameObject.Find("eCentralManager").GetComponent<CentralManager>();
+        
         _charaMov = GetComponent<CharaMovement>();
 
         DayNightCycle.onNewHour += UpdateHourly;
@@ -149,7 +173,8 @@ public class CharaRpg : MonoBehaviour
     //Getters
     public int GetCurrentStat(Stat stat)
     {
-        return _baseStat.GetStat(stat) + _statModifiers.GetStat(stat);
+        //stat*consciousnes+modifier
+        return Stats.GetMultiplyResult(_baseStat, _consciousness).GetStat(stat) + _statModifiers.GetStat(stat);
     }
 
     //Random Getters
@@ -161,11 +186,13 @@ public class CharaRpg : MonoBehaviour
     }
 
     //Updated Hourly
-    private  void UpdateHourly()
+    private void UpdateHourly()
     {
         //Hunger
         _hunger = _hunger > 0 ? _hunger - 1 : 0;
         //tiredness
+        //temperature
+        UpdateTemperature();
     }
 
     //Hunger and tiredness
@@ -174,12 +201,14 @@ public class CharaRpg : MonoBehaviour
     private void InitStatus()
     {
         _hunger = _maxHunger / 2;
+
+        _bodyTemperature = GetOutSideTemperature();
     }
     //Health Attribute
-    private int maxBloodStock = 3000;
+    private readonly int maxBloodStock = 3000;
     private int bloodStockGain = 30;
     private int bloodStock;
-    private float _consciousness = 1f; //if reaches 0, switch to shock state, *Social/Intelligence
+    private float _consciousness = 1f; //if reaches 0.1, switch to shock state, *Social/Intelligence
     private float _shockTreshold = 0.1f;
     private float _pain = 0f;
     private float _tempPain = 0f; //augmenté au moment d'ajouter une blesure, tend vers 0 à chaque Update
@@ -191,8 +220,30 @@ public class CharaRpg : MonoBehaviour
     private bool _isDead = false;
     //Bodyparts
     private List<BodyPart> _bodyParts;
+    //body temperature
+    private int _bodyTemperature;
+    private readonly int _minTemp = -5;
+    private readonly int _maxTemp = 35;
+    private int GetOutSideTemperature()
+    {
+        return _cm.GetTemperatureAtCoord(transform.position);
+    }
+    private int GetMinTempResistance()
+    {
+        return GetComponent<CharaInventory>().GetMinTemperatureModifier();
+    }
+    private void UpdateTemperature()
+    {
+        int outsiteTemp = GetOutSideTemperature();
+        //Update bodyTemperature
+        if(_bodyTemperature != outsiteTemp)
+        {
+            _bodyTemperature = _bodyTemperature > outsiteTemp ? _bodyTemperature - 1 : _bodyTemperature + 1;
+        }
+        //Update possible wound related to temperature
+    }
 
-    //Health class and enum
+    //BodyParts and Wound class/enum
     public enum WoundType
     {
         Fracture,  //treated by a split
@@ -511,7 +562,7 @@ public class CharaRpg : MonoBehaviour
 
 
         //Debug:
-        Debug.Log("CharaRpg: Blood Lost " + totalBloodLose + ", " + bloodStock + " left");
+        Debug.Log("CharaRpg: Blood Lost " + totalBloodLose + ", " + bloodStock + " left, consciousness: " + _consciousness);
         DebugWounds();
     }
     private bool CheckDeath()
@@ -590,6 +641,12 @@ public class CharaRpg : MonoBehaviour
 
         
     }
+    private void UpdateConsciousness()
+    {
+        _consciousness = 1 - _pain;
+
+        _isInShock = _consciousness < _shockTreshold;
+    }
     private void UpdateMovement()
     {
         if (_isDead || _isInShock)
@@ -602,14 +659,8 @@ public class CharaRpg : MonoBehaviour
                       - 0.25f * (2 - _bodyParts[5].GetFuncPurcent() - _bodyParts[6].GetFuncPurcent());
             if (_movement <= 0) _movement = 0f;
         }
-
+        Debug.Log("UpdateMovement: movement=" + _movement + ", consciousness=" + _consciousness);
         if (_charaMov != null) _charaMov.ModifyAgentSpeed(_movement * _consciousness);
-    }
-    private void UpdateConsciousness()
-    {
-        _consciousness = 1 - _pain;
-
-        _isInShock = _consciousness > _shockTreshold;
     }
 
     public void Die()
@@ -657,37 +708,23 @@ public class CharaRpg : MonoBehaviour
     {
         SendAddWound((int)wound.type, wound.damage, bodyPartName, wound.origin);
     }
-    public void TryDeathBite(int biteDamage)
-    {
-        //Choisis une partie du corps random
-        BodyPart bodyPart = _bodyParts[Random.Range(1, 13)];
-        //test de Force
-        if (!GetCheck(Stat.ms_strength))
-        {
-            //Si on rate le test de Force
-            //Soustrait les degats normalement (degats de type Sharp)
-            biteDamage -= GetComponent<CharaInventory>().GetBodyPartSharpResistance(bodyPart.bodyType);
-            if(biteDamage > 0)
-            {
-                //Si l'armure n'a pas absorbé le coup, on est mordu
-                Debug.Log("TryDeathBite: " + NameFull + " got bitten!");
-                AddWound(new Wound(WoundType.DeathBite, biteDamage, "zombie", 1.2f), bodyPart);
-            }
-        }
-    }
 
-    public void SendAddWound(int woundType, int initialDamage, string bodyPartName, string origin)
+    public void SendAddWound(int woundType, int initialDamage, string bodyPartName, string origin, float infectionIncrement = 0)
     {
         GetComponent<CharaConnect>().SendMsg(
             CharaConnect.CharaCommand.ReceiveAddWound,
             new int[2] { woundType , initialDamage },
             new string[2] { bodyPartName, origin },
-            null);
+            new float[1] { infectionIncrement });
     }
-    public void ReceiveAddWound(int woundType, int initialDamage, string bodyPartName, string origin)
+    public void ReceiveAddWound(int woundType, int initialDamage, string bodyPartName, string origin, float infectionIncrement)
     {
         _tempPain += initialDamage;
-        FindPartWithName(bodyPartName).AddWound(new Wound((WoundType)woundType, initialDamage, origin));
+        FindPartWithName(bodyPartName).AddWound(new Wound((WoundType)woundType, initialDamage, origin, infectionIncrement));
+    }
+    public void LocalAddWound(Wound wound, BodyPart bodyPart)
+    {
+        FindPartWithName(bodyPart.name).AddWound(wound);
     }
     //Combat handler
     public void DebugGetRandomDamage(int woundType)
@@ -719,6 +756,24 @@ public class CharaRpg : MonoBehaviour
             Wound wound = new Wound(type, damage, weapon.nickName);
 
             AddWound(wound, bodyPart);
+        }
+    }
+    public void TryDeathBite(int biteDamage)
+    {
+        //Choisis une partie du corps random
+        BodyPart bodyPart = _bodyParts[Random.Range(1, 13)];
+        //test de Force
+        if (!GetCheck(Stat.ms_strength))
+        {
+            //Si on rate le test de Force
+            //Soustrait les degats normalement (degats de type Sharp)
+            biteDamage -= GetComponent<CharaInventory>().GetBodyPartSharpResistance(bodyPart.bodyType);
+            if (biteDamage > 0)
+            {
+                //Si l'armure n'a pas absorbé le coup, on est mordu
+                Debug.Log("TryDeathBite: " + NameFull + " got bitten!");
+                LocalAddWound(new Wound(WoundType.DeathBite, biteDamage, "zombie", 1.2f), bodyPart);
+            }
         }
     }
 
@@ -763,6 +818,7 @@ public class CharaRpg : MonoBehaviour
         {
             debug += s;
         }
+        if (debug == "") debug = " healthy!";
         Debug.Log("DebugWounds: " + debug);
 
         GameObject _interface = gameObject.GetComponent<CharaInventory>().GetInterface();
@@ -771,11 +827,7 @@ public class CharaRpg : MonoBehaviour
             _interface.GetComponent<InterfaceManager>().UpdateInjuries(GetWoundsInfo());
         }
     }
-
-
-
-
-
+    
     //Action
     public void Eat(int food)
     {
@@ -827,21 +879,8 @@ public class CharaRpg : MonoBehaviour
             GetCurrentStat(Stat.lv_stamina).ToString(),
         };
     }
-
-
-    /*
-    [PunRPC]
-    public void SendToolTipInfo(string[] info)
-    {
-        Strength = int.Parse(info[1]);
-        Intelligence = int.Parse(info[2]);
-        Perception = int.Parse(info[3]);
-        Mental = int.Parse(info[4]);
-        Social = int.Parse(info[5]);
-        _hunger = int.Parse(info[6]);
-        _maxHunger = int.Parse(info[7]);
-    }*/
-
+    
+    //Names static manager
     public static string GetRandomFirstName()
     {
         using (StreamReader prenoms = new StreamReader("Assets/Resources/Database/prenoms.txt"))
