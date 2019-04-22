@@ -89,7 +89,6 @@ public class CharaInventory : MonoBehaviour
                 _linkedCharaInventory.ModifyCount(_item, -1);
                 //ClearSlot(); lets try this
             }
-            _linkedCharaInventory.UpdateUI();
         }
 
         public void OnClickButton()
