@@ -64,13 +64,12 @@ public class Equipable : Item
 
         if(equipSpace == EquipSpace.OneHanded)
         {
-            if(inv.equipments[0].equipSpace == EquipSpace.TwoHanded)
+            if(inv.equipments[0] != null && inv.equipments[0].equipSpace == EquipSpace.TwoHanded)
             {
                 inv.Add(inv.equipments[0]);
-                inv.Add(inv.equipments[1]);
 
                 inv.equipments[0] = this;
-                inv.equipments[1] = this;
+                inv.equipments[1] = null;
             }
             else
             {
@@ -93,16 +92,26 @@ public class Equipable : Item
         {
             if (inv.equipments[0] != null)
             {
-                inv.Add(inv.equipments[0]);
+                if (inv.equipments[0].equipSpace == EquipSpace.TwoHanded)
+                {
+                    inv.Add(inv.equipments[0]);
+                    inv.equipments[0] = this;
+                    inv.equipments[1] = this;
+                }
+                else
+                {
+                    if (inv.equipments[1] != null)
+                    {
+                        inv.Add(inv.equipments[1]);
+                    }
+                    inv.equipments[1] = inv.equipments[0];
+                    inv.equipments[0] = this;
+                }
             }
-
-            if (inv.equipments[1] != null)
+            else
             {
-                inv.Add(inv.equipments[1]);
+                inv.equipments[0] = this;
             }
-
-            inv.equipments[0] = this;
-            inv.equipments[1] = this;
         }
 
         GameObject _interface = inv.GetInterface();
@@ -120,6 +129,18 @@ public class Equipable : Item
         //return false
 
         CharaInventory inv = refInventChara.GetComponent<CharaInventory>();
+        for (int i = 0; i < inv.equipments.Length; i++)
+        {
+            if (inv.equipments[i] == this)
+            {
+                inv.equipments[i] = null;
+            }
+        }
+
+        GameObject _interface = inv.GetInterface();
+        if (_interface == null) return false;
+        _interface.GetComponent<InterfaceManager>().UpdateEquipment(inv);
+
         return inv.Add(this);
     }
     //Should be check before attacking
