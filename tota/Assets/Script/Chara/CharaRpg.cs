@@ -20,9 +20,6 @@ public class CharaRpg : MonoBehaviour
     private int _age;
 
     //Character
-    public static StreamReader prenoms = new StreamReader("Assets/Resources/Database/prenoms.txt");
-    public static StreamReader noms = new StreamReader("Assets/Resources/Database/noms.txt");
-    
     //Stats
     public enum Stat
     {
@@ -847,7 +844,7 @@ public class CharaRpg : MonoBehaviour
 
     public static string GetRandomFirstName()
     {
-        using (prenoms)
+        using (StreamReader prenoms = new StreamReader("Assets/Resources/Database/prenoms.txt"))
         {
             int index = Random.Range(1, 12437) + 1;
             for(int i = 0; i < index; i++)
@@ -860,7 +857,7 @@ public class CharaRpg : MonoBehaviour
 
     public static string GetRandomLastName()
     {
-        using (noms)
+        using (StreamReader noms = new StreamReader("Assets/Resources/Database/noms.txt"))
         {
             int index = Random.Range(1, 1000) + 1;
             for (int i = 0; i < index; i++)
