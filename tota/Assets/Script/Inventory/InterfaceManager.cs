@@ -72,7 +72,6 @@ public class InterfaceManager : MonoBehaviour
             child.GetChild(1).gameObject.SetActive(false);
             child.GetChild(2).gameObject.SetActive(false);
         }
-        //_equipment.transform.GetChild(3).GetChild(0).GetComponent<Image>().sprite = ; METTRE FIST
     }
 
     private void Active(GameObject obj)
@@ -90,6 +89,14 @@ public class InterfaceManager : MonoBehaviour
             head.transform.GetChild(4).GetChild(0).GetComponent<Text>().text = charaInventory.wearables[0].description;
             head.transform.GetChild(5).GetComponent<Button>().onClick.AddListener(() => Active(head.transform.GetChild(4).gameObject));
         }
+        else
+        {
+            GameObject head = _equipment.transform.GetChild(0).gameObject;
+            head.transform.GetChild(0).GetComponent<Image>().sprite = null;
+            head.transform.GetChild(0).GetComponent<Button>().onClick.RemoveAllListeners();
+            head.transform.GetChild(4).GetChild(0).GetComponent<Text>().text = "";
+            head.transform.GetChild(5).GetComponent<Button>().onClick.RemoveAllListeners();
+        }
 
         if (charaInventory.wearables[1] != null)
         {
@@ -98,6 +105,14 @@ public class InterfaceManager : MonoBehaviour
             torso.transform.GetChild(0).GetComponent<Button>().onClick.AddListener(() => charaInventory.wearables[1].Unequip(charaInventory.gameObject));
             torso.transform.GetChild(4).GetChild(0).GetComponent<Text>().text = charaInventory.wearables[1].description;
             torso.transform.GetChild(5).GetComponent<Button>().onClick.AddListener(() => Active(torso.transform.GetChild(4).gameObject));
+        }
+        else
+        {
+            GameObject torso = _equipment.transform.GetChild(1).gameObject;
+            torso.transform.GetChild(0).GetComponent<Image>().sprite = null;
+            torso.transform.GetChild(0).GetComponent<Button>().onClick.RemoveAllListeners();
+            torso.transform.GetChild(4).GetChild(0).GetComponent<Text>().text = "";
+            torso.transform.GetChild(5).GetComponent<Button>().onClick.RemoveAllListeners();
         }
 
         if (charaInventory.wearables[2] != null)
@@ -108,6 +123,14 @@ public class InterfaceManager : MonoBehaviour
             torso.transform.GetChild(4).GetChild(0).GetComponent<Text>().text = charaInventory.wearables[2].description;
             torso.transform.GetChild(5).GetComponent<Button>().onClick.AddListener(() => Active(torso.transform.GetChild(4).gameObject));
         }
+        else
+        {
+            GameObject torso = _equipment.transform.GetChild(2).gameObject;
+            torso.transform.GetChild(0).GetComponent<Image>().sprite = null;
+            torso.transform.GetChild(0).GetComponent<Button>().onClick.RemoveAllListeners();
+            torso.transform.GetChild(4).GetChild(0).GetComponent<Text>().text = "";
+            torso.transform.GetChild(5).GetComponent<Button>().onClick.RemoveAllListeners();
+        }
 
         if(charaInventory.wearables[3] != null)
         {
@@ -116,6 +139,14 @@ public class InterfaceManager : MonoBehaviour
             leg.transform.GetChild(0).GetComponent<Button>().onClick.AddListener(() => charaInventory.wearables[3].Unequip(charaInventory.gameObject));
             leg.transform.GetChild(4).GetChild(0).GetComponent<Text>().text = charaInventory.wearables[3].description;
             leg.transform.GetChild(5).GetComponent<Button>().onClick.AddListener(() => Active(leg.transform.GetChild(4).gameObject));
+        }
+        else
+        {
+            GameObject leg = _equipment.transform.GetChild(5).gameObject;
+            leg.transform.GetChild(0).GetComponent<Image>().sprite = null;
+            leg.transform.GetChild(0).GetComponent<Button>().onClick.RemoveAllListeners();
+            leg.transform.GetChild(4).GetChild(0).GetComponent<Text>().text = "";
+            leg.transform.GetChild(5).GetComponent<Button>().onClick.RemoveAllListeners();
         }
 
         if (charaInventory.equipments[0] != null)
@@ -126,6 +157,14 @@ public class InterfaceManager : MonoBehaviour
             left.transform.GetChild(4).GetChild(0).GetComponent<Text>().text = charaInventory.equipments[0].description;
             left.transform.GetChild(5).GetComponent<Button>().onClick.AddListener(() => Active(left.transform.GetChild(4).gameObject));
         }
+        else
+        {
+            GameObject left = _equipment.transform.GetChild(3).gameObject;
+            left.transform.GetChild(0).GetComponent<Image>().sprite = null;
+            left.transform.GetChild(0).GetComponent<Button>().onClick.RemoveAllListeners();
+            left.transform.GetChild(4).GetChild(0).GetComponent<Text>().text = "";
+            left.transform.GetChild(5).GetComponent<Button>().onClick.RemoveAllListeners();
+        }
 
         if (charaInventory.equipments[1] != null)
         {
@@ -135,7 +174,6 @@ public class InterfaceManager : MonoBehaviour
             {
                 right.transform.GetChild(3).gameObject.SetActive(true);
                 right.transform.GetChild(0).GetComponent<Button>().interactable = false;
-                _equipment.transform.GetChild(3).GetChild(0).GetComponent<Button>().onClick.AddListener(() => charaInventory.equipments[1].Unequip(charaInventory.gameObject));
             }
             else
             {
@@ -145,6 +183,14 @@ public class InterfaceManager : MonoBehaviour
             right.transform.GetChild(4).GetChild(0).GetComponent<Text>().text = charaInventory.equipments[1].description;
             right.transform.GetChild(5).GetComponent<Button>().onClick.AddListener(() => Active(right.transform.GetChild(4).gameObject));
 
+        }
+        else
+        {
+            GameObject right = _equipment.transform.GetChild(4).gameObject;
+            right.transform.GetChild(0).GetComponent<Image>().sprite = null;
+            right.transform.GetChild(0).GetComponent<Button>().onClick.RemoveAllListeners();
+            right.transform.GetChild(4).GetChild(0).GetComponent<Text>().text = "";
+            right.transform.GetChild(5).GetComponent<Button>().onClick.RemoveAllListeners();
         }
     }
 
