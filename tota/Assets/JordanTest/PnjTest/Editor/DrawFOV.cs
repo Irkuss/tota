@@ -17,10 +17,10 @@ public class DrowFOV : Editor
         Handles.DrawLine(fow.transform.position, fow.transform.position + viewAngleA * fow.wanderRadius);
         Handles.DrawLine(fow.transform.position, fow.transform.position + viewAngleB * fow.wanderRadius);
 
-        Handles.color = Color.red;
-        foreach (Transform visibleTarget in fow.visibleTargets)
+        if (fow._player != null)
         {
-            Handles.DrawLine(fow.transform.position, visibleTarget.position);
+            Handles.color = Color.red;
+            Handles.DrawLine(fow.transform.position, fow._player.position);
         }
     }
 

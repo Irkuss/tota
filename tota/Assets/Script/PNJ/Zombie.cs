@@ -1,19 +1,18 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
-using System.Threading;
 using UnityEngine;
 using UnityEngine.AI;
 
 public class Zombie : MonoBehaviour
 {
-    public NavMeshAgent navMeshAgent;
     private NavMeshAgent _agent;
 
-    public float fieldOfViewAngle = 50f;
-    public float wanderRadius = 7f;
+    public float fieldOfViewAngle = 140f;
+    public float wanderRadius = 10f;
     private Vector3 _wanderPoint;
 
     public List<Transform> visibleTargets;
+    [HideInInspector]
     public Transform _player;
 
     public bool isInFov;
@@ -37,16 +36,18 @@ public class Zombie : MonoBehaviour
     void Update()
     {
     }
-
-
-
+    
     void WanderStop(Vector3 destination)//Stop when arrived at destination
     {
-        if (Vector3.Distance(transform.position, destination) < 2f)
+        if (Vector3.Distance(transform.position, destination) <= _agent.stoppingDistance + 1f)
         {
+            Debug.Log("Zombie: Arrived");
             _wanderPoint = RandomWanderPoint();
             StartCoroutine(MovingDelay());
         }
+
+        if (_canMove)
+            _agent.SetDestination(_wanderPoint);
     }
 
     Vector3 RandomWanderPoint()// new random point
@@ -114,29 +115,38 @@ public class Zombie : MonoBehaviour
             yield return new WaitForSeconds(delay);
             if (FindVisibleTargets())
             {
+                Debug.Log("Zombie: In FOV");
                 if (alert == null)
                 {
                     AudioManager.instance.Play("Ping");
                     alert = new GameObject("Alert");
-                }
+                }                
                 _wanderPoint = _player.position;
+                _agent.SetDestination(_wanderPoint);
+                float distance = Vector3.Distance(_player.position, transform.position);
+                if (distance < 2f)
+                {
+                    Debug.Log("Zombie: ATTACC");
+                }
             }
             else
             {
+                Debug.Log("Zombie: Wander");
                 Destroy(alert);
+                WanderStop(_wanderPoint);
             }
-            WanderStop(_wanderPoint);
-            if (_canMove || FindVisibleTargets())
+            
+            /*if (_canMove || FindVisibleTargets())
             {
                 _agent.SetDestination(_wanderPoint);
-            }
+            }*/
         }
     }
 
     IEnumerator MovingDelay()
     {
         _canMove = false;
-        yield return new WaitForSeconds(4f);
+        yield return new WaitForSeconds(2f);
         _canMove = true;
     }
 

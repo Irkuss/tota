@@ -1,7 +1,7 @@
 ﻿using UnityEngine;
 using System.Collections;
 
-public class move : MonoBehaviour
+public class move2 : MonoBehaviour
 {
 
     public float moveSpeed = 6;
@@ -20,7 +20,7 @@ public class move : MonoBehaviour
     {
         Vector3 mousePos = viewCamera.ScreenToWorldPoint(new Vector3(Input.mousePosition.x, Input.mousePosition.y, viewCamera.transform.position.y));
         transform.LookAt(mousePos + Vector3.up * transform.position.y);
-        if (!Input.GetKey(KeyCode.LeftShift))
+        if(Input.GetKey(KeyCode.LeftShift))
             velocity = new Vector3(Input.GetAxisRaw("Horizontal"), 0, Input.GetAxisRaw("Vertical")).normalized * moveSpeed;
     }
 
