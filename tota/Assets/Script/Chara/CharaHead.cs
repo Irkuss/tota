@@ -158,9 +158,17 @@ public class CharaHead : Photon.PunBehaviour
         Debug.Log("CharaHead: reached Inter");
         //Interragis avec l'Interactable une fois proche
         _focus.Interact(this, actionIndex);
-
-        //Reset le focus
-        _focus = null;
-        _movement.StopAgent();
+        if(_focus.IsDoWhileAction[actionIndex])
+        {
+            //L'action est à continuer
+            SetFocus(_focus, actionIndex);
+        }
+        else
+        {
+            //Fin de l'action
+            //Reset le focus
+            _focus = null;
+            _movement.StopAgent();
+        }
     }
 }

@@ -8,17 +8,29 @@ public class CharaInteract : Interactable
     public override void Interact(CharaHead chara, int actionIndex = 0)
     {
         //TO CHANGE WHEN MULTIPLE INTERACT ARE POSSIBLE
-        GetComponent<CharaRpg>().DebugGetRandomDamage((int)CharaRpg.WoundType.Bruise);
+        
+        switch (actionIndex)
+        {
+            case 0: AttackWithSlot1(chara); break;
+            case 1: AttackWithSlot2(chara); break;
+            default: GetComponent<CharaRpg>().DebugGetRandomDamage((int)CharaRpg.WoundType.Bruise); break;
+        }
     }
 
     public override bool CheckAvailability(CharaHead chara, int actionIndex = 0)
     {
-        return true; //TODO
+        switch (actionIndex)
+        {
+            case 0: return CheckAttackWithSlot1(chara);
+            case 1: return CheckAttackWithSlot2(chara);
+        }
+        return false;
     }
 
     //Actions
 
-    public void Attack1(CharaHead chara)//Get attacked
+    //Attack with slot 1
+    public void AttackWithSlot1(CharaHead chara)//Get attacked
     {
         CharaInventory inv = chara.GetComponent<CharaInventory>();
         Equipable weapon = inv.equipments[0];
@@ -27,8 +39,13 @@ public class CharaInteract : Interactable
             GetComponent<CharaRpg>().GetAttackedWith(weapon, weapon.damage);
         }
     }
+    public bool CheckAttackWithSlot1(CharaHead chara)
+    {
+        return chara.GetComponent<CharaInventory>().equipments[0] != null;
+    }
 
-    public void Attack2(CharaHead chara)//Get attacked
+    //Attack with slot 2
+    public void AttackWithSlot2(CharaHead chara)//Get attacked
     {
         CharaInventory inv = chara.GetComponent<CharaInventory>();
         Equipable weapon = inv.equipments[1];
@@ -36,5 +53,9 @@ public class CharaInteract : Interactable
         {
             GetComponent<CharaRpg>().GetAttackedWith(weapon, weapon.damage);
         }
+    }
+    public bool CheckAttackWithSlot2(CharaHead chara)
+    {
+        return chara.GetComponent<CharaInventory>().equipments[1] != null;
     }
 }

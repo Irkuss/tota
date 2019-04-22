@@ -432,6 +432,7 @@ public class SpiritHead : Photon.MonoBehaviour
 
     private void GeneralActionHandler(Interactable inter)
     {
+        if (inter.PossibleActionNames.Length == 0) return; //Do nothing if no interaction exists
         //Processus de décision l'index d'action
         //Ouvre le dropDown Menu
         //Récupére les noms d'actions des strings (l'index du nom correspond à l'index d'action)

@@ -4,8 +4,7 @@ using UnityEngine;
 
 public class FloorManager : MonoBehaviour
 {
-    private static float _chunkHeight = 8.0f;
-    public static float ChunkHeight { get => _chunkHeight; }
+    public const float c_chunkHeight = 8.0f;
 
     private int floorLevel = 8;
 

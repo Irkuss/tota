@@ -67,4 +67,17 @@ public class Wearable : Item
         //return false
         return false;
     }
+
+    //Getters
+    public bool ContainsBodyType(CharaRpg.BodyType type)
+    {
+        foreach(CharaRpg.BodyType bodyType in zoneProtected)
+        {
+            if(bodyType == type)
+            {
+                return true;
+            }
+        }
+        return false;
+    }
 }
