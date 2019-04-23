@@ -78,11 +78,11 @@ public class OrganicOpacity : MonoBehaviour
     //Update opcaity handler
     private void UpdateRenderer()
     {
-        Debug.Log("OrganicOpacity: Updating Renderer");
+        //Debug.Log("OrganicOpacity: Updating Renderer");
         bool currentAbove = IsAboveFloorLevel(currentFloorLevel);
         if (currentAbove && !_wasAboveFloorLevel)
         {
-            Debug.Log("OrganicOpacity: Setting to invisible");
+            //Debug.Log("OrganicOpacity: Setting to invisible");
             foreach (Renderer rend in _renderers)
             {
                 rend.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.ShadowsOnly;
@@ -92,7 +92,7 @@ public class OrganicOpacity : MonoBehaviour
         }
         else if(!currentAbove && _wasAboveFloorLevel)
         {
-            Debug.Log("OrganicOpacity: Setting to visible");
+            //Debug.Log("OrganicOpacity: Setting to visible");
             foreach (Renderer rend in _renderers)
             {
                 rend.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.On;
