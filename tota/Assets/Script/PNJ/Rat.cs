@@ -6,43 +6,55 @@ using UnityEngine.AI;
 public class Rat : MonoBehaviour
 {
     private NavMeshAgent _agent;
+    private PhotonView _photon;
 
     public float wanderRadius;
     public float viewRadius;
     private Vector3 _wanderPoint;
 
-    public List<Transform> visibleTargets;
-    public Transform _player;
+    private List<Transform> _visibleTargets;
+    [HideInInspector]  public Transform _player;
 
     public LayerMask targetMask;
     public LayerMask obstacleMask;
 
     // Start is called before the first frame update
-    void Start()
+    private void Start()
     {
-        _agent = GetComponent<NavMeshAgent>();
-        Wander(RandomWanderPoint());
+        _visibleTargets = new List<Transform>();
+        if (PhotonNetwork.isMasterClient)
+        {
+            _agent = GetComponent<NavMeshAgent>();
+            _photon = GetComponent<PhotonView>();
+            Wander(GetRandomWanderPoint());
+            StartCoroutine(UpdateDelay());
+        }
     }
 
     // Update is called once per frame
-    void Update()
+    private IEnumerator UpdateDelay()
     {
-        if (FindTargets())
+        while(true)
         {
-            _agent.speed += 0.5f;
-            _wanderPoint = RunAway(_player.position);
+            yield return new WaitForSeconds(1f);
+
+            FindTargets();
+            if (_visibleTargets.Count > 0)
+            {
+                _agent.speed += 0.5f;
+                _wanderPoint = RunAway(_player.position);
+                Wander(_wanderPoint);
+            }
+            else
+            {
+                _agent.speed = 1f;
+
+            }
             Wander(_wanderPoint);
         }
-        else
-        {
-            _agent.speed = 1f;
-            
-        }
-        Wander(_wanderPoint);
-
     }
 
-    Vector3 RunAway(Vector3 playerPos)
+    private Vector3 RunAway(Vector3 playerPos)
     {
         NavMeshHit Hit;
         NavMesh.SamplePosition(-playerPos * 1.3f, out Hit, wanderRadius, -1);
@@ -50,7 +62,7 @@ public class Rat : MonoBehaviour
         return new Vector3(Hit.position.x, transform.position.y, Hit.position.z);
     }
 
-    public Vector3 RandomWanderPoint()// new random point
+    public Vector3 GetRandomWanderPoint()// new random point
     {
         Vector3 randomPoint = (Random.insideUnitSphere * wanderRadius) + transform.position;
         NavMeshHit Hit;
@@ -64,22 +76,24 @@ public class Rat : MonoBehaviour
         if (Vector3.Distance(transform.position, destination) <= _agent.stoppingDistance + 2f)
         {
             Debug.Log("Rats: Arrived");
-            _wanderPoint = RandomWanderPoint();
-            //StartCoroutine(MovingDelay());
+            if(PhotonNetwork.isMasterClient)
+            {
+                _wanderPoint = GetRandomWanderPoint();
+                SendUpdatedWanderPoint();
+            }
         }
         else
         {
             _agent.SetDestination(_wanderPoint);
+            SendUpdatedWanderPoint();
         }
-        /*if (_canMove)
-            _agent.SetDestination(_wanderPoint);*/
     }
 
-    private Transform closestPlayer(List<Transform> players)// returns closest player
+    private Transform GetClosestPlayer()// returns closest player
     {
         Transform target = null;
         float min = 1 / 0f; //infinity
-        foreach (Transform player in players)
+        foreach (Transform player in _visibleTargets)
         {
             float distance = Vector3.Distance(player.position, transform.position);
             if (distance < min)
@@ -92,9 +106,9 @@ public class Rat : MonoBehaviour
         return target;
     }
 
-    bool FindTargets()// search for visible targets
+    private void FindTargets()// search for visible targets
     {
-        visibleTargets.Clear();
+        _visibleTargets.Clear();
         Collider[] targetsInViewRadius = Physics.OverlapSphere(transform.position, viewRadius, targetMask);
         int count = targetsInViewRadius.Length;
         for (int i = 0; i < count; i++)
@@ -104,12 +118,30 @@ public class Rat : MonoBehaviour
             float dstToTarget = Vector3.Distance(transform.position, target.position);
             if (!Physics.Raycast(transform.position, dirToTarget, dstToTarget, obstacleMask))
             {
-                visibleTargets.Add(target);
+                _visibleTargets.Add(target);
             }
-            
         }
-        _player = closestPlayer(visibleTargets);
+        _player = GetClosestPlayer();
+    }
 
-        return visibleTargets.Count > 0;
+
+
+
+
+    //Networkig
+    public void KillSelf()
+    {
+        PhotonNetwork.Destroy(gameObject);
+    }
+
+    public void SendUpdatedWanderPoint()
+    {
+        _photon.RPC("RPC_SendUpdatedWanderPoint", PhotonTargets.OthersBuffered, _wanderPoint.x, _wanderPoint.y, _wanderPoint.z);
+    }
+    [PunRPC]
+    private void RPC_SendUpdatedWanderPoint(float x, float y, float z)
+    {
+        _wanderPoint = new Vector3(x, y, z);
+        _agent.SetDestination(_wanderPoint);
     }
 }

@@ -176,7 +176,17 @@ public class CharaRpg : MonoBehaviour
         //stat*consciousnes+modifier
         return Stats.GetMultiplyResult(_baseStat, _consciousness).GetStat(stat) + _statModifiers.GetStat(stat);
     }
+    public string GetQuirksInfo()
+    {
+        string info = "";
 
+        foreach(Quirk quirk in _quirks)
+        {
+            info += quirk.quirkName + ", ";
+        }
+
+        return info;
+    }
     //Random Getters
     public bool GetCheck(Stat ms, int modifier = 0)
     {
@@ -475,6 +485,17 @@ public class CharaRpg : MonoBehaviour
             int currHp = maxHp - GetTotalDamage();
             return ((float)currHp) / ((float)maxHp);
         }
+        public bool CheckIfInfected()
+        {
+            foreach(Wound wound in wounds)
+            {
+                if(wound.deathInfectionLevel > 0)
+                {
+                    return true;
+                }
+            }
+            return false;
+        }
         //Info Getters
         private int GetTotalDamage()
         {
@@ -691,13 +712,35 @@ public class CharaRpg : MonoBehaviour
         if (_charaMov != null) _charaMov.ModifyAgentSpeed(_movement * _consciousness);
     }
 
+    private bool CheckIfInfected()
+    {
+        foreach(BodyPart bp in _bodyParts)
+        {
+            if(bp.CheckIfInfected())
+            {
+                return true;
+            }
+        }
+        return false;
+    }
+
     public void Die()
     {
+        if(CheckIfInfected())
+        {
+            DieZombie();
+            return;
+        }
+
+        _isDead = true;
+        _movement = 0;
         //Chara dies
         Debug.Log("======================= CharaRpg: " + NameFull + " has died =======================");
     }
     public void DieZombie()
     {
+        _isDead = true;
+        _movement = 0;
         //Chara dies by death bite infection
         Debug.Log("======================= CharaRpg: " + NameFull + " has died of death bite infection =======================");
     }
