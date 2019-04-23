@@ -519,6 +519,7 @@ public class CharaRpg : MonoBehaviour
         _bodyParts.Add(new BodyPart("Left Hand", BodyType.Hand,          200, 0.8f));//12
 
         bloodStock = maxBloodStock;
+        UpdateHealth();
 
         StartCoroutine(Cor_UpdateHealth());
     }
@@ -558,13 +559,30 @@ public class CharaRpg : MonoBehaviour
         UpdatePain();
         UpdateConsciousness();
         UpdateMovement();
-        
 
+        GameObject _interface = gameObject.GetComponent<CharaInventory>().GetInterface();
+        if(_interface != null)
+        {
+            _interface.GetComponent<InterfaceManager>().UpdateStats(UpdateStats());
+        }
 
         //Debug:
         Debug.Log("CharaRpg: Blood Lost " + totalBloodLose + ", " + bloodStock + " left, consciousness: " + _consciousness);
         DebugWounds();
     }
+
+    private float[] UpdateStats()
+    {
+        return new float[5]
+        {
+            _pain,
+            _consciousness,
+            _movement,
+            bloodStock,
+            maxBloodStock
+        };
+    }
+
     private bool CheckDeath()
     {
         if(CheckBloodDeath())

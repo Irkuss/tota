@@ -100,4 +100,20 @@ public class ToolTip : MonoBehaviour
             _hungerFill.color = Color.green;
         }
     }
+
+    public void UpdateToolTip(string[] info)
+    {
+        if (_name != null)
+        {
+            _name.text = info[0];
+        }
+
+        _strengthSlider.transform.parent.GetComponent<Text>().text = "Strength : " + info[1] + " / 100";
+        _intelligenceSlider.transform.parent.GetComponent<Text>().text = "Intelligence : " + info[2] + " / 100";
+        _perceptionSlider.transform.parent.GetComponent<Text>().text = "Perception : " + info[3] + " / 100";
+        _mentalSlider.transform.parent.GetComponent<Text>().text = "Mental : " + info[4] + " / 100";
+        _socialSlider.transform.parent.GetComponent<Text>().text = "Social : " + info[5] + " / 100";
+        _hungerSlider.transform.parent.GetComponent<Text>().text = "Social : " + info[6] + " / " + info[7];
+
+    }
 }

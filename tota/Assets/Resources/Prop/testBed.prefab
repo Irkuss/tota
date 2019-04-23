@@ -245,6 +245,7 @@ GameObject:
   - component: {fileID: 7936060562881235685}
   - component: {fileID: 6176618647580468756}
   - component: {fileID: 2929287626000486016}
+  - component: {fileID: 660307639933694309}
   m_Layer: 5
   m_Name: Canvas
   m_TagString: Untagged
@@ -332,6 +333,18 @@ MonoBehaviour:
   m_BlockingMask:
     serializedVersion: 2
     m_Bits: 4294967295
+--- !u!114 &660307639933694309
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2374826906857594324}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f861333f577198842872c5fd45486d46, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &3989334268967228256
 GameObject:
   m_ObjectHideFlags: 0
@@ -806,7 +819,7 @@ RectTransform:
   m_GameObject: {fileID: 7271140900430489736}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 0.01, y: 0.01, z: 1}
+  m_LocalScale: {x: 0.02, y: 0.02, z: 1}
   m_Children:
   - {fileID: 4455657998325903773}
   - {fileID: 872722472801839996}
@@ -909,18 +922,7 @@ MonoBehaviour:
       m_Image: {fileID: 0}
   m_OnValueChanged:
     m_PersistentCalls:
-      m_Calls:
-      - m_Target: {fileID: 8737004137068632175}
-        m_MethodName: 
-        m_Mode: 1
-        m_Arguments:
-          m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: 
-          m_IntArgument: 0
-          m_FloatArgument: 0
-          m_StringArgument: 
-          m_BoolArgument: 0
-        m_CallState: 2
+      m_Calls: []
     m_TypeName: UnityEngine.UI.Dropdown+DropdownEvent, UnityEngine.UI, Version=1.0.0.0,
       Culture=neutral, PublicKeyToken=null
 --- !u!1 &8213226085708422764

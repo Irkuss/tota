@@ -11,6 +11,7 @@ public class InterfaceManager : MonoBehaviour
     [SerializeField] private RecipeTable _data = null;
     [SerializeField] private GameObject _equipment = null;
     [SerializeField] private GameObject _injuries = null;
+    [SerializeField] private GameObject _stats = null;
 
     private GameObject _recipe;
 
@@ -202,5 +203,13 @@ public class InterfaceManager : MonoBehaviour
             inj += str + "\n";
         }
         _injuries.GetComponent<Text>().text = inj;
+    }
+
+    public void UpdateStats(float[]stats)
+    {
+        _stats.transform.GetChild(0).GetComponent<Text>().text = "Pain : " + (int)(stats[0] * 100);
+        _stats.transform.GetChild(1).GetComponent<Text>().text = "Consciousness : " + (int)(stats[1] * 100);
+        _stats.transform.GetChild(2).GetComponent<Text>().text = "Movement : " + (int)(stats[2] * 100);
+        _stats.transform.GetChild(3).GetComponent<Text>().text = "BloodStock : " + (stats[3] * 100) / stats[4];
     }
 }

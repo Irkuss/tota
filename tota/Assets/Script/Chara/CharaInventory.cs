@@ -220,6 +220,7 @@ public class CharaInventory : MonoBehaviour
         _interface.transform.GetChild(1).GetChild(0).GetComponent<Text>().text = gameObject.GetComponent<CharaRpg>().NameFull;
         _interface.GetComponent<InterfaceManager>().InstantiateCraft(this);
         _interface.GetComponent<InterfaceManager>().InstantiateEquipment();
+        _interface.GetComponent<InterfaceManager>().UpdateEquipment(this);
 
         _inventory = Instantiate(_inventoryPrefab);
         _inventory.transform.SetParent(_interface.transform.GetChild(0).GetChild(3).GetChild(0), false);
@@ -253,15 +254,15 @@ public class CharaInventory : MonoBehaviour
             sum += item.Key.weight * item.Value;
         }
 
-        _inventory.transform.GetChild(1).GetComponent<Text>().text = "Poids actuel : " + sum + " || Poids max : " + gameObject.GetComponent<CharaRpg>().GetCurrentStat(CharaRpg.Stat.ms_strength)/2;
+        _inventory.transform.GetChild(1).GetComponent<Text>().text = "Poids actuel : " + sum + " || Poids max : " + gameObject.GetComponent<CharaRpg>().GetCurrentStat(CharaRpg.Stat.ms_strength)/5;
 
         return sum;
     }
 
     public void UpdateStats(string[] stats)
     {
-        GameObject stat = _interface.gameObject.GetComponent<InterfaceManager>().tooltip;
-        stat.GetComponent<ToolTip>().UpdateTool(stats);
+        //GameObject stat = _interface.gameObject.GetComponent<InterfaceManager>().tooltip;
+        //stat.GetComponent<ToolTip>().UpdateTool(stats);
     }
 
 

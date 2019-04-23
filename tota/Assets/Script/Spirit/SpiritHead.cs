@@ -19,6 +19,7 @@ public class SpiritHead : Photon.MonoBehaviour
     private GameObject _charaLayout;
     private GameObject _chara;
     private GameObject _channel;
+    private GameObject _build;
 
     //Le joueur qui contrôle ce Spirit (ne change pas)
     private PermissionsManager _permission = PermissionsManager.Instance;
@@ -38,6 +39,7 @@ public class SpiritHead : Photon.MonoBehaviour
         _inventoryLayout = eManager.InventoryLayout;
         _inventoryList = eManager.InventoryList;
         _channel = eManager.Channel;
+        _build = eManager.Build;
     }
     //Unity Callback
     void Start()
@@ -94,36 +96,6 @@ public class SpiritHead : Photon.MonoBehaviour
             //Projection des positions sur le sol
             Vector3 lowPosition = new Vector3(gameObject.transform.position.x, 1, gameObject.transform.position.z);
             GameObject.Find("eCentralManager").GetComponent<CharaManager>().SpawnChara(lowPosition, _playerOwner.MyTeamName,_playerOwner.Name);
-            /*
-            //Instantiation de Chara
-            GameObject go;
-            if (PhotonNetwork.offlineMode)
-            {
-                Debug.Log("SpiritHead: Instantiation du spirit (offline)");
-                go = Instantiate(Resources.Load<GameObject>(_charaPath), lowPosition, Quaternion.identity);
-                GameObject charaLayout = Instantiate(Resources.Load<GameObject>("CharaRef"));
-                charaLayout.GetComponent<LinkChara>().spirit = this;
-                charaLayout.GetComponent<LinkChara>().chara = go;
-            }
-            else
-            {
-                Debug.Log("SpiritHead: Instantiation du spirit (online)");
-                go = PhotonNetwork.Instantiate(_charaPath, lowPosition, Quaternion.identity, 0);
-                _chara = go;
-                if (_charaLayout == null)
-                {
-                    _charaLayout = charaL;
-                }
-                gameObject.GetComponent<PhotonView>().RPC("InstantiateCharaRef", PhotonTargets.AllBuffered, _playerOwner.Name);
-
-            }
-
-            //Met ce Chara dans notre équipe (par RPC)
-            if (_playerOwner != null)
-            {
-                go.GetComponent<CharaPermissions>().SetTeam(_playerOwner.MyTeamName);
-            }*/
-
         }
     }
 
@@ -189,10 +161,12 @@ public class SpiritHead : Photon.MonoBehaviour
             if (_isInBuildMode)
             {
                 ForceExitBuildMode();
+                _build.SetActive(false);
             }
             else
             {
-                EnterBuildMode("testWall");
+                //EnterBuildMode("testWall");
+                _build.SetActive(true);
             }
         }
     }
@@ -444,9 +418,9 @@ public class SpiritHead : Photon.MonoBehaviour
         //sinon elle est disponible
         //Appelle IndexActionHandler avec inter et l'index d'action choisi par le joueur        
 
-        IndexActionHandler(inter, 0);
+        //IndexActionHandler(inter, 0);
 
-        /*
+        
         Dropdown drop = inter.gameObject.transform.GetChild(0).GetChild(0).GetComponent<Dropdown>();
         drop.gameObject.SetActive(true);
 
@@ -470,7 +444,7 @@ public class SpiritHead : Photon.MonoBehaviour
                 drop.itemImage.color = Color.grey;
             }
             
-        });*/
+        });
     }
 
 
