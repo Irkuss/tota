@@ -10,6 +10,9 @@ public class ItemRecipe : ScriptableObject
     public Item result = null;
     public int resultCount;
 
+    [Header("Recipe path (if it has one)")]
+    public string resultPath = "";
+
     [Header("Recipe needed items")]
     //A chaque index des deux arrays se trouvent un Item requis et la quantité de cet Item requise
     //NB: les dictionnary marchent pas avec les Scriptables Objects du coup on bidouille deso

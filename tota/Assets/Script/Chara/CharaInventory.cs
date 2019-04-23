@@ -221,6 +221,7 @@ public class CharaInventory : MonoBehaviour
         _interface.GetComponent<InterfaceManager>().InstantiateCraft(this);
         _interface.GetComponent<InterfaceManager>().InstantiateEquipment();
         _interface.GetComponent<InterfaceManager>().UpdateEquipment(this);
+        _interface.GetComponent<InterfaceManager>().UpdateInjuries(GetComponent<CharaRpg>().GetWoundsInfo());
 
         _inventory = Instantiate(_inventoryPrefab);
         _inventory.transform.SetParent(_interface.transform.GetChild(0).GetChild(3).GetChild(0), false);
@@ -292,9 +293,12 @@ public class CharaInventory : MonoBehaviour
         int bodyPartSharpResistance = 0;
         foreach (Wearable equipment in wearables)
         {
-            if(equipment.ContainsBodyType(type))
+            if (equipment != null)
             {
-                bodyPartSharpResistance += equipment.sharpResistance;
+                if (equipment.ContainsBodyType(type))
+                {
+                    bodyPartSharpResistance += equipment.sharpResistance;
+                }
             }
         }
         return bodyPartSharpResistance;
@@ -304,7 +308,10 @@ public class CharaInventory : MonoBehaviour
         int totalSharpResistance = 0;
         foreach(Wearable equipment in wearables)
         {
-            totalSharpResistance += equipment.sharpResistance;
+            if (equipment != null)
+            {
+                totalSharpResistance += equipment.sharpResistance;
+            }
         }
         return totalSharpResistance;
     }
@@ -313,9 +320,12 @@ public class CharaInventory : MonoBehaviour
         int bodyPartMaceResistance = 0;
         foreach (Wearable equipment in wearables)
         {
-            if (equipment.ContainsBodyType(type))
+            if(equipment != null)
             {
-                bodyPartMaceResistance += equipment.maceResistance;
+                if (equipment.ContainsBodyType(type))
+                {
+                    bodyPartMaceResistance += equipment.maceResistance;
+                }
             }
         }
         return bodyPartMaceResistance;
@@ -325,7 +335,10 @@ public class CharaInventory : MonoBehaviour
         int totalMaceResistance = 0;
         foreach (Wearable equipment in wearables)
         {
-            totalMaceResistance += equipment.maceResistance;
+            if (equipment != null)
+            {
+                totalMaceResistance += equipment.maceResistance;
+            }
         }
         return totalMaceResistance;
     }

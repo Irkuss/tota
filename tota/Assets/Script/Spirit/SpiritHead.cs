@@ -416,10 +416,7 @@ public class SpiritHead : Photon.MonoBehaviour
         //Vérifie que les actions sont available à tous les charas selectionnés (IsActionIndexAvailableByAll déjà implémenté juste en dessous)
         //Si une action n'est pas available à au moins un Chara selectionné, elle est grisée,
         //sinon elle est disponible
-        //Appelle IndexActionHandler avec inter et l'index d'action choisi par le joueur        
-
-        //IndexActionHandler(inter, 0);
-
+        //Appelle IndexActionHandler avec inter et l'index d'action choisi par le joueur
         
         Dropdown drop = inter.gameObject.transform.GetChild(0).GetChild(0).GetComponent<Dropdown>();
         drop.gameObject.SetActive(true);

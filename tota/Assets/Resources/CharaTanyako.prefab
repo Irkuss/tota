@@ -438,9 +438,14 @@ MonoBehaviour:
   isMoving: 1
   _interTransform: {fileID: 9180920927353207022}
   _radius: 5
-  _possibleActionNames: []
-  _isDistanceAction: 
-  _isDoWhileAction: 
+  _possibleActionNames:
+  - Melee with weapon 1
+  - Melee with weapon 2
+  - Remote  with weapon 1
+  - Remote  with weapon 2
+  - Follow
+  _isDistanceAction: 0000010100
+  _isDoWhileAction: 0000000001
 --- !u!1001 &5204163093903766200
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -448,10 +453,6 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 9180920927353207022}
     m_Modifications:
-    - target: {fileID: 100002, guid: 7e15121f5f042ed46aba81406403f2d2, type: 3}
-      propertyPath: m_Name
-      value: LowBody
-      objectReference: {fileID: 0}
     - target: {fileID: 400002, guid: 7e15121f5f042ed46aba81406403f2d2, type: 3}
       propertyPath: m_LocalPosition.x
       value: 0.000013361
@@ -507,6 +508,10 @@ PrefabInstance:
     - target: {fileID: 400002, guid: 7e15121f5f042ed46aba81406403f2d2, type: 3}
       propertyPath: m_LocalScale.z
       value: 1.4
+      objectReference: {fileID: 0}
+    - target: {fileID: 100002, guid: 7e15121f5f042ed46aba81406403f2d2, type: 3}
+      propertyPath: m_Name
+      value: LowBody
       objectReference: {fileID: 0}
     - target: {fileID: 13700000, guid: 7e15121f5f042ed46aba81406403f2d2, type: 3}
       propertyPath: m_Materials.Array.data[0]

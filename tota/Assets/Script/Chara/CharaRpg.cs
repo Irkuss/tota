@@ -85,10 +85,10 @@ public class CharaRpg : MonoBehaviour
         }
         public static Stats GetMultiplyResult(Stats stats, float modifier)
         {
-            int[] newStat = stats._stats;
+            int[] newStat = new int[stats._stats.Length];
             for (int i = 0; i < newStat.Length; i++)
             {
-                newStat[i] = Mathf.FloorToInt(newStat[i] * modifier);
+                newStat[i] = Mathf.FloorToInt(stats._stats[i] * modifier);
             }
 
             return new Stats(newStat);
@@ -205,7 +205,7 @@ public class CharaRpg : MonoBehaviour
         _bodyTemperature = GetOutSideTemperature();
     }
     //Health Attribute
-    private readonly int maxBloodStock = 3000;
+    private readonly int maxBloodStock = 2000;
     private int bloodStockGain = 30;
     private int bloodStock;
     private float _consciousness = 1f; //if reaches 0.1, switch to shock state, *Social/Intelligence
@@ -299,6 +299,8 @@ public class CharaRpg : MonoBehaviour
         public string origin;
         //Treatment
         public bool isTreated = false;
+        //Pain
+        public int tempPain = 0;
         //Blood
         public int bloodLose = 0;
         //Infection
@@ -312,6 +314,8 @@ public class CharaRpg : MonoBehaviour
             damage = initialDamage;
             painFactor = WoundTypeToPainFactor[type];
             this.origin = origin;
+            //InitialPain
+            //tempPain = initialDamage;
             //Bleed
             if (WoundTypeToIsBleed[type]) bloodLose = initialDamage;
             //Infection
@@ -322,6 +326,7 @@ public class CharaRpg : MonoBehaviour
         {
             if (bloodLose != 0)
             {
+                tempPain = tempPain > 0 ? tempPain - 1 : 0;
                 damage--;
                 if (isTreated) damage--;
                 if (isResting) damage -= 2;
@@ -336,7 +341,8 @@ public class CharaRpg : MonoBehaviour
         //Pain
         public float GetPain()
         {
-            return damage * painFactor;
+            Debug.Log("GetPain: getting pain in wound -> " + (damage + tempPain) * painFactor);
+            return (damage + tempPain) * painFactor;
         }
         //End COndition
         public bool IsHealed()
@@ -383,13 +389,19 @@ public class CharaRpg : MonoBehaviour
         //Updating wound
         public void Update(bool isRested)
         {
+            List<Wound> woundToRemove = new List<Wound>();
             foreach (Wound wound in wounds)
             {
                 wound.Update(isRested);
                 if (wound.IsHealed())
                 {
-                    wounds.Remove(wound);
+                    woundToRemove.Add(wound);
                 }
+            }
+            //Remove
+            foreach(Wound wound in woundToRemove)
+            {
+                wounds.Remove(wound);
             }
         }
         public void TreatAllWoundsOfType(WoundType type)
@@ -419,7 +431,7 @@ public class CharaRpg : MonoBehaviour
                 if (totalDmg >= maxHp)
                 {
                     isDestroyed = true;
-                    wounds.Clear();
+                    ClearAllWound();
                     return true;
                 }
                 return false;
@@ -434,6 +446,10 @@ public class CharaRpg : MonoBehaviour
             isDestroyed = true;
             wounds.Clear();
         }
+        public void ClearAllWound()
+        {
+            wounds.Clear();
+        }
         //OtherGetters
         public float GetPain()
         {
@@ -442,7 +458,7 @@ public class CharaRpg : MonoBehaviour
             {
                 totalPainValue += wound.GetPain();
             }
-
+            Debug.Log("GetPain: getting pain in bodypart -> " + (totalPainValue / (float)maxHp) * painFactor);
             return (totalPainValue / (float)maxHp) * painFactor;
         }
         public int GetTotalBloodLose()
@@ -471,12 +487,11 @@ public class CharaRpg : MonoBehaviour
         }
         public string GetPartInfo()
         {
-            return name + "(" + GetTotalDamage() + "/" + maxHp + ")";
+            return name + "(" + (maxHp - GetTotalDamage()) + "/" + maxHp + ")";
         }
         public string[] GetWoundsInfo()
         {
             string[] woundsInfo = new string[wounds.Count];
-            Wound wound;
             for (int i = 0; i < wounds.Count; i++)
             {
                 woundsInfo[i] = wounds[i].GetWoundInfo();
@@ -505,18 +520,18 @@ public class CharaRpg : MonoBehaviour
     {
         _bodyParts = new List<BodyPart>();
         _bodyParts.Add(new BodyPart("Head", BodyType.Head,                50, 0.9f));//0
-        _bodyParts.Add(new BodyPart("Upper Torso", BodyType.Torso,       500, 0.6f));//1
-        _bodyParts.Add(new BodyPart("Lower Torso", BodyType.Torso,       500, 0.6f));//2
+        _bodyParts.Add(new BodyPart("Upper Torso", BodyType.Torso,       400, 0.6f));//1
+        _bodyParts.Add(new BodyPart("Lower Torso", BodyType.Torso,       400, 0.6f));//2
         _bodyParts.Add(new BodyPart("Right Leg", BodyType.Leg,           300, 0.7f));//3
         _bodyParts.Add(new BodyPart("Left Leg", BodyType.Leg,            300, 0.7f));//4
-        _bodyParts.Add(new BodyPart("Right Feet", BodyType.Feet,         200, 0.7f));//5
-        _bodyParts.Add(new BodyPart("Left Feet", BodyType.Feet,          200, 0.7f));//6
-        _bodyParts.Add(new BodyPart("Right Shoulder", BodyType.Shoulder, 400, 0.6f));//7
-        _bodyParts.Add(new BodyPart("Left Shoulder", BodyType.Shoulder,  400, 0.6f));//8
+        _bodyParts.Add(new BodyPart("Right Feet", BodyType.Feet,         150, 0.7f));//5
+        _bodyParts.Add(new BodyPart("Left Feet", BodyType.Feet,          150, 0.7f));//6
+        _bodyParts.Add(new BodyPart("Right Shoulder", BodyType.Shoulder, 350, 0.6f));//7
+        _bodyParts.Add(new BodyPart("Left Shoulder", BodyType.Shoulder,  350, 0.6f));//8
         _bodyParts.Add(new BodyPart("Right Arm", BodyType.Arm,           300, 0.7f));//9
         _bodyParts.Add(new BodyPart("Left Arm", BodyType.Arm,            300, 0.7f));//10
-        _bodyParts.Add(new BodyPart("Right Hand", BodyType.Hand,         200, 0.8f));//11
-        _bodyParts.Add(new BodyPart("Left Hand", BodyType.Hand,          200, 0.8f));//12
+        _bodyParts.Add(new BodyPart("Right Hand", BodyType.Hand,         150, 0.8f));//11
+        _bodyParts.Add(new BodyPart("Left Hand", BodyType.Hand,          150, 0.8f));//12
 
         bloodStock = maxBloodStock;
         UpdateHealth();
@@ -525,10 +540,14 @@ public class CharaRpg : MonoBehaviour
     }
     private IEnumerator Cor_UpdateHealth()
     {
-        while(true)
+        while(!_isDead)
         {
             UpdateHealth();
             yield return new WaitForSeconds(10);
+        }
+        foreach(BodyPart bp in _bodyParts)
+        {
+            bp.ClearAllWound();
         }
     }
 
@@ -538,7 +557,7 @@ public class CharaRpg : MonoBehaviour
         //Main Update
         foreach (BodyPart bodyPart in _bodyParts)
         {
-            bodyPart.Update(isRested);
+            bodyPart.Update(isRested || _isInShock);
             if(!bodyPart.CheckDestroyed()) totalBloodLose += bodyPart.GetTotalBloodLose();
         }
         //Blood lose
@@ -560,12 +579,8 @@ public class CharaRpg : MonoBehaviour
         UpdateConsciousness();
         UpdateMovement();
 
-        GameObject _interface = gameObject.GetComponent<CharaInventory>().GetInterface();
-        if(_interface != null)
-        {
-            _interface.GetComponent<InterfaceManager>().UpdateStats(UpdateStats());
-        }
-
+        //Update l'interface santé
+        UpdateInterfaceHealth();
         //Debug:
         Debug.Log("CharaRpg: Blood Lost " + totalBloodLose + ", " + bloodStock + " left, consciousness: " + _consciousness);
         DebugWounds();
@@ -653,11 +668,7 @@ public class CharaRpg : MonoBehaviour
         {
             totalPain += bp.GetPain();
         }
-
-        _pain = _tempPain + totalPain;
-        _tempPain = _tempPain > 0 ? _tempPain - 1 : 0;
-
-        
+        _pain = totalPain;
     }
     private void UpdateConsciousness()
     {
@@ -737,12 +748,19 @@ public class CharaRpg : MonoBehaviour
     }
     public void ReceiveAddWound(int woundType, int initialDamage, string bodyPartName, string origin, float infectionIncrement)
     {
-        _tempPain += initialDamage;
+        if (initialDamage <= 0) return;
+
         FindPartWithName(bodyPartName).AddWound(new Wound((WoundType)woundType, initialDamage, origin, infectionIncrement));
+
+        UpdateInterfaceHealth();
     }
     public void LocalAddWound(Wound wound, BodyPart bodyPart)
     {
+        if (wound.damage <= 0) return;
+
         FindPartWithName(bodyPart.name).AddWound(wound);
+
+        UpdateInterfaceHealth();
     }
     //Combat handler
     public void DebugGetRandomDamage(int woundType)
@@ -798,6 +816,9 @@ public class CharaRpg : MonoBehaviour
     //Health Info
     public string[] GetWoundsInfo()
     {
+        if (_isDead) return new string[1] { "Dead" };
+
+
         List<string> woundsInfo = new List<string>();
         List<string> missingInfo = new List<string>();
         //Get l'information
@@ -838,8 +859,10 @@ public class CharaRpg : MonoBehaviour
         }
         if (debug == "") debug = " healthy!";
         Debug.Log("DebugWounds: " + debug);
-
-        GameObject _interface = gameObject.GetComponent<CharaInventory>().GetInterface();
+    }
+    public void UpdateInterfaceHealth()
+    {
+        GameObject _interface = GetComponent<CharaInventory>().GetInterface();
         if (_interface != null)
         {
             _interface.GetComponent<InterfaceManager>().UpdateInjuries(GetWoundsInfo());
@@ -914,7 +937,6 @@ public class CharaRpg : MonoBehaviour
             return prenoms.ReadLine();
         }
     }
-
     public static string GetRandomLastName()
     {
         using (StreamReader noms = new StreamReader("Assets/Resources/Database/noms.txt"))
