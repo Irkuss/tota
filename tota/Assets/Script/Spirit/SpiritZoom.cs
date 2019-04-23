@@ -11,6 +11,9 @@ public class SpiritZoom : Photon.MonoBehaviour
     private Camera _cameraComp;
     private Transform _transformer;
 
+    private static Camera _cam;
+    public static Camera cam => _cam;
+
     //Tweakable value (!)
     private float _heightOffset = 10f;
 
@@ -26,6 +29,11 @@ public class SpiritZoom : Photon.MonoBehaviour
     private FloorManager _floorManager;
 
     // Unity Callbacks
+
+    private void Awake()
+    {
+        _cam = _spiritCamera.GetComponent<Camera>();
+    }
 
     void Start()
     {
