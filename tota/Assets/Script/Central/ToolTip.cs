@@ -113,7 +113,7 @@ public class ToolTip : MonoBehaviour
         _perceptionSlider.transform.parent.GetComponent<Text>().text = "Perception : " + info[3] + " / 100";
         _mentalSlider.transform.parent.GetComponent<Text>().text = "Mental : " + info[4] + " / 100";
         _socialSlider.transform.parent.GetComponent<Text>().text = "Social : " + info[5] + " / 100";
-        _hungerSlider.transform.parent.GetComponent<Text>().text = "Social : " + info[6] + " / " + info[7];
+        _hungerSlider.transform.parent.GetComponent<Text>().text = "Hunger : " + info[6] + " / " + info[7];
 
     }
 }

@@ -47,7 +47,7 @@ public class CentralManager : Photon.MonoBehaviour
     public void UpdateToolTip(string[] info)
     {
         toolTip.SetActive(true);
-        toolTip.GetComponent<ToolTip>().UpdateTool(info);
+        toolTip.GetComponent<ToolTip>().UpdateToolTip(info);
     }
 
     public void UpdateSkills(string[] info)
