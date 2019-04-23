@@ -176,7 +176,17 @@ public class CharaRpg : MonoBehaviour
         //stat*consciousnes+modifier
         return Stats.GetMultiplyResult(_baseStat, _consciousness).GetStat(stat) + _statModifiers.GetStat(stat);
     }
+    public string GetQuirksInfo()
+    {
+        string info = "";
 
+        foreach(Quirk quirk in _quirks)
+        {
+            info += quirk.quirkName + ", ";
+        }
+
+        return info;
+    }
     //Random Getters
     public bool GetCheck(Stat ms, int modifier = 0)
     {
