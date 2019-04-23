@@ -104,13 +104,14 @@ public class Equipable : Item
                     {
                         inv.Add(inv.equipments[1]);
                     }
-                    inv.equipments[1] = inv.equipments[0];
+                    inv.equipments[1] = this;
                     inv.equipments[0] = this;
                 }
             }
             else
             {
                 inv.equipments[0] = this;
+                inv.equipments[1] = this;
             }
         }
 

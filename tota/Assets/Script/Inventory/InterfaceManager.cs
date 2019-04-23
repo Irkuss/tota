@@ -7,7 +7,7 @@ public class InterfaceManager : MonoBehaviour
 {
     [SerializeField] private GameObject _craft = null;
     [SerializeField] private GameObject _slot = null;
-    [SerializeField] private GameObject _tooltip = null;
+    //[SerializeField] private GameObject _tooltip = null;
     [SerializeField] private RecipeTable _data = null;
     [SerializeField] private GameObject _equipment = null;
     [SerializeField] private GameObject _injuries = null;
@@ -15,7 +15,7 @@ public class InterfaceManager : MonoBehaviour
 
     private GameObject _recipe;
 
-    public GameObject tooltip => _tooltip;
+    //public GameObject tooltip => _tooltip;
 
     public void InstantiateCraft(CharaInventory charaInventory)
     {
