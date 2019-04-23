@@ -555,7 +555,6 @@ public class CharaRpg : MonoBehaviour
         _bodyParts.Add(new BodyPart("Left Hand", BodyType.Hand,          150, 0.8f));//12
 
         bloodStock = maxBloodStock;
-        UpdateHealth();
 
         StartCoroutine(Cor_UpdateHealth());
     }
@@ -607,7 +606,7 @@ public class CharaRpg : MonoBehaviour
         DebugWounds();
     }
 
-    private float[] UpdateStats()
+    public float[] UpdateStats()
     {
         return new float[5]
         {
@@ -909,6 +908,7 @@ public class CharaRpg : MonoBehaviour
         if (_interface != null)
         {
             _interface.GetComponent<InterfaceManager>().UpdateInjuries(GetWoundsInfo());
+            _interface.GetComponent<InterfaceManager>().UpdateStats(UpdateStats());
         }
     }
     
