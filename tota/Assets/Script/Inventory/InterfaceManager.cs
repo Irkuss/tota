@@ -12,6 +12,7 @@ public class InterfaceManager : MonoBehaviour
     [SerializeField] private GameObject _equipment = null;
     [SerializeField] private GameObject _injuries = null;
     [SerializeField] private GameObject _stats = null;
+    [SerializeField] private GameObject _textPref = null;
 
     private GameObject _recipe;
 
@@ -197,12 +198,19 @@ public class InterfaceManager : MonoBehaviour
 
     public void UpdateInjuries(string[] injuries)
     {
-        string inj = "Injuries :\n";
+        foreach(Transform child in _injuries.transform)
+        {
+            Destroy(child.gameObject);
+        }
+
+        GameObject inj = Instantiate(_textPref, _injuries.transform);
+        inj.GetComponent<Text>().text = "Injuries :";
+
         foreach(var str in injuries)
         {
-            inj += str + "\n";
+            GameObject i = Instantiate(_textPref, _injuries.transform);
+            i.GetComponent<Text>().text = str;
         }
-        _injuries.GetComponent<Text>().text = inj;
     }
 
     public void UpdateStats(float[]stats)
