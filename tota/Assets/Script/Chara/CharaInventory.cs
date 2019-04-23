@@ -94,11 +94,11 @@ public class CharaInventory : MonoBehaviour
         public void OnClickButton()
         {
             // Si l'item est utilisable
-            if (item.usable)
-            {
+            //if (item.usable) -> tanguy: on verifie dans Use (pour pouvoir le deplacer depuis un inventaire de chara)
+            //{
                 bool itemUsed = item.Use(_linkedCharaInventory.gameObject); // On appelle la fonction virtual de l'item en prenant la référence de son parent //_linkedCharaInventory._slotParent
                 if (itemUsed) OnRemoveButton();                            // On enleve l'item utilisé
-            }
+            //}
         }
 
         private void Pop()
@@ -130,7 +130,7 @@ public class CharaInventory : MonoBehaviour
     [SerializeField] private GameObject _interfacePrefab = null;
     private GameObject _inventory = null;
     private GameObject _interface = null;
-    private Slot[] _slots;
+    private Slot[] _slots = null;
 
     //Init
 
@@ -344,10 +344,15 @@ public class CharaInventory : MonoBehaviour
     {
         //Le booléen retourné représente la réussite de l'ajout de l'item
         Debug.Log("CharaInventory: Checking space");
-        if (inventory.Count >= _inventorySpace || 
-            UpdateWeight() + item.weight > (gameObject.GetComponent<CharaRpg>().GetCurrentStat(CharaRpg.Stat.ms_strength) / 2) ||
-            _slots[_inventorySpace-1].isEmpty == false && 
-            (_slots[_inventorySpace - 1].itemCount == item.stack || _slots[_inventorySpace - 1].item != item)) // Du spaghetti comme on aime
+
+        bool noMoreSpace = inventory.Count >= _inventorySpace;
+        bool noMoreStrength = GetComponent<CharaRpg>() == null ? false : (UpdateWeight() + item.weight > (GetComponent<CharaRpg>().GetCurrentStat(CharaRpg.Stat.ms_strength) / 5));
+        bool lastSpotIsNotEmpty = _slots == null ? false : !_slots[_inventorySpace - 1].isEmpty;
+        bool lastSpotIsFull = _slots == null ? false : _slots[_inventorySpace - 1].itemCount == item.stack;
+        bool lastSpotContainsADifferentItem = _slots == null ? false : _slots[_inventorySpace - 1].item != item;
+
+
+        if (noMoreSpace || noMoreStrength ||  lastSpotIsNotEmpty && (lastSpotIsFull || lastSpotContainsADifferentItem)) // Du spaghetti comme on aime
         {
             //Si l'inventaire est rempli, ne fait rien
             return false;

@@ -10,11 +10,11 @@ public class Interactable : MonoBehaviour
     [Header("Is this object moving or not?")]
     public bool isMoving = false; //Used to determine if chara have to get this transform.position when moving
     [Header("Interaction center")]
-    [SerializeField] private Transform _interTransform = null;
+    [SerializeField] protected Transform _interTransform = null;
     public Transform InterTransform => _interTransform;
 
     [Header("Radius of interaction, from interaction center")]
-    [SerializeField] private float _radius = 5;
+    [SerializeField] protected float _radius = 5;
     public float Radius { get => _radius; }
     [Header("All possible actions and their characteristics")]
     [SerializeField] private string[] _possibleActionNames = null; // actions names (used in the dropdown menu)

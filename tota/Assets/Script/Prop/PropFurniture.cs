@@ -7,12 +7,14 @@ public class PropFurniture : PropHandler
     [Header("PropFurniture Attribute")]
     //Defining attribute
     public LootTable lootTable = null;
-
+    public bool hasToRandAddLoot = true;
 
     //Private Attribute
     private CharaInventory _furnitureInventory;
-    private GameObject inventoryLayout;
+    private GameObject _inventoryLayout;
+    private Outline _outline;
 
+    private bool firstInteract = true;
 
     public enum FurnitureCommand
     {
@@ -27,20 +29,40 @@ public class PropFurniture : PropHandler
     {
         closeCharas = new List<CharaHead>();
         _furnitureInventory = GetComponent<CharaInventory>();
-        inventoryLayout = GameObject.Find("eCentralManager").GetComponent<CentralManager>().InventoryLayout;
+        _inventoryLayout = GameObject.Find("eCentralManager").GetComponent<CentralManager>().InventoryLayout;
+        _outline = GetComponent<Outline>();
+        _outline.enabled = false;
+    }
+
+    private void RandAddLoot()
+    {
+        Item[] itemToAdd = lootTable.GetChosenPropsArray(Random.Range(5, 10));
+        for (int i = 0; i < itemToAdd.Length; i++)
+        {
+            _furnitureInventory.Add(itemToAdd[i]);
+        }
     }
     
     public override void Interact(CharaHead chara, int actionIndex)
     {
-        if(!closeCharas.Contains(chara)) closeCharas.Add(chara);
-        if(_cor_UpdateClose == null)
+        if (closeCharas.Contains(chara))
         {
-            _cor_UpdateClose = Cor_UpdateClose();
-            StartCoroutine(_cor_UpdateClose);
+            return;
+        }
+        closeCharas.Add(chara);
+        if(!isFurnitureInvOpen)
+        {
+            StartCoroutine(Cor_UpdateClose());
         }
         //ouvre l'inventaire
-        inventoryLayout.SetActive(true);
-        _furnitureInventory.ToggleInventory(inventoryLayout);
+        _inventoryLayout.SetActive(true);
+        _furnitureInventory.ToggleInventory(_inventoryLayout);
+        if (firstInteract && hasToRandAddLoot)
+        {
+            RandAddLoot();
+
+            firstInteract = false;
+        }
     }
 
     public override bool CheckAvailability(CharaHead chara, int actionIndex = 0)
@@ -49,23 +71,38 @@ public class PropFurniture : PropHandler
     }
 
     //Close process
-    private IEnumerator _cor_UpdateClose = null;
+    private bool isFurnitureInvOpen = false;
 
     private IEnumerator Cor_UpdateClose()
     {
+        _outline.enabled = true;
+
         while(closeCharas.Count > 0)
         {
-            foreach(CharaHead ele in closeCharas)
+            List<CharaHead> charaToRemove = new List<CharaHead>();
+
+            Debug.Log("Cor_UpdateClose: there is still " + closeCharas.Count + " charas left next to this furniture");
+            foreach (CharaHead ele in closeCharas)
             {
-                if(Vector3.Distance(transform.position, ele.transform.position) > 4)
+                Debug.Log("Cor_UpdateClose: " + Vector3.Distance(_interTransform.position, ele.transform.position) + " is distance between this and a chara");
+                if (Vector3.Distance(_interTransform.position, ele.transform.position) > _radius + 1)
                 {
-                    closeCharas.Remove(ele);
+                    Debug.Log("Cor_UpdateClose: removing that chara");
+                    charaToRemove.Add(ele);
                 }
             }
-            yield return new WaitForSeconds(2f);
+
+            foreach(CharaHead chara in charaToRemove)
+            {
+                closeCharas.Remove(chara);
+            }
+            yield return new WaitForSeconds(0.3f);
         }
-        _cor_UpdateClose = null;
+        isFurnitureInvOpen = false;
+        Debug.Log("Cor_UpdateClose: closing inventory");
         _furnitureInventory.CloseInventory();
+
+        _outline.enabled = false;
     }
 
     //Receive

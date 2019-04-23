@@ -124,6 +124,7 @@ public class CharaHead : Photon.PunBehaviour
     //Focus on Interactable
 
     private Interactable _focus;
+    private Interactable _lastInteractedFocus = null;
     private IEnumerator _checkCor;
 
     public void SetFocus(Interactable inter, int actionIndex)
@@ -158,6 +159,7 @@ public class CharaHead : Photon.PunBehaviour
         Debug.Log("CharaHead: reached Inter");
         //Interragis avec l'Interactable une fois proche
         _focus.Interact(this, actionIndex);
+        _lastInteractedFocus = _focus;
         if(_focus.IsDoWhileAction[actionIndex])
         {
             //L'action est à continuer
@@ -170,5 +172,18 @@ public class CharaHead : Photon.PunBehaviour
             _focus = null;
             _movement.StopAgent();
         }
+    }
+
+    public bool TryAddItemToFurniture(Item item)
+    {
+        if(_lastInteractedFocus != null)
+        {
+            CharaInventory furnitureInv = _lastInteractedFocus.GetComponent<CharaInventory>();
+            if(furnitureInv != null)
+            {
+                return furnitureInv.Add(item);
+            }
+        }
+        return false;
     }
 }

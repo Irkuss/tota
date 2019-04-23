@@ -10,25 +10,25 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 8a990d58c42954d4eb72a20577528750, type: 3}
-  m_Name: Gun
+  m_Name: Shotgun
   m_EditorClassIdentifier: 
-  nickName: Handgun
-  description: A simple gun, useful to stay alive (uses Handgun ammo)
-  icon: {fileID: 21300000, guid: a3983c59ebf804b4abba687bd7c9e92f, type: 3}
+  nickName: Shotgun
+  description: Shotgun
+  icon: {fileID: 0}
   stack: 1
-  weight: 0
-  baseMarketValue: 20
+  weight: 2
+  baseMarketValue: 25
   usable: 1
   equipType: 1
   dmgType: 0
-  equipSpace: 0
+  equipSpace: 1
   specificType: 0
-  damage: 50
-  accuracyModifier: 0
-  attackSpeedModifier: 1.4
+  damage: 250
+  accuracyModifier: -10
+  attackSpeedModifier: 2
   meleeRequiredStrength: 0
   meleeRange: 0
-  remoteFalloffRange: 20
-  remoteMaxRange: 30
-  useAmmo: 1
-  ammo: {fileID: 11400000, guid: 975a6ed749fe87043aa67095ce4215d6, type: 2}
+  remoteFalloffRange: 10
+  remoteMaxRange: 20
+  useAmmo: 0
+  ammo: {fileID: 0}

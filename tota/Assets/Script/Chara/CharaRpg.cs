@@ -189,7 +189,7 @@ public class CharaRpg : MonoBehaviour
     private void UpdateHourly()
     {
         //Hunger
-        _hunger = _hunger > 0 ? _hunger - 1 : 0;
+        _hunger = _hunger < _maxHunger ? _hunger + 1 : _maxHunger;
         //tiredness
         //temperature
         UpdateTemperature();
@@ -200,7 +200,7 @@ public class CharaRpg : MonoBehaviour
     private int _maxHunger = 20;
     private void InitStatus()
     {
-        _hunger = _maxHunger / 2;
+        _hunger = _maxHunger / 5;
 
         _bodyTemperature = GetOutSideTemperature();
     }
@@ -829,15 +829,18 @@ public class CharaRpg : MonoBehaviour
     }
     
     //Action
-    public void Eat(int food)
+    public bool Eat(int food)
     {
-        if (_hunger < _maxHunger)
+        if (_hunger > 0)
         {
-            _hunger += food;
+            _hunger -= food;
+            _hunger = _hunger < 0 ? 0 : _hunger;
             UpdateToolTip(); // On appelle l'update du tooltip
             gameObject.GetComponent<CharaInventory>().UpdateStats(GetToolTipInfo());
             //GetComponent<PhotonView>().RPC("SendToolTipInfo", PhotonTargets.AllBuffered, GetToolTipInfo());
+            return true;
         }
+        return false;
     }
     public void UseItem()
     {
