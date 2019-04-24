@@ -8,7 +8,7 @@ public class SpiritHead : Photon.MonoBehaviour
 {
     //utilisé pour debugger (à swap avec un scriptable object des que possible)
 
-    private string _charaPath = "CharaTanyako";
+    private string _charaPath = "CharaMarc";
     [SerializeField] private ItemRecipe bigAppleRecipe = null;
     [SerializeField] private ItemTable itemTable = null;
 
@@ -444,7 +444,7 @@ public class SpiritHead : Photon.MonoBehaviour
             }
             else
             {
-                drop.itemImage.color = Color.grey;
+                drop.captionImage.color = Color.grey;
             }
             
         });
