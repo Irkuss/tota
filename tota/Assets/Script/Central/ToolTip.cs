@@ -8,6 +8,7 @@ public class ToolTip : MonoBehaviour
     //Temporaire
 
     [SerializeField] private Text _name = null;
+    [SerializeField] private Text _quirks = null;
     //On recupere les Component Text qui seront modifiés
     [SerializeField] private Text _carpenter = null;
     [SerializeField] private Text _doctor = null;
@@ -101,13 +102,13 @@ public class ToolTip : MonoBehaviour
         }
     }
 
-    public void UpdateToolTip(string[] info)
+    public void UpdateToolTip(string[] info, string quirks)
     {
         if (_name != null)
         {
             _name.text = info[0];
         }
-
+        _quirks.text = quirks;
         _strengthSlider.transform.parent.GetComponent<Text>().text = "Strength : " + info[1] + " / 100";
         _intelligenceSlider.transform.parent.GetComponent<Text>().text = "Intelligence : " + info[2] + " / 100";
         _perceptionSlider.transform.parent.GetComponent<Text>().text = "Perception : " + info[3] + " / 100";

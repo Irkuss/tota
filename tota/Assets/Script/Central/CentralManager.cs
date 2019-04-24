@@ -44,10 +44,10 @@ public class CentralManager : Photon.MonoBehaviour
     [SerializeField] private GameObject _build = null;
     public GameObject Build { get { return _build; } }
 
-    public void UpdateToolTip(string[] info)
+    public void UpdateToolTip(string[] info,string quirks)
     {
         toolTip.SetActive(true);
-        toolTip.GetComponent<ToolTip>().UpdateToolTip(info);
+        toolTip.GetComponent<ToolTip>().UpdateToolTip(info,quirks);
     }
 
     public void UpdateSkills(string[] info)
