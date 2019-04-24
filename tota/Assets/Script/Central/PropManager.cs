@@ -57,9 +57,9 @@ public class PropManager : MonoBehaviour
         }
 
         //Sending special command
-        public void ReceivePropCommand(int[] command)
+        public void ReceivePropCommand(int[] command, float[] commandFloat)
         {
-            if (_go != null) _go.GetComponentInChildren<PropHandler>().CommandReceive(command);
+            if (_go != null) _go.GetComponentInChildren<PropHandler>().CommandReceive(command, commandFloat);
         }
     }
 
@@ -212,17 +212,17 @@ public class PropManager : MonoBehaviour
         }
     }
 
-    public void SendPropCommand(int id, int[] command)
+    public void SendPropCommand(int id, int[] command, float[] commandFloat)
     {
-        GetComponent<PhotonView>().RPC("RPC_SendPropCommand", PhotonTargets.AllBuffered, id, command);
+        GetComponent<PhotonView>().RPC("RPC_SendPropCommand", PhotonTargets.AllBuffered, id, command, commandFloat);
     }
-    [PunRPC] private void RPC_SendPropCommand(int id, int[] command)
+    [PunRPC] private void RPC_SendPropCommand(int id, int[] command, float[] commandFloat)
     {
         RealProp prop = FindPropWithId(id);
 
         if (prop != null)
         {
-            prop.ReceivePropCommand(command);
+            prop.ReceivePropCommand(command, commandFloat);
         }
     }
 }

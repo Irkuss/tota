@@ -106,7 +106,7 @@ public class PropFurniture : PropHandler
     }
 
     //Receive
-    public override void CommandReceive(int[] command)
+    public override void CommandReceive(int[] command, float[] commandFloat)
     {
         switch ((FurnitureCommand) command[0])
         {

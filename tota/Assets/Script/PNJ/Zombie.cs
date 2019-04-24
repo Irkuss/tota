@@ -32,60 +32,82 @@ public class Zombie : MonoBehaviour
     private void Start()
     {
         _visibleTargets = new List<Transform>();
-        if(PhotonNetwork.isMasterClient)
+        //ref
+        _agent = GetComponent<NavMeshAgent>();
+        _photon = GetComponent<PhotonView>();
+        if (PhotonNetwork.isMasterClient)
         {
-            //ref
-            _agent = GetComponent<NavMeshAgent>();
-            _photon = GetComponent<PhotonView>();
-            //Start
-            _wanderPoint = GetRandomWanderPoint();
-            _agent.SetDestination(_wanderPoint);
-            _agent.speed = 1;
-            StartCoroutine("FindTargetsWithDelay", .6f);
+            StartCoroutine(FindTargetsWithDelay());
         }
     }
 
     //Main loop
-    private IEnumerator FindTargetsWithDelay(float delay)
+    private IEnumerator FindTargetsWithDelay()
     {
+        int cycleBeforeMoving = Random.Range(2,4) * 2;
+        float delay = 0.5f;
+        _agent.speed = 1;
+        _wanderPoint = transform.position;
+
+        ForcePosition();
+        int cycleBeforeForcingPosition = 100;
+
         while (true)
         {
             yield return new WaitForSeconds(delay);
+            if(cycleBeforeForcingPosition <= 0)
+            {
+                ForcePosition();
+                cycleBeforeForcingPosition = 100;
+            }
+            else
+            {
+                cycleBeforeForcingPosition--;
+            }
+
             FindVisibleTargets();
             if (_visibleTargets.Count > 0)
             {
-                Debug.Log("Zombie: In FOV");
+                //Debug.Log("Zombie: In FOV");
                 if (alert == null)
                 {
                     AudioManager.instance.Play("Ping");
                     alert = new GameObject("Alert");
                 }
                 _wanderPoint = player.position;
+
                 _agent.SetDestination(_wanderPoint);
-                float distance = Vector3.Distance(player.position, transform.position);
-                if (distance < 2f)
+                SendUpdatedWanderPoint();
+                
+                if (Vector3.Distance(player.position, transform.position) < 2f)
                 {
                     player.GetComponent<CharaRpg>().TryDeathBite(30);
+                    yield return new WaitForSeconds(1f);
                 }
             }
             else
             {
-                Debug.Log("Zombie: Wander");
+                //Debug.Log("Zombie: Wander");
                 Destroy(alert);
 
                 //
-                if (Vector3.Distance(transform.position, _wanderPoint) <= _agent.stoppingDistance + 1f)
+                if (Vector3.Distance(transform.position, _wanderPoint) <= _agent.stoppingDistance + 0.3f)
                 {
-                    Debug.Log("Zombie: Arrived");
-                    if(PhotonNetwork.isMasterClient)
+                    //Debug.Log("Zombie: Arrived");
+                    
+                    if(cycleBeforeMoving <= 0)
                     {
                         _wanderPoint = GetRandomWanderPoint();
                         SendUpdatedWanderPoint();
+                        _agent.SetDestination(_wanderPoint);
+
+                        cycleBeforeMoving = Random.Range(4, 10) * 2;
                     }
-                    yield return new WaitForSeconds(2f);
-                    _agent.SetDestination(_wanderPoint);
+                    else
+                    {
+                        cycleBeforeMoving--;
+                    }
                 }
-                //WanderStop(_wanderPoint);
             }
         }
     }
@@ -143,28 +165,7 @@ public class Zombie : MonoBehaviour
         }
         return new Vector3(Mathf.Sin(angleInDegrees * Mathf.Deg2Rad), 0, Mathf.Cos(angleInDegrees * Mathf.Deg2Rad));
     }
-
     
-    //Depre?
-    private IEnumerator MovingDelay()
-    {
-        _canMove = false;
-        yield return new WaitForSeconds(2f);
-        _canMove = true;
-    }
-    private void WanderStop(Vector3 destination)//Stop when arrived at destination
-    {
-        if (Vector3.Distance(transform.position, destination) <= _agent.stoppingDistance + 1f)
-        {
-            Debug.Log("Zombie: Arrived");
-            _wanderPoint = GetRandomWanderPoint();
-            StartCoroutine(MovingDelay());
-        }
-
-        if (_canMove)
-            _agent.SetDestination(_wanderPoint);
-    }
-
     //Attacked
     private int healthPoint = 100;
 
@@ -191,4 +192,14 @@ public class Zombie : MonoBehaviour
         _wanderPoint = new Vector3(x, y, z);
         _agent.SetDestination(_wanderPoint);
     }
+
+    public void ForcePosition()
+    {
+        _photon.RPC("RPC_ForceZombiePosition", PhotonTargets.OthersBuffered, _wanderPoint.x, _wanderPoint.y, _wanderPoint.z);
+    }
+    [PunRPC] private void RPC_ForceZombiePosition(float x, float y, float z)
+    {
+        transform.position = new Vector3(x, y, z);
+    }
+
 }

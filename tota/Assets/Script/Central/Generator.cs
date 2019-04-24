@@ -1996,7 +1996,6 @@ public class Generator : MonoBehaviour
         }
         //Les clients recoivent l'entiereté des infos
         ClientUpdateWorldType(worldTypeData);
-        OnWorldTypeReceived();
     }
     private void ClientUpdateWorldType(int[] worldTypeData)
     {
@@ -2017,8 +2016,6 @@ public class Generator : MonoBehaviour
     private void OnWorldTypeReceived()
     {
         //The truest Start
-        ////LoadChunkAround(_spawnPoint, _spawnPoint);
-
         //numbers of chunk left to generate (decrements when a chunk finishes to load)
         chunkLeftToLoad = _worldLength * _worldLength;
         Debug.Log("OnWorldTypeReceived: chunkLeftToLoad " + chunkLeftToLoad);

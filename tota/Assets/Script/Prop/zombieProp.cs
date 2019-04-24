@@ -5,7 +5,7 @@ using UnityEngine;
 public class zombieProp : MonoBehaviour
 {
     public int chanceToSpawn = 50;
-    public string zombiePath = "Prop/zombieProp";
+    public string path = "Prop/zombieProp";
 
     private void Start()
     {
@@ -14,13 +14,15 @@ public class zombieProp : MonoBehaviour
 
     private IEnumerator WaitForNavmeh()
     {
-        yield return new WaitForSeconds(5f);
+        yield return new WaitForSeconds(3f);
 
         if (PhotonNetwork.isMasterClient)
         {
             if (Random.Range(0, 100) < chanceToSpawn)
             {
-                PhotonNetwork.Instantiate(zombiePath, transform.position, Quaternion.identity, 0);
+                Quaternion angle = Quaternion.Euler(0, Random.Range(0,360), 0);
+
+                PhotonNetwork.Instantiate(path, transform.position, angle, 0);
             }
         }
     }

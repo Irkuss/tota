@@ -329,19 +329,21 @@ public class CharaRpg : MonoBehaviour
             //Bleed
             if (WoundTypeToIsBleed[type]) bloodLose = initialDamage;
             //Infection
+            deathInfectionIncrement = infectionIncrement;
             if (infectionIncrement > 0) deathInfectionLevel = 0;
         }
         //Treating the wound
         public void Update(bool isResting = false)
         {
-            if (bloodLose != 0)
+            tempPain = tempPain > 0 ? tempPain - 1 : 0;
+            if (bloodLose == 0)
             {
-                tempPain = tempPain > 0 ? tempPain - 1 : 0;
                 damage--;
                 if (isTreated) damage--;
                 if (isResting) damage -= 2;
             }
             deathInfectionLevel += deathInfectionIncrement;
+            if (deathInfectionLevel > 100f) deathInfectionLevel = 100f;
         }
         public void Treat()
         {
@@ -351,7 +353,7 @@ public class CharaRpg : MonoBehaviour
         //Pain
         public float GetPain()
         {
-            Debug.Log("GetPain: getting pain in wound -> " + (damage + tempPain) * painFactor);
+            //Debug.Log("GetPain: getting pain in wound -> " + (damage + tempPain) * painFactor);
             return (damage + tempPain) * painFactor;
         }
         //End COndition
@@ -366,9 +368,9 @@ public class CharaRpg : MonoBehaviour
         //OtherGetters
         public string GetWoundInfo()
         {
-            string info = WoundTypeToString[type] + " (from " + origin + ") (" + damage + " damage)";
-            if (bloodLose != 0) info += " (bleeding: " + bloodLose + ")";
-            if (deathInfectionIncrement > 0) info += " (infection progress: " + deathInfectionLevel +")";
+            string info = WoundTypeToString[type] + " (" + origin + ") (dmg" + damage + ")";
+            if (bloodLose != 0) info += " (bleed: " + bloodLose + ")";
+            if (deathInfectionIncrement > 0) info += " (infection: " + deathInfectionLevel +"%)";
             return info;
         }
     }
@@ -495,6 +497,19 @@ public class CharaRpg : MonoBehaviour
                 }
             }
             return false;
+        }
+        public float GetMaxInfection()
+        {
+            float maxInfectionLevel = 0f;
+
+            foreach (Wound wound in wounds)
+            {
+                if(maxInfectionLevel < wound.deathInfectionLevel)
+                {
+                    maxInfectionLevel = wound.deathInfectionLevel;
+                }
+            }
+            return maxInfectionLevel;
         }
         //Info Getters
         private int GetTotalDamage()
@@ -688,11 +703,25 @@ public class CharaRpg : MonoBehaviour
         {
             totalPain += bp.GetPain();
         }
-        _pain = totalPain;
+        _pain = totalPain * _globalPainFactor;
     }
     private void UpdateConsciousness()
     {
         _consciousness = 1 - _pain;
+        float maxInfection = 0f;
+        float infection;
+        foreach(BodyPart bp in _bodyParts)
+        {
+            infection = bp.GetMaxInfection();
+            if (maxInfection < infection)
+            {
+                maxInfection = infection;
+            }
+        }
+        _consciousness -= (maxInfection / 100f);
+
+
+        if (_consciousness < 0) _consciousness = 0;
 
         _isInShock = _consciousness < _shockTreshold;
     }
@@ -777,7 +806,7 @@ public class CharaRpg : MonoBehaviour
     }
     public void AddWound(Wound wound, string bodyPartName)
     {
-        SendAddWound((int)wound.type, wound.damage, bodyPartName, wound.origin);
+        SendAddWound((int)wound.type, wound.damage, bodyPartName, wound.origin, wound.deathInfectionIncrement);
     }
 
     public void SendAddWound(int woundType, int initialDamage, string bodyPartName, string origin, float infectionIncrement = 0)
@@ -850,7 +879,7 @@ public class CharaRpg : MonoBehaviour
             {
                 //Si l'armure n'a pas absorbé le coup, on est mordu
                 Debug.Log("TryDeathBite: " + NameFull + " got bitten!");
-                LocalAddWound(new Wound(WoundType.DeathBite, biteDamage, "zombie", 1.2f), bodyPart);
+                AddWound(new Wound(WoundType.DeathBite, biteDamage, "zombie", 1.2f), bodyPart);
             }
         }
     }

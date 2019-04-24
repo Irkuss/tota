@@ -22,11 +22,10 @@ public class Rat : MonoBehaviour
     private void Start()
     {
         _visibleTargets = new List<Transform>();
+        _agent = GetComponent<NavMeshAgent>();
+        _photon = GetComponent<PhotonView>();
         if (PhotonNetwork.isMasterClient)
         {
-            _agent = GetComponent<NavMeshAgent>();
-            _photon = GetComponent<PhotonView>();
-            Wander(GetRandomWanderPoint());
             StartCoroutine(UpdateDelay());
         }
     }
@@ -34,23 +33,81 @@ public class Rat : MonoBehaviour
     // Update is called once per frame
     private IEnumerator UpdateDelay()
     {
-        while(true)
-        {
-            yield return new WaitForSeconds(1f);
+        int cycleBeforeMoving = 20;
 
-            FindTargets();
-            if (_visibleTargets.Count > 0)
+        bool isRunningAway = false;
+        float slowSpeed = 1f;
+        float fastSpeed = 4f;
+
+        _wanderPoint = transform.position;
+
+        _agent.speed = slowSpeed;
+
+        ForcePosition();
+        int cycleBeforeForcingPosition = 100;
+
+        while (true)
+        {
+            yield return new WaitForSeconds(0.5f);
+            if (cycleBeforeForcingPosition <= 0)
             {
-                _agent.speed += 0.5f;
-                _wanderPoint = RunAway(_player.position);
-                Wander(_wanderPoint);
+                ForcePosition();
+                cycleBeforeForcingPosition = 100;
             }
             else
             {
-                _agent.speed = 1f;
-
+                cycleBeforeForcingPosition--;
             }
-            Wander(_wanderPoint);
+
+            if (!isRunningAway)
+            {
+                Debug.Log("RatUpdateDelay: We are not running");
+                //Si on n'est pas en train de s'enfuir
+                FindTargets();
+                if (_visibleTargets.Count > 0)
+                {
+                    Debug.Log("RatUpdateDelay: started to flee!");
+                    //Si on a détecté une target
+                    isRunningAway = true;
+                    _agent.speed = fastSpeed;
+                    _wanderPoint = RunAway(_player.position);
+                    _agent.SetDestination(_wanderPoint);
+                    Debug.Log("RatUpdateDelay: currently moving from to " + _wanderPoint);
+                    SendUpdatedWanderPoint();
+                }
+                else
+                {
+                    Debug.Log("RatUpdateDelay: we are safe");
+                    //Si on est safe
+                    if (Vector3.Distance(transform.position, _wanderPoint) <= _agent.stoppingDistance + 0.3f)
+                    {
+
+                        if (cycleBeforeMoving <= 0)
+                        {
+                            Debug.Log("RatUpdateDelay: starting to move");
+                            _wanderPoint = GetRandomWanderPoint();
+                            _agent.SetDestination(_wanderPoint);
+                            SendUpdatedWanderPoint();
+                            Debug.Log("RatUpdateDelay: currently moving from to " + _wanderPoint);
+                            cycleBeforeMoving = Random.Range(2, 6) * 2;
+                        }
+                        else
+                        {
+                            cycleBeforeMoving--;
+                        }
+                    }
+                }
+            }
+            else
+            {
+                Debug.Log("RatUpdateDelay: We are running!");
+                //Si on est en train de s'enfuir
+                if (Vector3.Distance(transform.position, _wanderPoint) <= _agent.stoppingDistance + 0.3f)
+                {
+                    isRunningAway = false;
+                    _agent.speed = slowSpeed;
+                }
+            }
         }
     }
 
@@ -61,7 +118,7 @@ public class Rat : MonoBehaviour
 
         return new Vector3(Hit.position.x, transform.position.y, Hit.position.z);
     }
-
+ 
     public Vector3 GetRandomWanderPoint()// new random point
     {
         Vector3 randomPoint = (Random.insideUnitSphere * wanderRadius) + transform.position;
@@ -69,24 +126,6 @@ public class Rat : MonoBehaviour
         NavMesh.SamplePosition(randomPoint, out Hit, wanderRadius, -1);
 
         return new Vector3(Hit.position.x, transform.position.y, Hit.position.z);
-    }
-
-    public void Wander(Vector3 destination)//Stop when arrived at destination
-    {
-        if (Vector3.Distance(transform.position, destination) <= _agent.stoppingDistance + 2f)
-        {
-            Debug.Log("Rats: Arrived");
-            if(PhotonNetwork.isMasterClient)
-            {
-                _wanderPoint = GetRandomWanderPoint();
-                SendUpdatedWanderPoint();
-            }
-        }
-        else
-        {
-            _agent.SetDestination(_wanderPoint);
-            SendUpdatedWanderPoint();
-        }
     }
 
     private Transform GetClosestPlayer()// returns closest player
@@ -143,5 +182,15 @@ public class Rat : MonoBehaviour
     {
         _wanderPoint = new Vector3(x, y, z);
         _agent.SetDestination(_wanderPoint);
+    }
+
+    public void ForcePosition()
+    {
+        _photon.RPC("RPC_ForceRatPosition", PhotonTargets.OthersBuffered, _wanderPoint.x, _wanderPoint.y, _wanderPoint.z);
+    }
+    [PunRPC]
+    private void RPC_ForceRatPosition(float x, float y, float z)
+    {
+        transform.position = new Vector3(x, y, z);
     }
 }
