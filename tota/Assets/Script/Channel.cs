@@ -52,22 +52,22 @@ public class Channel : MonoBehaviour
         if (args.Length <= 1) return;
         if (_team == null && args[0] != "#general") return;
 
-        if(args[0] == "#general")
+        if(args[0] == "/all")
         {
             for(int i = 1; i < args.Length; i++)
             {
                 output += args[i];
             }
-            gameObject.GetComponent<PhotonView>().RPC("SendReceive", PhotonTargets.AllBuffered, output, true, _player.Name);
+            GameObject.Find("eCentralManager").GetComponent<PhotonView>().RPC("SendReceive", PhotonTargets.AllBuffered, output, true, _player.Name);
             
         }
-        else if(args[1] == "#" + _teamName)
+        else if(args[1] == "/" + _teamName)
         {
             for (int i = 1; i < args.Length; i++)
             {
                 output += args[i];
             }
-            gameObject.GetComponent<PhotonView>().RPC("SendReceive", PhotonTargets.AllBuffered, output, false, _player.Name);
+            GameObject.Find("eCentralManager").GetComponent<PhotonView>().RPC("SendReceive", PhotonTargets.AllBuffered, output, false, _player.Name);
         }
         
     }

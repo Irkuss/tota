@@ -55,7 +55,7 @@ public class PropFurniture : PropHandler
             StartCoroutine(Cor_UpdateClose());
         }
         //ouvre l'inventaire
-        _inventoryLayout.SetActive(true);
+        _inventoryLayout.transform.parent.parent.gameObject.SetActive(true);
         _furnitureInventory.ToggleInventory(_inventoryLayout);
         if (firstInteract && hasToRandAddLoot)
         {

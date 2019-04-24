@@ -718,6 +718,7 @@ public class CharaRpg : MonoBehaviour
                 maxInfection = infection;
             }
         }
+        _consciousness = _consciousness * (float)bloodStock / (float)maxBloodStock;
         _consciousness -= (maxInfection / 100f);
 
 
