@@ -61,34 +61,28 @@ public class Rat : MonoBehaviour
 
             if (!isRunningAway)
             {
-                Debug.Log("RatUpdateDelay: We are not running");
                 //Si on n'est pas en train de s'enfuir
                 FindTargets();
                 if (_visibleTargets.Count > 0)
                 {
-                    Debug.Log("RatUpdateDelay: started to flee!");
                     //Si on a détecté une target
                     isRunningAway = true;
                     _agent.speed = fastSpeed;
                     _wanderPoint = RunAway(_player.position);
                     _agent.SetDestination(_wanderPoint);
-                    Debug.Log("RatUpdateDelay: currently moving from to " + _wanderPoint);
                     SendUpdatedWanderPoint();
                 }
                 else
                 {
-                    Debug.Log("RatUpdateDelay: we are safe");
                     //Si on est safe
                     if (Vector3.Distance(transform.position, _wanderPoint) <= _agent.stoppingDistance + 0.3f)
                     {
 
                         if (cycleBeforeMoving <= 0)
                         {
-                            Debug.Log("RatUpdateDelay: starting to move");
                             _wanderPoint = GetRandomWanderPoint();
                             _agent.SetDestination(_wanderPoint);
                             SendUpdatedWanderPoint();
-                            Debug.Log("RatUpdateDelay: currently moving from to " + _wanderPoint);
                             cycleBeforeMoving = Random.Range(2, 6) * 2;
                         }
                         else
@@ -100,7 +94,6 @@ public class Rat : MonoBehaviour
             }
             else
             {
-                Debug.Log("RatUpdateDelay: We are running!");
                 //Si on est en train de s'enfuir
                 if (Vector3.Distance(transform.position, _wanderPoint) <= _agent.stoppingDistance + 0.3f)
                 {

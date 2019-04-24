@@ -158,9 +158,9 @@ public class SpiritHead : Photon.MonoBehaviour
         //Entree et sortie du buildMode
         if (Input.GetKeyDown(KeyCode.B))
         {
-            if (_isInBuildMode)
+            if (_build.activeSelf)
             {
-                ForceExitBuildMode();
+                if(_isInBuildMode) ForceExitBuildMode();
                 _build.SetActive(false);
             }
             else
@@ -419,6 +419,10 @@ public class SpiritHead : Photon.MonoBehaviour
         //Appelle IndexActionHandler avec inter et l'index d'action choisi par le joueur
         
         Dropdown drop = inter.gameObject.transform.GetChild(0).GetChild(0).GetComponent<Dropdown>();
+        if (drop == null)
+        {
+            return;
+        }
         drop.gameObject.SetActive(true);
 
         drop.ClearOptions();
