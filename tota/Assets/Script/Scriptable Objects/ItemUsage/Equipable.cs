@@ -128,8 +128,9 @@ public class Equipable : Item
         //if inventory has enough space (1)
         //    return true
         //return false
-
         CharaInventory inv = refInventChara.GetComponent<CharaInventory>();
+        if (!inv.Add(this)) return false;
+
         for (int i = 0; i < inv.equipments.Length; i++)
         {
             if (inv.equipments[i] == this)
@@ -142,7 +143,7 @@ public class Equipable : Item
         if (_interface == null) return false;
         _interface.GetComponent<InterfaceManager>().UpdateEquipment(inv);
 
-        return inv.Add(this);
+        return true;
     }
     //Should be check before attacking
     public bool CanAttack(CharaInventory inv)

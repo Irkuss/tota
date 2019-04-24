@@ -963,7 +963,7 @@ public class CharaRpg : MonoBehaviour
     //ToolTip
     public void UpdateToolTip()
     {
-        GameObject.Find("eCentralManager").GetComponent<CentralManager>().UpdateToolTip(GetToolTipInfo());
+        GameObject.Find("eCentralManager").GetComponent<CentralManager>().UpdateToolTip(GetToolTipInfo(),GetQuirksInfo());
         GameObject.Find("eCentralManager").GetComponent<CentralManager>().UpdateSkills(GetSkillInfo());
     }
 

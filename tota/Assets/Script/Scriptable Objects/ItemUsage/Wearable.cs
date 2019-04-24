@@ -80,7 +80,9 @@ public class Wearable : Item
         //return false
 
         CharaInventory inv = refInventChara.GetComponent<CharaInventory>();
-        for(int i = 0; i < inv.wearables.Length; i++)
+        if (!inv.Add(this)) return false;
+
+        for (int i = 0; i < inv.wearables.Length; i++)
         {
             if (inv.wearables[i] == this)
             {
@@ -92,7 +94,7 @@ public class Wearable : Item
         if (_interface == null) return false;
         _interface.GetComponent<InterfaceManager>().UpdateEquipment(inv);
 
-        return inv.Add(this);
+        return true;
     }
 
     //Getters
