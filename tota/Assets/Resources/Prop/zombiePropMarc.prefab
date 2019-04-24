@@ -94,8 +94,8 @@ MonoBehaviour:
   m_JumpPower: 12
   m_GravityMultiplier: 3
   m_RunCycleLegOffset: 0.2
-  m_MoveSpeedMultiplier: 1
-  m_AnimSpeedMultiplier: 1
+  m_MoveSpeedMultiplier: 0.5
+  m_AnimSpeedMultiplier: 0.3
   m_GroundCheckDistance: 2
 --- !u!95 &2488539790001303498
 Animator:
@@ -343,10 +343,6 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 9180920927353207022}
     m_Modifications:
-    - target: {fileID: 100066, guid: 440718d4e458f8342a2f6b6040ef45d2, type: 3}
-      propertyPath: m_Name
-      value: zombi1
-      objectReference: {fileID: 0}
     - target: {fileID: 400066, guid: 440718d4e458f8342a2f6b6040ef45d2, type: 3}
       propertyPath: m_LocalPosition.x
       value: 0
@@ -402,6 +398,14 @@ PrefabInstance:
     - target: {fileID: 400066, guid: 440718d4e458f8342a2f6b6040ef45d2, type: 3}
       propertyPath: m_LocalScale.z
       value: 3.5
+      objectReference: {fileID: 0}
+    - target: {fileID: 100066, guid: 440718d4e458f8342a2f6b6040ef45d2, type: 3}
+      propertyPath: m_Name
+      value: zombi1
+      objectReference: {fileID: 0}
+    - target: {fileID: 9500000, guid: 440718d4e458f8342a2f6b6040ef45d2, type: 3}
+      propertyPath: m_Enabled
+      value: 0
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 440718d4e458f8342a2f6b6040ef45d2, type: 3}

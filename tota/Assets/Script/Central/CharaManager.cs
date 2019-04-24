@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class CharaManager : MonoBehaviour
 {
-    private string _charaPath = "CharaTarc"; //TEMP
+    private string _charaPath = "CharaMarc"; //TEMP
     //Ref
     [SerializeField] private QuirkTable _quirkTable;
 

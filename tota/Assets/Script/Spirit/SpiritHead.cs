@@ -409,6 +409,7 @@ public class SpiritHead : Photon.MonoBehaviour
 
     private void GeneralActionHandler(Interactable inter)
     {
+        Debug.Log("GeneralActionHandler: 1   " + inter.PossibleActionNames.Length);
         if (inter.PossibleActionNames.Length == 0) return; //Do nothing if no interaction exists
         //Processus de décision l'index d'action
         //Ouvre le dropDown Menu
@@ -417,7 +418,7 @@ public class SpiritHead : Photon.MonoBehaviour
         //Si une action n'est pas available à au moins un Chara selectionné, elle est grisée,
         //sinon elle est disponible
         //Appelle IndexActionHandler avec inter et l'index d'action choisi par le joueur
-        
+        Debug.Log("GeneralActionHandler: 2");
         Dropdown drop = inter.gameObject.transform.GetChild(0).GetChild(0).GetComponent<Dropdown>();
         if (drop == null)
         {
@@ -425,6 +426,7 @@ public class SpiritHead : Photon.MonoBehaviour
         }
         drop.gameObject.SetActive(true);
 
+        Debug.Log("GeneralActionHandler: 3");
         drop.ClearOptions();
         List<string> actions = new List<string> ();
         foreach (var action in inter.PossibleActionNames)
