@@ -357,6 +357,12 @@ public class CharaInventory : MonoBehaviour
     //Adding and removing item
     public bool Add(Item item)
     {
+        if(item == null)
+        {
+            Debug.Log("CharaInventory: item was null");
+            return false;
+        }
+
         //Le booléen retourné représente la réussite de l'ajout de l'item
         Debug.Log("CharaInventory: Checking space");
 
