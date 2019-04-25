@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.AI;
+using UnityStandardAssets.Characters.ThirdPerson;
 
 public class Zombie : MonoBehaviour
 {
@@ -16,6 +17,7 @@ public class Zombie : MonoBehaviour
     //reference
     private NavMeshAgent _agent;
     private PhotonView _photon;
+    private ThirdPersonCharacter _character;
 
     //Destination (decided by masterClient)
     private Vector3 _wanderPoint;
@@ -32,8 +34,10 @@ public class Zombie : MonoBehaviour
     private void Start()
     {
         _visibleTargets = new List<Transform>();
+        _character = GetComponent<ThirdPersonCharacter>();
         //ref
         _agent = GetComponent<NavMeshAgent>();
+        _agent.updateRotation = false;
         _photon = GetComponent<PhotonView>();
         if (PhotonNetwork.isMasterClient)
         {
@@ -46,7 +50,7 @@ public class Zombie : MonoBehaviour
     {
         int cycleBeforeMoving = Random.Range(2,4) * 2;
         float delay = 0.5f;
-        _agent.speed = 1;
+        _agent.speed = 0.5f;
         _wanderPoint = transform.position;
 
         ForcePosition();
@@ -109,6 +113,18 @@ public class Zombie : MonoBehaviour
                     }
                 }
             }
+        }
+    }
+
+    private void Update()
+    {
+        if(_agent.remainingDistance > _agent.stoppingDistance)
+        {
+            _character.Move(_agent.desiredVelocity, false, false);
+        }
+        else
+        {
+            _character.Move(Vector3.zero, false, false);
         }
     }
 
