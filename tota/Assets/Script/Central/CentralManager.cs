@@ -44,6 +44,12 @@ public class CentralManager : Photon.MonoBehaviour
     [SerializeField] private GameObject _build = null;
     public GameObject Build { get { return _build; } }
 
+    [SerializeField] private GameObject _actions = null;
+    public GameObject Actions { get { return _actions; } }
+
+    [SerializeField] private GameObject _button = null;
+    public GameObject Button { get { return _button; } }
+
     public void UpdateToolTip(string[] info,string quirks)
     {
         toolTip.SetActive(true);
