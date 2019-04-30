@@ -280,6 +280,11 @@ public class SpiritHead : Photon.MonoBehaviour
     private void LeftClickUpdate()
     {
         RaycastHit hit;
+        foreach (Transform child in _actions.transform.GetChild(0).GetChild(0))
+        {
+            Destroy(child.gameObject);
+        }
+        _actions.SetActive(false);
 
         if (ClickedOnSomething(out hit))
         {
@@ -431,6 +436,8 @@ public class SpiritHead : Photon.MonoBehaviour
         //Si une action n'est pas available à au moins un Chara selectionné, elle est grisée,
         //sinon elle est disponible
         //Appelle IndexActionHandler avec inter et l'index d'action choisi par le joueur
+        Vector3 vec = new Vector3(inter.transform.position.x, 3, inter.transform.position.z);
+        _actions.transform.position = _spiritCamera.GetComponent<Camera>().WorldToScreenPoint(vec);
 
         _actions.SetActive(true);
         string[] actions = inter.PossibleActionNames;

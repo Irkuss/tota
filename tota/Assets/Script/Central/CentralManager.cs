@@ -20,6 +20,7 @@ public class CentralManager : Photon.MonoBehaviour
     public GameObject toolTip;
     public GameObject pauseMenu;
     [SerializeField] private GameObject _charaRef = null;
+    [SerializeField] private GameObject _options = null;
 
     public static bool isPause = false;
 
@@ -140,7 +141,16 @@ public class CentralManager : Photon.MonoBehaviour
 
     public void Options()
     {
+        pauseMenu.SetActive(false);
+        _options.SetActive(true);
+    }
 
+    public void Controls()
+    {
+        if (_options.transform.GetChild(0).GetChild(0).GetComponent<InputField>().text == "z")
+        {
+            Mode.Instance.zqsd = true;
+        }
     }
 
     public void Quit()
