@@ -8,7 +8,7 @@ public class SpiritHead : Photon.MonoBehaviour
 {
     //utilisé pour debugger (à swap avec un scriptable object des que possible)
 
-    private string _charaPath = "CharaTanyako";
+    private string _charaPath = "CharaMarc";
     [SerializeField] private ItemRecipe bigAppleRecipe = null;
     [SerializeField] private ItemTable itemTable = null;
 
@@ -20,6 +20,8 @@ public class SpiritHead : Photon.MonoBehaviour
     private GameObject _chara;
     private GameObject _channel;
     private GameObject _build;
+    private GameObject _actions;
+    private GameObject _button;
 
     //Le joueur qui contrôle ce Spirit (ne change pas)
     private PermissionsManager _permission = PermissionsManager.Instance;
@@ -31,7 +33,15 @@ public class SpiritHead : Photon.MonoBehaviour
 
     private void Awake()
     {
-        PermissionsManager.Instance.spirit = this;
+        if (!photonView.isMine)
+        {
+
+            this.enabled = false;
+        }
+        else
+        {
+            PermissionsManager.Instance.spirit = this;
+        }        
 
         _selectedList = new List<GameObject>();
         CentralManager eManager = GameObject.Find("eCentralManager").GetComponent<CentralManager>();
@@ -40,15 +50,13 @@ public class SpiritHead : Photon.MonoBehaviour
         _inventoryList = eManager.InventoryList;
         _channel = eManager.Channel;
         _build = eManager.Build;
+        _actions = eManager.Actions;
+        _button = eManager.Button;
     }
     //Unity Callback
     void Start()
     {
-        if (!photonView.isMine)
-        {
-
-            this.enabled = false;
-        }
+        
     }
 
     void Update()
@@ -272,6 +280,11 @@ public class SpiritHead : Photon.MonoBehaviour
     private void LeftClickUpdate()
     {
         RaycastHit hit;
+        foreach (Transform child in _actions.transform.GetChild(0).GetChild(0))
+        {
+            Destroy(child.gameObject);
+        }
+        _actions.SetActive(false);
 
         if (ClickedOnSomething(out hit))
         {
@@ -318,6 +331,11 @@ public class SpiritHead : Photon.MonoBehaviour
             else
             {
                 Debug.Log("RightClickUpdate: removing focus, pointing a destination to charas");
+                foreach (Transform child in _actions.transform.GetChild(0).GetChild(0))
+                {
+                    Destroy(child.gameObject);
+                }
+                _actions.SetActive(false);
                 RemoveFocusAll();
                 ActionMoveAllTo(hit.point);
             }
@@ -418,36 +436,38 @@ public class SpiritHead : Photon.MonoBehaviour
         //Si une action n'est pas available à au moins un Chara selectionné, elle est grisée,
         //sinon elle est disponible
         //Appelle IndexActionHandler avec inter et l'index d'action choisi par le joueur
-        Debug.Log("GeneralActionHandler: 2");
-        Dropdown drop = inter.gameObject.transform.GetChild(0).GetChild(0).GetComponent<Dropdown>();
-        if (drop == null)
-        {
-            return;
-        }
-        drop.gameObject.SetActive(true);
+        Vector3 vec = new Vector3(inter.transform.position.x, 3, inter.transform.position.z);
+        _actions.transform.position = _spiritCamera.GetComponent<Camera>().WorldToScreenPoint(vec);
 
-        Debug.Log("GeneralActionHandler: 3");
-        drop.ClearOptions();
-        List<string> actions = new List<string> ();
-        foreach (var action in inter.PossibleActionNames)
-        {
-            actions.Add(action);
-        }
-        drop.AddOptions(actions);
+        _actions.SetActive(true);
+        string[] actions = inter.PossibleActionNames;
 
-        drop.onValueChanged.AddListener(delegate
+        for(int i = 0; i < inter.PossibleActionNames.Length; i++)
         {
-            if (IsActionIndexAvailableByAll(inter, drop.value))
+            GameObject act = Instantiate(_button, _actions.transform.GetChild(0).GetChild(0));
+            act.transform.GetChild(0).GetComponent<Text>().text = actions[i];
+
+            if (!IsActionIndexAvailableByAll(inter,i))
             {
-                IndexActionHandler(inter, drop.value);
-                drop.gameObject.SetActive(false);
+                act.GetComponent<Image>().color = Color.grey;
+                act.GetComponent<Button>().interactable = false;
             }
             else
             {
-                drop.itemImage.color = Color.grey;
+                act.GetComponent<Button>().onClick.AddListener(
+                () => 
+                {
+                    IndexActionHandler(inter, i);
+                    foreach(Transform child in _actions.transform.GetChild(0).GetChild(0))
+                    {
+                        Destroy(child.gameObject);
+                    }
+                    _actions.SetActive(false);                    
+                }
+                );
             }
-            
-        });
+        }
+
     }
 
 

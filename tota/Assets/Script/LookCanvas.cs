@@ -6,12 +6,12 @@ public class LookCanvas : MonoBehaviour
 {
 
     // Update is called once per frame
-    /*void Update()
+    void Update()
     {
         if (SpiritZoom.cam == null) return;
         transform.LookAt(transform.position + SpiritZoom.cam.transform.rotation * Vector3.forward,
             SpiritZoom.cam.transform.rotation * Vector3.up);
-    }*/
+    }
 
     private void Awake()
     {

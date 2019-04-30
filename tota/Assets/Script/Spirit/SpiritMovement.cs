@@ -35,8 +35,29 @@ public class SpiritMovement : Photon.MonoBehaviour
     {
         //Deplacement wasd sur le plan x/z
         //NB: le deplacement vertical est géré dans SpiritZoom
-        float moveHorizontal = Input.GetAxis("Horizontal"); //Fleches horizontal ou 'a' / 'd'
-        float moveVertical = Input.GetAxis("Vertical"); //Fleches vertical ou 'w' / 's'
+        float moveHorizontal;
+        float moveVertical;
+
+        if (Mode.Instance.zqsd)
+        {
+            moveHorizontal = Input.GetAxis("MoveH"); //Fleches horizontal ou 'a' / 'd'
+            moveVertical = Input.GetAxis("MoveV"); //Fleches vertical ou 'w' / 's'
+        }
+        else
+        {
+            moveHorizontal = Input.GetAxis("Horizontal"); //Fleches horizontal ou 'a' / 'd'
+            moveVertical = Input.GetAxis("Vertical"); //Fleches vertical ou 'w' / 's'
+        }
+
+        if(moveHorizontal != 0 || moveVertical != 0)
+        {            
+            GameObject _actions = GameObject.Find("eCentralManager").GetComponent<CentralManager>().Actions;
+            foreach (Transform child in _actions.transform.GetChild(0).GetChild(0))
+            {
+                Destroy(child.gameObject);
+            }
+            _actions.SetActive(false);
+        }
 
         //Vector représentant la direction du mouvement
         Vector3 movement = new Vector3(moveHorizontal, 0.0f, moveVertical);

@@ -39,13 +39,13 @@ public class CharaInteract : Interactable
     public void AttackWithSlot(CharaHead chara, int slot)//Get attacked
     {
         CharaInventory inv = chara.GetComponent<CharaInventory>();
-        Equipable weapon = inv.equipments[slot];
-
-        Debug.Log("AttackWithSlot: attacking with slot " + slot + " as weapon: " + weapon.nickName);
+        Equipable weapon = inv.equipments[slot];        
 
         if (weapon != null)
         {
-            if(weapon.equipType == Equipable.EquipType.Melee)
+            Debug.Log("AttackWithSlot: attacking with slot " + slot + " as weapon: " + weapon.nickName);
+
+            if (weapon.equipType == Equipable.EquipType.Melee)
             {
                 //Attack melee
                 CharaRpg rpg = chara.GetComponent<CharaRpg>();

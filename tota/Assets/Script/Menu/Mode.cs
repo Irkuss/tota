@@ -8,6 +8,7 @@ public class Mode : MonoBehaviour
     public static Mode Instance;
     [HideInInspector] public bool online;
     private string _mode = null;
+    [HideInInspector] public bool zqsd = false;
 
     private void Awake()
     {
