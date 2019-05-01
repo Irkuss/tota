@@ -824,6 +824,7 @@ public class CharaRpg : MonoBehaviour
 
         FindPartWithName(bodyPartName).AddWound(new Wound((WoundType)woundType, initialDamage, origin, infectionIncrement));
 
+        UpdateHealth(false);
         UpdateInterfaceHealth();
     }
     public void LocalAddWound(Wound wound, BodyPart bodyPart)

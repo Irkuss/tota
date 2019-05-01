@@ -36,7 +36,7 @@ public class PropFurniture : PropHandler
 
     private void RandAddLoot()
     {
-        Item[] itemToAdd = lootTable.GetChosenPropsArray(Random.Range(5, 10));
+        Item[] itemToAdd = lootTable.GetChosenPropsArray(Random.Range(8, 12));
         for (int i = 0; i < itemToAdd.Length; i++)
         {
             _furnitureInventory.Add(itemToAdd[i]);
@@ -85,7 +85,7 @@ public class PropFurniture : PropHandler
             foreach (CharaHead ele in closeCharas)
             {
                 //Debug.Log("Cor_UpdateClose: " + Vector3.Distance(_interTransform.position, ele.transform.position) + " is distance between this and a chara");
-                if (Vector3.Distance(_interTransform.position, ele.transform.position) > _radius + 0.5f)
+                if (Vector3.Distance(_interTransform.position, ele.transform.position) > _radius + 0.1f)
                 {
                     //Debug.Log("Cor_UpdateClose: removing that chara");
                     charaToRemove.Add(ele);

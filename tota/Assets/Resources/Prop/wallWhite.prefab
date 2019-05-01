@@ -45,6 +45,7 @@ GameObject:
   - component: {fileID: 548039794523857264}
   - component: {fileID: 4272358547101499784}
   - component: {fileID: 7514062009823272998}
+  - component: {fileID: 6107757127989742866}
   m_Layer: 0
   m_Name: Whitebrickwall
   m_TagString: Untagged
@@ -60,7 +61,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 3903921051610610386}
   m_LocalRotation: {x: 0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: -0.27, y: 0, z: -1.24}
+  m_LocalPosition: {x: -0.27, y: 0, z: -0.75}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 3679505839626489294}
@@ -122,8 +123,8 @@ BoxCollider:
   m_IsTrigger: 0
   m_Enabled: 1
   serializedVersion: 2
-  m_Size: {x: 12.4, y: 7.1, z: 0.6}
-  m_Center: {x: 0.10000014, y: 3.55, z: 1.5}
+  m_Size: {x: 6.2, y: 3.55, z: 0.3}
+  m_Center: {x: 0.05000007, y: 1.775, z: 0.75}
 --- !u!114 &4272358547101499784
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -155,3 +156,19 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   isMoving: 0
+--- !u!208 &6107757127989742866
+NavMeshObstacle:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3903921051610610386}
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Shape: 1
+  m_Extents: {x: 3.1000001, y: 1.7750001, z: 0.15}
+  m_MoveThreshold: 0.1
+  m_Carve: 1
+  m_CarveOnlyStationary: 1
+  m_Center: {x: 0.05, y: 1.7750001, z: 0.75000006}
+  m_TimeToStationary: 0.5

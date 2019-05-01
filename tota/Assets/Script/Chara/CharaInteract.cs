@@ -11,12 +11,11 @@ public class CharaInteract : Interactable
         
         switch (actionIndex)
         {
-            case 0: break;
-            case 1: AttackWithSlot(chara, 0); break;//melee 0
-            case 2: AttackWithSlot(chara, 1); break;//melee 1
-            case 3: AttackWithSlot(chara, 0); break;//remote 0
-            case 4: AttackWithSlot(chara, 1); break;//remote 1
-            case 5: break; //Follow target
+            case 0: AttackWithSlot(chara, 0); break;//melee 0
+            case 1: AttackWithSlot(chara, 1); break;//melee 1
+            case 2: AttackWithSlot(chara, 0); break;//remote 0
+            case 3: AttackWithSlot(chara, 1); break;//remote 1
+            case 4: break; //Follow target
             default: GetComponent<CharaRpg>().DebugGetRandomDamage((int)CharaRpg.WoundType.Bruise); break;
         }
     }
@@ -33,13 +32,26 @@ public class CharaInteract : Interactable
         }
         return false;
     }
+    public override float GetActionTime(CharaHead chara, int actionIndex = 0)
+    {
+        CharaInventory inv = chara.GetComponent<CharaInventory>();
+        
+        switch (actionIndex)
+        {
+            case 0: return inv.equipments[0].attackSpeedModifier;//melee 0
+            case 1: return inv.equipments[1].attackSpeedModifier;//melee 1
+            case 2: return inv.equipments[0].attackSpeedModifier;//remote 0
+            case 3: return inv.equipments[1].attackSpeedModifier;//remote 1
+            case 4: return 0f; //Follow
+        }
+        return 0f;
+    }
 
     //Actions
 
     public void AttackWithSlot(CharaHead chara, int slot)//Get attacked
     {
-        CharaInventory inv = chara.GetComponent<CharaInventory>();
-        Equipable weapon = inv.equipments[slot];        
+        Equipable weapon = chara.GetComponent<CharaInventory>().equipments[slot]; 
 
         if (weapon != null)
         {
@@ -68,6 +80,10 @@ public class CharaInteract : Interactable
                 GetComponent<CharaRpg>().GetAttackedWith(weapon, damage);
             }
         }
+        else
+        {
+            Debug.Log("AttackWithSlot: Unexpected null weapon, CheckAttackWithSlot failed!");
+        }
     }
     public bool CheckAttackWithSlot(CharaHead chara, int slot, bool isMelee)
     {
@@ -81,6 +97,8 @@ public class CharaInteract : Interactable
             }
             else
             {
+
+                if (isMelee) return false;
                 //Attack remote
                 float maxRange = weapon.remoteMaxRange;
 
@@ -90,7 +108,7 @@ public class CharaInteract : Interactable
                     RaycastHit hit;
                     //testing if visible from player
                     Vector3 higher = new Vector3(0, 1.5f, 0);
-                    Debug.Log("DRAWING RAYCAST");
+                    Debug.Log("CheckAttackWithSlot: checking victim sight with raycast");
                     Debug.DrawRay(transform.position + higher, (chara.transform.position - transform.position) + higher, Color.green, 3, false);
                     if (Physics.Raycast(transform.position + higher, (chara.transform.position - transform.position) + higher, out hit, maxRange))
                     {

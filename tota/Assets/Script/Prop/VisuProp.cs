@@ -21,10 +21,9 @@ public class VisuProp : PropHandler
     {
         switch(actionIndex)
         {
-            case 0: break; //TO REMOVE WHEN YANIS CORRIGE IUEZHFIUHZIZNFIJ
-            case 1: FillNeededItem(chara); break;
-            case 2: Construct(chara); break;
-            case 3: CancelConstruction(chara); break;
+            case 0: FillNeededItem(chara); break;
+            case 1: Construct(chara); break;
+            case 2: CancelConstruction(chara); break;
         }
     }
 
@@ -32,10 +31,9 @@ public class VisuProp : PropHandler
     {
         switch (actionIndex)
         {
-            case 0: return false;
-            case 1: return !hasAllItems && recipe.CanBeCraftedWith(chara.GetComponent<CharaInventory>().inventory);
-            case 2: return hasAllItems;
-            case 3: return true;
+            case 0: return !hasAllItems && recipe.CanBeCraftedWith(chara.GetComponent<CharaInventory>().inventory) && recipe.neededItem.Length != 0;
+            case 1: return hasAllItems || recipe.neededItem.Length == 0;
+            case 2: return true;
         }
         return false;
     }
