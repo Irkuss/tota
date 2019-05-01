@@ -25,6 +25,7 @@ public class SpiritMovement : Photon.MonoBehaviour
 
     void FixedUpdate()
     {
+        if (Channel.isWriting) return;
         //Fixed update car on travaille avec de la physique (AddForce)
         Move();
     }

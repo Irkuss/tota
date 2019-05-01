@@ -435,56 +435,48 @@ public class SpiritHead : Photon.MonoBehaviour
         //Si une action n'est pas available à au moins un Chara selectionné, elle est grisée,
         //sinon elle est disponible
         //Appelle IndexActionHandler avec inter et l'index d'action choisi par le joueur
+        foreach (Transform child in _actions.transform.GetChild(0).GetChild(0))
+        {
+            Destroy(child.gameObject);
+        }
 
-        /*
-        Dropdown drop = inter.gameObject.transform.GetChild(0).GetChild(0).GetComponent<Dropdown>();
-        if (drop == null)
-        {
-            return;
-        }
-        drop.gameObject.SetActive(true);
-        
-        drop.ClearOptions();
-        List<string> actions = new List<string> ();
-        foreach (var action in inter.PossibleActionNames)
-        {
-            actions.Add(action);
-        }
-        drop.AddOptions(actions);
-        */
         Vector3 vec = new Vector3(inter.transform.position.x, 3, inter.transform.position.z);
         _actions.transform.position = _spiritCamera.GetComponent<Camera>().WorldToScreenPoint(vec);
 
         _actions.SetActive(true);
-        string[] actions = inter.PossibleActionNames;
-        //
-
-        for(int i = 0; i < inter.PossibleActionNames.Length; i++)
-        {
+        int i = 0;
+        foreach(var action in inter.PossibleActionNames)
+        { 
             GameObject act = Instantiate(_button, _actions.transform.GetChild(0).GetChild(0));
-            act.transform.GetChild(0).GetComponent<Text>().text = actions[i];
+            act.transform.GetChild(0).GetComponent<Text>().text = inter.PossibleActionNames[i];
+
+            act.GetComponent<Button>().onClick.AddListener(() => Act(inter, act.transform.GetChild(0).GetComponent<Text>().text));
 
             if (!IsActionIndexAvailableByAll(inter,i))
             {
                 act.GetComponent<Image>().color = Color.grey;
                 act.GetComponent<Button>().interactable = false;
             }
-            else
-            {
-                act.GetComponent<Button>().onClick.AddListener(
-                () => 
-                {
-                    IndexActionHandler(inter, i);
-                    foreach(Transform child in _actions.transform.GetChild(0).GetChild(0))
-                    {
-                        Destroy(child.gameObject);
-                    }
-                    _actions.SetActive(false);                    
-                }
-                );
-            }
+            i += 1;
         }
 
+    }
+
+    public void Act(Interactable inter,string action)
+    {
+        List<string> actions = new List<string>();
+        foreach(var s in inter.PossibleActionNames)
+        {
+            actions.Add(s);
+        }
+
+        int i = actions.IndexOf(action);
+        IndexActionHandler(inter, i);
+        foreach (Transform child in _actions.transform.GetChild(0).GetChild(0))
+        {
+            Destroy(child.gameObject);
+        }
+        _actions.SetActive(false);
     }
 
 
