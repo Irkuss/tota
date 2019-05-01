@@ -20,6 +20,7 @@ public class CentralManager : Photon.MonoBehaviour
     public GameObject toolTip;
     public GameObject pauseMenu;
     [SerializeField] private GameObject _charaRef = null;
+    [SerializeField] private GameObject _options = null;
 
     public static bool isPause = false;
 
@@ -43,6 +44,12 @@ public class CentralManager : Photon.MonoBehaviour
 
     [SerializeField] private GameObject _build = null;
     public GameObject Build { get { return _build; } }
+
+    [SerializeField] private GameObject _actions = null;
+    public GameObject Actions { get { return _actions; } }
+
+    [SerializeField] private GameObject _button = null;
+    public GameObject Button { get { return _button; } }
 
     public void UpdateToolTip(string[] info,string quirks)
     {
@@ -134,7 +141,16 @@ public class CentralManager : Photon.MonoBehaviour
 
     public void Options()
     {
+        pauseMenu.SetActive(false);
+        _options.SetActive(true);
+    }
 
+    public void Controls()
+    {
+        if (_options.transform.GetChild(0).GetChild(0).GetComponent<InputField>().text == "z")
+        {
+            Mode.Instance.zqsd = true;
+        }
     }
 
     public void Quit()

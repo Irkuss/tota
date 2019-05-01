@@ -170,6 +170,7 @@ public class CharaInventory : MonoBehaviour
 
     public void UpdateUI()
     {
+        if (_slots == null) return;
         int i = 0;
         foreach (KeyValuePair<Item, int> item in inventory)
         {

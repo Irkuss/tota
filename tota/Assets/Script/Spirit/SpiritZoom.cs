@@ -85,6 +85,13 @@ public class SpiritZoom : Photon.MonoBehaviour
     {
         if (Input.GetAxis("Mouse ScrollWheel") != 0)
         {
+            GameObject _actions = GameObject.Find("eCentralManager").GetComponent<CentralManager>().Actions;
+            foreach (Transform child in _actions.transform.GetChild(0).GetChild(0))
+            {
+                Destroy(child.gameObject);
+            }
+            _actions.SetActive(false);
+
             if (Input.GetKey(KeyCode.LeftShift))
             {
                 //Field of view Scroll
