@@ -12,12 +12,17 @@ public class CharaHead : Photon.PunBehaviour
     [SerializeField] private CharaPermissions _permissions = null;
     [SerializeField] private CharaOutline _outline = null;
 
+    //Autre ref
+    private float _baseStoppingDistance;
     //Searched in Start
     private GameObject _eManager;
     private PermissionsManager _permManager;
 
     //Unity Callbacks
-
+    private void Awake()
+    {
+        _baseStoppingDistance = _movement.navMeshAgent.stoppingDistance;
+    }
     private void Start()
     {
         _eManager = GameObject.Find("eCentralManager"); //pas ouf comm methode, mieux vaux avec un tag
@@ -134,6 +139,15 @@ public class CharaHead : Photon.PunBehaviour
         _movement.MoveToInter(_focus);
 
         _checkCor = CheckDistanceInter(actionIndex);
+
+        if (_focus.IsDoWhileAction[actionIndex])
+        {
+            SetStopDistance(_focus.Radius * 2f / 3f);
+        }
+        else
+        {
+            SetStopDistance(_baseStoppingDistance);
+        }
         StartCoroutine(_checkCor);
     }
 
@@ -158,11 +172,21 @@ public class CharaHead : Photon.PunBehaviour
         }
         Debug.Log("CharaHead: reached Inter");
         //Interragis avec l'Interactable une fois proche
+
+        /* Dois attendre inter.GetActionTime(this, actionIndex)
+         * 
+         * A IMPLEMENTER
+         * 
+         */
+
+
+        //Interragis
         _focus.Interact(this, actionIndex);
         _lastInteractedFocus = _focus;
         if(_focus.IsDoWhileAction[actionIndex])
         {
             //L'action est à continuer
+            yield return new WaitForSeconds(0.4f);
             SetFocus(_focus, actionIndex);
         }
         else

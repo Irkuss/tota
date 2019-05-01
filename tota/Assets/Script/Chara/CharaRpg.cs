@@ -10,6 +10,8 @@ public class CharaRpg : MonoBehaviour
     private static QuirkTable quirkTable;
     private CentralManager _cm;
     private CharaMovement _charaMov;
+    [SerializeField] private WoundTable _woundTable;
+    private static WoundTable woundTable;
     //Name
     private string _nameFirst = "John";
     public string NameFirst => _nameFirst;
@@ -38,6 +40,10 @@ public class CharaRpg : MonoBehaviour
         sk_marksman,
         //Stats Level
         lv_stamina,
+    }
+    public static bool IsMainStat(Stat stat)
+    {
+        return (int)stat > 4;
     }
     public const int c_statNumber = 12; //TO UPDATE WHEN ADDING NEW STATS
     public struct Stats
@@ -100,12 +106,12 @@ public class CharaRpg : MonoBehaviour
     //Init Awake
     private void Awake()
     {
+        woundTable = _woundTable;
         quirkTable = _quirkTable;
         _nameFirst = GetRandomFirstName();
         _nameLast = GetRandomLastName();
         _cm = GameObject.Find("eCentralManager").GetComponent<CentralManager>();
     }
-
     //Init
     private void Start()
     {
@@ -187,6 +193,17 @@ public class CharaRpg : MonoBehaviour
 
         return info;
     }
+    public float GetTimeModifier(Stat stat)
+    {
+        float statValue = GetCurrentStat(stat);
+        
+        if(IsMainStat(stat))
+        {
+            return 1.75f - statValue * 0.015f; //0 -> 1.75, 50 -> 1, 100 -> 0.25
+        }
+        return 1f - statValue * 0.75f; //0 -> 1, 10 -> 0.25
+    }
+
     //Random Getters
     public bool GetCheck(Stat ms, int modifier = 0)
     {
@@ -253,16 +270,7 @@ public class CharaRpg : MonoBehaviour
         //Update possible wound related to temperature
     }
 
-    //BodyParts and Wound class/enum
-    public enum WoundType
-    {
-        Fracture,  //treated by a split
-        Bruise, //treated by cream1
-        Burn,   //treated by cream2
-        FrostBite,//treated by FIRE
-        Bleeding, //treated by bandage
-        DeathBite, //treated by amputation
-    }
+    //BodyParts and Wound
     public enum BodyType
     {
         Head,
@@ -273,41 +281,15 @@ public class CharaRpg : MonoBehaviour
         Arm,
         Hand,
     }
-    public static Dictionary<WoundType, string> WoundTypeToString = new Dictionary<WoundType, string>()
-    {
-        { WoundType.Fracture, "Fracture" },
-        { WoundType.Bruise, "Bruise" },
-        { WoundType.Burn, "Burn" },
-        { WoundType.FrostBite, "FrostBite" },
-        { WoundType.Bleeding, "Bleeding" },
-        { WoundType.DeathBite, "Death Bite" }
-    };
-    public static Dictionary<WoundType, bool> WoundTypeToIsBleed = new Dictionary<WoundType, bool>()
-    {
-        { WoundType.Fracture, false },
-        { WoundType.Bruise, false },
-        { WoundType.Burn, false },
-        { WoundType.FrostBite, false },
-        { WoundType.Bleeding, true },
-        { WoundType.DeathBite, true }
-    };
-    public static Dictionary<WoundType, float> WoundTypeToPainFactor = new Dictionary<WoundType, float>()
-    {
-        { WoundType.Fracture, 1f },
-        { WoundType.Bruise, 0.75f },
-        { WoundType.Burn, 1.5f },
-        { WoundType.FrostBite, 0.5f },
-        { WoundType.Bleeding, 1f },
-        { WoundType.DeathBite, 1f }
-    };
     public class Wound
     {
         //Inititial attribute
-        public WoundType type;
+        public WoundInfo.WoundType type;
         public int damage;
         public float painFactor;
         public string origin;
         //Treatment
+        public bool needToBeOperated = false;
         public bool isTreated = false;
         //Pain
         public int tempPain = 0;
@@ -317,17 +299,18 @@ public class CharaRpg : MonoBehaviour
         public float deathInfectionLevel = -1;
         public float deathInfectionIncrement = 0;
         //Constructeur
-        public Wound(WoundType type, int initialDamage, string origin, float infectionIncrement = 0)
+        public Wound(WoundInfo.WoundType type, int initialDamage, string origin, float infectionIncrement = 0)
         {
             //Attribute
             this.type = type;
             damage = initialDamage;
-            painFactor = WoundTypeToPainFactor[type];
+            painFactor = woundTable.GetInfo(type).painFactor;
             this.origin = origin;
+            this.needToBeOperated = woundTable.GetInfo(type).hasToBeOperated;
             //InitialPain
-            //tempPain = initialDamage;
+            tempPain = initialDamage;
             //Bleed
-            if (WoundTypeToIsBleed[type]) bloodLose = initialDamage;
+            if (woundTable.GetInfo(type).makesBleed) bloodLose = initialDamage;
             //Infection
             deathInfectionIncrement = infectionIncrement;
             if (infectionIncrement > 0) deathInfectionLevel = 0;
@@ -368,7 +351,7 @@ public class CharaRpg : MonoBehaviour
         //OtherGetters
         public string GetWoundInfo()
         {
-            string info = WoundTypeToString[type] + " (" + origin + ") (dmg" + damage + ")";
+            string info = woundTable.GetInfo(type).nickName + " (" + origin + ") (dmg: " + damage + ")";
             if (bloodLose != 0) info += " (bleed: " + bloodLose + ")";
             if (deathInfectionIncrement > 0) info += " (infection: " + deathInfectionLevel +"%)";
             return info;
@@ -416,7 +399,7 @@ public class CharaRpg : MonoBehaviour
                 wounds.Remove(wound);
             }
         }
-        public void TreatAllWoundsOfType(WoundType type)
+        public void TreatAllWoundsOfType(WoundInfo.WoundType type)
         {
             foreach (Wound wound in wounds)
             {
@@ -586,13 +569,27 @@ public class CharaRpg : MonoBehaviour
         }
     }
 
-    private void UpdateHealth(bool isRested = false)
+    private void UpdateHealth()
+    {
+        UpdateWounds();
+
+        UpdateHealthStatus();
+    }
+    private void UpdateWounds()
+    {
+        bool isRested = false;
+
+        foreach (BodyPart bodyPart in _bodyParts)
+        {
+            bodyPart.Update(isRested || _isInShock);
+        }
+    }
+    private void UpdateHealthStatus()
     {
         int totalBloodLose = 0;
         //Main Update
         foreach (BodyPart bodyPart in _bodyParts)
         {
-            bodyPart.Update(isRested || _isInShock);
             if(!bodyPart.CheckDestroyed()) totalBloodLose += bodyPart.GetTotalBloodLose();
         }
         //Blood lose
@@ -675,7 +672,7 @@ public class CharaRpg : MonoBehaviour
 
         if(infectedWound != null)
         {
-            if(infectedWound.type == WoundType.DeathBite)
+            if(infectedWound.type == WoundInfo.WoundType.DeathBite)
             {
                 DieZombie();
                 return true;
@@ -704,6 +701,7 @@ public class CharaRpg : MonoBehaviour
             totalPain += bp.GetPain();
         }
         _pain = totalPain * _globalPainFactor;
+        if (_isDead) _pain = 0f;
     }
     private void UpdateConsciousness()
     {
@@ -818,13 +816,15 @@ public class CharaRpg : MonoBehaviour
             new string[2] { bodyPartName, origin },
             new float[1] { infectionIncrement });
     }
+
+
     public void ReceiveAddWound(int woundType, int initialDamage, string bodyPartName, string origin, float infectionIncrement)
     {
         if (initialDamage <= 0) return;
 
-        FindPartWithName(bodyPartName).AddWound(new Wound((WoundType)woundType, initialDamage, origin, infectionIncrement));
+        FindPartWithName(bodyPartName).AddWound(new Wound((WoundInfo.WoundType)woundType, initialDamage, origin, infectionIncrement));
 
-        UpdateHealth(false);
+        UpdateHealthStatus();
         UpdateInterfaceHealth();
     }
     public void LocalAddWound(Wound wound, BodyPart bodyPart)
@@ -833,7 +833,27 @@ public class CharaRpg : MonoBehaviour
 
         FindPartWithName(bodyPart.name).AddWound(wound);
 
+        UpdateHealthStatus();
         UpdateInterfaceHealth();
+    }
+    //Treatment
+    public void TreatAllWoundsOfType(WoundInfo.WoundType type)
+    {
+        foreach(BodyPart bodyPart in _bodyParts)
+        {
+            bodyPart.TreatAllWoundsOfType(type);
+        }
+        UpdateHealthStatus();
+    }
+    public void AmputateEveryInfectedPart()
+    {
+        foreach(BodyPart bodyPart in _bodyParts)
+        {
+            if(bodyPart.CheckIfInfected())
+            {
+                bodyPart.ForceFalloff();
+            }
+        }
     }
     //Combat handler
     public void DebugGetRandomDamage(int woundType)
@@ -845,19 +865,19 @@ public class CharaRpg : MonoBehaviour
     {
         BodyPart bodyPart = _bodyParts[Random.Range(1, 13)]; //1-12 
         //<------------------Doit réduire les dégats avec la liste des protections de la partie du corps correspondant
-        WoundType type;
+        WoundInfo.WoundType type;
         switch(weapon.dmgType)
         {
             case Equipable.DamageType.Mace:
                 damage -= GetComponent<CharaInventory>().GetBodyPartMaceResistance(bodyPart.bodyType);
-                type = damage > 40 ? WoundType.Fracture : WoundType.Bruise;
+                type = damage > 40 ? WoundInfo.WoundType.Fracture : WoundInfo.WoundType.Bruise;
                 break;
             case Equipable.DamageType.Sharp:
                 damage -= GetComponent<CharaInventory>().GetBodyPartSharpResistance(bodyPart.bodyType);
-                type = WoundType.Bleeding;
+                type = WoundInfo.WoundType.Bleeding;
                 break;
             default:
-                type = WoundType.Bruise;
+                type = WoundInfo.WoundType.Bruise;
                 break;
         }
         if (damage > 0)
@@ -881,7 +901,7 @@ public class CharaRpg : MonoBehaviour
             {
                 //Si l'armure n'a pas absorbé le coup, on est mordu
                 Debug.Log("TryDeathBite: " + NameFull + " got bitten!");
-                AddWound(new Wound(WoundType.DeathBite, biteDamage, "zombie", 1.2f), bodyPart);
+                AddWound(new Wound(WoundInfo.WoundType.DeathBite, biteDamage, "zombie", 1.2f), bodyPart);
             }
         }
     }
@@ -916,10 +936,16 @@ public class CharaRpg : MonoBehaviour
             }
         }
         //Parse en array
-        string[] woundsInfoArray = new string[woundsInfo.Count];
-        for (int i = 0; i < woundsInfo.Count; i++)
+        string[] woundsInfoArray = new string[woundsInfo.Count + missingInfo.Count];
+        int i = 0;
+        for (; i < woundsInfo.Count; i++)
         {
             woundsInfoArray[i] = woundsInfo[i];
+        }
+        for (int j = 0; j < missingInfo.Count; j++)
+        {
+            woundsInfoArray[i] = missingInfo[j];
+            i++;
         }
         return woundsInfoArray;
     }
