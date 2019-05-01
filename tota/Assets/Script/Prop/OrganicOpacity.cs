@@ -100,6 +100,7 @@ public class OrganicOpacity : MonoBehaviour
             if (_renderer != null) _renderer.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.On;
             _collider.enabled = true;
         }
+        _wasAboveFloorLevel = currentAbove;
     }
 
     private bool IsAboveFloorLevel(int newFloorLevel)

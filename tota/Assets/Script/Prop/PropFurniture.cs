@@ -81,13 +81,13 @@ public class PropFurniture : PropHandler
         {
             List<CharaHead> charaToRemove = new List<CharaHead>();
 
-            Debug.Log("Cor_UpdateClose: there is still " + closeCharas.Count + " charas left next to this furniture");
+            //Debug.Log("Cor_UpdateClose: there is still " + closeCharas.Count + " charas left next to this furniture");
             foreach (CharaHead ele in closeCharas)
             {
-                Debug.Log("Cor_UpdateClose: " + Vector3.Distance(_interTransform.position, ele.transform.position) + " is distance between this and a chara");
-                if (Vector3.Distance(_interTransform.position, ele.transform.position) > _radius + 1)
+                //Debug.Log("Cor_UpdateClose: " + Vector3.Distance(_interTransform.position, ele.transform.position) + " is distance between this and a chara");
+                if (Vector3.Distance(_interTransform.position, ele.transform.position) > _radius + 0.5f)
                 {
-                    Debug.Log("Cor_UpdateClose: removing that chara");
+                    //Debug.Log("Cor_UpdateClose: removing that chara");
                     charaToRemove.Add(ele);
                 }
             }
@@ -99,7 +99,7 @@ public class PropFurniture : PropHandler
             yield return new WaitForSeconds(0.3f);
         }
         isFurnitureInvOpen = false;
-        Debug.Log("Cor_UpdateClose: closing inventory");
+        //Debug.Log("Cor_UpdateClose: closing inventory");
         _furnitureInventory.CloseInventory();
 
         _outline.enabled = false;

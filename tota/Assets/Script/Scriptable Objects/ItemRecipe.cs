@@ -62,4 +62,16 @@ public class ItemRecipe : ScriptableObject
             charaInventory.Add(result);
         }
     }
+
+    public void Refund(CharaInventory charaInventory)
+    {
+        for (int i = 0; i < neededItem.Length; i++)
+        {
+            Item item = neededItem[i];
+            for (int count = 0; count < neededItemCount[i]; count++)
+            {
+                charaInventory.Add(item);
+            }
+        }
+    }
 }

@@ -1248,7 +1248,7 @@ public class Generator : MonoBehaviour
                     {
                         tempBuilds[xTemp, yTemp].Generate(x, y);
                     }
-                    yield return null;
+                    //yield return null;
                 }
                 //Generate Streets
                 if (_layout == WorldLayout.City) GenerateStreets(tempRoads, tempBuilds, x, y);
@@ -1288,7 +1288,7 @@ public class Generator : MonoBehaviour
                         {
                             position = (j + x * Mathf.FloorToInt(c_worldChunkLength), i + y * Mathf.FloorToInt(c_worldChunkLength));
                             if (IsOnGround(new Vector3(position.Item1,0, position.Item2), 2)) treePositions.Add(position);
-                            
+                            //treePositions.Add(position);
                         }
                     }
                 }
@@ -1486,11 +1486,6 @@ public class Generator : MonoBehaviour
                 hitOneGround = true;
             }
             return hitOneGround;
-        }
-        private void MasterLightPlaceTree(PropManager propManager, int x, int y)
-        {
-            Prop randTree = propTable.GetRandomPropWithType(PropTable.PropType.Tree);
-            propManager.LightPlaceProp(x, y, (byte)Random.Range(0, 4), propTable.GetIdWithProp(randTree));
         }
         private void MasterMassLightPlaceTree(PropManager propManager, List<(int, int)> pos)
         {

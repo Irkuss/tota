@@ -12,7 +12,8 @@ public class SpiritHead : Photon.MonoBehaviour
     [SerializeField] private ItemRecipe bigAppleRecipe = null;
     [SerializeField] private ItemTable itemTable = null;
 
-    [SerializeField] private GameObject _spiritCamera = null;
+    //[SerializeField] private GameObject _spiritCamera = null;
+    private Camera _spiritCamera = null;
 
     private GameObject _inventoryList;
     private GameObject _inventoryLayout;
@@ -31,7 +32,7 @@ public class SpiritHead : Photon.MonoBehaviour
 
     private void Awake()
     {
-        PermissionsManager.Instance.spirit = this;
+        if(photonView.isMine) PermissionsManager.Instance.spirit = this;
 
         _selectedList = new List<GameObject>();
         CentralManager eManager = GameObject.Find("eCentralManager").GetComponent<CentralManager>();
@@ -44,9 +45,9 @@ public class SpiritHead : Photon.MonoBehaviour
     //Unity Callback
     void Start()
     {
+        _spiritCamera = GetComponentInChildren<Camera>();
         if (!photonView.isMine)
         {
-
             this.enabled = false;
         }
     }
@@ -261,7 +262,7 @@ public class SpiritHead : Photon.MonoBehaviour
     private bool ClickedOnSomething(out RaycastHit hit)
     {
         //Useful function for the rest of SpiritHead
-        Ray ray = _spiritCamera.GetComponent<Camera>().ScreenPointToRay(Input.mousePosition);
+        Ray ray = _spiritCamera.ScreenPointToRay(Input.mousePosition);
         if (Physics.Raycast(ray, out hit))
         {
             return true;
@@ -307,14 +308,13 @@ public class SpiritHead : Photon.MonoBehaviour
         if (ClickedOnSomething(out hit))
         {
             Debug.Log("RightClickUpdate: clicked on something");
-            //if (hit.transform.CompareTag("Interactable")) -> les charas doivent etre interactable
-            //
             Interactable inter = hit.collider.GetComponent<Interactable>();
-            if (inter != null) //la verif se fait donc là
+
+            Debug.Log("RightClickUpdate: clicking on " + hit.transform.name);
+            if (inter != null)
             {
                 GeneralActionHandler(inter);
             }
-            //}
             else
             {
                 Debug.Log("RightClickUpdate: removing focus, pointing a destination to charas");
@@ -409,7 +409,6 @@ public class SpiritHead : Photon.MonoBehaviour
 
     private void GeneralActionHandler(Interactable inter)
     {
-        Debug.Log("GeneralActionHandler: 1   " + inter.PossibleActionNames.Length);
         if (inter.PossibleActionNames.Length == 0) return; //Do nothing if no interaction exists
         //Processus de décision l'index d'action
         //Ouvre le dropDown Menu
@@ -418,15 +417,13 @@ public class SpiritHead : Photon.MonoBehaviour
         //Si une action n'est pas available à au moins un Chara selectionné, elle est grisée,
         //sinon elle est disponible
         //Appelle IndexActionHandler avec inter et l'index d'action choisi par le joueur
-        Debug.Log("GeneralActionHandler: 2");
         Dropdown drop = inter.gameObject.transform.GetChild(0).GetChild(0).GetComponent<Dropdown>();
         if (drop == null)
         {
             return;
         }
         drop.gameObject.SetActive(true);
-
-        Debug.Log("GeneralActionHandler: 3");
+        
         drop.ClearOptions();
         List<string> actions = new List<string> ();
         foreach (var action in inter.PossibleActionNames)

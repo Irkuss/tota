@@ -28,6 +28,7 @@ public class PropHandler : Interactable
     //Have to be called to destroy this gameobject
     public void DestroySelf()
     {
+        Debug.Log("DestroySelf: ordering destroying self, " + name + " (id: " + _id + ")");
         GameObject.Find("eCentralManager").GetComponent<PropManager>().DestroyProp(_id);
     }
 }

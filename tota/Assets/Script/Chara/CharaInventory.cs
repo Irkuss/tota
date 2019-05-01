@@ -276,7 +276,7 @@ public class CharaInventory : MonoBehaviour
         {
             Destroy(_interface);
         }
-        Debug.Log("CharaInventory: closed Inventory after being deselected");
+        //Debug.Log("CharaInventory: closed Inventory after being deselected");
     }
 
     public void CloseInventory()
@@ -359,12 +359,12 @@ public class CharaInventory : MonoBehaviour
     {
         if(item == null)
         {
-            Debug.Log("CharaInventory: item was null");
+            Debug.Log("CharaInventory: item was null (happens when generating Loots in furniture)");
             return false;
         }
 
         //Le booléen retourné représente la réussite de l'ajout de l'item
-        Debug.Log("CharaInventory: Checking space");
+        //Debug.Log("CharaInventory: Checking space");
 
         bool noMoreSpace = inventory.Count >= _inventorySpace;
         bool noMoreStrength = GetComponent<CharaRpg>() == null ? false : (UpdateWeight() + item.weight > (GetComponent<CharaRpg>().GetCurrentStat(CharaRpg.Stat.ms_strength) / 5));
@@ -381,7 +381,7 @@ public class CharaInventory : MonoBehaviour
         Debug.Log("CharaInventory: Adding item");
         if (inventory.ContainsKey(item))
         {
-            Debug.Log("CharaInventory: Item was already present");
+            Debug.Log("CharaInventory: Item was already present, incrementing already existin item");
             //Si l'item était déjà dans l'inventaire, augmente son compte de 1
             //inventory[item] += 1;
             ModifyCount(item, 1);
@@ -403,11 +403,6 @@ public class CharaInventory : MonoBehaviour
             //gameObject.GetComponent<PhotonView>().RPC("AddWithId", PhotonTargets.AllBuffered, itemTable.GetIdWithItem(item));
         }
         Debug.Log("CharaInventory: Item has been added");
-        //Appelle le Callback en s'assurant que quelqu'un écoute
-        //if (onItemChangedCallback != null) onItemChangedCallback.Invoke();
-
-        //UpdateUI();
-
         return true;
     }
 
@@ -422,11 +417,6 @@ public class CharaInventory : MonoBehaviour
         {
             GetComponent<PropHandler>().CommandSend(new int[2] { (int)PropFurniture.FurnitureCommand.Remove, itemTable.GetIdWithItem(item) });
         }
-        
-        //gameObject.GetComponent<PhotonView>().RPC("RemoveWithId", PhotonTargets.AllBuffered, itemTable.GetIdWithItem(item));
-
-        //inventory.Remove(item);
-        //UpdateUI();
     }
 
     public void ModifyCount(Item item, int countModifier)
@@ -440,7 +430,6 @@ public class CharaInventory : MonoBehaviour
         {
             GetComponent<PropHandler>().CommandSend(new int[3] { (int)PropFurniture.FurnitureCommand.Modify, itemTable.GetIdWithItem(item), countModifier });
         }
-        //gameObject.GetComponent<PhotonView>().RPC("ModifyCountWithId", PhotonTargets.AllBuffered, itemTable.GetIdWithItem(item), countModifier);
     }
 
     //RPC functions

@@ -118,7 +118,7 @@ public class CharaHead : Photon.PunBehaviour
     private void CloseInventoryOnDeselected()
     {
         GetComponent<CharaInventory>().CloseInterface();
-        Debug.Log("CharaHead: closing inventory of a deselected Chara");
+        //Debug.Log("CharaHead: closing inventory of a deselected Chara");
     }
 
     //Focus on Interactable

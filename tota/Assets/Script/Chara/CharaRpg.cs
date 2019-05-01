@@ -470,7 +470,7 @@ public class CharaRpg : MonoBehaviour
             {
                 totalPainValue += wound.GetPain();
             }
-            Debug.Log("GetPain: getting pain in bodypart -> " + (totalPainValue / (float)maxHp) * painFactor);
+            //Debug.Log("GetPain: getting pain in bodypart -> " + (totalPainValue / (float)maxHp) * painFactor);
             return (totalPainValue / (float)maxHp) * painFactor;
         }
         public int GetTotalBloodLose()
@@ -617,7 +617,7 @@ public class CharaRpg : MonoBehaviour
         //Update l'interface santé
         UpdateInterfaceHealth();
         //Debug:
-        Debug.Log("CharaRpg: Blood Lost " + totalBloodLose + ", " + bloodStock + " left, consciousness: " + _consciousness);
+        //Debug.Log("CharaRpg: Blood Lost " + totalBloodLose + ", " + bloodStock + " left, consciousness: " + _consciousness);
         DebugWounds();
     }
 
@@ -738,7 +738,7 @@ public class CharaRpg : MonoBehaviour
                       - 0.25f * (2 - _bodyParts[5].GetFuncPurcent() - _bodyParts[6].GetFuncPurcent());
             if (_movement <= 0) _movement = 0f;
         }
-        Debug.Log("UpdateMovement: movement=" + _movement + ", consciousness=" + _consciousness);
+        //Debug.Log("UpdateMovement: movement=" + _movement + ", consciousness=" + _consciousness);
         if (_charaMov != null) _charaMov.ModifyAgentSpeed(_movement * _consciousness);
     }
 

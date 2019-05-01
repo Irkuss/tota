@@ -10,7 +10,7 @@ public class VisuHandler : MonoBehaviour
     [SerializeField] private string _note = "VisuHandler: has to be placed on a blueprint construction";
     //[Header("VisuHandler: has to be placed on a blueprint construction")]
     //Half of the box check dimension
-    [Header("Half of the box check dimension")]
+    [Header("Box check dimension")]
     [SerializeField] private float checkX = 0;
     [SerializeField] private float checkY = 0;
     [SerializeField] private float checkZ = 0;
@@ -26,19 +26,16 @@ public class VisuHandler : MonoBehaviour
     private bool hadValidSpace = true;
     private IEnumerator updateColorCor;
 
-    //Path for the construction created with this blueprint (from Resources)
-    [Header("Path for the construction created with this blueprint (from Resources)")]
-    [SerializeField] private string path;
 
     //Init
     private void Awake()
     {
         invaderColliders = new List<Collider>();
         halfDir = new Vector3(checkX/2, checkY/2, checkZ/2);
+        originLayer = gameObject.layer;
     }
     private void Start()
     {
-        originLayer = gameObject.layer;
         renderers = GetComponentsInChildren<Renderer>();
         Material[] materials = new Material[renderers.Length];
         for (int i = 0; i < renderers.Length; i++)
@@ -106,12 +103,11 @@ public class VisuHandler : MonoBehaviour
     }
 
     //Entree et sortie de la visualisation
-    public void StartVisualisation()
+    public void StartVisualisation() //CALLED BEFORE START WHEN BUILDING
     {
         //Things to do when settings the blueprint
-
         gameObject.layer = 2; //Set layer to Ignore Raycast
-        GetComponent<NavMeshObstacle>().enabled = false;
+        GetComponent<Collider>().enabled = false;
         foreach (Collider coll in GetComponentsInChildren<Collider>()) coll.enabled = false;
     }
     public void EndVisualisation()
@@ -119,9 +115,9 @@ public class VisuHandler : MonoBehaviour
         //Things to do when placing the blueprint (NB: it has to return to the Start state)
         StopCoroutine(updateColorCor);
         ChangeMatColor(validMat);
-
+        Debug.Log("EndVisualisation: setting layer to " + originLayer);
         gameObject.layer = originLayer; //Set layer to layer before it was changed
-        GetComponent<NavMeshObstacle>().enabled = true;
+        GetComponent<Collider>().enabled = true;
         foreach (Collider coll in GetComponentsInChildren<Collider>()) coll.enabled = true;
     }
 
@@ -131,15 +127,5 @@ public class VisuHandler : MonoBehaviour
         Vector3 center = new Vector3(transform.position.x, transform.position.y + checkY/2 + 0.5f, transform.position.z);
         Collider[] colls = Physics.OverlapBox(center, halfDir, transform.rotation);
         return colls.Length == 0;
-    }
-
-    //RealGo
-    public void Construct()
-    {
-        //Crée un nouveau prop
-        GameObject.Find("eCentralManager").
-            GetComponent<PropManager>().
-            PlaceProp(transform.position, transform.rotation.eulerAngles.y, path);
-        GetComponent<PropHandler>().DestroySelf();
     }
 }
