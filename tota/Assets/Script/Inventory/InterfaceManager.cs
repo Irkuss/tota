@@ -14,6 +14,12 @@ public class InterfaceManager : MonoBehaviour
     [SerializeField] private GameObject _stats = null;
     [SerializeField] private GameObject _textPref = null;
 
+    [SerializeField] private Sprite _head = null;
+    [SerializeField] private Sprite _torso = null;
+    [SerializeField] private Sprite _fistL = null;
+    [SerializeField] private Sprite _fistR = null;
+    [SerializeField] private Sprite _leg = null;
+
     private GameObject _recipe;
 
     //public GameObject tooltip => _tooltip;
@@ -74,6 +80,13 @@ public class InterfaceManager : MonoBehaviour
             child.GetChild(1).gameObject.SetActive(false);
             child.GetChild(2).gameObject.SetActive(false);
         }
+
+        _equipment.transform.GetChild(0).GetChild(0).GetComponent<Image>().sprite = _head;
+        _equipment.transform.GetChild(1).GetChild(0).GetComponent<Image>().sprite = _torso;
+        _equipment.transform.GetChild(2).GetChild(0).GetComponent<Image>().sprite = _torso;
+        _equipment.transform.GetChild(3).GetChild(0).GetComponent<Image>().sprite = _fistL;
+        _equipment.transform.GetChild(4).GetChild(0).GetComponent<Image>().sprite = _fistR;
+        _equipment.transform.GetChild(5).GetChild(0).GetComponent<Image>().sprite = _leg;
     }
 
     private void Active(GameObject obj)
@@ -94,7 +107,7 @@ public class InterfaceManager : MonoBehaviour
         else
         {
             GameObject head = _equipment.transform.GetChild(0).gameObject;
-            head.transform.GetChild(0).GetComponent<Image>().sprite = null;
+            head.transform.GetChild(0).GetComponent<Image>().sprite = _head;
             head.transform.GetChild(0).GetComponent<Button>().onClick.RemoveAllListeners();
             head.transform.GetChild(4).GetChild(0).GetComponent<Text>().text = "";
             head.transform.GetChild(5).GetComponent<Button>().onClick.RemoveAllListeners();
@@ -111,7 +124,7 @@ public class InterfaceManager : MonoBehaviour
         else
         {
             GameObject torso = _equipment.transform.GetChild(1).gameObject;
-            torso.transform.GetChild(0).GetComponent<Image>().sprite = null;
+            torso.transform.GetChild(0).GetComponent<Image>().sprite = _torso;
             torso.transform.GetChild(0).GetComponent<Button>().onClick.RemoveAllListeners();
             torso.transform.GetChild(4).GetChild(0).GetComponent<Text>().text = "";
             torso.transform.GetChild(5).GetComponent<Button>().onClick.RemoveAllListeners();
@@ -128,7 +141,7 @@ public class InterfaceManager : MonoBehaviour
         else
         {
             GameObject torso = _equipment.transform.GetChild(2).gameObject;
-            torso.transform.GetChild(0).GetComponent<Image>().sprite = null;
+            torso.transform.GetChild(0).GetComponent<Image>().sprite = _torso;
             torso.transform.GetChild(0).GetComponent<Button>().onClick.RemoveAllListeners();
             torso.transform.GetChild(4).GetChild(0).GetComponent<Text>().text = "";
             torso.transform.GetChild(5).GetComponent<Button>().onClick.RemoveAllListeners();
@@ -145,7 +158,7 @@ public class InterfaceManager : MonoBehaviour
         else
         {
             GameObject leg = _equipment.transform.GetChild(5).gameObject;
-            leg.transform.GetChild(0).GetComponent<Image>().sprite = null;
+            leg.transform.GetChild(0).GetComponent<Image>().sprite = _leg;
             leg.transform.GetChild(0).GetComponent<Button>().onClick.RemoveAllListeners();
             leg.transform.GetChild(4).GetChild(0).GetComponent<Text>().text = "";
             leg.transform.GetChild(5).GetComponent<Button>().onClick.RemoveAllListeners();
@@ -162,7 +175,7 @@ public class InterfaceManager : MonoBehaviour
         else
         {
             GameObject left = _equipment.transform.GetChild(3).gameObject;
-            left.transform.GetChild(0).GetComponent<Image>().sprite = null;
+            left.transform.GetChild(0).GetComponent<Image>().sprite = _fistL;
             left.transform.GetChild(0).GetComponent<Button>().onClick.RemoveAllListeners();
             left.transform.GetChild(4).GetChild(0).GetComponent<Text>().text = "";
             left.transform.GetChild(5).GetComponent<Button>().onClick.RemoveAllListeners();
@@ -189,7 +202,7 @@ public class InterfaceManager : MonoBehaviour
         else
         {
             GameObject right = _equipment.transform.GetChild(4).gameObject;
-            right.transform.GetChild(0).GetComponent<Image>().sprite = null;
+            right.transform.GetChild(0).GetComponent<Image>().sprite = _fistR;
             right.transform.GetChild(0).GetComponent<Button>().onClick.RemoveAllListeners();
             right.transform.GetChild(4).GetChild(0).GetComponent<Text>().text = "";
             right.transform.GetChild(5).GetComponent<Button>().onClick.RemoveAllListeners();
