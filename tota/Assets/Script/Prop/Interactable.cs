@@ -24,7 +24,9 @@ public class Interactable : MonoBehaviour
     public bool[] IsDistanceAction => _isDistanceAction;     // (it often has a complex CheckAvailability counterpart)
     [SerializeField] private bool[] _isDoWhileAction = null; //a do while Action is done until the focus is removed (ex: hunting / following)
     public bool[] IsDoWhileAction => _isDoWhileAction;
-    
+    [SerializeField] private bool[] _makesActionNotAppearWhenUnavailable = null;
+    public bool[] MakesActionNotAppearWhenUnavailable => _makesActionNotAppearWhenUnavailable;
+
     //Interact, has to be overwritten
     public virtual void Interact(CharaHead chara, int actionIndex = 0)
     {

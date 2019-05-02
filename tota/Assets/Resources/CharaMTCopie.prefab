@@ -139,6 +139,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _quirkTable: {fileID: 11400000, guid: b0878f919758b654191e554b8bdfdd22, type: 2}
+  _woundTable: {fileID: 11400000, guid: 94773804f2350ee4eb03d3fa15d73eb5, type: 2}
 --- !u!114 &3140698998155076899
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -450,8 +451,10 @@ MonoBehaviour:
   - Attack with  Melee 2
   - Attack with  Remote 1
   - Attack with  Remote 2
-  _isDistanceAction: 00000101
-  _isDoWhileAction: 00000000
+  - Follow
+  _isDistanceAction: 0000010100
+  _isDoWhileAction: 0000000001
+  _makesActionNotAppearWhenUnavailable: 0101010101
 --- !u!1001 &2111425133669654000
 PrefabInstance:
   m_ObjectHideFlags: 0

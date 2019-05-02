@@ -16,7 +16,7 @@ public class CharaInteract : Interactable
             case 2: AttackWithSlot(chara, 0); break;//remote 0
             case 3: AttackWithSlot(chara, 1); break;//remote 1
             case 4: break; //Follow target
-            default: GetComponent<CharaRpg>().DebugGetRandomDamage((int)CharaRpg.WoundType.Bruise); break;
+            default: GetComponent<CharaRpg>().DebugGetRandomDamage((int)WoundInfo.WoundType.Bruise); break;
         }
     }
 
@@ -28,7 +28,7 @@ public class CharaInteract : Interactable
             case 1: return CheckAttackWithSlot(chara, 1, true);//melee 1
             case 2: return CheckAttackWithSlot(chara, 0, false);//remote 0
             case 3: return CheckAttackWithSlot(chara, 1, false);//remote 1
-            case 4: return true; //Follow
+            case 4: return (chara != GetComponent<CharaHead>()); //Follow
         }
         return false;
     }
@@ -87,6 +87,8 @@ public class CharaInteract : Interactable
     }
     public bool CheckAttackWithSlot(CharaHead chara, int slot, bool isMelee)
     {
+        if (chara == GetComponent<CharaHead>()) return false;
+
         Equipable weapon = chara.GetComponent<CharaInventory>().equipments[slot];
         if (weapon != null)
         {

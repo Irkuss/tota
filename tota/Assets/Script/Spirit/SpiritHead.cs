@@ -444,20 +444,23 @@ public class SpiritHead : Photon.MonoBehaviour
         _actions.transform.position = _spiritCamera.GetComponent<Camera>().WorldToScreenPoint(vec);
 
         _actions.SetActive(true);
-        int i = 0;
-        foreach(var action in inter.PossibleActionNames)
-        { 
-            GameObject act = Instantiate(_button, _actions.transform.GetChild(0).GetChild(0));
-            act.transform.GetChild(0).GetComponent<Text>().text = inter.PossibleActionNames[i];
+        for (int i = 0; i < inter.PossibleActionNames.Length; i++)
+        {
+            bool isAvailable = IsActionIndexAvailableByAll(inter, i);
 
-            act.GetComponent<Button>().onClick.AddListener(() => Act(inter, act.transform.GetChild(0).GetComponent<Text>().text));
-
-            if (!IsActionIndexAvailableByAll(inter,i))
+            if (isAvailable || !inter.MakesActionNotAppearWhenUnavailable[i])
             {
-                act.GetComponent<Image>().color = Color.grey;
-                act.GetComponent<Button>().interactable = false;
+                GameObject act = Instantiate(_button, _actions.transform.GetChild(0).GetChild(0));
+                act.transform.GetChild(0).GetComponent<Text>().text = inter.PossibleActionNames[i];
+
+                act.GetComponent<Button>().onClick.AddListener(() => Act(inter, act.transform.GetChild(0).GetComponent<Text>().text));
+
+                if (!isAvailable)
+                {
+                    act.GetComponent<Image>().color = Color.grey;
+                    act.GetComponent<Button>().interactable = false;
+                }
             }
-            i += 1;
         }
 
     }
