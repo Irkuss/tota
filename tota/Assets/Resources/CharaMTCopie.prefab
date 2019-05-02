@@ -87,6 +87,9 @@ MonoBehaviour:
   _movement: {fileID: 247426329935115716}
   _permissions: {fileID: 7769216232444261954}
   _outline: {fileID: 8060226554219029762}
+  _aiActivationLayer:
+    serializedVersion: 2
+    m_Bits: 4096
 --- !u!114 &247426329935115716
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -452,9 +455,11 @@ MonoBehaviour:
   - Attack with  Remote 1
   - Attack with  Remote 2
   - Follow
-  _isDistanceAction: 0000010100
-  _isDoWhileAction: 0000000001
-  _makesActionNotAppearWhenUnavailable: 0101010101
+  - Amputate infected parts
+  - Treat Bleeding wounds
+  _isDistanceAction: 00000101000000
+  _isDoWhileAction: 00000000010000
+  _makesActionNotAppearWhenUnavailable: 01010101010100
 --- !u!1001 &2111425133669654000
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -462,16 +467,6 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 9180920927353207022}
     m_Modifications:
-    - target: {fileID: 868892114768916745, guid: bd5c9227a10775145b4f509aa7a17bdf,
-        type: 3}
-      propertyPath: m_Name
-      value: Actions
-      objectReference: {fileID: 0}
-    - target: {fileID: 868892114768916745, guid: bd5c9227a10775145b4f509aa7a17bdf,
-        type: 3}
-      propertyPath: m_Layer
-      value: 11
-      objectReference: {fileID: 0}
     - target: {fileID: 776958892168255387, guid: bd5c9227a10775145b4f509aa7a17bdf,
         type: 3}
       propertyPath: m_LocalPosition.x
@@ -587,6 +582,16 @@ PrefabInstance:
       propertyPath: m_LocalScale.x
       value: 1
       objectReference: {fileID: 0}
+    - target: {fileID: 868892114768916745, guid: bd5c9227a10775145b4f509aa7a17bdf,
+        type: 3}
+      propertyPath: m_Name
+      value: Actions
+      objectReference: {fileID: 0}
+    - target: {fileID: 868892114768916745, guid: bd5c9227a10775145b4f509aa7a17bdf,
+        type: 3}
+      propertyPath: m_Layer
+      value: 11
+      objectReference: {fileID: 0}
     - target: {fileID: 5193689017522062421, guid: bd5c9227a10775145b4f509aa7a17bdf,
         type: 3}
       propertyPath: m_IsActive
@@ -672,22 +677,6 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 9180920927353207022}
     m_Modifications:
-    - target: {fileID: 100050, guid: a190c6110b1c4b94aafb2395cfc74db5, type: 3}
-      propertyPath: m_Name
-      value: testperso4
-      objectReference: {fileID: 0}
-    - target: {fileID: 100050, guid: a190c6110b1c4b94aafb2395cfc74db5, type: 3}
-      propertyPath: m_Layer
-      value: 11
-      objectReference: {fileID: 0}
-    - target: {fileID: 100004, guid: a190c6110b1c4b94aafb2395cfc74db5, type: 3}
-      propertyPath: m_Layer
-      value: 11
-      objectReference: {fileID: 0}
-    - target: {fileID: 100052, guid: a190c6110b1c4b94aafb2395cfc74db5, type: 3}
-      propertyPath: m_Layer
-      value: 11
-      objectReference: {fileID: 0}
     - target: {fileID: 400050, guid: a190c6110b1c4b94aafb2395cfc74db5, type: 3}
       propertyPath: m_LocalPosition.x
       value: 0
@@ -743,6 +732,22 @@ PrefabInstance:
     - target: {fileID: 400050, guid: a190c6110b1c4b94aafb2395cfc74db5, type: 3}
       propertyPath: m_LocalScale.z
       value: 3.5
+      objectReference: {fileID: 0}
+    - target: {fileID: 100050, guid: a190c6110b1c4b94aafb2395cfc74db5, type: 3}
+      propertyPath: m_Name
+      value: testperso4
+      objectReference: {fileID: 0}
+    - target: {fileID: 100050, guid: a190c6110b1c4b94aafb2395cfc74db5, type: 3}
+      propertyPath: m_Layer
+      value: 11
+      objectReference: {fileID: 0}
+    - target: {fileID: 100004, guid: a190c6110b1c4b94aafb2395cfc74db5, type: 3}
+      propertyPath: m_Layer
+      value: 11
+      objectReference: {fileID: 0}
+    - target: {fileID: 100052, guid: a190c6110b1c4b94aafb2395cfc74db5, type: 3}
+      propertyPath: m_Layer
+      value: 11
       objectReference: {fileID: 0}
     - target: {fileID: 100044, guid: a190c6110b1c4b94aafb2395cfc74db5, type: 3}
       propertyPath: m_Layer

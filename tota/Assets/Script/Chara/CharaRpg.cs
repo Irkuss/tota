@@ -481,6 +481,29 @@ public class CharaRpg : MonoBehaviour
             }
             return false;
         }
+        public int GetCountWoundsOfType(WoundInfo.WoundType type)
+        {
+            int count = 0;
+            foreach (Wound wound in wounds)
+            {
+                if (wound.type == type)
+                {
+                    count++;
+                }
+            }
+            return count;
+        }
+        public bool HasWoundsOfType(WoundInfo.WoundType type)
+        {
+            foreach (Wound wound in wounds)
+            {
+                if (wound.type == type)
+                {
+                    return true;
+                }
+            }
+            return false;
+        }
         public float GetMaxInfection()
         {
             float maxInfectionLevel = 0f;
@@ -808,7 +831,7 @@ public class CharaRpg : MonoBehaviour
         SendAddWound((int)wound.type, wound.damage, bodyPartName, wound.origin, wound.deathInfectionIncrement);
     }
 
-    public void SendAddWound(int woundType, int initialDamage, string bodyPartName, string origin, float infectionIncrement = 0)
+    private void SendAddWound(int woundType, int initialDamage, string bodyPartName, string origin, float infectionIncrement = 0)
     {
         GetComponent<CharaConnect>().SendMsg(
             CharaConnect.CharaCommand.ReceiveAddWound,
@@ -837,6 +860,28 @@ public class CharaRpg : MonoBehaviour
         UpdateInterfaceHealth();
     }
     //Treatment
+    public int GetCountWoundsOfType(WoundInfo.WoundType type)
+    {
+        int count = 0;
+        foreach (BodyPart bodyPart in _bodyParts)
+        {
+            count += bodyPart.GetCountWoundsOfType(type);
+        }
+        return count;
+    }
+    public bool HasWoundOfType(WoundInfo.WoundType type)
+    {
+        foreach (BodyPart bodyPart in _bodyParts)
+        {
+            Debug.Log("HasWoundOfType: Checking " + bodyPart.name);
+            if(bodyPart.HasWoundsOfType(type))
+            {
+                Debug.Log("HasWoundOfType: found wounds of type in " + bodyPart.name);
+                return true;
+            }
+        }
+        return false;
+    }
     public void TreatAllWoundsOfType(WoundInfo.WoundType type)
     {
         foreach(BodyPart bodyPart in _bodyParts)
@@ -844,6 +889,17 @@ public class CharaRpg : MonoBehaviour
             bodyPart.TreatAllWoundsOfType(type);
         }
         UpdateHealthStatus();
+    }
+    public bool IsInfected()
+    {
+        foreach (BodyPart bodyPart in _bodyParts)
+        {
+            if (bodyPart.CheckIfInfected())
+            {
+                return true;
+            }
+        }
+        return false;
     }
     public void AmputateEveryInfectedPart()
     {
@@ -957,7 +1013,7 @@ public class CharaRpg : MonoBehaviour
             debug += s;
         }
         if (debug == "") debug = " healthy!";
-        Debug.Log("DebugWounds: " + debug);
+        //Debug.Log("DebugWounds: " + debug);
     }
     public void UpdateInterfaceHealth()
     {
@@ -972,6 +1028,7 @@ public class CharaRpg : MonoBehaviour
     //Action
     public bool Eat(int food)
     {
+        //Called by food item when clicking in charainventory
         if (_hunger > 0)
         {
             _hunger -= food;
@@ -982,10 +1039,6 @@ public class CharaRpg : MonoBehaviour
             return true;
         }
         return false;
-    }
-    public void UseItem()
-    {
-
     }
 
     //ToolTip
