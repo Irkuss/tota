@@ -469,14 +469,20 @@ public class SpiritHead : Photon.MonoBehaviour
         {
             actions.Add(s);
         }
-
         int i = actions.IndexOf(action);
+
+
         IndexActionHandler(inter, i);
         foreach (Transform child in _actions.transform.GetChild(0).GetChild(0))
         {
             Destroy(child.gameObject);
         }
         _actions.SetActive(false);
+    }
+
+    private IEnumerator WaitAction(Interactable inter)
+    {
+        yield return new WaitForSeconds(5);
     }
 
 

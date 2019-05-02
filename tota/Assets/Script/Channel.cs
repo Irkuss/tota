@@ -56,7 +56,7 @@ public class Channel : MonoBehaviour
         {
             for (int i = 1; i < args.Length; i++)
             {
-                output += args[i];
+                output += " " + args[i];
             }
             gameObject.GetComponent<PhotonView>().RPC("SendReceiveM", PhotonTargets.AllBuffered, output, true, _player.Name);
 
@@ -65,7 +65,7 @@ public class Channel : MonoBehaviour
         {
             for (int i = 1; i < args.Length; i++)
             {
-                output += args[i];
+                output += " " + args[i];
             }
             gameObject.GetComponent<PhotonView>().RPC("SendReceiveM", PhotonTargets.AllBuffered, output, false, _player.Name);
         }
