@@ -29,6 +29,13 @@ public class CharaHead : Photon.PunBehaviour
         _permManager = PermissionsManager.Instance;
     }
 
+    private void Update()
+    {
+        Image fill = GameObject.Find("eCentralManager").GetComponent<CentralManager>().Fill;
+        Vector3 vec = new Vector3(gameObject.transform.position.x, 3, gameObject.transform.position.z);
+        fill.gameObject.transform.position = SpiritZoom.cam.WorldToScreenPoint(vec);
+    }
+
     //Clic Gauche
 
     public bool LeftClickedOn(PermissionsManager.Player playerWhoClickedUs)
@@ -165,6 +172,8 @@ public class CharaHead : Photon.PunBehaviour
 
     private IEnumerator CheckDistanceInter(int actionIndex)
     {
+        Image fill = GameObject.Find("eCentralManager").GetComponent<CentralManager>().Fill;
+
         while (Vector3.Distance(transform.position, _focus.InterTransform.position) > _focus.Radius * 0.8f)
         {
             if(_focus.isMoving) _movement.MoveToInter(_focus); //Update les positions si on sait qu'il bouge
@@ -172,12 +181,20 @@ public class CharaHead : Photon.PunBehaviour
         }
         Debug.Log("CharaHead: reached Inter");
         //Interragis avec l'Interactable une fois proche
-
-        /* Dois attendre inter.GetActionTime(this, actionIndex)
-         * 
-         * A IMPLEMENTER
-         * 
-         */
+        
+        fill.gameObject.SetActive(true);
+        yield return new WaitForSeconds(_focus.GetActionTime(this,actionIndex));
+        fill.fillAmount = 0.2f;
+        yield return new WaitForSeconds(_focus.GetActionTime(this, actionIndex));
+        fill.fillAmount = 0.4f;
+        yield return new WaitForSeconds(_focus.GetActionTime(this, actionIndex));
+        fill.fillAmount = 0.6f;
+        yield return new WaitForSeconds(_focus.GetActionTime(this, actionIndex));
+        fill.fillAmount = 0.8f;
+        yield return new WaitForSeconds(_focus.GetActionTime(this, actionIndex));
+        fill.fillAmount = 1;
+        yield return new WaitForSeconds(0.5f);
+        fill.gameObject.SetActive(false);
 
 
         //Interragis

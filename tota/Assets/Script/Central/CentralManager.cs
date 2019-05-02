@@ -20,9 +20,10 @@ public class CentralManager : Photon.MonoBehaviour
     public GameObject toolTip;
     public GameObject pauseMenu;
     [SerializeField] private GameObject _charaRef = null;
-    [SerializeField] private GameObject _options = null;
+    [SerializeField] private GameObject _options = null;    
 
     public static bool isPause = false;
+    private bool online;
 
     private PermissionsManager permi;
     private PermissionsManager.Team team = null;
@@ -51,6 +52,9 @@ public class CentralManager : Photon.MonoBehaviour
     [SerializeField] private GameObject _button = null;
     public GameObject Button { get { return _button; } }
 
+    [SerializeField] private Image _fill = null;
+    public Image Fill { get { return _fill; } }
+
     public void UpdateToolTip(string[] info,string quirks)
     {
         toolTip.SetActive(true);
@@ -77,13 +81,16 @@ public class CentralManager : Photon.MonoBehaviour
     //Unity Callbacks
     private void Awake()
     {
-        permi = PermissionsManager.Instance;
-        player = permi.GetPlayerWithName(PhotonNetwork.player.NickName);
-        if (player != null)
+        online = Mode.Instance.online;
+        if (online)
         {
-            team = permi.GetTeamWithPlayer(player);
-        }
-        
+            permi = PermissionsManager.Instance;
+            player = permi.GetPlayerWithName(PhotonNetwork.player.NickName);
+            if (player != null)
+            {
+                team = permi.GetTeamWithPlayer(player);
+            }
+        }               
     }
 
     private void Start()
@@ -176,22 +183,11 @@ public class CentralManager : Photon.MonoBehaviour
     {
         Debug.Log("CentralManager: Instantiation de spirit");
 
-        
-        Debug.Log("Teams : ");
-        foreach (var team in permi.TeamList)
-        {
-            Debug.Log(team.Name);
-            foreach (var playr in team.PlayerList)
-            {
-                Debug.Log(playr.Name);
-            }
-        }
-
         //Instantiate the spirit
         GameObject spirit;
         float spawnValue = (generator.SpawnPoint + 0.5f) * Generator.c_worldChunkLength;
         Vector3 spawnPosition = new Vector3(spawnValue, c_cameraStartHeight, spawnValue);
-        if (PhotonNetwork.offlineMode)
+        if (!online || PhotonNetwork.offlineMode)
         {
             spirit = Instantiate(Resources.Load<GameObject>("Spirit"), spawnPosition, Quaternion.identity);
         }
@@ -205,11 +201,22 @@ public class CentralManager : Photon.MonoBehaviour
 
         if (player == null || team == null)
         {
-            teamName = "Team" + permi.GetNumberOfTeams();
-            //Crée une nouvelle équipe avec comme nom "teamName"
-            permi.GetComponent<PhotonView>().RPC("CreateTeam", PhotonTargets.AllBuffered, teamName);
-            //Ajoute un nouveau joueur avec comme nom celui du client //TODO pour l'instant chaque joueur joue tout seul
-            permi.GetComponent<PhotonView>().RPC("AddNewPlayerToTeam", PhotonTargets.AllBuffered, teamName, PhotonNetwork.player.NickName,true);
+            if (!online)
+            {
+                teamName = "MyTeam";
+                permi.CreateTeam(teamName);
+                permi.AddNewPlayerToTeam(teamName, PhotonNetwork.player.NickName, true);
+            }
+            else
+            {
+                teamName = "Team" + permi.GetNumberOfTeams();
+                //Crée une nouvelle équipe avec comme nom "teamName"
+                permi.GetComponent<PhotonView>().RPC("CreateTeam", PhotonTargets.AllBuffered, teamName);
+                //Ajoute un nouveau joueur avec comme nom celui du client //TODO pour l'instant chaque joueur joue tout seul
+                permi.GetComponent<PhotonView>().RPC("AddNewPlayerToTeam", PhotonTargets.AllBuffered, teamName, PhotonNetwork.player.NickName, true);
+                
+            }
+
             //Recupere le Player crée par AddNewPlayerToTeam
             player = permi.GetPlayerWithName(PhotonNetwork.player.NickName);
         }

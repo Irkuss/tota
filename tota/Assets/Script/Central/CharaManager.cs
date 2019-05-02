@@ -21,7 +21,14 @@ public class CharaManager : MonoBehaviour
     public void SpawnChara(Vector3 pos, string teamName, string playerName)
     {
         int[] quirks = GetNewSerializedQuirks();
-        GetComponent<PhotonView>().RPC("RPC_SpawnChara", PhotonTargets.AllBuffered, pos.x, pos.y, pos.z, teamName, quirks, playerName);
+        if (Mode.Instance.online)
+        {
+            GetComponent<PhotonView>().RPC("RPC_SpawnChara", PhotonTargets.AllBuffered, pos.x, pos.y, pos.z, teamName, quirks, playerName);
+        }
+        else
+        {
+            RPC_SpawnChara(pos.x, pos.y, pos.z, teamName, quirks, playerName);
+        }
     }
     [PunRPC] private void RPC_SpawnChara(float x, float y, float z, string teamName, int[] quirks, string playerName)
     {
@@ -84,7 +91,15 @@ public class CharaManager : MonoBehaviour
     //Command
     public void SendMsgTo(GameObject chara, int cc, int[] intArgs, string[] stringArgs, float[] floatArgs)
     {
-        GetComponent<PhotonView>().RPC("RPC_ReceiveMsg", PhotonTargets.AllBuffered, GetIdWithChara(chara), cc, intArgs, stringArgs, floatArgs);
+        if (Mode.Instance.online)
+        {
+            GetComponent<PhotonView>().RPC("RPC_ReceiveMsg", PhotonTargets.AllBuffered, GetIdWithChara(chara), cc, intArgs, stringArgs, floatArgs);
+        }
+        else
+        {
+            RPC_ReceiveMsg(GetIdWithChara(chara), cc, intArgs, stringArgs, floatArgs);
+        }
+        
     }
     [PunRPC] public void RPC_ReceiveMsg(int id, int cc, int[] intArgs, string[] stringArgs, float[] floatArgs)
     {

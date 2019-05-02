@@ -483,11 +483,6 @@ public class SpiritHead : Photon.MonoBehaviour
         _actions.SetActive(false);
     }
 
-    private IEnumerator WaitAction(Interactable inter)
-    {
-        yield return new WaitForSeconds(5);
-    }
-
 
     public bool IsActionIndexAvailableByAll(Interactable inter, int actionIndex)
     {
@@ -574,7 +569,7 @@ public class SpiritHead : Photon.MonoBehaviour
 
     private void DisplayChannel()
     {
-        if (Input.GetKeyDown(KeyCode.C))
+        if (Mode.Instance.online && Input.GetKeyDown(KeyCode.C))
         {
             _channel.SetActive(!_channel.activeSelf);
         }
