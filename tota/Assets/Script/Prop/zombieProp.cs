@@ -22,7 +22,11 @@ public class zombieProp : MonoBehaviour
             {
                 Quaternion angle = Quaternion.Euler(0, Random.Range(0,360), 0);
 
-                PhotonNetwork.Instantiate(path, transform.position, angle, 0);
+                if(Mode.Instance.online) PhotonNetwork.Instantiate(path, transform.position, angle, 0);
+                else
+                {
+                    Instantiate(Resources.Load<GameObject>(path), transform.position, angle);
+                }
             }
         }
     }

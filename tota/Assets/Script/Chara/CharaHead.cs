@@ -19,10 +19,19 @@ public class CharaHead : Photon.PunBehaviour
     private GameObject _eManager;
     private PermissionsManager _permManager;
 
+    [SerializeField] private GameObject _fill;
+    private GameObject fillObj;
+    private bool needFill;
+
     //Unity Callbacks
     private void Awake()
     {
         _baseStoppingDistance = _movement.navMeshAgent.stoppingDistance;
+        CentralManager central = GameObject.Find("eCentralManager").GetComponent<CentralManager>();
+        GameObject canvas = central.Canvas;
+
+        fillObj = Instantiate(_fill, canvas.transform);
+        fillObj.SetActive(false);
     }
     private void Start()
     {
@@ -63,6 +72,15 @@ public class CharaHead : Photon.PunBehaviour
         // Draw a yellow sphere at the transform's position
         Gizmos.color = Color.yellow;
         Gizmos.DrawWireSphere(transform.position, c_radiusToActivate);
+    }
+
+    private void Update()
+    {
+        if (needFill)
+        {
+            Vector3 vec = new Vector3(gameObject.transform.position.x, 3, gameObject.transform.position.z);
+            fillObj.transform.position = SpiritZoom.cam.WorldToScreenPoint(vec);
+        }
     }
     //Clic Gauche
 
@@ -218,13 +236,8 @@ public class CharaHead : Photon.PunBehaviour
         }
         Debug.Log("CharaHead: reached Inter");
         //Interragis avec l'Interactable une fois proche
-
-        /* Dois attendre inter.GetActionTime(this, actionIndex)
-         * 
-         * A IMPLEMENTER
-         * 
-         */
-
+        float actionTime = _focus.GetActionTime(this, actionIndex);
+        if (actionTime > 0) yield return StartCoroutine(WaitAction(actionTime));
 
         //Interragis
         _focus.Interact(this, actionIndex);
@@ -243,6 +256,26 @@ public class CharaHead : Photon.PunBehaviour
             _movement.StopAgent();
         }
     }
+
+    public IEnumerator WaitAction(float waitingTime)
+    {
+        Image fill = fillObj.GetComponent<Image>();
+        needFill = true;
+        fillObj.SetActive(true);
+
+        float startTime = Time.time;
+        float progressTime = Time.time - startTime;
+        while(progressTime < waitingTime)
+        {
+            yield return null;
+            fill.fillAmount = progressTime / waitingTime;
+            progressTime = Time.time - startTime;
+        }                   
+        
+        fillObj.SetActive(false);
+        fill.fillAmount = 0;
+        needFill = false;
+    } 
 
     public bool TryAddItemToFurniture(Item item)
     {
