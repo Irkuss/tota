@@ -73,6 +73,11 @@ public class InterfaceManager : MonoBehaviour
         }
     }
 
+    public void ForceOpenCraft(int index)
+    {
+        GameObject parent = _craft.transform.parent.gameObject;
+    }
+
     public void InstantiateEquipment()
     {
         foreach(Transform child in _equipment.transform)
@@ -231,6 +236,7 @@ public class InterfaceManager : MonoBehaviour
         _stats.transform.GetChild(0).GetComponent<Text>().text = "Pain : " + (int)(stats[0] * 100) + " %";
         _stats.transform.GetChild(1).GetComponent<Text>().text = "Consciousness : " + (int)(stats[1] * 100) + " %";
         _stats.transform.GetChild(2).GetComponent<Text>().text = "Movement : " + (int)(stats[2] * 100) + " %";
-        _stats.transform.GetChild(3).GetComponent<Text>().text = "BloodStock : " + (stats[3] * 100) / stats[4] + " %";
+        _stats.transform.GetChild(3).GetComponent<Text>().text = "Manipulation : " + (int)(stats[3] * 100) + " %";
+        _stats.transform.GetChild(4).GetComponent<Text>().text = "BloodStock : " + (stats[4] * 100) / stats[5] + " %";
     }
 }

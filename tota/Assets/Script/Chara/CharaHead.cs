@@ -89,7 +89,7 @@ public class CharaHead : Photon.PunBehaviour
         //LeftClickedOn renvoie true, si le Spirit a réussi a slectionné Chara, false sinon
         //NB: Il renvoie aussi false lors de la deselection
 
-        if (playerWhoClickedUs == null) return false;
+        if (playerWhoClickedUs == null || gameObject.GetComponent<CharaRpg>().IsDead) return false;
 
         //Debug.Log("Chara: I have been clicked by "+ playerWhoClickedUs.Name);
 
