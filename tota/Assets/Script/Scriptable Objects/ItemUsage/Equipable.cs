@@ -60,6 +60,8 @@ public class Equipable : Item
         //    return true
         //return false;
 
+        refInventChara.GetComponent<CharaHead>().CallCoroutine(useTime);
+
         CharaInventory inv = refInventChara.GetComponent<CharaInventory>();
 
         if(equipSpace == EquipSpace.OneHanded)

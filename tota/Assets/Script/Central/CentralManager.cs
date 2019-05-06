@@ -263,11 +263,15 @@ public class CentralManager : Photon.MonoBehaviour
                     quirks[j] = int.Parse(quirkS[j]);
                 }
 
-                gameObject.GetComponent<CharaManager>().RPC_SpawnChara(pos.x,pos.y,pos.z,teamName,quirks,playerName);
+                GameObject chara = gameObject.GetComponent<CharaManager>().RPC_SpawnChara(pos.x,pos.y,pos.z,teamName,quirks,playerName);
+                CharaRpg rpg = chara.GetComponent<CharaRpg>();
+                CharaInventory inventory = chara.GetComponent<CharaInventory>();
 
-                string name = reader.ReadLine();
+                string[] name = reader.ReadLine().Split(' ');
+                rpg.SetIdentity(name[0], name[1]);
 
                 string[] healthStats = reader.ReadLine().Split('/');
+                rpg.SetStats(healthStats);
 
                 string[] info = reader.ReadLine().Split('/');
                 string[] skills = reader.ReadLine().Split('/');
@@ -280,8 +284,28 @@ public class CentralManager : Photon.MonoBehaviour
                     int value = int.Parse(items[1]);
                 }
 
+
                 string[] wearables = reader.ReadLine().Split('/');
-                string[] equipments = reader.ReadLine().Split('/');         
+                for(int k = 0; k < wearables.Length; k++)
+                {
+                    Item item = inventory.ItemTable.GetItemWithName(wearables[k]);
+
+                    if (item != null && (Wearable) item != null)
+                    {
+                        inventory.wearables[k] = (Wearable) item;
+                    }
+                }
+
+                string[] equipments = reader.ReadLine().Split('/');
+                for (int m = 0; m < equipments.Length; m++)
+                {
+                    Item item = inventory.ItemTable.GetItemWithName(wearables[m]);
+
+                    if (item != null && (Equipable)item != null)
+                    {
+                        inventory.equipments[m] = (Equipable)item;
+                    }
+                }
             }
 
         }

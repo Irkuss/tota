@@ -21,6 +21,12 @@ public class CharaRpg : MonoBehaviour
     //Age
     private int _age;
 
+    public void SetIdentity(string first, string last)
+    {
+        _nameFirst = first;
+        _nameLast = last;
+    }
+
     //Character
     //Stats
     public enum Stat
@@ -251,6 +257,7 @@ public class CharaRpg : MonoBehaviour
     //Status
     private bool _isInShock = false;
     private bool _isDead = false;
+    public bool IsDead { get { return _isDead; } }
     //Bodyparts
     private List<BodyPart> _bodyParts;
     //body temperature
@@ -652,14 +659,24 @@ public class CharaRpg : MonoBehaviour
 
     public float[] UpdateStats()
     {
-        return new float[5]
+        return new float[6]
         {
             _pain,
             _consciousness,
             _movement,
+            _manipulation,
             bloodStock,
             maxBloodStock
         };
+    }
+
+    public void SetStats(string[] stats)
+    {
+        _pain = float.Parse(stats[0]);
+        _consciousness = float.Parse(stats[1]);
+        _movement = float.Parse(stats[2]);
+        _manipulation = float.Parse(stats[3]);
+        bloodStock = int.Parse(stats[4]);
     }
 
     private bool CheckDeath()
@@ -811,6 +828,7 @@ public class CharaRpg : MonoBehaviour
         _isDead = true;
         _movement = 0;
         //Chara dies
+        PermissionsManager.Instance.spirit.CharaDie(gameObject);
         Debug.Log("======================= CharaRpg: " + NameFull + " has died =======================");
     }
     public void DieZombie()

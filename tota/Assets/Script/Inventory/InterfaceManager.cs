@@ -7,7 +7,6 @@ public class InterfaceManager : MonoBehaviour
 {
     [SerializeField] private GameObject _craft = null;
     [SerializeField] private GameObject _slot = null;
-    //[SerializeField] private GameObject _tooltip = null;
     [SerializeField] private RecipeTable _data = null;
     [SerializeField] private GameObject _equipment = null;
     [SerializeField] private GameObject _injuries = null;
@@ -49,6 +48,7 @@ public class InterfaceManager : MonoBehaviour
         }
         else
         {
+            StartCoroutine(charaInventory.gameObject.GetComponent<CharaHead>().WaitAction(recipe.recipeTime));
             recipe.CraftWith(charaInventory);
         }
     }
@@ -71,6 +71,11 @@ public class InterfaceManager : MonoBehaviour
             }
             i++;
         }
+    }
+
+    public void ForceOpenCraft(int index)
+    {
+        GameObject parent = _craft.transform.parent.gameObject;
     }
 
     public void InstantiateEquipment()
@@ -231,6 +236,7 @@ public class InterfaceManager : MonoBehaviour
         _stats.transform.GetChild(0).GetComponent<Text>().text = "Pain : " + (int)(stats[0] * 100) + " %";
         _stats.transform.GetChild(1).GetComponent<Text>().text = "Consciousness : " + (int)(stats[1] * 100) + " %";
         _stats.transform.GetChild(2).GetComponent<Text>().text = "Movement : " + (int)(stats[2] * 100) + " %";
-        _stats.transform.GetChild(3).GetComponent<Text>().text = "BloodStock : " + (stats[3] * 100) / stats[4] + " %";
+        _stats.transform.GetChild(3).GetComponent<Text>().text = "Manipulation : " + (int)(stats[3] * 100) + " %";
+        _stats.transform.GetChild(4).GetComponent<Text>().text = "BloodStock : " + (stats[4] * 100) / stats[5] + " %";
     }
 }
