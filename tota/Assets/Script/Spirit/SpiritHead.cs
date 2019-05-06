@@ -90,9 +90,6 @@ public class SpiritHead : Photon.MonoBehaviour
         //Keycode.I check
         TestInventoryAdd();
 
-        //Keycode.O check
-        TestCraftBigApple();
-
         TestBuildInput();
     }
 
@@ -145,27 +142,6 @@ public class SpiritHead : Photon.MonoBehaviour
             foreach (GameObject Chara in _selectedList)
             {
                 Chara.GetComponent<CharaInventory>().Add(item);
-            }
-        }
-    }
-    private void TestCraftBigApple()
-    {
-        if (Input.GetKeyDown(KeyCode.O))
-        {
-            foreach (GameObject Chara in _selectedList)
-            {
-                Debug.Log("TestCraftBigApple: Trying to craft bigApple");
-                CharaInventory charaInv = Chara.GetComponent<CharaInventory>();
-                if (bigAppleRecipe.CanBeCraftedWith(charaInv.inventory))
-                {
-                    Debug.Log("TestCraftBigApple: crafted bigApple");
-                    bigAppleRecipe.CraftWith(charaInv);
-                }
-                else
-                {
-                    Debug.Log("TestCraftBigApple: failed to craft bigApple");
-                }
-
             }
         }
     }
@@ -468,6 +444,7 @@ public class SpiritHead : Photon.MonoBehaviour
 
     private void GeneralActionHandler(Interactable inter)
     {
+        if (_selectedList.Count == 0) return; //Do nothing if no charas are selected
         if (inter.PossibleActionNames.Length == 0) return; //Do nothing if no interaction exists
         //Processus de décision l'index d'action
         //Ouvre le dropDown Menu

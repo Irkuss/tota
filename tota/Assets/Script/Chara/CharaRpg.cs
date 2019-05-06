@@ -634,7 +634,7 @@ public class CharaRpg : MonoBehaviour
             bloodStock -= totalBloodLose;
         }
         //Check Death
-        if (CheckDeath()) return;
+        if (_isDead || CheckDeath()) return;
         //Make limb falloff
         CheckFalloff();
         //Update Stats

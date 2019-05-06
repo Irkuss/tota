@@ -88,6 +88,7 @@ GameObject:
   - component: {fileID: 6685989600191636858}
   - component: {fileID: 6685989600191636856}
   - component: {fileID: 6685989600191636859}
+  - component: {fileID: 5662282435531044812}
   m_Layer: 0
   m_Name: Camera
   m_TagString: MainCamera
@@ -140,12 +141,12 @@ Camera:
   m_CullingMask:
     serializedVersion: 2
     m_Bits: 4294967295
-  m_RenderingPath: -1
+  m_RenderingPath: 3
   m_TargetTexture: {fileID: 0}
   m_TargetDisplay: 0
   m_TargetEye: 3
   m_HDR: 1
-  m_AllowMSAA: 1
+  m_AllowMSAA: 0
   m_AllowDynamicResolution: 0
   m_ForceIntoRT: 0
   m_OcclusionCulling: 1
@@ -159,6 +160,19 @@ AudioListener:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 6685989600191636861}
   m_Enabled: 1
+--- !u!114 &5662282435531044812
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6685989600191636861}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ff26db721962cdf4a8edcdfa9a767d2a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  profile: {fileID: 11400000, guid: bfc020c682c143c4b93439e94a455cc9, type: 2}
 --- !u!1 &6685989601875957937
 GameObject:
   m_ObjectHideFlags: 0
@@ -237,9 +251,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9a08f4beeb526944b8c95bf5197c828b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  bigAppleRecipe: {fileID: 11400000, guid: b1cfd2da721f58c468ad8fbf0158d7f0, type: 2}
+  bigAppleRecipe: {fileID: 0}
   itemTable: {fileID: 11400000, guid: 53de43c060c7ffe459db8e15c09cd294, type: 2}
-  _spiritCamera: {fileID: 6685989600191636861}
 --- !u!114 &1365571399
 MonoBehaviour:
   m_ObjectHideFlags: 0
