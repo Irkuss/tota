@@ -232,6 +232,11 @@ public class CharaHead : Photon.PunBehaviour
         needFill = false;
     } 
 
+    public void CallCoroutine(float waitingTime)
+    {
+        StartCoroutine(WaitAction(waitingTime));
+    }
+
     public bool TryAddItemToFurniture(Item item)
     {
         if(_lastInteractedFocus != null)
