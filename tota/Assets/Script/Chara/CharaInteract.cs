@@ -16,7 +16,8 @@ public class CharaInteract : Interactable
             case 2: AttackWithSlot(chara, 0); break;//remote 0
             case 3: AttackWithSlot(chara, 1); break;//remote 1
             case 4: break; //Follow target
-            default: GetComponent<CharaRpg>().DebugGetRandomDamage((int)WoundInfo.WoundType.Bruise); break;
+            case 5: GetComponent<CharaRpg>().AmputateEveryInfectedPart(); break; //Amputate infected parts
+            case 6: GetComponent<CharaRpg>().TreatAllWoundsOfType(WoundInfo.WoundType.Bleeding); break; //Treat Bleeding
         }
     }
 
@@ -29,20 +30,27 @@ public class CharaInteract : Interactable
             case 2: return CheckAttackWithSlot(chara, 0, false);//remote 0
             case 3: return CheckAttackWithSlot(chara, 1, false);//remote 1
             case 4: return (chara != GetComponent<CharaHead>()); //Follow
+            case 5: return
+                    (GetComponent<CharaRpg>().IsInfected()
+                    && (chara.GetComponent<CharaRpg>().GetCurrentStat(CharaRpg.Stat.sk_doctor) >= 2));//Amputate infected parts
+            case 6: return GetComponent<CharaRpg>().HasWoundOfType(WoundInfo.WoundType.Bleeding); break; //Treat Bleeding
         }
         return false;
     }
     public override float GetActionTime(CharaHead chara, int actionIndex = 0)
     {
         CharaInventory inv = chara.GetComponent<CharaInventory>();
-        
+        CharaRpg rpg = chara.GetComponent<CharaRpg>();
+
         switch (actionIndex)
         {
-            case 0: return inv.equipments[0].attackSpeedModifier;//melee 0
-            case 1: return inv.equipments[1].attackSpeedModifier;//melee 1
-            case 2: return inv.equipments[0].attackSpeedModifier;//remote 0
-            case 3: return inv.equipments[1].attackSpeedModifier;//remote 1
+            case 0: return inv.equipments[0].attackSpeedModifier * rpg.GetTimeModifier(CharaRpg.Stat.ms_strength);//melee 0
+            case 1: return inv.equipments[1].attackSpeedModifier * rpg.GetTimeModifier(CharaRpg.Stat.ms_strength);//melee 1
+            case 2: return inv.equipments[0].attackSpeedModifier * rpg.GetTimeModifier(CharaRpg.Stat.sk_marksman);//remote 0
+            case 3: return inv.equipments[1].attackSpeedModifier * rpg.GetTimeModifier(CharaRpg.Stat.sk_marksman);//remote 1
             case 4: return 0f; //Follow
+            case 5: return 10 * rpg.GetTimeModifier(CharaRpg.Stat.sk_doctor); //Amputate infected parts
+            case 6: return GetComponent<CharaRpg>().GetCountWoundsOfType(WoundInfo.WoundType.Bleeding) * 2 * rpg.GetTimeModifier(CharaRpg.Stat.sk_doctor); //Treat Bleeding
         }
         return 0f;
     }

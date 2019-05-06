@@ -457,22 +457,8 @@ public class Generator : MonoBehaviour
             ConnectAllBetween(nodePoiSW, nodePoiSE, nodePoiNE, nodePoiNW);
             ConnectAllBetween(north, east, south, west);
             //Random extend some roads of 1 or 2 to a direction they are not open
-            List<RoadNode> roadToExtend = new List<RoadNode>();
-            //Choose roads to extends
-            RoadNode roadTemp;
-            for (int y = 0; y < c_districtInWorldChunk; y++)
-            {
-                for (int x = 0; x < c_districtInWorldChunk; x++)
-                {
-                    roadTemp = roadMatrix[x, y];
-                    if (roadTemp.IsRoad() && Random.Range(0, c_randExtendRoad) == 0)
-                    {
-                        roadToExtend.Add(roadTemp);
-                    }
-                }
-            }
-            //Extend chosen roads
-            foreach (RoadNode road in roadToExtend) Extend(road);
+            ExtendRoads();
+            ExtendRoads();
         }
         //Modify Roads Common
         private void InitCard(RoadNode nodeMiddle, ref RoadNode north, ref RoadNode south, ref RoadNode east, ref RoadNode west)
@@ -517,6 +503,25 @@ public class Generator : MonoBehaviour
             return roadMatrix[x, y];
         }
         //Extender
+        private void ExtendRoads()
+        {
+            List<RoadNode> roadToExtend = new List<RoadNode>();
+            //Choose roads to extends
+            RoadNode roadTemp;
+            for (int y = 1; y < c_districtInWorldChunk - 1; y++)
+            {
+                for (int x = 1; x < c_districtInWorldChunk - 1; x++)
+                {
+                    roadTemp = roadMatrix[x, y];
+                    if (roadTemp.IsRoad() && Random.Range(0, c_randExtendRoad) == 0)
+                    {
+                        roadToExtend.Add(roadTemp);
+                    }
+                }
+            }
+            //Extend chosen roads
+            foreach (RoadNode road in roadToExtend) Extend(road);
+        }
         private void Extend(RoadNode road)
         {
             List<RoadNode> validRoadToExtend = new List<RoadNode>();
@@ -1268,10 +1273,10 @@ public class Generator : MonoBehaviour
                 int treeAntiDensity = 200; //The bigger, the lesser tree
                 switch (_biome)
                 {
-                    case WorldBiome.Plain: treeAntiDensity = 300; break;
-                    case WorldBiome.Arid: treeAntiDensity = 400; break;
-                    case WorldBiome.Forest: treeAntiDensity = 100; break;
-                    case WorldBiome.DeepForest: treeAntiDensity = 60; break;
+                    case WorldBiome.Plain: treeAntiDensity = 60; break;
+                    case WorldBiome.Arid: treeAntiDensity = 300; break;
+                    case WorldBiome.Forest: treeAntiDensity = 60; break;
+                    case WorldBiome.DeepForest: treeAntiDensity = 30; break;
                     default: treeAntiDensity = 500; break;
                 }
 
@@ -1555,7 +1560,7 @@ public class Generator : MonoBehaviour
     public const float c_worldChunkLength = c_districtLength * c_districtInWorldChunk; //1008
 
     public const int c_randBigSquare = 5;
-    public const int c_randExtendRoad = 5;
+    public const int c_randExtendRoad = 3;
 
     #region Table
     //Path and directories
@@ -2017,6 +2022,7 @@ public class Generator : MonoBehaviour
         //The truest Start
         //numbers of chunk left to generate (decrements when a chunk finishes to load)
         chunkLeftToLoad = _worldLength * _worldLength;
+        loadingChunkLeftToLoad = chunkLeftToLoad;
         Debug.Log("OnWorldTypeReceived: chunkLeftToLoad " + chunkLeftToLoad);
         //Start the generation of all chunk
         StartCoroutine(LoadAllChunk());
@@ -2024,8 +2030,8 @@ public class Generator : MonoBehaviour
         //Wait for end of generation
         StartCoroutine(OnGenerationEnded());
     }
-
-    private int chunkLeftToLoad;
+    private int loadingChunkLeftToLoad;
+    private int chunkLeftToLoad = -1;
     private bool loadingChunk = false;
     
 
@@ -2136,8 +2142,7 @@ public class Generator : MonoBehaviour
         loadingChunk = false;
     }
 
-
-    //Depre
+    //Ending
     private IEnumerator OnGenerationEnded()
     {
         while (loadingChunk || chunkLeftToLoad > 0) yield return new WaitForSeconds(0.5f);
@@ -2148,4 +2153,15 @@ public class Generator : MonoBehaviour
         cm.PlaceCameraAbove(_spawnPoint, _spawnPoint);
         cm.OnGenerationFinished();
     }
+
+
+    //Getters for loading
+    public float GetCurrentStatus()
+    {
+        if(chunkLeftToLoad < 0) return 0;
+        if (chunkLeftToLoad == 0) return 1;
+        return  (loadingChunkLeftToLoad - chunkLeftToLoad) / (float)loadingChunkLeftToLoad;
+    }
+
+
 }

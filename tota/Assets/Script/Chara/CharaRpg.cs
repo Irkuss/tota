@@ -43,7 +43,7 @@ public class CharaRpg : MonoBehaviour
     }
     public static bool IsMainStat(Stat stat)
     {
-        return (int)stat > 4;
+        return (int)stat < 5;
     }
     public const int c_statNumber = 12; //TO UPDATE WHEN ADDING NEW STATS
     public struct Stats
@@ -179,8 +179,11 @@ public class CharaRpg : MonoBehaviour
     //Getters
     public int GetCurrentStat(Stat stat)
     {
-        //stat*consciousnes+modifier
-        return Stats.GetMultiplyResult(_baseStat, _consciousness).GetStat(stat) + _statModifiers.GetStat(stat);
+        if(IsMainStat(stat))
+        {
+            return Stats.GetMultiplyResult(_baseStat, _consciousness).GetStat(stat) + _statModifiers.GetStat(stat);
+        }
+        return _baseStat.GetStat(stat) + _statModifiers.GetStat(stat);
     }
     public string GetQuirksInfo()
     {
@@ -196,11 +199,13 @@ public class CharaRpg : MonoBehaviour
     public float GetTimeModifier(Stat stat)
     {
         float statValue = GetCurrentStat(stat);
-        
-        if(IsMainStat(stat))
+        Debug.Log("GetTimeModifier: statValue " + statValue);
+        if (IsMainStat(stat))
         {
+            Debug.Log("GetTimeModifier: returning " + (1.75f - statValue * 0.015f));
             return 1.75f - statValue * 0.015f; //0 -> 1.75, 50 -> 1, 100 -> 0.25
         }
+        Debug.Log("GetTimeModifier: returning " + (1f - statValue * 0.75f));
         return 1f - statValue * 0.75f; //0 -> 1, 10 -> 0.25
     }
 
@@ -241,6 +246,7 @@ public class CharaRpg : MonoBehaviour
     private float _tempPain = 0f; //augmenté au moment d'ajouter une blesure, tend vers 0 à chaque Update
     private float _globalPainFactor = 1f;
     private float _manipulation = 1f; //*craft and construction
+    public float Manipulation => _manipulation;
     private float _movement = 1f; //*walk speed, = min(feet1, leg1) + min(feet2, leg2)
     //Status
     private bool _isInShock = false;
@@ -467,6 +473,8 @@ public class CharaRpg : MonoBehaviour
         }
         public float GetFuncPurcent()
         {
+            if(isDestroyed) return 0;
+
             int currHp = maxHp - GetTotalDamage();
             return ((float)currHp) / ((float)maxHp);
         }
@@ -475,6 +483,29 @@ public class CharaRpg : MonoBehaviour
             foreach(Wound wound in wounds)
             {
                 if(wound.deathInfectionLevel > 0)
+                {
+                    return true;
+                }
+            }
+            return false;
+        }
+        public int GetCountWoundsOfType(WoundInfo.WoundType type)
+        {
+            int count = 0;
+            foreach (Wound wound in wounds)
+            {
+                if (wound.type == type)
+                {
+                    count++;
+                }
+            }
+            return count;
+        }
+        public bool HasWoundsOfType(WoundInfo.WoundType type)
+        {
+            foreach (Wound wound in wounds)
+            {
+                if (wound.type == type)
                 {
                     return true;
                 }
@@ -610,6 +641,7 @@ public class CharaRpg : MonoBehaviour
         UpdatePain();
         UpdateConsciousness();
         UpdateMovement();
+        UpdateManipulation();
 
         //Update l'interface santé
         UpdateInterfaceHealth();
@@ -732,12 +764,28 @@ public class CharaRpg : MonoBehaviour
         }
         else
         {
-            _movement = 1 - 0.5f * (2 - _bodyParts[3].GetFuncPurcent() - _bodyParts[4].GetFuncPurcent())
-                      - 0.25f * (2 - _bodyParts[5].GetFuncPurcent() - _bodyParts[6].GetFuncPurcent());
+            _movement = 1 - 0.5f * (2 - _bodyParts[3].GetFuncPurcent() - _bodyParts[4].GetFuncPurcent()) //Mains
+                      - 0.3f * (4 - _bodyParts[7].GetFuncPurcent() //Rigth Shoulder
+                                  - _bodyParts[8].GetFuncPurcent() //Left Shoulder
+                                  - _bodyParts[9].GetFuncPurcent() //Right Arm
+                                  - _bodyParts[10].GetFuncPurcent()); //Left Arm
             if (_movement <= 0) _movement = 0f;
         }
         //Debug.Log("UpdateMovement: movement=" + _movement + ", consciousness=" + _consciousness);
         if (_charaMov != null) _charaMov.ModifyAgentSpeed(_movement * _consciousness);
+    }
+    private void UpdateManipulation()
+    {
+        if (_isDead || _isInShock)
+        {
+            _manipulation = 0f;
+        }
+        else
+        {
+            _manipulation = 1 - 0.5f * (2 - _bodyParts[9].GetFuncPurcent() - _bodyParts[10].GetFuncPurcent())
+                      - 0.25f * (2 - _bodyParts[5].GetFuncPurcent() - _bodyParts[6].GetFuncPurcent());
+            if (_manipulation <= 0) _manipulation = 0f;
+        }
     }
 
     private bool CheckIfInfected()
@@ -808,7 +856,7 @@ public class CharaRpg : MonoBehaviour
         SendAddWound((int)wound.type, wound.damage, bodyPartName, wound.origin, wound.deathInfectionIncrement);
     }
 
-    public void SendAddWound(int woundType, int initialDamage, string bodyPartName, string origin, float infectionIncrement = 0)
+    private void SendAddWound(int woundType, int initialDamage, string bodyPartName, string origin, float infectionIncrement = 0)
     {
         GetComponent<CharaConnect>().SendMsg(
             CharaConnect.CharaCommand.ReceiveAddWound,
@@ -837,6 +885,28 @@ public class CharaRpg : MonoBehaviour
         UpdateInterfaceHealth();
     }
     //Treatment
+    public int GetCountWoundsOfType(WoundInfo.WoundType type)
+    {
+        int count = 0;
+        foreach (BodyPart bodyPart in _bodyParts)
+        {
+            count += bodyPart.GetCountWoundsOfType(type);
+        }
+        return count;
+    }
+    public bool HasWoundOfType(WoundInfo.WoundType type)
+    {
+        foreach (BodyPart bodyPart in _bodyParts)
+        {
+            Debug.Log("HasWoundOfType: Checking " + bodyPart.name);
+            if(bodyPart.HasWoundsOfType(type))
+            {
+                Debug.Log("HasWoundOfType: found wounds of type in " + bodyPart.name);
+                return true;
+            }
+        }
+        return false;
+    }
     public void TreatAllWoundsOfType(WoundInfo.WoundType type)
     {
         foreach(BodyPart bodyPart in _bodyParts)
@@ -844,6 +914,17 @@ public class CharaRpg : MonoBehaviour
             bodyPart.TreatAllWoundsOfType(type);
         }
         UpdateHealthStatus();
+    }
+    public bool IsInfected()
+    {
+        foreach (BodyPart bodyPart in _bodyParts)
+        {
+            if (bodyPart.CheckIfInfected())
+            {
+                return true;
+            }
+        }
+        return false;
     }
     public void AmputateEveryInfectedPart()
     {
@@ -854,6 +935,7 @@ public class CharaRpg : MonoBehaviour
                 bodyPart.ForceFalloff();
             }
         }
+        UpdateHealthStatus();
     }
     //Combat handler
     public void DebugGetRandomDamage(int woundType)
@@ -957,7 +1039,7 @@ public class CharaRpg : MonoBehaviour
             debug += s;
         }
         if (debug == "") debug = " healthy!";
-        Debug.Log("DebugWounds: " + debug);
+        //Debug.Log("DebugWounds: " + debug);
     }
     public void UpdateInterfaceHealth()
     {
@@ -972,6 +1054,7 @@ public class CharaRpg : MonoBehaviour
     //Action
     public bool Eat(int food)
     {
+        //Called by food item when clicking in charainventory
         if (_hunger > 0)
         {
             _hunger -= food;
@@ -982,10 +1065,6 @@ public class CharaRpg : MonoBehaviour
             return true;
         }
         return false;
-    }
-    public void UseItem()
-    {
-
     }
 
     //ToolTip

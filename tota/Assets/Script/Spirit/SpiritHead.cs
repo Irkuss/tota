@@ -68,7 +68,10 @@ public class SpiritHead : Photon.MonoBehaviour
         {
             //Normal Right Left click check
             ClickUpdate();
+            DoubleClickUpdate();
         }
+
+
 
         //Do all test functions
         TestAll();
@@ -268,6 +271,9 @@ public class SpiritHead : Photon.MonoBehaviour
     }
 
     //Clicking and selecting
+    public const float c_doubleClickDelay = 0.5f;
+    private bool _isReadyToDoubleRightClick = false;
+    private float _timeWhenDoubleRightClick;
 
     private void ClickUpdate()
     {
@@ -275,6 +281,17 @@ public class SpiritHead : Photon.MonoBehaviour
         {
             if (Input.GetMouseButtonDown(0)) LeftClickUpdate();
             if (Input.GetMouseButtonDown(1)) RightClickUpdate();
+        }
+    }
+    private void DoubleClickUpdate()
+    {
+        if(_isReadyToDoubleRightClick)
+        {
+            if (Time.time - _timeWhenDoubleRightClick > c_doubleClickDelay)
+            {
+                Debug.Log("DoubleClickUpdate: double right click expired");
+                _isReadyToDoubleRightClick = false;
+            }
         }
     }
 
@@ -348,7 +365,20 @@ public class SpiritHead : Photon.MonoBehaviour
                 }
                 _actions.SetActive(false);
                 RemoveFocusAll();
-                ActionMoveAllTo(hit.point);
+
+                if(!_isReadyToDoubleRightClick)
+                {
+                    //Fait marcher les charas dans le cas ou on click
+                    ActionMoveAllTo(hit.point, false);
+
+                    _isReadyToDoubleRightClick = true;
+                    _timeWhenDoubleRightClick = Time.time;
+                }
+                else
+                {
+                    //Fait courir les charas dans le cas ou on double click droit
+                    ActionMoveAllTo(hit.point, true);
+                }
             }
         }
 
@@ -425,13 +455,13 @@ public class SpiritHead : Photon.MonoBehaviour
 
     //Charas order to selected chara (Right Click action)
 
-    private void ActionMoveAllTo(Vector3 destination)
+    private void ActionMoveAllTo(Vector3 destination, bool isRunning)
     {
         //Deplace tous les charas selectionnés à une position donnée
         float stopDistance = 0.2f + (_selectedList.Count - 1) * 0.4f; //Temporaire
         foreach (GameObject Chara in _selectedList)
         {
-            Chara.GetComponent<CharaHead>().SetDestination(destination);
+            Chara.GetComponent<CharaHead>().SetDestination(destination, isRunning);
             Chara.GetComponent<CharaHead>().SetStopDistance(stopDistance);
         }
     }

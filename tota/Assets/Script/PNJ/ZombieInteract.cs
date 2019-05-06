@@ -4,6 +4,7 @@ using UnityEngine;
 
 public class ZombieInteract : Interactable
 {
+    //Override
     public override void Interact(CharaHead chara, int actionIndex)
     {
         switch (actionIndex)
@@ -25,6 +26,21 @@ public class ZombieInteract : Interactable
             case 3: return CheckAttackWithSlot(chara, 1, false);//remote 1
         }
         return false;
+    }
+    public override float GetActionTime(CharaHead chara, int actionIndex = 0)
+    {
+        CharaInventory inv = chara.GetComponent<CharaInventory>();
+        CharaRpg rpg = chara.GetComponent<CharaRpg>();
+
+        switch (actionIndex)
+        {
+            case 0: return inv.equipments[0].attackSpeedModifier * rpg.GetTimeModifier(CharaRpg.Stat.ms_strength);//melee 0
+            case 1: return inv.equipments[1].attackSpeedModifier * rpg.GetTimeModifier(CharaRpg.Stat.ms_strength);//melee 1
+            case 2: return inv.equipments[0].attackSpeedModifier * rpg.GetTimeModifier(CharaRpg.Stat.sk_marksman);//remote 0
+            case 3: return inv.equipments[1].attackSpeedModifier * rpg.GetTimeModifier(CharaRpg.Stat.sk_marksman);//remote 1
+            case 4: return 0f; //Follow
+        }
+        return 0f;
     }
 
     public void AttackWithSlot(CharaHead chara, int slot)//Get attacked
@@ -72,6 +88,7 @@ public class ZombieInteract : Interactable
             }
             else
             {
+                if (isMelee) return false;
                 //Attack remote
                 float maxRange = weapon.remoteMaxRange;
 
