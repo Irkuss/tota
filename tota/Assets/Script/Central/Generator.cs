@@ -1612,15 +1612,15 @@ public class Generator : MonoBehaviour
     private void Start()
     {
         //Init de worldLength et de spawnpoint
-        //_worldLength = Mode.Instance.online ? (int)PhotonNetwork.room.CustomProperties["heightMap"] : 3;
+        _worldLength = Mode.Instance.online ? (int)PhotonNetwork.room.CustomProperties["heightMap"] : 1;
         //Debug.Log(_worldLength);
-        _worldLength = PermissionsManager.Instance.heightMap;
+        //_worldLength = PermissionsManager.Instance.heightMap;
         _spawnPoint = (_worldLength - 1) / 2;//(milieu de la map dans la matrice), 10 -> (10-1)/2 -> 4, 2 -> (2-1)/2-> 0, 1 -> (1-1)/2 -> 0
         //Tout le monde Initialise la matrice des WorldNode
         _world = new WorldNode[_worldLength, _worldLength];
         InitWorld();
         
-        if (PhotonNetwork.isMasterClient)
+        if (PhotonNetwork.isMasterClient || !Mode.Instance.online)
         {
             Debug.Log("Generator: Starting Init of WorldType as masterClient");
             //Au start le master decide le type des WorldNode
@@ -1971,11 +1971,7 @@ public class Generator : MonoBehaviour
         if (Mode.Instance.online)
         {
             GetComponent<PhotonView>().RPC("MasterSendWorldTypeRPC", PhotonTargets.OthersBuffered, _worldLength, worldTypeData);
-        }
-        else
-        {
-            MasterSendWorldTypeRPC(_worldLength, worldTypeData);
-        }
+        }       
         
     }
     [PunRPC] private void MasterSendWorldTypeRPC(int worldLength, int[] worldTypeData)
@@ -2092,11 +2088,11 @@ public class Generator : MonoBehaviour
         }
         else
         {
-            MasterDataAskedHandler(x, y, PhotonNetwork.player.ID);
+            MasterDataAskedHandler(x, y);
         }
         
     }
-    [PunRPC] private void MasterDataAskedHandler(int x, int y, int IdOfAsker)
+    [PunRPC] private void MasterDataAskedHandler(int x, int y, int IdOfAsker = 0)
     {
         //Debug.Log("MasterDataAskedHandler: Master sending data to " + PhotonPlayer.Find(IdOfAsker).NickName);
         //Appelé par RPC par ClientLoadChunk (seulement effectué par Master)

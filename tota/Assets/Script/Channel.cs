@@ -58,16 +58,16 @@ public class Channel : MonoBehaviour
             {
                 output += " " + args[i];
             }
-            gameObject.GetComponent<PhotonView>().RPC("SendReceiveM", PhotonTargets.AllBuffered, output, true, _player.Name);
+            if (Mode.Instance.online) gameObject.GetComponent<PhotonView>().RPC("SendReceiveM", PhotonTargets.AllBuffered, output, true, _player.Name);
 
         }
-        else if (args[1] == "/" + _teamName)
+        else if (args[0] == "/" + _teamName)
         {
             for (int i = 1; i < args.Length; i++)
             {
                 output += " " + args[i];
             }
-            gameObject.GetComponent<PhotonView>().RPC("SendReceiveM", PhotonTargets.AllBuffered, output, false, _player.Name);
+            if (Mode.Instance.online) gameObject.GetComponent<PhotonView>().RPC("SendReceiveM", PhotonTargets.AllBuffered, output, false, _player.Name);
         }
 
     }

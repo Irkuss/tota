@@ -158,11 +158,7 @@ public class PropManager : MonoBehaviour
         if (Mode.Instance.online)
         {
             GetComponent<PhotonView>().RPC("RPC_PlaceProp", PhotonTargets.OthersBuffered, pos.x, pos.y, pos.z, rot, name);
-        }
-        else
-        {
-            RPC_PlaceProp(pos.x, pos.y, pos.z, rot, name);
-        }
+        }       
         
     }
     [PunRPC] private void RPC_PlaceProp(float x, float y, float z, float rot, string path)

@@ -123,6 +123,17 @@ public class SpiritHead : Photon.MonoBehaviour
         }
     }
 
+    public void CharaDie(GameObject chara) 
+    {
+        foreach(Transform charaRef in _charaLayout.transform)
+        {
+            if(charaRef.GetComponent<LinkChara>().chara == chara)
+            {
+                Destroy(charaRef.gameObject);
+            }
+        }
+    }
+
     private void TestInventoryAdd()
     {
         if (Input.GetKeyDown(KeyCode.I))

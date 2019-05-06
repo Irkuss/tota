@@ -188,7 +188,7 @@ public class Zombie : MonoBehaviour
     //RPC
     public void GetAttackedWith(int damage)
     {
-        _photon.RPC("RPC_GetAttackedWith", PhotonTargets.AllBuffered, damage);
+        if(Mode.Instance.online) _photon.RPC("RPC_GetAttackedWith", PhotonTargets.AllBuffered, damage);
     }
     [PunRPC] private void RPC_GetAttackedWith(int damage)
     {
@@ -201,7 +201,7 @@ public class Zombie : MonoBehaviour
 
     public void SendUpdatedWanderPoint()
     {
-        _photon.RPC("RPC_SendUpdatedWanderPoint", PhotonTargets.OthersBuffered, _wanderPoint.x,_wanderPoint.y,_wanderPoint.z);
+        if (Mode.Instance.online) _photon.RPC("RPC_SendUpdatedWanderPoint", PhotonTargets.OthersBuffered, _wanderPoint.x,_wanderPoint.y,_wanderPoint.z);
     }
     [PunRPC]private void RPC_SendUpdatedWanderPoint(float x, float y, float z)
     {
@@ -211,7 +211,7 @@ public class Zombie : MonoBehaviour
 
     public void ForcePosition()
     {
-        _photon.RPC("RPC_ForceZombiePosition", PhotonTargets.OthersBuffered, _wanderPoint.x, _wanderPoint.y, _wanderPoint.z);
+        if (Mode.Instance.online) _photon.RPC("RPC_ForceZombiePosition", PhotonTargets.OthersBuffered, _wanderPoint.x, _wanderPoint.y, _wanderPoint.z);
     }
     [PunRPC] private void RPC_ForceZombiePosition(float x, float y, float z)
     {

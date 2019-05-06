@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
+using System.IO;
 
 public class CentralManager : Photon.MonoBehaviour
 {
@@ -52,8 +53,8 @@ public class CentralManager : Photon.MonoBehaviour
     [SerializeField] private GameObject _button = null;
     public GameObject Button { get { return _button; } }
 
-    [SerializeField] private Image _fill = null;
-    public Image Fill { get { return _fill; } }
+    [SerializeField] private GameObject _canvas = null;
+    public GameObject Canvas { get { return _canvas; } }
 
     public void UpdateToolTip(string[] info,string quirks)
     {
@@ -82,9 +83,9 @@ public class CentralManager : Photon.MonoBehaviour
     private void Awake()
     {
         online = Mode.Instance.online;
+        permi = PermissionsManager.Instance;
         if (online)
-        {
-            permi = PermissionsManager.Instance;
+        {           
             player = permi.GetPlayerWithName(PhotonNetwork.player.NickName);
             if (player != null)
             {
@@ -162,8 +163,131 @@ public class CentralManager : Photon.MonoBehaviour
 
     public void Quit()
     {
+        if (!Mode.Instance.online)
+        {
+            Save();
+        }
+
         Application.Quit();
     }
+
+    private void Save()
+    {
+        string path = Application.persistentDataPath + "save.txt";
+
+        using (StreamWriter writer = new StreamWriter(path))
+        {
+            writer.WriteLine(_charaLayout.transform.childCount);
+
+            foreach(Transform child in _charaLayout.transform)
+            {
+                GameObject chara = child.GetComponent<LinkChara>().chara;
+
+                writer.WriteLine(chara.transform.position.x + "/" + chara.transform.position.y + "/" + chara.transform.position.z);
+
+                CharaRpg head = chara.GetComponent<CharaRpg>();
+
+                string quirks = "";
+                //foreach(var quirk in head.GetQuirksInfo().Split(',',' '))
+                //{
+                //    quirks += quirk + "/";
+                //}
+
+                foreach (var quirk in head.SerializeQuirks())
+                {
+                    quirks += quirk + "/";
+                }
+                writer.WriteLine(quirks);
+
+                writer.WriteLine(head.NameFull);
+
+                float[] healthStats = head.UpdateStats();
+                writer.WriteLine(healthStats[0] + "/" + healthStats[1] + "/" + healthStats[2] +
+                    "/" + healthStats[3] + "/" + healthStats[4]);
+
+                string[] info = head.GetToolTipInfo();
+                string[] skills = head.GetSkillInfo();
+
+                writer.WriteLine(info[0] + "/" + info[1] + "/" + info[2] + "/" + info[3] + "/" + info[4] +
+                    "/" + info[5] + "/" + info[6] + "/" + info[7]);
+
+                writer.WriteLine(skills[0] + "/" + skills[1] + "/" + skills[2] + "/" + skills[3] + "/" +
+                    skills[4] + "/" + skills[5] + "/" + skills[6]);
+
+                CharaInventory inventory = chara.GetComponent<CharaInventory>();
+
+                string inv = "";
+
+                foreach(var item in inventory.inventory)
+                {
+                    inv += item.Key.nickName + " " + item.Value + "/";
+                }
+                writer.WriteLine(inv);
+
+                string wearables = "";
+
+                foreach(var wear in inventory.wearables)
+                {
+                    wearables += wear.nickName;
+                }
+                writer.WriteLine(wearables);
+
+                string equipments = "";
+
+                foreach (var equip in inventory.equipments)
+                {
+                    equipments += equip.nickName;
+                }
+                writer.WriteLine(equipments);
+            }
+        }
+    }
+
+    private void Load(string teamName, string playerName)
+    {
+        string path = Application.persistentDataPath + "save.txt";
+        if (!File.Exists(path)) return;
+
+        using (StreamReader reader = new StreamReader(path))
+        {
+            int number = int.Parse(reader.ReadLine());
+            for(int i = 0; i < number; i++)
+            {
+                string[] gameobj = reader.ReadLine().Split('/');
+                Vector3 pos = new Vector3(int.Parse(gameobj[0]), int.Parse(gameobj[1]), int.Parse(gameobj[2]));
+
+                string[] quirkS = reader.ReadLine().Split('/');
+                int[] quirks = new int[quirkS.Length];
+                for(int j = 0; j < quirkS.Length; j++)
+                {
+                    quirks[j] = int.Parse(quirkS[j]);
+                }
+
+                gameObject.GetComponent<CharaManager>().RPC_SpawnChara(pos.x,pos.y,pos.z,teamName,quirks,playerName);
+
+                string name = reader.ReadLine();
+
+                string[] healthStats = reader.ReadLine().Split('/');
+
+                string[] info = reader.ReadLine().Split('/');
+                string[] skills = reader.ReadLine().Split('/');
+
+                string[] inv = reader.ReadLine().Split('/');
+                foreach(var iteM in inv)
+                {
+                    string[] items = iteM.Split(' ');
+                    string item = items[0];                    
+                    int value = int.Parse(items[1]);
+                }
+
+                string[] wearables = reader.ReadLine().Split('/');
+                string[] equipments = reader.ReadLine().Split('/');         
+            }
+
+        }
+    }
+
+
     //Temperature getters
     public int GetTemperatureAtCoord(Vector3 pos)
     {

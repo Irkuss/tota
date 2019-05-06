@@ -168,7 +168,7 @@ public class Rat : MonoBehaviour
 
     public void SendUpdatedWanderPoint()
     {
-        _photon.RPC("RPC_SendUpdatedWanderPoint", PhotonTargets.OthersBuffered, _wanderPoint.x, _wanderPoint.y, _wanderPoint.z);
+        if (Mode.Instance.online) _photon.RPC("RPC_SendUpdatedWanderPoint", PhotonTargets.OthersBuffered, _wanderPoint.x, _wanderPoint.y, _wanderPoint.z);
     }
     [PunRPC]
     private void RPC_SendUpdatedWanderPoint(float x, float y, float z)
@@ -179,7 +179,7 @@ public class Rat : MonoBehaviour
 
     public void ForcePosition()
     {
-        _photon.RPC("RPC_ForceRatPosition", PhotonTargets.OthersBuffered, _wanderPoint.x, _wanderPoint.y, _wanderPoint.z);
+        if (Mode.Instance.online) _photon.RPC("RPC_ForceRatPosition", PhotonTargets.OthersBuffered, _wanderPoint.x, _wanderPoint.y, _wanderPoint.z);
     }
     [PunRPC]
     private void RPC_ForceRatPosition(float x, float y, float z)
