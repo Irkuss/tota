@@ -179,8 +179,11 @@ public class CharaRpg : MonoBehaviour
     //Getters
     public int GetCurrentStat(Stat stat)
     {
-        //stat*consciousnes+modifier
-        return Stats.GetMultiplyResult(_baseStat, _consciousness).GetStat(stat) + _statModifiers.GetStat(stat);
+        if((int) stat < 5)
+        {
+            return Stats.GetMultiplyResult(_baseStat, _consciousness).GetStat(stat) + _statModifiers.GetStat(stat);
+        }
+        return _baseStat.GetStat(stat) + _statModifiers.GetStat(stat);
     }
     public string GetQuirksInfo()
     {
@@ -241,6 +244,7 @@ public class CharaRpg : MonoBehaviour
     private float _tempPain = 0f; //augmenté au moment d'ajouter une blesure, tend vers 0 à chaque Update
     private float _globalPainFactor = 1f;
     private float _manipulation = 1f; //*craft and construction
+    public float Manipulation => _manipulation;
     private float _movement = 1f; //*walk speed, = min(feet1, leg1) + min(feet2, leg2)
     //Status
     private bool _isInShock = false;
@@ -467,6 +471,8 @@ public class CharaRpg : MonoBehaviour
         }
         public float GetFuncPurcent()
         {
+            if(isDestroyed) return 0;
+
             int currHp = maxHp - GetTotalDamage();
             return ((float)currHp) / ((float)maxHp);
         }
@@ -633,6 +639,7 @@ public class CharaRpg : MonoBehaviour
         UpdatePain();
         UpdateConsciousness();
         UpdateMovement();
+        UpdateManipulation();
 
         //Update l'interface santé
         UpdateInterfaceHealth();
@@ -755,12 +762,28 @@ public class CharaRpg : MonoBehaviour
         }
         else
         {
-            _movement = 1 - 0.5f * (2 - _bodyParts[3].GetFuncPurcent() - _bodyParts[4].GetFuncPurcent())
-                      - 0.25f * (2 - _bodyParts[5].GetFuncPurcent() - _bodyParts[6].GetFuncPurcent());
+            _movement = 1 - 0.5f * (2 - _bodyParts[3].GetFuncPurcent() - _bodyParts[4].GetFuncPurcent()) //Mains
+                      - 0.3f * (4 - _bodyParts[7].GetFuncPurcent() //Rigth Shoulder
+                                  - _bodyParts[8].GetFuncPurcent() //Left Shoulder
+                                  - _bodyParts[9].GetFuncPurcent() //Right Arm
+                                  - _bodyParts[10].GetFuncPurcent()); //Left Arm
             if (_movement <= 0) _movement = 0f;
         }
         //Debug.Log("UpdateMovement: movement=" + _movement + ", consciousness=" + _consciousness);
         if (_charaMov != null) _charaMov.ModifyAgentSpeed(_movement * _consciousness);
+    }
+    private void UpdateManipulation()
+    {
+        if (_isDead || _isInShock)
+        {
+            _manipulation = 0f;
+        }
+        else
+        {
+            _manipulation = 1 - 0.5f * (2 - _bodyParts[9].GetFuncPurcent() - _bodyParts[10].GetFuncPurcent())
+                      - 0.25f * (2 - _bodyParts[5].GetFuncPurcent() - _bodyParts[6].GetFuncPurcent());
+            if (_manipulation <= 0) _manipulation = 0f;
+        }
     }
 
     private bool CheckIfInfected()
@@ -910,6 +933,7 @@ public class CharaRpg : MonoBehaviour
                 bodyPart.ForceFalloff();
             }
         }
+        UpdateHealthStatus();
     }
     //Combat handler
     public void DebugGetRandomDamage(int woundType)

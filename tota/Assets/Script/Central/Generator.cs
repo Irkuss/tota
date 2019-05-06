@@ -2013,6 +2013,7 @@ public class Generator : MonoBehaviour
         //The truest Start
         //numbers of chunk left to generate (decrements when a chunk finishes to load)
         chunkLeftToLoad = _worldLength * _worldLength;
+        loadingChunkLeftToLoad = chunkLeftToLoad;
         Debug.Log("OnWorldTypeReceived: chunkLeftToLoad " + chunkLeftToLoad);
         //Start the generation of all chunk
         StartCoroutine(LoadAllChunk());
@@ -2020,8 +2021,8 @@ public class Generator : MonoBehaviour
         //Wait for end of generation
         StartCoroutine(OnGenerationEnded());
     }
-
-    private int chunkLeftToLoad;
+    private int loadingChunkLeftToLoad;
+    private int chunkLeftToLoad = -1;
     private bool loadingChunk = false;
     
 
@@ -2116,8 +2117,7 @@ public class Generator : MonoBehaviour
         loadingChunk = false;
     }
 
-
-    //Depre
+    //Ending
     private IEnumerator OnGenerationEnded()
     {
         while (loadingChunk || chunkLeftToLoad > 0) yield return new WaitForSeconds(0.5f);
@@ -2128,4 +2128,15 @@ public class Generator : MonoBehaviour
         cm.PlaceCameraAbove(_spawnPoint, _spawnPoint);
         cm.OnGenerationFinished();
     }
+
+
+    //Getters for loading
+    public float GetCurrentStatus()
+    {
+        if(chunkLeftToLoad < 0) return 0;
+        if (chunkLeftToLoad == 0) return 1;
+        return  (loadingChunkLeftToLoad - chunkLeftToLoad) / (float)loadingChunkLeftToLoad;
+    }
+
+
 }
