@@ -36,4 +36,16 @@ public class ItemTable : ScriptableObject
     {
         return allItemArray[Random.Range(0, allItemArray.Length)];
     }
+
+    public Item GetItemWithName(string name)
+    {
+        foreach(var item in allItemArray)
+        {
+            if(item.nickName == name)
+            {
+                return item;
+            }
+        }
+        return null;
+    }
 }

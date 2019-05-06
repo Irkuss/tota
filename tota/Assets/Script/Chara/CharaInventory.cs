@@ -109,6 +109,7 @@ public class CharaInventory : MonoBehaviour
 
     //Database des items (pour avoir leur id, pour les update en rpc)
     [SerializeField] private ItemTable itemTable = null;
+    public ItemTable ItemTable { get { return itemTable; } }
 
     //Dictionnaire représentant l'inventaire
     [HideInInspector]
@@ -268,6 +269,13 @@ public class CharaInventory : MonoBehaviour
         //stat.GetComponent<ToolTip>().UpdateTool(stats);
     }
 
+    public void ForceOpenCraft(int index)
+    {
+        if(_interface != null)
+        {
+            _interface.GetComponent<InterfaceManager>().ForceOpenCraft(index);
+        }
+    }
 
     public void CloseInterface()
     {

@@ -10,6 +10,7 @@ public class Food : Item
     protected override bool UseAsChara(GameObject refInventChara)
     {
         Debug.Log("Using food:" + this.nickName);
+        refInventChara.GetComponent<CharaHead>().CallCoroutine(useTime);
         return refInventChara.GetComponentInParent<CharaRpg>().Eat(foodValue);
     }
 }
