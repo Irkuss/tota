@@ -43,7 +43,7 @@ public class CharaRpg : MonoBehaviour
     }
     public static bool IsMainStat(Stat stat)
     {
-        return (int)stat > 4;
+        return (int)stat < 5;
     }
     public const int c_statNumber = 12; //TO UPDATE WHEN ADDING NEW STATS
     public struct Stats
@@ -179,7 +179,7 @@ public class CharaRpg : MonoBehaviour
     //Getters
     public int GetCurrentStat(Stat stat)
     {
-        if((int) stat < 5)
+        if(IsMainStat(stat))
         {
             return Stats.GetMultiplyResult(_baseStat, _consciousness).GetStat(stat) + _statModifiers.GetStat(stat);
         }
@@ -199,11 +199,13 @@ public class CharaRpg : MonoBehaviour
     public float GetTimeModifier(Stat stat)
     {
         float statValue = GetCurrentStat(stat);
-        
-        if(IsMainStat(stat))
+        Debug.Log("GetTimeModifier: statValue " + statValue);
+        if (IsMainStat(stat))
         {
+            Debug.Log("GetTimeModifier: returning " + (1.75f - statValue * 0.015f));
             return 1.75f - statValue * 0.015f; //0 -> 1.75, 50 -> 1, 100 -> 0.25
         }
+        Debug.Log("GetTimeModifier: returning " + (1f - statValue * 0.75f));
         return 1f - statValue * 0.75f; //0 -> 1, 10 -> 0.25
     }
 

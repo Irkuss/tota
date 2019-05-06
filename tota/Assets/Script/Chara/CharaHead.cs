@@ -222,6 +222,8 @@ public class CharaHead : Photon.PunBehaviour
 
     private IEnumerator CheckDistanceInter(int actionIndex)
     {
+        if (_focus == null) Debug.Log("CheckDistanceInter: Unexpected null focus");
+
         while (Vector3.Distance(transform.position, _focus.InterTransform.position) > _focus.Radius * 0.8f)
         {
             if(_focus.isMoving)
@@ -237,6 +239,7 @@ public class CharaHead : Photon.PunBehaviour
         Debug.Log("CharaHead: reached Inter");
         //Interragis avec l'Interactable une fois proche
         float actionTime = _focus.GetActionTime(this, actionIndex);
+        Debug.Log("CharaHead: " + actionTime);
         if (actionTime > 0) yield return StartCoroutine(WaitAction(actionTime));
 
         //Interragis
