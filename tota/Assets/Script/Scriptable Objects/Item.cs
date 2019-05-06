@@ -22,7 +22,11 @@ public class Item : ScriptableObject
     public int stack = 1; //Nombre d'exemplaire maximum dans un slot de l'inventaire
     public int weight = 0; //Poids dans l'inventaire
     public int baseMarketValue = 0; //Valeur commerciale
+
+    [Header("Interact attribute")]
     public bool usable = false; //Peut-il etre utilisé?
+    public float useTime = 0;
+
     //Usage public
     
     public bool Use(GameObject refInventChara)

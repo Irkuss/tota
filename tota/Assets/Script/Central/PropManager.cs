@@ -112,7 +112,15 @@ public class PropManager : MonoBehaviour
     {
         Debug.Log("MassLightPlaceProp: mass placing props (" + length + ")");
         //Called by master when generating
-        GetComponent<PhotonView>().RPC("RPC_MassLightPlaceProp", PhotonTargets.AllBuffered, length, x, z, rot, propIds);
+        if (Mode.Instance.online)
+        {
+            GetComponent<PhotonView>().RPC("RPC_MassLightPlaceProp", PhotonTargets.AllBuffered, length, x, z, rot, propIds);
+        }
+        else
+        {
+            RPC_MassLightPlaceProp(length, x, z, rot, propIds);
+        }
+        
     }
     [PunRPC] private void RPC_MassLightPlaceProp(int length, int[] x, int[] z, byte[] rot, int[] propIds)
     {
@@ -129,7 +137,14 @@ public class PropManager : MonoBehaviour
     {
         Debug.Log("PlaceProp: placing a new prop with path: " + name);
         //Make all players place the new prop
-        GetComponent<PhotonView>().RPC("RPC_PlaceProp", PhotonTargets.AllBuffered, pos.x, pos.y, pos.z, rot, name);
+        if (Mode.Instance.online)
+        {
+            GetComponent<PhotonView>().RPC("RPC_PlaceProp", PhotonTargets.AllBuffered, pos.x, pos.y, pos.z, rot, name);
+        }
+        else
+        {
+            RPC_PlaceProp(pos.x, pos.y, pos.z, rot, name);
+        }
     }
     public void PlaceAlreadyExistingProp(GameObject go, float rot, string name)
     {
@@ -140,7 +155,11 @@ public class PropManager : MonoBehaviour
         //Add the prop to the list
         _props.Add(prop);
         Vector3 pos = go.transform.position;
-        GetComponent<PhotonView>().RPC("RPC_PlaceProp", PhotonTargets.OthersBuffered, pos.x, pos.y, pos.z, rot, name);
+        if (Mode.Instance.online)
+        {
+            GetComponent<PhotonView>().RPC("RPC_PlaceProp", PhotonTargets.OthersBuffered, pos.x, pos.y, pos.z, rot, name);
+        }       
+        
     }
     [PunRPC] private void RPC_PlaceProp(float x, float y, float z, float rot, string path)
     {
@@ -161,7 +180,15 @@ public class PropManager : MonoBehaviour
     //Destroy
     public void DestroyProp(int id)
     {
-        GetComponent<PhotonView>().RPC("RPC_DestroyProp", PhotonTargets.AllBuffered, id);
+        if (Mode.Instance.online)
+        {
+            GetComponent<PhotonView>().RPC("RPC_DestroyProp", PhotonTargets.AllBuffered, id);
+        }
+        else
+        {
+            RPC_DestroyProp(id);
+        }
+        
     }
     [PunRPC] private void RPC_DestroyProp(int id)
     {
@@ -182,7 +209,15 @@ public class PropManager : MonoBehaviour
     //Send command
     public void SendPropCommand(int id, int[] command, float[] commandFloat)
     {
-        GetComponent<PhotonView>().RPC("RPC_SendPropCommand", PhotonTargets.AllBuffered, id, command, commandFloat);
+        if (Mode.Instance.online)
+        {
+            GetComponent<PhotonView>().RPC("RPC_SendPropCommand", PhotonTargets.AllBuffered, id, command, commandFloat);
+        }
+        else
+        {
+            RPC_SendPropCommand(id, command, commandFloat);
+        }
+        
     }
     [PunRPC] private void RPC_SendPropCommand(int id, int[] command, float[] commandFloat)
     {

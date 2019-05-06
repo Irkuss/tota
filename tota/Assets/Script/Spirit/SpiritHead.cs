@@ -123,6 +123,17 @@ public class SpiritHead : Photon.MonoBehaviour
         }
     }
 
+    public void CharaDie(GameObject chara) 
+    {
+        foreach(Transform charaRef in _charaLayout.transform)
+        {
+            if(charaRef.GetComponent<LinkChara>().chara == chara)
+            {
+                Destroy(charaRef.gameObject);
+            }
+        }
+    }
+
     private void TestInventoryAdd()
     {
         if (Input.GetKeyDown(KeyCode.I))
@@ -472,8 +483,9 @@ public class SpiritHead : Photon.MonoBehaviour
         {
             actions.Add(s);
         }
-
         int i = actions.IndexOf(action);
+
+
         IndexActionHandler(inter, i);
         foreach (Transform child in _actions.transform.GetChild(0).GetChild(0))
         {
@@ -568,7 +580,7 @@ public class SpiritHead : Photon.MonoBehaviour
 
     private void DisplayChannel()
     {
-        if (Input.GetKeyDown(KeyCode.C))
+        if (Mode.Instance.online && Input.GetKeyDown(KeyCode.C))
         {
             _channel.SetActive(!_channel.activeSelf);
         }
