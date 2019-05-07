@@ -282,6 +282,51 @@ public class SpiritHead : Photon.MonoBehaviour
         return false;
     }
 
+    private bool WIPClickedOnSomething(out RaycastHit hit)
+    {
+        int currentFloorLevel = GetComponent<SpiritZoom>().FloorManagerRef.FloorLevel;
+        Debug.Log("ClickedOnSomething: Casting raycast at floor " + currentFloorLevel);
+
+
+        Ray ray = _spiritCamera.ScreenPointToRay(Input.mousePosition);
+
+        RaycastHit[] hits = Physics.RaycastAll(ray);
+        
+        if(hits.Length > 0)
+        {
+            RaycastHit possibleHit;
+            GeneralOpacity generalOpacity;
+            for (int i = 0; i < hits.Length; i++)
+            {
+                possibleHit = hits[i];
+                generalOpacity = possibleHit.transform.GetComponent<GeneralOpacity>();
+                if(generalOpacity != null)
+                {
+                    if(generalOpacity.CurrentFloorLevel <= currentFloorLevel)
+                    {
+                        Debug.Log("ClickedOnSomething: Returning hit with name " + possibleHit.transform.name);
+                        hit = possibleHit;
+                        return true;
+                    }
+                }
+                else
+                {
+                    Debug.Log("ClickedOnSomething: Returning hit wihtout general opacity with name " + possibleHit.transform.name);
+                    hit = possibleHit;
+                    return true;
+                }
+                Debug.Log("ClickedOnSomething: Cycled through '" + possibleHit.transform.name + "' with floor " + generalOpacity.CurrentFloorLevel);
+            }
+        }
+        Debug.Log("ClickedOnSomething: Unexpected clicked on nothing");
+        //AUCUNE CHANCE D'ARRIVER EN CONDITION NORMAL
+        if (Physics.Raycast(ray, out hit))
+        {
+            return true;
+        }
+        return false;
+    }
+
     private void LeftClickUpdate()
     {
         RaycastHit hit;

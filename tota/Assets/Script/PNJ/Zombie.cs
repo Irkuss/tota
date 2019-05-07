@@ -101,7 +101,7 @@ public class Zombie : MonoBehaviour
             yield return new WaitForSeconds(delay);
             if(_canTakeDecision)
             {
-                Debug.Log("FindTargetsWithDelay: taking decision");
+                //Debug.Log("FindTargetsWithDelay: taking decision");
                 if (cycleBeforeForcingPosition <= 0)
                 {
                     ForcePosition();

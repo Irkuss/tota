@@ -6,9 +6,10 @@ public class FloorManager : MonoBehaviour
 {
     public const float c_chunkHeight = 8.0f;
 
-    private int floorLevel = 8;
+    private int _floorLevel = 8;
+    public int FloorLevel => _floorLevel;
 
-    private int maxFloorLevel = 8; //A MODIFIER SI ON A DES BATIMENTS AVEC PLUS D'ETAGES
+    private readonly int _maxFloorLevel = 8; //A MODIFIER SI ON A DES BATIMENTS AVEC PLUS D'ETAGES
 
     //Callback creation: when floorLevel is modified
 
@@ -19,7 +20,7 @@ public class FloorManager : MonoBehaviour
     {
         if (onFloorLevelChanged != null) //Si une personne nous écoute
         {
-            onFloorLevelChanged(floorLevel); //Declenche le callback chez les spectateurs
+            onFloorLevelChanged(_floorLevel); //Declenche le callback chez les spectateurs
         }
     }
 
@@ -27,21 +28,21 @@ public class FloorManager : MonoBehaviour
 
     public int GetFloorLevel()
     {
-        return floorLevel;
+        return _floorLevel;
     }
 
     public int GetMaxFloorLevel()
     {
-        return maxFloorLevel;
+        return _maxFloorLevel;
     }
 
     //Setters
 
     public void TryDecrease()
     {
-        if (floorLevel < maxFloorLevel)
+        if (_floorLevel < _maxFloorLevel)
         {
-            floorLevel++;
+            _floorLevel++;
             //Debug.Log("FloorManager: downed to " + floorLevel);
 
             //Call callbacks to everyone listening
@@ -51,9 +52,9 @@ public class FloorManager : MonoBehaviour
 
     public void TryIncrease()
     {
-        if (floorLevel > 0)
+        if (_floorLevel > 0)
         {
-            floorLevel--;
+            _floorLevel--;
             //Debug.Log("FloorManager: upped to " + floorLevel);
 
             //Call callbacks to everyone listening
@@ -63,10 +64,10 @@ public class FloorManager : MonoBehaviour
 
     public void TrySet(int newLevel)
     {
-        if (newLevel >= 0 && newLevel <= maxFloorLevel)
+        if (newLevel >= 0 && newLevel <= _maxFloorLevel)
         {
-            floorLevel = newLevel;
-            onFloorLevelChanged(floorLevel);
+            _floorLevel = newLevel;
+            onFloorLevelChanged(_floorLevel);
         }
     }
 }

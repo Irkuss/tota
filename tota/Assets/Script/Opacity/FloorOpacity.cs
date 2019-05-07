@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class FloorOpacity : MonoBehaviour
+public class FloorOpacity : GeneralOpacity
 {
     public int currentFloor = 0;
 
@@ -11,6 +11,8 @@ public class FloorOpacity : MonoBehaviour
 
     void Start()
     {
+        _currentFloorLevel = currentFloor;
+
         _renderer = GetComponent<Renderer>();
         _collider = GetComponent<Collider>();
 
@@ -26,14 +28,16 @@ public class FloorOpacity : MonoBehaviour
         if (currentFloor > newFloorLevel)
         {
             _renderer.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.ShadowsOnly;
-            //_renderer.enabled = false;
-            _collider.enabled = false;
+
+
+            //_collider.enabled = false;
         }
         else
         {
             _renderer.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.On;
-            //_renderer.enabled = true;
-            _collider.enabled = true;
+
+
+            //_collider.enabled = true;
         }
     }
 

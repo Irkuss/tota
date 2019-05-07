@@ -27,6 +27,7 @@ public class SpiritZoom : Photon.MonoBehaviour
 
     //Init Spirit Environment
     private FloorManager _floorManager;
+    public FloorManager FloorManagerRef => _floorManager;
 
     // Unity Callbacks
 

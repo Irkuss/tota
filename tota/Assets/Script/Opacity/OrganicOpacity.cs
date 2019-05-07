@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class OrganicOpacity : MonoBehaviour
+public class OrganicOpacity : GeneralOpacity
 {
     public bool isMoving = false;
     private bool _wasAboveFloorLevel;
@@ -10,8 +10,6 @@ public class OrganicOpacity : MonoBehaviour
     private Renderer[] _renderers;
     private Renderer _renderer;
     private Collider _collider;
-
-    private int currentFloorLevel;
 
     private IEnumerator _cor_updateRender;
     private float _previousY;
@@ -28,8 +26,8 @@ public class OrganicOpacity : MonoBehaviour
         }
 
         //Init le floor level (pas ouf mais n'arrive qu'une fois par organic)
-        currentFloorLevel = GameObject.Find("eCentralManager").GetComponent<FloorManager>().GetFloorLevel();
-        _wasAboveFloorLevel = IsAboveFloorLevel(currentFloorLevel);
+        _currentFloorLevel = GameObject.Find("eCentralManager").GetComponent<FloorManager>().GetFloorLevel();
+        _wasAboveFloorLevel = IsAboveFloorLevel(_currentFloorLevel);
         UpdateRenderer();
         if (isMoving)
         {
@@ -56,8 +54,8 @@ public class OrganicOpacity : MonoBehaviour
     //Updating opacity (by callback)
     private void UpdateFloorLevel(int newFloorLevel)
     {
-        _wasAboveFloorLevel = IsAboveFloorLevel(currentFloorLevel);
-        currentFloorLevel = newFloorLevel;
+        _wasAboveFloorLevel = IsAboveFloorLevel(_currentFloorLevel);
+        _currentFloorLevel = newFloorLevel;
 
         UpdateRenderer();
     }
@@ -79,7 +77,7 @@ public class OrganicOpacity : MonoBehaviour
     private void UpdateRenderer()
     {
         //Debug.Log("OrganicOpacity: Updating Renderer");
-        bool currentAbove = IsAboveFloorLevel(currentFloorLevel);
+        bool currentAbove = IsAboveFloorLevel(_currentFloorLevel);
         if (currentAbove && !_wasAboveFloorLevel)
         {
             //Debug.Log("OrganicOpacity: Setting to invisible");
@@ -88,7 +86,9 @@ public class OrganicOpacity : MonoBehaviour
                 rend.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.ShadowsOnly;
             }
             if(_renderer!=null) _renderer.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.ShadowsOnly;
-            _collider.enabled = false;
+
+
+            //_collider.enabled = false;
         }
         else if(!currentAbove && _wasAboveFloorLevel)
         {
@@ -98,7 +98,9 @@ public class OrganicOpacity : MonoBehaviour
                 rend.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.On;
             }
             if (_renderer != null) _renderer.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.On;
-            _collider.enabled = true;
+
+
+            //_collider.enabled = true;
         }
         _wasAboveFloorLevel = currentAbove;
     }

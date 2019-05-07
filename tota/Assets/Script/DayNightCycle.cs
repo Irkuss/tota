@@ -4,20 +4,32 @@ using UnityEngine;
 
 public class DayNightCycle : MonoBehaviour
 {
+    //Reference
     private Light _sun;
-    public float speed;
+    [SerializeField] private float _rotationSpeedModifier;
+
+    //Heure
     public float heure;
-    public int day = 1;
-    private Seasons _season;
-    private float _slider;
+
+    //Game status
+    private int _dayPassedSinceStart = 1;
+    private Seasons _currentSeason;
     private bool _changedHour;
 
+    private float _sliderProgressStatus;
+
+    //Custom event
     public delegate void TimerHour();
     public static event TimerHour onNewHour;
 
     public delegate void NewSeason(Seasons saison);
     public static event NewSeason onNewseason;
 
+    //day time status
+    private bool _isDayTime = true;
+    public bool IsDayTime => _isDayTime;
+
+    //Season Attribute
     public enum Seasons
     {
         SUMMER = 0,
@@ -28,77 +40,70 @@ public class DayNightCycle : MonoBehaviour
     private Dictionary<Seasons, int> _baseSeasonTemperature = new Dictionary<Seasons, int>()
     {
         {Seasons.SUMMER, 25 },
-        {Seasons.AUTUMM, 10 },
-        {Seasons.WINTER, -5 },
-        {Seasons.SPRING, 15 }
+        {Seasons.AUTUMM, 15 },
+        {Seasons.WINTER, -10 },
+        {Seasons.SPRING, 20 }
     };
-    public int GetCurrentSeasonTemperature()
+    
+    
+    //Start
+    private void Start()
     {
-        return _baseSeasonTemperature[_season];
-    }
-
-    private void UpdateCallback()
-    {
-        if (onNewHour != null) //Si une personne nous écoute
-        {
-            onNewHour(); //Declenche le callback chez les spectateurs
-        }
-
-        if (onNewseason != null) //Si une personne nous écoute
-        {
-            onNewseason(_season); //Declenche le callback chez les spectateurs
-        }
-    }
-
-    void Start()
-    {
-        _season = Seasons.SUMMER;
-        UpdateCallback();
+        _currentSeason = Seasons.SUMMER;
+        CallNewSeason();
+        CallNewHour();
         _sun = GetComponent<Light>();
         transform.rotation = Quaternion.Euler(0, 60, 0);
-        _slider = 0.5f;
+        _sliderProgressStatus = 0.5f;
         AudioManager.instance.StartCoroutine("StartMusic", "Solitude");
     }
 
-    void Update()
+    //Update
+    private void Update()
     {
+        DebugForceNextSeason(); //Temp pour test les saisons
+        
         Cycle();
-        NextSeason();
-        if (heure > 16f && heure < 17f && _changedHour)
-        {
-            Debug.Log("DayNightCycle: Night");
-            AudioManager.instance.StartCoroutine("EndMusic", "Solitude");
-            AudioManager.instance.StartCoroutine("StartMusic", "Nightwalk");
-        }
-        if (heure > 5f && heure < 6f && _changedHour)
-        {
-            Debug.Log("DayNightCycle: Day");
-            AudioManager.instance.StartCoroutine("EndMusic", "Nightwalk");
-            AudioManager.instance.StartCoroutine("StartMusic","Solitude");
-        }
-            
+        CheckNextSeason();
     }
 
-    void Cycle()
+    private void Cycle()
     {
-        if (_slider >= 1.0)//Reset le slider à 0 pour faire un cycle
+        if (_sliderProgressStatus >= 1.0f)//Reset le slider à 0 pour faire un cycle
         {
-            _slider = 0;
-            day++;
+            _sliderProgressStatus = 0;
+            _dayPassedSinceStart++;
         }
 
         if (_changedHour)
         {
-            UpdateCallback();
+            Debug.Log("CallNewHour: starting new hour");
+            CallNewHour();
+            //Handling daynight changes
+            if (heure >= 20f && heure <= 21f)
+            {
+                Debug.Log("DayNightCycle: Starting Night");
+                _isDayTime = false;
+                AudioManager.instance.StartCoroutine("EndMusic", "Solitude");
+                AudioManager.instance.StartCoroutine("StartMusic", "Nightwalk");
+            }
+            else if (heure >= 5f && heure <= 6f)
+            {
+                Debug.Log("DayNightCycle: Starting Day");
+                _isDayTime = true;
+                AudioManager.instance.StartCoroutine("EndMusic", "Nightwalk");
+                AudioManager.instance.StartCoroutine("StartMusic", "Solitude");
+            }
         }
 
-        heure = _slider * 24;
-        _sun.transform.rotation = Quaternion.Euler((_slider * 360) - 90, 60, 0);
-        _slider = _slider + Time.deltaTime / speed;
+        heure = _sliderProgressStatus * 24;
+        _sun.transform.rotation = Quaternion.Euler((_sliderProgressStatus * 360) - 90, 60, 0);
+        _sliderProgressStatus = _sliderProgressStatus + Time.deltaTime / _rotationSpeedModifier;
 
-        int newHeure = (int)(_slider * 24); //Calcule l'heure suivante
+        int newHeure = (int)(_sliderProgressStatus * 24); //Calcule l'heure suivante
         _changedHour = newHeure - (int)heure > 0; //Fais la différence pour voir si on a changé d'heure
 
+        //Couleur orangé au lever et coucher de soleil
         float posx = transform.eulerAngles.x;
         if (posx > -10 && posx < 40 || posx > 150 && posx < 190)//Change la couleur en orangé au levé et au couché du soleil
         {
@@ -110,20 +115,59 @@ public class DayNightCycle : MonoBehaviour
         }
     }
 
-    void NextSeason()
+    private void CheckNextSeason()
     {
-        if (day >= 20)
+        if (_dayPassedSinceStart % 20 == 0)//Tous les 20 jours changent de saisons
         {
-            day = 1;
-            int next = ((int)_season + 1) % 4;
-            switch (next)
-            {
-                case 0: _season = Seasons.SUMMER; break;
-                case 1: _season = Seasons.AUTUMM; break;
-                case 2: _season = Seasons.WINTER; break;
-                case 3: _season = Seasons.SPRING; break;
-            }
-            UpdateCallback();
+            ForceNextSeason();
         }
     }
+    private void ForceNextSeason()
+    {
+        int next = ((int)_currentSeason + 1) % 4;
+        switch (next)
+        {
+            case 0: _currentSeason = Seasons.SUMMER; break;
+            case 1: _currentSeason = Seasons.AUTUMM; break;
+            case 2: _currentSeason = Seasons.WINTER; break;
+            case 3: _currentSeason = Seasons.SPRING; break;
+        }
+        CallNewSeason();
+    }
+
+    //Getters
+    public int GetCurrentTemperature()
+    {
+        //Called by all charas every health cycle
+        int dayTimeModifier = _isDayTime ? 0 : -4;
+
+        return _baseSeasonTemperature[_currentSeason] + dayTimeModifier;
+    }
+
+    //Custom callback
+    private void CallNewHour()
+    {
+        if (onNewHour != null) //Si une personne nous écoute
+        {
+            onNewHour(); //Declenche le callback chez les spectateurs
+        }
+    }
+    private void CallNewSeason()
+    {
+        if (onNewseason != null) //Si une personne nous écoute
+        {
+            onNewseason(_currentSeason); //Declenche le callback chez les spectateurs
+        }
+    }
+
+
+    //Debug
+    public void DebugForceNextSeason()
+    {
+        if (Input.GetKeyDown(KeyCode.L))
+        {
+            ForceNextSeason();
+        }
+    }
+
 }

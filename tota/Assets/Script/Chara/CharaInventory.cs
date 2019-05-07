@@ -358,7 +358,10 @@ public class CharaInventory : MonoBehaviour
         int minTempModifier = 0;
         foreach(Wearable wearable in wearables)
         {
-            minTempModifier += wearable.minTempModifier;
+            if(wearable != null)
+            {
+                minTempModifier += wearable.minTempModifier;
+            }
         }
         return minTempModifier;
     }

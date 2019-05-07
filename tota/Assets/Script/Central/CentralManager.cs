@@ -316,7 +316,7 @@ public class CentralManager : Photon.MonoBehaviour
     public int GetTemperatureAtCoord(Vector3 pos)
     {
         //Called by charaRpg
-        return dayNightCycle.GetCurrentSeasonTemperature() + GetComponent<Generator>().GetPosTempModifier(pos);
+        return dayNightCycle.GetCurrentTemperature() + GetComponent<Generator>().GetPosTempModifier(pos);
     }
 
     //Special Callbacks
