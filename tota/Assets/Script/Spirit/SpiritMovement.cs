@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class SpiritMovement : Photon.MonoBehaviour
 {
@@ -51,7 +52,15 @@ public class SpiritMovement : Photon.MonoBehaviour
         }
 
         if(moveHorizontal != 0 || moveVertical != 0)
-        {            
+        {
+            if (Mode.Instance.firstTime == 0)
+            {
+                GameObject tuto = GameObject.Find("eCentralManager").GetComponent<CentralManager>().Tuto;
+                tuto.SetActive(true);
+                tuto.transform.GetChild(0).GetComponent<Text>().text = "You can also zoom or dezoom the vision of the camera of your current position";
+                Mode.Instance.firstTime = 1;
+            }
+
             GameObject _actions = GameObject.Find("eCentralManager").GetComponent<CentralManager>().Actions;
             foreach (Transform child in _actions.transform.GetChild(0).GetChild(0))
             {

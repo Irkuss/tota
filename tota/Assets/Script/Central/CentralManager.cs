@@ -19,9 +19,11 @@ public class CentralManager : Photon.MonoBehaviour
     //Bouton et interface
     public GameObject tempButton;
     public GameObject toolTip;
-    public GameObject pauseMenu;
+    [SerializeField] private GameObject pauseMenu = null;
     [SerializeField] private GameObject _charaRef = null;
-    [SerializeField] private GameObject _options = null;    
+    [SerializeField] private GameObject _options = null;
+    [SerializeField] private GameObject _save = null;
+    [SerializeField] private GameObject _quit = null;    
 
     public static bool isPause = false;
     private bool online;
@@ -56,6 +58,9 @@ public class CentralManager : Photon.MonoBehaviour
     [SerializeField] private GameObject _canvas = null;
     public GameObject Canvas { get { return _canvas; } }
 
+    [SerializeField] private GameObject _tuto = null;
+    public GameObject Tuto { get { return _tuto; } }
+
     public void UpdateToolTip(string[] info,string quirks)
     {
         toolTip.SetActive(true);
@@ -77,8 +82,6 @@ public class CentralManager : Photon.MonoBehaviour
         _tooltipL.SetActive(!_tooltipL.activeSelf);
     }
     
-
-
     //Unity Callbacks
     private void Awake()
     {
@@ -165,18 +168,27 @@ public class CentralManager : Photon.MonoBehaviour
     {
         if (!Mode.Instance.online)
         {
-            Save();
+            pauseMenu.SetActive(false);
+            _save.SetActive(true);
+            _quit.SetActive(true);
         }
 
         Application.Quit();
     }
 
+    public void CallSave()
+    {
+        Save();
+        Application.Quit();
+    }
+
     private void Save()
     {
-        string path = Application.persistentDataPath + "save.txt";
-
+        string path = Application.persistentDataPath + "/save.txt";
+        
         using (StreamWriter writer = new StreamWriter(path))
         {
+            writer.WriteLine(System.DateTime.Now);
             writer.WriteLine(_charaLayout.transform.childCount);
 
             foreach(Transform child in _charaLayout.transform)
@@ -188,15 +200,12 @@ public class CentralManager : Photon.MonoBehaviour
                 CharaRpg head = chara.GetComponent<CharaRpg>();
 
                 string quirks = "";
-                //foreach(var quirk in head.GetQuirksInfo().Split(',',' '))
-                //{
-                //    quirks += quirk + "/";
-                //}
-
-                foreach (var quirk in head.SerializeQuirks())
+                int[] serializeQuirks = head.SerializeQuirks();
+                for(int i = 0; i < serializeQuirks.Length - 1; i++)
                 {
-                    quirks += quirk + "/";
+                    quirks += serializeQuirks[i] + "/";
                 }
+                quirks += serializeQuirks[serializeQuirks.Length -1];
                 writer.WriteLine(quirks);
 
                 writer.WriteLine(head.NameFull);
@@ -208,7 +217,7 @@ public class CentralManager : Photon.MonoBehaviour
                 string[] info = head.GetToolTipInfo();
                 string[] skills = head.GetSkillInfo();
 
-                writer.WriteLine(info[0] + "/" + info[1] + "/" + info[2] + "/" + info[3] + "/" + info[4] +
+                writer.WriteLine(info[1] + "/" + info[2] + "/" + info[3] + "/" + info[4] +
                     "/" + info[5] + "/" + info[6] + "/" + info[7]);
 
                 writer.WriteLine(skills[0] + "/" + skills[1] + "/" + skills[2] + "/" + skills[3] + "/" +
@@ -222,48 +231,92 @@ public class CentralManager : Photon.MonoBehaviour
                 {
                     inv += item.Key.nickName + " " + item.Value + "/";
                 }
-                writer.WriteLine(inv);
+                if (inv == "")
+                {
+                    writer.WriteLine("null");
+                }
+                else
+                {
+                    writer.WriteLine(inv);
+                }                
 
                 string wearables = "";
 
-                foreach(var wear in inventory.wearables)
+                Wearable[] wear = inventory.wearables;
+                for (int d = 0; d < wear.Length -1; d++)
                 {
-                    wearables += wear.nickName;
+                    if (wear[d] == null)
+                    {
+                        wearables += "null/";
+                    }
+                    else
+                    {
+                        wearables += wear[d].nickName + "/";
+                    }
+                }
+                if (wear[wear.Length - 1] == null)
+                {
+                    wearables += "null";
+                }
+                else
+                {
+                    wearables += wear[wear.Length -1].nickName;
                 }
                 writer.WriteLine(wearables);
 
                 string equipments = "";
 
-                foreach (var equip in inventory.equipments)
+                Equipable[] equip = inventory.equipments;
+                for (int e = 0; e < equip.Length - 1; e++)
                 {
-                    equipments += equip.nickName;
+                    if (equip[e] == null)
+                    {
+                        equipments += "null/";
+                    }
+                    else
+                    {
+                        equipments += equip[e].nickName + "/";
+                    }
+                }
+                if (equip[equip.Length - 1] == null)
+                {
+                    equipments += "null";
+                }
+                else
+                {
+                    equipments += equip[equip.Length - 1].nickName;
                 }
                 writer.WriteLine(equipments);
+                writer.WriteLine();
             }
         }
     }
 
     private void Load(string teamName, string playerName)
     {
-        string path = Application.persistentDataPath + "save.txt";
+        string path = Application.persistentDataPath + "/save.txt";
         if (!File.Exists(path)) return;
 
         using (StreamReader reader = new StreamReader(path))
         {
+            reader.ReadLine();
             int number = int.Parse(reader.ReadLine());
             for(int i = 0; i < number; i++)
             {
                 string[] gameobj = reader.ReadLine().Split('/');
-                Vector3 pos = new Vector3(int.Parse(gameobj[0]), int.Parse(gameobj[1]), int.Parse(gameobj[2]));
+                Vector3 pos = new Vector3(float.Parse(gameobj[0]), float.Parse(gameobj[1]), float.Parse(gameobj[2]));
 
                 string[] quirkS = reader.ReadLine().Split('/');
-                int[] quirks = new int[quirkS.Length];
+                List<int> listQuirk = new List<int>();
                 for(int j = 0; j < quirkS.Length; j++)
                 {
-                    quirks[j] = int.Parse(quirkS[j]);
+                    if(int.TryParse(quirkS[j],out int q))
+                    {
+                        listQuirk.Add(q);
+                    }
                 }
 
-                GameObject chara = gameObject.GetComponent<CharaManager>().RPC_SpawnChara(pos.x,pos.y,pos.z,teamName,quirks,playerName);
+                GameObject chara = gameObject.GetComponent<CharaManager>().RPC_SpawnChara(pos.x,pos.y,pos.z,teamName,listQuirk.ToArray(),playerName);
                 CharaRpg rpg = chara.GetComponent<CharaRpg>();
                 CharaInventory inventory = chara.GetComponent<CharaInventory>();
 
@@ -274,38 +327,84 @@ public class CentralManager : Photon.MonoBehaviour
                 rpg.SetStats(healthStats);
 
                 string[] info = reader.ReadLine().Split('/');
+                int[] setInfo = new int[info.Length];
+                for(int g = 0; g < info.Length; g++)
+                {
+                    setInfo[g] = int.Parse(info[g]);
+                }
+
                 string[] skills = reader.ReadLine().Split('/');
+                int[] setSkill = new int[skills.Length];
+                for (int g = 0; g < skills.Length; g++)
+                {
+                    setSkill[g] = int.Parse(skills[g]);
+                }
 
                 string[] inv = reader.ReadLine().Split('/');
                 foreach(var iteM in inv)
                 {
                     string[] items = iteM.Split(' ');
-                    string item = items[0];                    
-                    int value = int.Parse(items[1]);
-                }
+                    if(items.Length >= 2)
+                    {
+                        string stringItem = "";
+                        for(int y = 0; y < items.Length - 2; y++)
+                        {
+                            stringItem += items[y] + " ";
+                        }
+                        stringItem += items[items.Length - 2];
 
+                        Item item = inventory.ItemTable.GetItemWithName(stringItem);
+                        int value = int.Parse(items[items.Length -1]);
+
+                        if(item != null)
+                        {
+                            for(int z = 0; z < value; z++)
+                            {
+                                inventory.Add(item);
+                            }
+                        }
+                    }                    
+                }
 
                 string[] wearables = reader.ReadLine().Split('/');
                 for(int k = 0; k < wearables.Length; k++)
                 {
-                    Item item = inventory.ItemTable.GetItemWithName(wearables[k]);
-
-                    if (item != null && (Wearable) item != null)
+                    if(wearables[k] == "null")
                     {
-                        inventory.wearables[k] = (Wearable) item;
+                        inventory.wearables[k] = null;
                     }
+                    else
+                    {
+                        Item item = inventory.ItemTable.GetItemWithName(wearables[k]);
+
+                        if (item != null && (Wearable) item != null)
+                        {
+                            inventory.wearables[k] = (Wearable) item;
+                        }
+                    }
+                    
                 }
 
                 string[] equipments = reader.ReadLine().Split('/');
                 for (int m = 0; m < equipments.Length; m++)
                 {
-                    Item item = inventory.ItemTable.GetItemWithName(wearables[m]);
-
-                    if (item != null && (Equipable)item != null)
+                    if(equipments[m] == "null")
                     {
-                        inventory.equipments[m] = (Equipable)item;
+                        inventory.equipments[m] = null;
                     }
+                    else
+                    {
+                        Item item = inventory.ItemTable.GetItemWithName(equipments[m]);
+
+                        if (item != null && (Equipable) item != null)
+                        {
+                            inventory.equipments[m] = (Equipable) item;
+                        }
+                    }
+                    
                 }
+
+                reader.ReadLine();
             }
 
         }
@@ -324,6 +423,9 @@ public class CentralManager : Photon.MonoBehaviour
     {
         //Appelé par Generator/Start/*Received Package*/GenerateEnd une fois que le monde s'est généré
         tempButton.SetActive(true);
+        _tuto.SetActive(true);
+        _tuto.transform.GetChild(0).GetComponent<Text>().text = "Welcome in the solo mode of Tales of the Apocalypse. This is short tutorial for you to understand the main commands of the game";
+        _tuto.transform.GetChild(1).GetComponent<Button>().onClick.AddListener(() => _tuto.SetActive(false));
     }
 
     //Spawn le joueur (appelé par le bouton spawn)
@@ -389,6 +491,14 @@ public class CentralManager : Photon.MonoBehaviour
                 spirit.GetComponent<SpiritHead>().TryCharaSpawn(true,_charaLayout);
             }
         }
-        
+
+        if (!online)
+        {
+            if (Mode.Instance.load)
+            {
+                Load(teamName, player.Name);
+            }
+        }
+                
     }
 }

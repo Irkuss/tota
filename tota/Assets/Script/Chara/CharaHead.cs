@@ -54,13 +54,13 @@ public class CharaHead : Photon.PunBehaviour
             yield return new WaitForSeconds(1f);
 
             Collider[] allAi = Physics.OverlapSphere(transform.position, c_radiusToActivate, _aiActivationLayer);
-            Debug.Log("CheckForAi: got " + allAi.Length + " zombies in detection sphere");
+            //Debug.Log("CheckForAi: got " + allAi.Length + " zombies in detection sphere");
             foreach(Collider aiCollider in allAi)
             {
                 Zombie zombieComp = aiCollider.GetComponent<Zombie>();
                 if(zombieComp != null)
                 {
-                    Debug.Log("CheckForAi: Activating a zombie in range");
+                    //Debug.Log("CheckForAi: Activating a zombie in range");
                     zombieComp.ForceActivate(this);
                 }
             }

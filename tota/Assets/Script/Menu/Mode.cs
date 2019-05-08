@@ -1,14 +1,20 @@
-﻿using System.Collections;
+﻿using System.IO;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 using UnityEngine.SceneManagement;
 
 public class Mode : MonoBehaviour
 {
     public static Mode Instance;
-    [HideInInspector] public bool online;
     private string _mode = null;
+    [HideInInspector] public bool online;   
     [HideInInspector] public bool zqsd = false;
+    [HideInInspector] public bool load = false;
+    [HideInInspector] public int firstTime = 0;
+    [SerializeField] private GameObject _loadButton = null;
+    [SerializeField] private GameObject _launchButton = null;
+    [SerializeField] private GameObject _loadText = null;
 
     private void Awake()
     {
@@ -45,6 +51,40 @@ public class Mode : MonoBehaviour
         if (!online) SceneManager.LoadScene(3);
     }
 
-    
+    public void Load()
+    {
+        string path = Application.persistentDataPath + "/save.txt";
+        if (!File.Exists(path))
+        {
+            _loadText.SetActive(true);
+            _loadText.GetComponent<Text>().text = "Nothing to load";
+        }
+        else
+        {
+            using (StreamReader reader = new StreamReader(path))
+            {
+                string date = reader.ReadLine();
+                string[] dsplit = date.Split(' ');
+                if(dsplit.Length != 1)
+                {
+                    _loadText.SetActive(true);
+                    _loadText.GetComponent<Text>().text = "Loading from : " + date;
+                    load = true;
+                    _loadButton.SetActive(false);
+                    _launchButton.SetActive(true);
+                }
+                else
+                {
+                    _loadText.SetActive(true);
+                    _loadText.GetComponent<Text>().text = "An error has occured";
+                }
+            }
+        }       
+    }
+
+    public void LaunchLoad()
+    {
+        SceneManager.LoadScene(3);
+    }
 
 }

@@ -23,6 +23,7 @@ public class SpiritHead : Photon.MonoBehaviour
     private GameObject _build;
     private GameObject _actions;
     private GameObject _button;
+    private GameObject _tuto;
 
     //Le joueur qui contrôle ce Spirit (ne change pas)
     private PermissionsManager _permission = PermissionsManager.Instance;
@@ -53,7 +54,18 @@ public class SpiritHead : Photon.MonoBehaviour
         _build = eManager.Build;
         _actions = eManager.Actions;
         _button = eManager.Button;
+        _tuto = eManager.Tuto;
+
+        StartCoroutine(WaitForTuto());
+        _tuto.SetActive(true);
+        _tuto.transform.GetChild(0).GetComponent<Text>().text = "Now you can move yourself using the wqsd keys or the directional arrows";
     }
+
+    private IEnumerator WaitForTuto()
+    {
+        yield return new WaitForSeconds(3f);       
+    }
+
     //Unity Callback
     void Start()
     {
@@ -70,8 +82,6 @@ public class SpiritHead : Photon.MonoBehaviour
             ClickUpdate();
             DoubleClickUpdate();
         }
-
-
 
         //Do all test functions
         TestAll();
@@ -105,6 +115,14 @@ public class SpiritHead : Photon.MonoBehaviour
             //Projection des positions sur le sol
             Vector3 lowPosition = new Vector3(gameObject.transform.position.x, 1, gameObject.transform.position.z);
             GameObject.Find("eCentralManager").GetComponent<CharaManager>().SpawnChara(lowPosition, _playerOwner.MyTeamName,_playerOwner.Name);
+
+            if(Mode.Instance.firstTime == 2)
+            {
+                StartCoroutine(WaitForTuto());
+                _tuto.SetActive(true);
+                _tuto.transform.GetChild(0).GetComponent<Text>().text = "Nice, you have created a new character. You can select him by clicking left on him.";
+                Mode.Instance.firstTime = 3;
+            }
         }
     }
 
@@ -305,6 +323,14 @@ public class SpiritHead : Photon.MonoBehaviour
                 {
                     ClickOnChara(hit.transform.gameObject);
                 }
+
+                if(Mode.Instance.firstTime == 3)
+                {
+                    StartCoroutine(WaitForTuto());
+                    _tuto.SetActive(true);
+                    _tuto.transform.GetChild(0).GetComponent<Text>().text = "You can also move your character. Once you have selected him you can right click on a position and your character will walk until this point";
+                    Mode.Instance.firstTime = 4;
+                }
             }
             else
             {
@@ -354,6 +380,17 @@ public class SpiritHead : Photon.MonoBehaviour
                 {
                     //Fait courir les charas dans le cas ou on double click droit
                     ActionMoveAllTo(hit.point, true);
+                }
+
+                if(Mode.Instance.firstTime == 4)
+                {
+                    StartCoroutine(WaitForTuto());
+                    _tuto.SetActive(true);
+                    _tuto.transform.GetChild(0).GetComponent<Text>().text = "WOW some informations about your character appear on the screen. You can see more details by pressing the E key.\n"
+                        + "Other keys : \n"
+                        + "Press B to open the build mode.\n"
+                        + "Press ESCAPE to open the pause menu.";
+                    Mode.Instance.firstTime = 5;
                 }
             }
         }
@@ -566,6 +603,18 @@ public class SpiritHead : Photon.MonoBehaviour
         {
             _inventoryList.SetActive(false);
         }
+    }
+
+    public void ForceOpenCraft(GameObject chara, int index)
+    {
+        chara.GetComponent<CharaInventory>().ToggleInterface(_inventoryLayout, chara.GetComponent<CharaRpg>().GetToolTipInfo());
+        GameObject _interface = chara.GetComponent<CharaInventory>().GetInterface();
+        if (_interface != null)
+        {
+            _interface.GetComponent<InterfaceManager>().ForceOpenCraft(index);
+            _inventoryList.SetActive(true);
+        }        
+        
     }
 
     public void MoveCamera(Vector3 pos)

@@ -6,6 +6,9 @@ using UnityEngine.SceneManagement;
 public class MainMenu : MonoBehaviour
 {
     [SerializeField] private GameObject _modes = null;
+    [SerializeField] private GameObject _loadButton = null;
+    [SerializeField] private GameObject _launchButton = null;
+    [SerializeField] private GameObject _loadText = null;
 
     public void SoloGame()
     {
@@ -47,7 +50,8 @@ public class MainMenu : MonoBehaviour
         Debug.Log("back");
         _modes.SetActive(false);
         gameObject.SetActive(true);
+        _loadButton.SetActive(true);
+        _launchButton.SetActive(false);
+        _loadText.SetActive(false);
     }
-
-
 }

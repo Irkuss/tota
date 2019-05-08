@@ -5,7 +5,11 @@ using UnityEngine.UI;
 
 public class InterfaceManager : MonoBehaviour
 {
-    [SerializeField] private GameObject _craft = null;
+    [SerializeField] private GameObject _craftTop = null;
+    [SerializeField] private GameObject _craftMidTop = null;
+    [SerializeField] private GameObject _craftMidDown = null;
+    [SerializeField] private GameObject _craftDown = null;
+
     [SerializeField] private GameObject _slot = null;
     [SerializeField] private RecipeTable _data = null;
     [SerializeField] private GameObject _equipment = null;
@@ -27,7 +31,7 @@ public class InterfaceManager : MonoBehaviour
     {
         foreach (var recipe in _data.recipes)
         {
-            _recipe = Instantiate(_slot, _craft.transform.GetChild(0));
+            _recipe = Instantiate(_slot, _craftTop.transform.GetChild(0));
             _recipe.transform.GetChild(0).GetComponent<Image>().sprite = recipe.result.icon;
             _recipe.transform.GetChild(0).GetComponent<Button>().onClick.AddListener(() => ClickCraft(charaInventory,recipe));
             _recipe.transform.GetChild(1).gameObject.SetActive(false);
@@ -58,7 +62,7 @@ public class InterfaceManager : MonoBehaviour
         int i = 0;
         foreach(var recipe in _data.recipes)
         {
-            _recipe = _craft.transform.GetChild(0).GetChild(i).gameObject;
+            _recipe = _craftTop.transform.GetChild(0).GetChild(i).gameObject;
             if (!recipe.CanBeCraftedWith(charaInventory.inventory) || recipe.type != RecipeTable.RecipeType.Base)
             {
                 _recipe.transform.GetChild(1).gameObject.SetActive(false);
@@ -75,7 +79,22 @@ public class InterfaceManager : MonoBehaviour
 
     public void ForceOpenCraft(int index)
     {
-        GameObject parent = _craft.transform.parent.gameObject;
+        _craftTop.transform.parent.SetAsLastSibling();
+        switch (index)
+        {
+            case 0:
+                _craftTop.transform.SetAsLastSibling();
+                break;
+            case 1:
+                _craftMidTop.transform.SetAsLastSibling();
+                break;
+            case 2:
+                _craftMidDown.transform.SetAsLastSibling();
+                break;
+            case 3:
+                _craftDown.transform.SetAsLastSibling();
+                break;
+        }
     }
 
     public void InstantiateEquipment()
