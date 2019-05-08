@@ -51,7 +51,7 @@ public class Zombie : MonoBehaviour
 
     public void ForceActivate(CharaHead activatorChara)
     {
-        if (!_canTakeDecision) Debug.Log("ForceActivate: A zombie has been activated");
+        //if (!_canTakeDecision) Debug.Log("ForceActivate: A zombie has been activated");
         //Called by CharaHead in CheckForAi
 
         if(!_activatorCharas.Contains(activatorChara))
@@ -80,7 +80,7 @@ public class Zombie : MonoBehaviour
         //End condition
         if(_activatorCharas.Count == 0)
         {
-            Debug.Log("CheckDeactivate: A zombie has been deactivated");
+            //Debug.Log("CheckDeactivate: A zombie has been deactivated");
             _canTakeDecision = false;
         }
     }

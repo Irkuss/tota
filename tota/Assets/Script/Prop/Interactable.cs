@@ -4,8 +4,6 @@ using UnityEngine;
 
 public class Interactable : MonoBehaviour
 {
-    //Interactable class, has to be derived from to be useful (ex: PropHandl
-
     //Characteristics of Interactable
     [Header("Is this object moving or not?")]
     public bool isMoving = false; //Used to determine if chara have to get this transform.position when moving

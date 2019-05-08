@@ -47,6 +47,24 @@ public class CharaRpg : MonoBehaviour
         //Stats Level
         lv_stamina,
     }
+    public static Dictionary<Stat, string> statToString = new Dictionary<Stat, string>
+    {
+        //Main stats (de 1 à 100)
+        { Stat.ms_strength, "Strength"},
+        { Stat.ms_intelligence, "Intelligence"},
+        { Stat.ms_perception, "Perception"},
+        { Stat.ms_mental, "Mental"},
+        { Stat.ms_social, "Social"},
+        //Skills (-1 à 10) (0 de base) (-1 desactive les actions liées) 
+        { Stat.sk_doctor, "Doctor"},
+        { Stat.sk_farmer, "Farmer"},
+        { Stat.sk_carpenter, "Carpenter"},
+        { Stat.sk_scavenger, "Scavenger"},
+        { Stat.sk_electrician, "Electrician"},
+        { Stat.sk_marksman, "Marksman"},
+        //Stats Level
+        { Stat.lv_stamina, "Stamina"},
+    };
     public static bool IsMainStat(Stat stat)
     {
         return (int)stat < 5;
@@ -211,7 +229,7 @@ public class CharaRpg : MonoBehaviour
             Debug.Log("GetTimeModifier: returning " + (1.75f - statValue * 0.015f));
             return 1.75f - statValue * 0.015f; //0 -> 1.75, 50 -> 1, 100 -> 0.25
         }
-        Debug.Log("GetTimeModifier: returning " + (1f - statValue * 0.75f));
+        Debug.Log("GetTimeModifier: returning " + (1f - statValue * 0.075f));
         return 1f - statValue * 0.75f; //0 -> 1, 10 -> 0.25
     }
 
@@ -1108,7 +1126,7 @@ public class CharaRpg : MonoBehaviour
         }
         if (debug == "") debug = " healthy!";
         //Debug.Log("DebugWounds: " + debug);
-        Debug.Log("DebugWounds: felt temperature by " + NameFull + ", " + _feltTemperature + " (outside temp: " + GetOutSideTemperature() + ")");
+        //Debug.Log("DebugWounds: felt temperature by " + NameFull + ", " + _feltTemperature + " (outside temp: " + GetOutSideTemperature() + ")");
     }
     public void UpdateInterfaceHealth()
     {

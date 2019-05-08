@@ -4,13 +4,22 @@ using UnityEngine;
 
 public class Tree : PropHandler
 {
+    [Header("Tree Attribute")]
     public Item woodRaw;
+    public float baseCutTime = 10;
 
     public override void Interact(CharaHead chara, int actionIndex)
     {
         Debug.Log("Tree: Interacting");
         Cut(chara);
     }
+    public override float GetActionTime(CharaHead chara, int actionIndex = 0)
+    {
+        return baseCutTime * chara.GetComponent<CharaRpg>().GetTimeModifier(CharaRpg.Stat.ms_strength);
+    }
+
+
+
 
     private void Cut(CharaHead chara)
     {

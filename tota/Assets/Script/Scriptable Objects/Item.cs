@@ -29,11 +29,11 @@ public class Item : ScriptableObject
 
     //Usage public
     
-    public bool Use(GameObject refInventChara)
+    public bool Use(GameObject refInvent)
     {
         //Clique Handler
         //dans un inventaire de furniture
-        if (refInventChara.GetComponent<CharaRpg>() == null)
+        if (refInvent.GetComponent<CharaRpg>() == null)
         {
             if (SpiritHead.SelectedList.Count != 0)
             {
@@ -42,10 +42,10 @@ public class Item : ScriptableObject
             return false;
         }
         //dans un inventaire de chara
-        //si on est en train de shift clic
+        //si on est en train de shift clic alors on essaie de deplacer l'item dans un inventaire de furniture
         if(Input.GetKey(KeyCode.LeftShift))
         {
-            CharaHead head = refInventChara.GetComponent<CharaHead>();
+            CharaHead head = refInvent.GetComponent<CharaHead>();
             if(head != null)
             {
                 //On essaie d'ajouter l'item à un inventaire de furniture
@@ -59,11 +59,14 @@ public class Item : ScriptableObject
         }
         //clic normal
         if (!usable) return false;
-        //Utilisation de l'item
-        return UseAsChara(refInventChara);
+        //Utilisation différé de l'item
+
+        refInvent.GetComponent<CharaHead>().UseItem(this);
+        return false;
+        //return UseAsChara(refInvent.GetComponent<CharaInventory>());
     }
 
-    protected virtual bool UseAsChara(GameObject refInventChara)
+    public virtual bool UseAsChara(CharaInventory refInventChara)
     {
         /* Use:
          * Prend en paramètre le gameObject qui l'utilise (un chara normalement)
@@ -71,6 +74,10 @@ public class Item : ScriptableObject
          * -Renvoie si l'item a pu être utilisé (certains Items sont inutilisable dans certains cas, ex: equipable)
          * */
         return false;
+    }
+    public virtual float GetUseTime()
+    {
+        return useTime;
     }
 
     public virtual bool Unequip(GameObject refInventChara)

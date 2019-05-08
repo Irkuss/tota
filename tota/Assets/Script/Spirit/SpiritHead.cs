@@ -265,13 +265,13 @@ public class SpiritHead : Photon.MonoBehaviour
         {
             if (Time.time - _timeWhenDoubleRightClick > c_doubleClickDelay)
             {
-                Debug.Log("DoubleClickUpdate: double right click expired");
+                //Debug.Log("DoubleClickUpdate: double right click expired");
                 _isReadyToDoubleRightClick = false;
             }
         }
     }
 
-    private bool ClickedOnSomething(out RaycastHit hit)
+    private bool DEPRE_ClickedOnSomething(out RaycastHit hit)
     {
         //Useful function for the rest of SpiritHead
         Ray ray = _spiritCamera.ScreenPointToRay(Input.mousePosition);
@@ -279,10 +279,74 @@ public class SpiritHead : Photon.MonoBehaviour
         {
             return true;
         }
+        Debug.Log("ClickedOnSomething: Unexpected spiritRaycast hit nothing");
         return false;
     }
 
-    private bool WIPClickedOnSomething(out RaycastHit hit)
+    private bool ClickedOnSomething(out RaycastHit hit)
+    {
+        //Debug.Log("==========ClickedOnSomething: Starting new Raycast==========");
+        //VER2_iterativeCasting_ClickedOnSomething
+        int currentFloorLevel = GetComponent<SpiritZoom>().FloorManagerRef.FloorLevel;
+        
+        Ray ray = _spiritCamera.ScreenPointToRay(Input.mousePosition);
+
+        Vector3 direction = ray.direction; //Will not change as the raycast goes through unvalid hits
+        Vector3 origin = ray.origin; //Will update after hitting an unvalid hit
+
+        bool hitSomethingValid = false;
+
+        int maxStep = 20;
+        int step = 0;
+        //Debug.Log("ClickedOnSomething: Starting direction is " + direction + ", starting origin is " + origin);
+        while (!hitSomethingValid && step < maxStep)
+        {
+            Color debugColor = new Color(Random.Range(0f, 1f), Random.Range(0f, 1f), Random.Range(0f, 1f));
+            Debug.DrawRay(origin, direction * 30, debugColor, 3f);
+            if (Physics.Raycast(origin, direction, out RaycastHit possibleHit))
+            {
+                if(IsHitValid(currentFloorLevel, possibleHit))
+                {
+                    //Debug.Log("ClickedOnSomething: Step done " + step);
+                    hit = possibleHit;
+                    return true;
+                }
+                else
+                {
+                    //Debug.Log("ClickedOnSomething: Cycling from " + origin + " to " + possibleHit.point);
+                    origin = possibleHit.point + direction * 0.1f;
+                }
+            }
+            else
+            {
+                break;
+            }
+            step++;
+        }
+        if (step == maxStep) Debug.LogWarning("ClickedOnSomething: Unexpected reached maxStep ! ");
+        Debug.LogWarning("ClickedOnSomething: Unexpected spiritRaycast hit nothing");
+        hit = new RaycastHit();
+        return false;
+    }
+    private bool IsHitValid(int currentFloorLevel, RaycastHit hit)
+    {
+        GeneralOpacity generalOpacity = hit.transform.GetComponent<GeneralOpacity>();
+        if (generalOpacity != null)
+        {
+            if (generalOpacity.CurrentFloorLevel <= currentFloorLevel)
+            {
+
+                //Debug.Log("IsHitValid: Returning hit with name " + hit.transform.name);
+                return true;
+            }
+            //Debug.Log("IsHitValid: Cycled through '" + hit.transform.name + "' with floor " + generalOpacity.CurrentFloorLevel);
+            return false;
+        }
+        //Debug.Log("IsHitValid: Returning hit wihtout general opacity (" + hit.transform.name + ")");
+        return true;
+    }
+
+    private bool VER1_naiveFilter_ClickedOnSomething(out RaycastHit hit)
     {
         int currentFloorLevel = GetComponent<SpiritZoom>().FloorManagerRef.FloorLevel;
         Debug.Log("ClickedOnSomething: Casting raycast at floor " + currentFloorLevel);
@@ -320,10 +384,7 @@ public class SpiritHead : Photon.MonoBehaviour
         }
         Debug.Log("ClickedOnSomething: Unexpected clicked on nothing");
         //AUCUNE CHANCE D'ARRIVER EN CONDITION NORMAL
-        if (Physics.Raycast(ray, out hit))
-        {
-            return true;
-        }
+        hit = new RaycastHit();
         return false;
     }
 
@@ -369,17 +430,17 @@ public class SpiritHead : Photon.MonoBehaviour
         RaycastHit hit;
         if (ClickedOnSomething(out hit))
         {
-            Debug.Log("RightClickUpdate: clicked on something");
+            //Debug.Log("RightClickUpdate: clicked on something");
             Interactable inter = hit.collider.GetComponent<Interactable>();
 
-            Debug.Log("RightClickUpdate: clicking on " + hit.transform.name);
+            //Debug.Log("RightClickUpdate: clicking on " + hit.transform.name);
             if (inter != null)
             {
                 GeneralActionHandler(inter);
             }
             else
             {
-                Debug.Log("RightClickUpdate: removing focus, pointing a destination to charas");
+                //Debug.Log("RightClickUpdate: removing focus, pointing a destination to charas");
                 foreach (Transform child in _actions.transform.GetChild(0).GetChild(0))
                 {
                     Destroy(child.gameObject);

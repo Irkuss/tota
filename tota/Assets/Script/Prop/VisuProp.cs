@@ -26,21 +26,32 @@ public class VisuProp : PropHandler
             case 2: CancelConstruction(chara); break;
         }
     }
-
     public override bool CheckAvailability(CharaHead chara, int actionIndex = 0)
     {
         switch (actionIndex)
         {
             case 0: return !hasAllItems && recipe.CanBeCraftedWith(chara.GetComponent<CharaInventory>().inventory) && recipe.neededItem.Length != 0;
-            case 1: return hasAllItems || recipe.neededItem.Length == 0;
-            case 2: return true;
+            case 1: return (hasAllItems || recipe.neededItem.Length == 0) && recipe.CanBeCraftedBySkill(chara.GetComponent<CharaInventory>());
+            case 2: return true; //Cancel Construction
         }
         return false;
+    }
+    public override float GetActionTime(CharaHead chara, int actionIndex = 0)
+    {
+        switch (actionIndex)
+        {
+            case 0: return 1f; //FillNeededItem
+            case 1: return recipe.GetCraftTime(chara.GetComponent<CharaInventory>()); //Construct
+            case 2: return 1f; //Cancel Construction
+        }
+        return 0f;
     }
     //Construction method (Interaction)
 
     public void FillNeededItem(CharaHead chara)
     {
+        if (!CheckAvailability(chara, 0)) return; //Si au moment d'arriver, le blueprint est déjà rempli annule tout
+
         Debug.Log("FillNeededItem: a visu has enough items to be constructed");
         recipe.RemoveNeededItems(chara.GetComponent<CharaInventory>());
         CommandSend(new int[1] { (int)VisuCommand.Completed });
@@ -54,7 +65,7 @@ public class VisuProp : PropHandler
             GetComponent<PropManager>().
             PlaceProp(transform.position, transform.rotation.eulerAngles.y, recipe.resultPath);
         //Se détruit
-        GetComponent<PropHandler>().DestroySelf();
+        DestroySelf();
     }
     public void CancelConstruction(CharaHead chara)
     {

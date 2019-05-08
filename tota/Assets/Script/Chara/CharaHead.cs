@@ -180,13 +180,21 @@ public class CharaHead : Photon.PunBehaviour
     }
 
     //Focus on Interactable
+    private IEnumerator _checkFocusDistanceCor = null;
+    private IEnumerator _craftingItemCor = null;
+    private IEnumerator _useItemCor = null;
+    private IEnumerator _waitActionCor = null;
 
+    //Focus
     private Interactable _focus;
     private Interactable _lastInteractedFocus = null;
-    private IEnumerator _checkCor;
+    public Interactable LastInteractedFocus => _lastInteractedFocus;
+    
 
     public void SetFocus(Interactable inter, int actionIndex)
     {
+        RemoveFocus(true);
+
         bool isRunning = false;
         _focus = inter;
         //Prise de décision sur la speed and stoping distance of agent
@@ -202,28 +210,75 @@ public class CharaHead : Photon.PunBehaviour
         {
             SetStopDistance(_baseStoppingDistance);
         }
-        //Startin coroutine
-        _checkCor = CheckDistanceInter(actionIndex);
+        //Starting coroutine
         _movement.MoveToInter(_focus, isRunning);
-        StartCoroutine(_checkCor);
+
+        _checkFocusDistanceCor = CheckDistanceInter(actionIndex);
+        StartCoroutine(_checkFocusDistanceCor);
+    }
+    public void CraftItem(ItemRecipe recipe)
+    {
+        //Called when crafting an item (when the craft is already available)
+        RemoveFocus(false);
+
+        _craftingItemCor = Cor_CraftingItem(recipe);
+        StartCoroutine(_craftingItemCor);
+    }
+    public void UseItem(Item item)
+    {
+        //Called by food, equipable, wearable
+        RemoveFocus(true);
+
+        _useItemCor = Cor_UseItem(item);
+        StartCoroutine(_useItemCor);
     }
 
-    public void RemoveFocus()
+    public void RemoveFocus(bool alsoRemoveLastInter = true)
     {
-        if (_focus != null)
+        //Called when setting a destination or when craftin an item (or when using an item)
+        ForceRemoveFocus();
+        ForceEndCraft();
+        ForceEndWaitAction();
+
+        _movement.StopAgent();
+        if (alsoRemoveLastInter) _lastInteractedFocus = null; //tfalse when crafting an item only to keepworkshop busy (or when interacting with a focus oc)
+
+        GetComponent<CharaInventory>().UpdateCraft();
+    }
+    private void ForceRemoveFocus()
+    {
+        if (_focus != null || _checkFocusDistanceCor != null)
         {
-            StopCoroutine(_checkCor);
-            //Reset le focus
+            StopCoroutine(_checkFocusDistanceCor);
+            _checkFocusDistanceCor = null;
             _focus = null;
-            //Arret l'agent
-            _movement.StopAgent();
         }
+    }
+    private void ForceEndCraft()
+    {
+        if (_craftingItemCor != null)
+        {
+            StopCoroutine(_craftingItemCor);
+            _craftingItemCor = null;
+        }
+    }
+    private void ForceEndWaitAction()
+    {
+        if (_waitActionCor != null)
+        {
+            StopCoroutine(_waitActionCor);
+            _waitActionCor = null;
+        }
+        fillObj.SetActive(false);
+        needFill = false;
+        fillObj.GetComponent<Image>().fillAmount = 0;
     }
 
     private IEnumerator CheckDistanceInter(int actionIndex)
     {
-        if (_focus == null) Debug.Log("CheckDistanceInter: Unexpected null focus");
+        if (_focus == null) Debug.LogWarning("CheckDistanceInter: Unexpected null focus");
 
+        //Verification de la distance par rapport au focus
         while (Vector3.Distance(transform.position, _focus.InterTransform.position) > _focus.Radius * 0.8f)
         {
             if(_focus.isMoving)
@@ -236,16 +291,25 @@ public class CharaHead : Photon.PunBehaviour
             }
             yield return new WaitForSeconds(0.5f);
         }
-        Debug.Log("CharaHead: reached Inter");
+        Debug.Log("CharaHead: reached Inter, starting waiting time of " + _focus.GetActionTime(this, actionIndex));
+
+        _movement.StopAgent();
+
         //Interragis avec l'Interactable une fois proche
         float actionTime = _focus.GetActionTime(this, actionIndex);
-        Debug.Log("CharaHead: " + actionTime);
-        if (actionTime > 0) yield return StartCoroutine(WaitAction(actionTime));
+        if (actionTime > 0)
+        {
+            _waitActionCor = WaitAction(actionTime);
+            yield return StartCoroutine(_waitActionCor);
+        }
 
-        //Interragis
-        _focus.Interact(this, actionIndex);
+        //Interragis une fois le waiting time passé
         _lastInteractedFocus = _focus;
-        if(_focus.IsDoWhileAction[actionIndex])
+        _focus.Interact(this, actionIndex);
+        
+        GetComponent<CharaInventory>().UpdateCraft(); //Update les recipe au cas ou on interagis avec un workshop
+
+        if (_focus.IsDoWhileAction[actionIndex])
         {
             //L'action est à continuer
             yield return new WaitForSeconds(0.4f);
@@ -255,42 +319,61 @@ public class CharaHead : Photon.PunBehaviour
         {
             //Fin de l'action
             //Reset le focus
-            _focus = null;
-            _movement.StopAgent();
+            RemoveFocus(false);
         }
     }
+    private IEnumerator Cor_CraftingItem(ItemRecipe recipe)
+    {
+        _waitActionCor = WaitAction(recipe.GetCraftTime(GetComponent<CharaInventory>()));
 
-    public IEnumerator WaitAction(float waitingTime)
+        yield return StartCoroutine(_waitActionCor);
+
+        recipe.CraftWith(GetComponent<CharaInventory>());
+    }
+    private IEnumerator Cor_UseItem(Item item)
+    {
+        _waitActionCor = WaitAction(item.GetUseTime());
+
+        yield return StartCoroutine(_waitActionCor);
+
+        CharaInventory inv = GetComponent<CharaInventory>();
+
+        if (item.UseAsChara(inv))
+        {
+            inv.ModifyCount(item, -1);
+        }
+
+    }
+    private IEnumerator WaitAction(float waitingTime)
     {
         Image fill = fillObj.GetComponent<Image>();
         needFill = true;
         fillObj.SetActive(true);
 
         float startTime = Time.time;
+        //Fill
         float progressTime = Time.time - startTime;
-        while(progressTime < waitingTime)
+        while (progressTime < waitingTime)
         {
             yield return null;
             fill.fillAmount = progressTime / waitingTime;
             progressTime = Time.time - startTime;
-        }                   
-        
+        }
+        //End Fill
         fillObj.SetActive(false);
         fill.fillAmount = 0;
         needFill = false;
-    } 
-
-    public void CallCoroutine(float waitingTime)
-    {
-        StartCoroutine(WaitAction(waitingTime));
     }
 
+    
+
+    //Special Interact
     public bool TryAddItemToFurniture(Item item)
     {
-        if(_lastInteractedFocus != null)
+        if (_lastInteractedFocus != null)
         {
             CharaInventory furnitureInv = _lastInteractedFocus.GetComponent<CharaInventory>();
-            if(furnitureInv != null)
+            if (furnitureInv != null)
             {
                 return furnitureInv.Add(item);
             }

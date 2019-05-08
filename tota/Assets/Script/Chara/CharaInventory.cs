@@ -18,16 +18,14 @@ public class CharaInventory : MonoBehaviour
         private Button _itemButton;
         private Button _info;
         private GameObject _counter;
-
-        private Dictionary<Item, int> _linkedInventory;
+        
         private CharaInventory _linkedCharaInventory;
 
         public Slot(CharaInventory charaInventory,Dictionary<Item, int> inventory,Image icon, Button removeButton, Button itemButton, Button info, GameObject counter, bool pos)
         {
             //Reference au CharaInventory pour appeler UpdateUI (SPAGHETTI BOIII)
             _linkedCharaInventory = charaInventory;
-            //Reference à l'inventaire
-            _linkedInventory = inventory;
+
             isEmpty = pos;
             //Initialisation de  l'UI
             _icon = icon;
@@ -49,8 +47,16 @@ public class CharaInventory : MonoBehaviour
             _itemCount = itemCount;
 
             //Change Icon
-            _icon.sprite = _item.icon;
-            _icon.enabled = true;
+            if (_icon != null)
+            {
+                _icon.enabled = true;
+                _icon.sprite = _item.icon;
+            }
+            else
+            {
+                Debug.LogWarning("AddItem: icon is null"); //THIS HAPPEN WHEN THE INVENTORY IS NOT OPEN WHEN ADDING THE ITEM
+            }
+            
             //Change counter
             _counter.SetActive(true);
             _counter.GetComponent<Text>().text = _itemCount.ToString();
@@ -80,6 +86,8 @@ public class CharaInventory : MonoBehaviour
         public void OnRemoveButton()
         {
             //Appelé par le bouton pour detruire l'item
+            _linkedCharaInventory.ModifyCount(_item, -1);
+            /*
             if (_linkedInventory[_item] <= 1)
             {
                _linkedCharaInventory.Remove(_item);
@@ -88,7 +96,7 @@ public class CharaInventory : MonoBehaviour
             {
                 _linkedCharaInventory.ModifyCount(_item, -1);
                 //ClearSlot(); lets try this
-            }
+            }*/
         }
 
         public void OnClickButton()
@@ -154,11 +162,11 @@ public class CharaInventory : MonoBehaviour
             _slots[i] = new Slot(
                 this,
                 inventory,
-                child.transform.GetChild(0).GetComponent<Image>(),
-                child.transform.GetChild(1).GetComponent<Button>(),
-                child.transform.GetChild(0).GetComponent<Button>(),
-                child.transform.GetChild(5).GetComponent<Button>(),
-                child.transform.GetChild(2).gameObject,
+                child.transform.GetChild((int)InterfaceManager.SlotIndex.Item).GetComponent<Image>(),
+                child.transform.GetChild((int)InterfaceManager.SlotIndex.RemoveButton).GetComponent<Button>(),
+                child.transform.GetChild((int)InterfaceManager.SlotIndex.Item).GetComponent<Button>(),
+                child.transform.GetChild((int)InterfaceManager.SlotIndex.PopDescription).GetComponent<Button>(),
+                child.transform.GetChild((int)InterfaceManager.SlotIndex.Stack).gameObject,
                 true);
         }
         //Desactive les slots en trop
@@ -208,10 +216,14 @@ public class CharaInventory : MonoBehaviour
 
         if(_interface != null)
         {
-            _interface.GetComponent<InterfaceManager>().UpdateCraft(this);
+            UpdateCraft();
             UpdateWeight();
         }
 
+    }
+    public void UpdateCraft()
+    {
+        _interface.GetComponent<InterfaceManager>().UpdateCraft(this);
     }
 
     //Openning and closing Inventory (canvas)
@@ -446,22 +458,19 @@ public class CharaInventory : MonoBehaviour
 
     //RPC functions
 
-    /*[PunRPC]
-    private */ public void RemoveWithId(int id)
+    public void RemoveWithId(int id)
     {
         inventory.Remove(itemTable.GetItemWithId(id));
 
         UpdateUI();
     }
-    /*[PunRPC]
-    private */ public void AddWithId(int id)
+    public void AddWithId(int id)
     {
         inventory.Add(itemTable.GetItemWithId(id),1);
 
         UpdateUI();
     }
-    /*[PunRPC]
-    private*/ public void ModifyCountWithId(int id, int countModifier)
+    public void ModifyCountWithId(int id, int countModifier)
     {
         inventory[itemTable.GetItemWithId(id)] += countModifier;
 
