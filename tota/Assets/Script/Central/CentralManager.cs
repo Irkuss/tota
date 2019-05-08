@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
+using System.IO;
 
 public class CentralManager : Photon.MonoBehaviour
 {
@@ -20,9 +21,10 @@ public class CentralManager : Photon.MonoBehaviour
     public GameObject toolTip;
     public GameObject pauseMenu;
     [SerializeField] private GameObject _charaRef = null;
-    [SerializeField] private GameObject _options = null;
+    [SerializeField] private GameObject _options = null;    
 
     public static bool isPause = false;
+    private bool online;
 
     private PermissionsManager permi;
     private PermissionsManager.Team team = null;
@@ -51,6 +53,9 @@ public class CentralManager : Photon.MonoBehaviour
     [SerializeField] private GameObject _button = null;
     public GameObject Button { get { return _button; } }
 
+    [SerializeField] private GameObject _canvas = null;
+    public GameObject Canvas { get { return _canvas; } }
+
     public void UpdateToolTip(string[] info,string quirks)
     {
         toolTip.SetActive(true);
@@ -77,13 +82,16 @@ public class CentralManager : Photon.MonoBehaviour
     //Unity Callbacks
     private void Awake()
     {
+        online = Mode.Instance.online;
         permi = PermissionsManager.Instance;
-        player = permi.GetPlayerWithName(PhotonNetwork.player.NickName);
-        if (player != null)
-        {
-            team = permi.GetTeamWithPlayer(player);
-        }
-        
+        if (online)
+        {           
+            player = permi.GetPlayerWithName(PhotonNetwork.player.NickName);
+            if (player != null)
+            {
+                team = permi.GetTeamWithPlayer(player);
+            }
+        }               
     }
 
     private void Start()
@@ -155,8 +163,155 @@ public class CentralManager : Photon.MonoBehaviour
 
     public void Quit()
     {
+        if (!Mode.Instance.online)
+        {
+            Save();
+        }
+
         Application.Quit();
     }
+
+    private void Save()
+    {
+        string path = Application.persistentDataPath + "save.txt";
+
+        using (StreamWriter writer = new StreamWriter(path))
+        {
+            writer.WriteLine(_charaLayout.transform.childCount);
+
+            foreach(Transform child in _charaLayout.transform)
+            {
+                GameObject chara = child.GetComponent<LinkChara>().chara;
+
+                writer.WriteLine(chara.transform.position.x + "/" + chara.transform.position.y + "/" + chara.transform.position.z);
+
+                CharaRpg head = chara.GetComponent<CharaRpg>();
+
+                string quirks = "";
+                //foreach(var quirk in head.GetQuirksInfo().Split(',',' '))
+                //{
+                //    quirks += quirk + "/";
+                //}
+
+                foreach (var quirk in head.SerializeQuirks())
+                {
+                    quirks += quirk + "/";
+                }
+                writer.WriteLine(quirks);
+
+                writer.WriteLine(head.NameFull);
+
+                float[] healthStats = head.UpdateStats();
+                writer.WriteLine(healthStats[0] + "/" + healthStats[1] + "/" + healthStats[2] +
+                    "/" + healthStats[3] + "/" + healthStats[4]);
+
+                string[] info = head.GetToolTipInfo();
+                string[] skills = head.GetSkillInfo();
+
+                writer.WriteLine(info[0] + "/" + info[1] + "/" + info[2] + "/" + info[3] + "/" + info[4] +
+                    "/" + info[5] + "/" + info[6] + "/" + info[7]);
+
+                writer.WriteLine(skills[0] + "/" + skills[1] + "/" + skills[2] + "/" + skills[3] + "/" +
+                    skills[4] + "/" + skills[5] + "/" + skills[6]);
+
+                CharaInventory inventory = chara.GetComponent<CharaInventory>();
+
+                string inv = "";
+
+                foreach(var item in inventory.inventory)
+                {
+                    inv += item.Key.nickName + " " + item.Value + "/";
+                }
+                writer.WriteLine(inv);
+
+                string wearables = "";
+
+                foreach(var wear in inventory.wearables)
+                {
+                    wearables += wear.nickName;
+                }
+                writer.WriteLine(wearables);
+
+                string equipments = "";
+
+                foreach (var equip in inventory.equipments)
+                {
+                    equipments += equip.nickName;
+                }
+                writer.WriteLine(equipments);
+            }
+        }
+    }
+
+    private void Load(string teamName, string playerName)
+    {
+        string path = Application.persistentDataPath + "save.txt";
+        if (!File.Exists(path)) return;
+
+        using (StreamReader reader = new StreamReader(path))
+        {
+            int number = int.Parse(reader.ReadLine());
+            for(int i = 0; i < number; i++)
+            {
+                string[] gameobj = reader.ReadLine().Split('/');
+                Vector3 pos = new Vector3(int.Parse(gameobj[0]), int.Parse(gameobj[1]), int.Parse(gameobj[2]));
+
+                string[] quirkS = reader.ReadLine().Split('/');
+                int[] quirks = new int[quirkS.Length];
+                for(int j = 0; j < quirkS.Length; j++)
+                {
+                    quirks[j] = int.Parse(quirkS[j]);
+                }
+
+                GameObject chara = gameObject.GetComponent<CharaManager>().RPC_SpawnChara(pos.x,pos.y,pos.z,teamName,quirks,playerName);
+                CharaRpg rpg = chara.GetComponent<CharaRpg>();
+                CharaInventory inventory = chara.GetComponent<CharaInventory>();
+
+                string[] name = reader.ReadLine().Split(' ');
+                rpg.SetIdentity(name[0], name[1]);
+
+                string[] healthStats = reader.ReadLine().Split('/');
+                rpg.SetStats(healthStats);
+
+                string[] info = reader.ReadLine().Split('/');
+                string[] skills = reader.ReadLine().Split('/');
+
+                string[] inv = reader.ReadLine().Split('/');
+                foreach(var iteM in inv)
+                {
+                    string[] items = iteM.Split(' ');
+                    string item = items[0];                    
+                    int value = int.Parse(items[1]);
+                }
+
+
+                string[] wearables = reader.ReadLine().Split('/');
+                for(int k = 0; k < wearables.Length; k++)
+                {
+                    Item item = inventory.ItemTable.GetItemWithName(wearables[k]);
+
+                    if (item != null && (Wearable) item != null)
+                    {
+                        inventory.wearables[k] = (Wearable) item;
+                    }
+                }
+
+                string[] equipments = reader.ReadLine().Split('/');
+                for (int m = 0; m < equipments.Length; m++)
+                {
+                    Item item = inventory.ItemTable.GetItemWithName(wearables[m]);
+
+                    if (item != null && (Equipable)item != null)
+                    {
+                        inventory.equipments[m] = (Equipable)item;
+                    }
+                }
+            }
+
+        }
+    }
+
+
     //Temperature getters
     public int GetTemperatureAtCoord(Vector3 pos)
     {
@@ -176,22 +331,11 @@ public class CentralManager : Photon.MonoBehaviour
     {
         Debug.Log("CentralManager: Instantiation de spirit");
 
-        
-        Debug.Log("Teams : ");
-        foreach (var team in permi.TeamList)
-        {
-            Debug.Log(team.Name);
-            foreach (var playr in team.PlayerList)
-            {
-                Debug.Log(playr.Name);
-            }
-        }
-
         //Instantiate the spirit
         GameObject spirit;
         float spawnValue = (generator.SpawnPoint + 0.5f) * Generator.c_worldChunkLength;
         Vector3 spawnPosition = new Vector3(spawnValue, c_cameraStartHeight, spawnValue);
-        if (PhotonNetwork.offlineMode)
+        if (!online || PhotonNetwork.offlineMode)
         {
             spirit = Instantiate(Resources.Load<GameObject>("Spirit"), spawnPosition, Quaternion.identity);
         }
@@ -205,11 +349,22 @@ public class CentralManager : Photon.MonoBehaviour
 
         if (player == null || team == null)
         {
-            teamName = "Team" + permi.GetNumberOfTeams();
-            //Crée une nouvelle équipe avec comme nom "teamName"
-            permi.GetComponent<PhotonView>().RPC("CreateTeam", PhotonTargets.AllBuffered, teamName);
-            //Ajoute un nouveau joueur avec comme nom celui du client //TODO pour l'instant chaque joueur joue tout seul
-            permi.GetComponent<PhotonView>().RPC("AddNewPlayerToTeam", PhotonTargets.AllBuffered, teamName, PhotonNetwork.player.NickName,true);
+            if (!online)
+            {
+                teamName = "MyTeam";
+                permi.CreateTeam(teamName);
+                permi.AddNewPlayerToTeam(teamName, PhotonNetwork.player.NickName, true);
+            }
+            else
+            {
+                teamName = "Team" + permi.GetNumberOfTeams();
+                //Crée une nouvelle équipe avec comme nom "teamName"
+                permi.GetComponent<PhotonView>().RPC("CreateTeam", PhotonTargets.AllBuffered, teamName);
+                //Ajoute un nouveau joueur avec comme nom celui du client //TODO pour l'instant chaque joueur joue tout seul
+                permi.GetComponent<PhotonView>().RPC("AddNewPlayerToTeam", PhotonTargets.AllBuffered, teamName, PhotonNetwork.player.NickName, true);
+                
+            }
+
             //Recupere le Player crée par AddNewPlayerToTeam
             player = permi.GetPlayerWithName(PhotonNetwork.player.NickName);
         }

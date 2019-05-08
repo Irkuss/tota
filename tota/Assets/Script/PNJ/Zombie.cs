@@ -45,6 +45,46 @@ public class Zombie : MonoBehaviour
         }
     }
 
+    //Activor and deactivator
+    private bool _canTakeDecision = false;
+    private List<CharaHead> _activatorCharas = new List<CharaHead>();
+
+    public void ForceActivate(CharaHead activatorChara)
+    {
+        if (!_canTakeDecision) Debug.Log("ForceActivate: A zombie has been activated");
+        //Called by CharaHead in CheckForAi
+
+        if(!_activatorCharas.Contains(activatorChara))
+        {
+            //ajoute le chara en tant qu'activator
+            _activatorCharas.Add(activatorChara);
+            _canTakeDecision = true;
+        }
+    }
+    private void CheckDeactivate()
+    {
+        List<CharaHead> activatorToRemove = new List<CharaHead>();
+        //Verifie la distance de chaque activateur
+        foreach(CharaHead activatorChara in _activatorCharas)
+        {
+            if(Vector3.Distance(transform.position, activatorChara.transform.position) > CharaHead.c_radiusToActivate)
+            {
+                activatorToRemove.Add(activatorChara);
+            }
+        }
+        //Supprimes les charas eloignées des activateurs
+        foreach(CharaHead deactivator in activatorToRemove)
+        {
+            _activatorCharas.Remove(deactivator);
+        }
+        //End condition
+        if(_activatorCharas.Count == 0)
+        {
+            Debug.Log("CheckDeactivate: A zombie has been deactivated");
+            _canTakeDecision = false;
+        }
+    }
+
     //Main loop
     private IEnumerator FindTargetsWithDelay()
     {
@@ -59,59 +99,64 @@ public class Zombie : MonoBehaviour
         while (true)
         {
             yield return new WaitForSeconds(delay);
-            if(cycleBeforeForcingPosition <= 0)
+            if(_canTakeDecision)
             {
-                ForcePosition();
-                cycleBeforeForcingPosition = 100;
-            }
-            else
-            {
-                cycleBeforeForcingPosition--;
-            }
-
-            FindVisibleTargets();
-            if (_visibleTargets.Count > 0)
-            {
-                //Debug.Log("Zombie: In FOV");
-                if (alert == null)
+                Debug.Log("FindTargetsWithDelay: taking decision");
+                if (cycleBeforeForcingPosition <= 0)
                 {
-                    AudioManager.instance.Play("Ping");
-                    alert = new GameObject("Alert");
+                    ForcePosition();
+                    cycleBeforeForcingPosition = 100;
                 }
-                _wanderPoint = player.position;
-
-                _agent.SetDestination(_wanderPoint);
-                SendUpdatedWanderPoint();
-                
-                if (Vector3.Distance(player.position, transform.position) < 2f)
+                else
                 {
-                    player.GetComponent<CharaRpg>().TryDeathBite(30);
-                    yield return new WaitForSeconds(1f);
+                    cycleBeforeForcingPosition--;
                 }
-            }
-            else
-            {
-                //Debug.Log("Zombie: Wander");
-                Destroy(alert);
 
-                //
-                if (Vector3.Distance(transform.position, _wanderPoint) <= _agent.stoppingDistance + 0.3f)
+                FindVisibleTargets();
+                if (_visibleTargets.Count > 0)
                 {
-                    //Debug.Log("Zombie: Arrived");
-                    
-                    if(cycleBeforeMoving <= 0)
+                    //Zombie is chasing a chara
+                    if (alert == null)
                     {
-                        _wanderPoint = GetRandomWanderPoint();
-                        SendUpdatedWanderPoint();
-                        _agent.SetDestination(_wanderPoint);
-
-                        cycleBeforeMoving = Random.Range(4, 10) * 2;
+                        AudioManager.instance.Play("Ping");
+                        alert = new GameObject("Alert");
                     }
-                    else
+                    _wanderPoint = player.position;
+
+                    _agent.SetDestination(_wanderPoint);
+                    SendUpdatedWanderPoint();
+
+                    if (Vector3.Distance(player.position, transform.position) < 2f)
                     {
-                        cycleBeforeMoving--;
+                        player.GetComponent<CharaRpg>().TryDeathBite(30);
+                        yield return new WaitForSeconds(1f);
                     }
                 }
+                else
+                {
+                    //Zombie is wandering
+                    Destroy(alert);
+                    if (Vector3.Distance(transform.position, _wanderPoint) <= _agent.stoppingDistance + 0.3f)
+                    {
+                        //Zombie is close to destination
+                        if (cycleBeforeMoving <= 0)
+                        {
+                            //Find new wander spot
+                            _wanderPoint = GetRandomWanderPoint();
+                            SendUpdatedWanderPoint();
+                            _agent.SetDestination(_wanderPoint);
+
+                            cycleBeforeMoving = Random.Range(4, 10) * 2;
+                        }
+                        else
+                        {
+                            //Wait before finding new wander spot
+                            cycleBeforeMoving--;
+                        }
+                    }
+                }
+                //Verifie si le zombie se desactive
+                CheckDeactivate();
             }
         }
     }
@@ -127,6 +172,8 @@ public class Zombie : MonoBehaviour
             _character.Move(Vector3.zero, false, false);
         }
     }
+
+    
 
     //Helper functions
 
@@ -188,7 +235,7 @@ public class Zombie : MonoBehaviour
     //RPC
     public void GetAttackedWith(int damage)
     {
-        _photon.RPC("RPC_GetAttackedWith", PhotonTargets.AllBuffered, damage);
+        if(Mode.Instance.online) _photon.RPC("RPC_GetAttackedWith", PhotonTargets.AllBuffered, damage);
     }
     [PunRPC] private void RPC_GetAttackedWith(int damage)
     {
@@ -201,7 +248,7 @@ public class Zombie : MonoBehaviour
 
     public void SendUpdatedWanderPoint()
     {
-        _photon.RPC("RPC_SendUpdatedWanderPoint", PhotonTargets.OthersBuffered, _wanderPoint.x,_wanderPoint.y,_wanderPoint.z);
+        if (Mode.Instance.online) _photon.RPC("RPC_SendUpdatedWanderPoint", PhotonTargets.OthersBuffered, _wanderPoint.x,_wanderPoint.y,_wanderPoint.z);
     }
     [PunRPC]private void RPC_SendUpdatedWanderPoint(float x, float y, float z)
     {
@@ -211,7 +258,7 @@ public class Zombie : MonoBehaviour
 
     public void ForcePosition()
     {
-        _photon.RPC("RPC_ForceZombiePosition", PhotonTargets.OthersBuffered, _wanderPoint.x, _wanderPoint.y, _wanderPoint.z);
+        if (Mode.Instance.online) _photon.RPC("RPC_ForceZombiePosition", PhotonTargets.OthersBuffered, _wanderPoint.x, _wanderPoint.y, _wanderPoint.z);
     }
     [PunRPC] private void RPC_ForceZombiePosition(float x, float y, float z)
     {

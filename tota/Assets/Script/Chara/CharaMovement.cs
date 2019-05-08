@@ -10,17 +10,24 @@ public class CharaMovement : MonoBehaviour
     public NavMeshAgent navMeshAgent;
     public ThirdPersonCharacter character;
 
-    private float _baseAgentSpeed;
+
+    private bool _isRunning = false;
+    public bool IsRunning => _isRunning;
+    private float _baseAgentWalkingSpeed = 0.7f;
+    private float _baseAgentRunningSpeed = 1f;
+    
     private float _baseAgentAngularSpeed;
+
+    private float _currentHealthModifier = 1f;
 
     private void Start()
     {
-        _baseAgentSpeed = navMeshAgent.speed;
         _baseAgentAngularSpeed = navMeshAgent.angularSpeed;
     }
 
     private void Update()
     {
+        //Update le ThirdPersonCharacter
         navMeshAgent.updateRotation = false;
         if (navMeshAgent.remainingDistance > navMeshAgent.stoppingDistance)
         {
@@ -33,9 +40,9 @@ public class CharaMovement : MonoBehaviour
     }
 
     //Deplacement clic droit
-    public void MoveTo(Vector3 position)
+    public void MoveTo(Vector3 position, bool isRunning)
     {
-        SetDestination(position);
+        SetDestination(position, isRunning);
     }
 
     public void SetStoppingDistance(float newStop)
@@ -47,44 +54,50 @@ public class CharaMovement : MonoBehaviour
     {
         navMeshAgent.stoppingDistance = newStop;
     }
-    /*[PunRPC] private void RPC_SetStoppingDistance(float newStop)
-    {
-        navMeshAgent.stoppingDistance = newStop;
-    }*/
 
     //Modification depuis CharaRpg
     public void ModifyAgentSpeed(float speedModifier)
     {
-        navMeshAgent.speed = _baseAgentSpeed * speedModifier;
-        navMeshAgent.angularSpeed = _baseAgentAngularSpeed * speedModifier;
+        //Called by UpdateHealth every delay seconds
+        _currentHealthModifier = speedModifier;
+        UpdateSpeed();
+    }
+    private void UpdateSpeed()
+    {
+        navMeshAgent.speed = _isRunning
+            ? _baseAgentRunningSpeed * _currentHealthModifier
+            : _baseAgentWalkingSpeed * _currentHealthModifier;
+        
+        navMeshAgent.angularSpeed = _baseAgentAngularSpeed * _currentHealthModifier;
     }
 
     //Deplacement vers un Interactable
-    public void MoveToInter(Interactable inter)
+    public void MoveToInter(Interactable inter, bool isRunning = false)
     {
-        SetDestination(inter.InterTransform.position);
+        SetDestination(inter.InterTransform.position, isRunning);
     }
 
     public void StopAgent()
     {
-        SetDestination(transform.position);
+        SetDestination(transform.position, false);
     }
 
     //Update to network
     //Update current destination
 
-    private void SetDestination(Vector3 dest)
+    private void SetDestination(Vector3 dest, bool isRunning)
     {
-        GetComponent<CharaConnect>().SendMsg(CharaConnect.CharaCommand.RPC_SetDestination, null, null, new float[3] { dest.x, dest.y, dest.z });
+        int runInt = isRunning ? 1 : 0;
+
+        GetComponent<CharaConnect>().SendMsg(CharaConnect.CharaCommand.RPC_SetDestination, new int[1] { runInt}, null, new float[3] { dest.x, dest.y, dest.z });
         //GetComponent<PhotonView>().RPC("RPC_SetDestination", PhotonTargets.AllBuffered, dest.x, dest.y, dest.z);
     }
-    public void RPC_SetDestination(float x, float y, float z)
+    public void RPC_SetDestination(int runInt, float x, float y, float z)
     {
+        _isRunning = runInt == 1 ? true : false;
+        UpdateSpeed();
         navMeshAgent.SetDestination(new Vector3(x, y, z));
     }
-    /*
-    [PunRPC] private void RPC_SetDestination(float x, float y, float z)
-    {
-        navMeshAgent.SetDestination(new Vector3(x, y, z));
-    }*/
+
+
 }

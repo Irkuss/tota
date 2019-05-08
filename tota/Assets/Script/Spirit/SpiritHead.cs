@@ -68,7 +68,10 @@ public class SpiritHead : Photon.MonoBehaviour
         {
             //Normal Right Left click check
             ClickUpdate();
+            DoubleClickUpdate();
         }
+
+
 
         //Do all test functions
         TestAll();
@@ -86,9 +89,6 @@ public class SpiritHead : Photon.MonoBehaviour
 
         //Keycode.I check
         TestInventoryAdd();
-
-        //Keycode.O check
-        TestCraftBigApple();
 
         TestBuildInput();
     }
@@ -123,6 +123,17 @@ public class SpiritHead : Photon.MonoBehaviour
         }
     }
 
+    public void CharaDie(GameObject chara) 
+    {
+        foreach(Transform charaRef in _charaLayout.transform)
+        {
+            if(charaRef.GetComponent<LinkChara>().chara == chara)
+            {
+                Destroy(charaRef.gameObject);
+            }
+        }
+    }
+
     private void TestInventoryAdd()
     {
         if (Input.GetKeyDown(KeyCode.I))
@@ -131,27 +142,6 @@ public class SpiritHead : Photon.MonoBehaviour
             foreach (GameObject Chara in _selectedList)
             {
                 Chara.GetComponent<CharaInventory>().Add(item);
-            }
-        }
-    }
-    private void TestCraftBigApple()
-    {
-        if (Input.GetKeyDown(KeyCode.O))
-        {
-            foreach (GameObject Chara in _selectedList)
-            {
-                Debug.Log("TestCraftBigApple: Trying to craft bigApple");
-                CharaInventory charaInv = Chara.GetComponent<CharaInventory>();
-                if (bigAppleRecipe.CanBeCraftedWith(charaInv.inventory))
-                {
-                    Debug.Log("TestCraftBigApple: crafted bigApple");
-                    bigAppleRecipe.CraftWith(charaInv);
-                }
-                else
-                {
-                    Debug.Log("TestCraftBigApple: failed to craft bigApple");
-                }
-
             }
         }
     }
@@ -257,6 +247,9 @@ public class SpiritHead : Photon.MonoBehaviour
     }
 
     //Clicking and selecting
+    public const float c_doubleClickDelay = 0.5f;
+    private bool _isReadyToDoubleRightClick = false;
+    private float _timeWhenDoubleRightClick;
 
     private void ClickUpdate()
     {
@@ -264,6 +257,17 @@ public class SpiritHead : Photon.MonoBehaviour
         {
             if (Input.GetMouseButtonDown(0)) LeftClickUpdate();
             if (Input.GetMouseButtonDown(1)) RightClickUpdate();
+        }
+    }
+    private void DoubleClickUpdate()
+    {
+        if(_isReadyToDoubleRightClick)
+        {
+            if (Time.time - _timeWhenDoubleRightClick > c_doubleClickDelay)
+            {
+                Debug.Log("DoubleClickUpdate: double right click expired");
+                _isReadyToDoubleRightClick = false;
+            }
         }
     }
 
@@ -337,7 +341,20 @@ public class SpiritHead : Photon.MonoBehaviour
                 }
                 _actions.SetActive(false);
                 RemoveFocusAll();
-                ActionMoveAllTo(hit.point);
+
+                if(!_isReadyToDoubleRightClick)
+                {
+                    //Fait marcher les charas dans le cas ou on click
+                    ActionMoveAllTo(hit.point, false);
+
+                    _isReadyToDoubleRightClick = true;
+                    _timeWhenDoubleRightClick = Time.time;
+                }
+                else
+                {
+                    //Fait courir les charas dans le cas ou on double click droit
+                    ActionMoveAllTo(hit.point, true);
+                }
             }
         }
 
@@ -414,19 +431,20 @@ public class SpiritHead : Photon.MonoBehaviour
 
     //Charas order to selected chara (Right Click action)
 
-    private void ActionMoveAllTo(Vector3 destination)
+    private void ActionMoveAllTo(Vector3 destination, bool isRunning)
     {
         //Deplace tous les charas selectionnés à une position donnée
         float stopDistance = 0.2f + (_selectedList.Count - 1) * 0.4f; //Temporaire
         foreach (GameObject Chara in _selectedList)
         {
-            Chara.GetComponent<CharaHead>().SetDestination(destination);
+            Chara.GetComponent<CharaHead>().SetDestination(destination, isRunning);
             Chara.GetComponent<CharaHead>().SetStopDistance(stopDistance);
         }
     }
 
     private void GeneralActionHandler(Interactable inter)
     {
+        if (_selectedList.Count == 0) return; //Do nothing if no charas are selected
         if (inter.PossibleActionNames.Length == 0) return; //Do nothing if no interaction exists
         //Processus de décision l'index d'action
         //Ouvre le dropDown Menu
@@ -472,8 +490,9 @@ public class SpiritHead : Photon.MonoBehaviour
         {
             actions.Add(s);
         }
-
         int i = actions.IndexOf(action);
+
+
         IndexActionHandler(inter, i);
         foreach (Transform child in _actions.transform.GetChild(0).GetChild(0))
         {
@@ -568,7 +587,7 @@ public class SpiritHead : Photon.MonoBehaviour
 
     private void DisplayChannel()
     {
-        if (Input.GetKeyDown(KeyCode.C))
+        if (Mode.Instance.online && Input.GetKeyDown(KeyCode.C))
         {
             _channel.SetActive(!_channel.activeSelf);
         }

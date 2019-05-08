@@ -18,6 +18,8 @@ public class ItemRecipe : ScriptableObject
     //NB: les dictionnary marchent pas avec les Scriptables Objects du coup on bidouille deso
     public Item[] neededItem;
     public int[] neededItemCount;
+    [Header("Base recipe time")]
+    public float recipeTime = 0;
 
     public RecipeTable.RecipeType type = RecipeTable.RecipeType.Base;
 

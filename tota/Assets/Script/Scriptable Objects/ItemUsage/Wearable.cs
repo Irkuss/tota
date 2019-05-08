@@ -31,6 +31,8 @@ public class Wearable : Item
         //    return true
         //return false;
 
+        refInventChara.GetComponent<CharaHead>().CallCoroutine(useTime);
+
         CharaInventory inv = refInventChara.GetComponent<CharaInventory>();
         switch (inventorySpotTaken)
         {

@@ -37,7 +37,7 @@ public class CharaConnect : MonoBehaviour
         switch((CharaCommand) cc)
         {
             case CharaCommand.RPC_SetStoppingDistance:  GetComponent<CharaMovement>().RPC_SetStoppingDistance(f[0]); break;
-            case CharaCommand.RPC_SetDestination: GetComponent<CharaMovement>().RPC_SetDestination(f[0],f[1],f[2]); break;
+            case CharaCommand.RPC_SetDestination: GetComponent<CharaMovement>().RPC_SetDestination(i[0], f[0],f[1],f[2]); break;
             case CharaCommand.UpdateTeamColor: GetComponent<CharaOutline>().UpdateTeamColor(); break;
             case CharaCommand.ChangeColorTo: GetComponent<CharaOutline>().ChangeColorTo(i); break;
             case CharaCommand.SetOutlineToSelected: GetComponent<CharaOutline>().SetOutlineToSelected(); break;
