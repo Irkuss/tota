@@ -11,7 +11,7 @@ public class CharaRpg : MonoBehaviour
     private CentralManager _cm;
     private CharaMovement _charaMov;
     [SerializeField] private WoundTable _woundTable;
-    private static WoundTable woundTable;
+    public static WoundTable woundTable;
     //Name
     private string _nameFirst = "John";
     public string NameFirst => _nameFirst;
@@ -574,7 +574,8 @@ public class CharaRpg : MonoBehaviour
         {
             foreach (Wound wound in wounds)
             {
-                if (wound.type == type)
+                //A: le type correspond, B: on saigne, C: le type est Bleeding
+                if (wound.type == type && (wound.bloodLose != 0 || type != WoundInfo.WoundType.Bleeding))
                 {
                     return true;
                 }
@@ -849,7 +850,7 @@ public class CharaRpg : MonoBehaviour
         }
         else
         {
-            _manipulation = 1 - 0.5f * (2 - _bodyParts[3].GetFuncPurcent() - _bodyParts[4].GetFuncPurcent()) //Mains
+            _manipulation = 1 - 0.5f * (2 - _bodyParts[11].GetFuncPurcent() - _bodyParts[12].GetFuncPurcent()) //Mains
                       - 0.3f * (4 - _bodyParts[7].GetFuncPurcent() //Rigth Shoulder
                                   - _bodyParts[8].GetFuncPurcent() //Left Shoulder
                                   - _bodyParts[9].GetFuncPurcent() //Right Arm
@@ -867,7 +868,7 @@ public class CharaRpg : MonoBehaviour
         }
         else
         {
-            _movement = 1 - 0.5f * (2 - _bodyParts[9].GetFuncPurcent() - _bodyParts[10].GetFuncPurcent())
+            _movement = 1 - 0.5f * (2 - _bodyParts[3].GetFuncPurcent() - _bodyParts[4].GetFuncPurcent())
                       - 0.25f * (2 - _bodyParts[5].GetFuncPurcent() - _bodyParts[6].GetFuncPurcent());
             if (_movement <= 0) _movement = 0f;
         }

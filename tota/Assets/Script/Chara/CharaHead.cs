@@ -340,7 +340,7 @@ public class CharaHead : Photon.PunBehaviour
 
         if (item.UseAsChara(inv))
         {
-            inv.ModifyCount(item, -1);
+            inv.Remove(item);
         }
 
     }

@@ -19,9 +19,7 @@ public class PropFurniture : PropHandler
 
     public enum FurnitureCommand
     {
-        Add,
         Modify,
-        Remove,
         FirstInteract
     }
     private List<CharaHead> _charasUsing;
@@ -129,8 +127,6 @@ public class PropFurniture : PropHandler
     {
         switch ((FurnitureCommand) command[0])
         {
-            case FurnitureCommand.Add: _furnitureInventory.AddWithId(command[1]); break;
-            case FurnitureCommand.Remove: _furnitureInventory.RemoveWithId(command[1]); break;
             case FurnitureCommand.Modify: _furnitureInventory.ModifyCountWithId(command[1], command[2]); break;
             case FurnitureCommand.FirstInteract: SetFirstInteract(); break;
         }

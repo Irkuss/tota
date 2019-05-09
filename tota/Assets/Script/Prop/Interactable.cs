@@ -13,19 +13,30 @@ public class Interactable : MonoBehaviour
 
     [Header("Radius of interaction, from interaction center")]
     [SerializeField] protected float _radius = 5;
-    public float Radius { get => _radius; }
+    public float Radius  => _radius;
+    
     [Header("All possible actions and their characteristics")]
-    //There are '_possibleActionNames.Length + 1' possible actions
-    [SerializeField] private string[] _possibleActionNames = null; // actions names (used in the dropdown menu)
+    [SerializeField] protected string[] _possibleActionNames = null; // actions names (used in the dropdown menu)
     public string[] PossibleActionNames => _possibleActionNames;
+    public int ActionLength => _possibleActionNames.Length;
     [SerializeField] private bool[] _isDistanceAction = null; //a distance Action can be interacted without moving the chara
     public bool[] IsDistanceAction => _isDistanceAction;     // (it often has a complex CheckAvailability counterpart)
     [SerializeField] private bool[] _isDoWhileAction = null; //a do while Action is done until the focus is removed (ex: hunting / following)
     public bool[] IsDoWhileAction => _isDoWhileAction;
-    [SerializeField] private bool[] _makesActionNotAppearWhenUnavailable = null;
+    [SerializeField] protected bool[] _makesActionNotAppearWhenUnavailable = null;
     public bool[] MakesActionNotAppearWhenUnavailable => _makesActionNotAppearWhenUnavailable;
 
     //Interact, has to be overwritten
+    public virtual string GetActionName(CharaHead chara, int actionIndex = 0)
+    {
+        return _possibleActionNames[actionIndex];
+    }
+
+    public virtual bool GetIsActionAppearWhenUnavailable(CharaHead chara, int actionIndex = 0)
+    {
+        return _makesActionNotAppearWhenUnavailable[actionIndex];
+    }
+
     public virtual void Interact(CharaHead chara, int actionIndex = 0)
     {
         Debug.Log("Interactable: Interacting as " + chara.GetComponent<CharaRpg>().NameFull + " with actionIndex " + actionIndex);

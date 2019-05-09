@@ -18,8 +18,6 @@ public class CharaConnect : MonoBehaviour
         RPC_SetTeamNull,
         SetOwner,
         SetOwnerNull,
-        RemoveWithId,
-        AddWithId,
         ModifyCountWithId,
         ReceiveAddWound
     }
@@ -46,8 +44,6 @@ public class CharaConnect : MonoBehaviour
             case CharaCommand.RPC_SetTeamNull: GetComponent<CharaPermissions>().RPC_SetTeamNull(); break;
             case CharaCommand.SetOwner: GetComponent<CharaPermissions>().SetOwner(s[0]); break;
             case CharaCommand.SetOwnerNull: GetComponent<CharaPermissions>().SetOwnerNull(); break;
-            case CharaCommand.RemoveWithId: GetComponent<CharaInventory>().RemoveWithId(i[0]); break;
-            case CharaCommand.AddWithId: GetComponent<CharaInventory>().AddWithId(i[0]); break;
             case CharaCommand.ModifyCountWithId: GetComponent<CharaInventory>().ModifyCountWithId(i[0],i[1]); break;
             case CharaCommand.ReceiveAddWound: GetComponent<CharaRpg>().ReceiveAddWound(i[0], i[1], s[0], s[1], f[0]); break;
         }

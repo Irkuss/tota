@@ -86,17 +86,7 @@ public class CharaInventory : MonoBehaviour
         public void OnRemoveButton()
         {
             //Appelé par le bouton pour detruire l'item
-            _linkedCharaInventory.ModifyCount(_item, -1);
-            /*
-            if (_linkedInventory[_item] <= 1)
-            {
-               _linkedCharaInventory.Remove(_item);
-            }
-            else
-            {
-                _linkedCharaInventory.ModifyCount(_item, -1);
-                //ClearSlot(); lets try this
-            }*/
+            _linkedCharaInventory.Remove(_item);
         }
 
         public void OnClickButton()
@@ -245,7 +235,6 @@ public class CharaInventory : MonoBehaviour
         InitSlots();
         UpdateStats(stats);
     }
-
     public void ToggleInventory(GameObject parent)
     {
         _inventory = Instantiate(_inventoryPrefab);
@@ -274,7 +263,6 @@ public class CharaInventory : MonoBehaviour
 
         return sum;
     }
-
     public void UpdateStats(string[] stats)
     {
         //GameObject stat = _interface.gameObject.GetComponent<InterfaceManager>().tooltip;
@@ -291,7 +279,6 @@ public class CharaInventory : MonoBehaviour
         }
         //Debug.Log("CharaInventory: closed Inventory after being deselected");
     }
-
     public void CloseInventory()
     {
         if(_inventory != null)
@@ -370,6 +357,18 @@ public class CharaInventory : MonoBehaviour
         return minTempModifier;
     }
 
+    //Item Getters
+    public bool Contains(Item item, int quantity = 1)
+    {
+        if (item == null) return true;
+
+        if(inventory.ContainsKey(item))
+        {
+            return inventory[item] >= quantity;
+        }
+        return false;
+    }
+
     //Adding and removing item
     public bool Add(Item item)
     {
@@ -378,7 +377,6 @@ public class CharaInventory : MonoBehaviour
             Debug.Log("CharaInventory: item was null (happens when generating Loots in furniture)");
             return false;
         }
-
         //Le booléen retourné représente la réussite de l'ajout de l'item
         //Debug.Log("CharaInventory: Checking space");
 
@@ -388,51 +386,20 @@ public class CharaInventory : MonoBehaviour
         bool lastSpotIsFull = _slots == null ? false : _slots[_inventorySpace - 1].itemCount == item.stack;
         bool lastSpotContainsADifferentItem = _slots == null ? false : _slots[_inventorySpace - 1].item != item;
 
-
         if (noMoreSpace || noMoreStrength ||  lastSpotIsNotEmpty && (lastSpotIsFull || lastSpotContainsADifferentItem)) // Du spaghetti comme on aime
         {
             //Si l'inventaire est rempli, ne fait rien
             return false;
         }
-        Debug.Log("CharaInventory: Adding item");
-        if (inventory.ContainsKey(item))
-        {
-            Debug.Log("CharaInventory: Item was already present, incrementing already existin item");
-            //Si l'item était déjà dans l'inventaire, augmente son compte de 1
-            //inventory[item] += 1;
-            ModifyCount(item, 1);
-        }
-        else
-        {
-            Debug.Log("CharaInventory: Item was not present");
-            //Si l'item n'était pas dans l'inventaire, ajoute un exemplaire de cet item
-            //inventory.Add(item, 1);
-            CharaConnect conn = GetComponent<CharaConnect>();
-            if (conn != null)
-            {
-                conn.SendMsg(CharaConnect.CharaCommand.AddWithId, new int[1] { itemTable.GetIdWithItem(item) }, null, null);
-            }
-            else
-            {
-                GetComponent<PropHandler>().CommandSend(new int[2] { (int)PropFurniture.FurnitureCommand.Add, itemTable.GetIdWithItem(item) });
-            }
-            //gameObject.GetComponent<PhotonView>().RPC("AddWithId", PhotonTargets.AllBuffered, itemTable.GetIdWithItem(item));
-        }
-        Debug.Log("CharaInventory: Item has been added");
+        Debug.Log("CharaInventory: Adding item " + item.nickName);
+        ModifyCount(item, 1);
         return true;
     }
 
     public void Remove(Item item)
     {
-        CharaConnect conn = GetComponent<CharaConnect>();
-        if (conn != null)
-        {
-            conn.SendMsg(CharaConnect.CharaCommand.RemoveWithId, new int[1] { itemTable.GetIdWithItem(item) }, null, null);
-        }
-        else
-        {
-            GetComponent<PropHandler>().CommandSend(new int[2] { (int)PropFurniture.FurnitureCommand.Remove, itemTable.GetIdWithItem(item) });
-        }
+        Debug.Log("CharaInventory: Removing item " + item.nickName);
+        ModifyCount(item, -1);
     }
 
     public void ModifyCount(Item item, int countModifier)
@@ -449,31 +416,40 @@ public class CharaInventory : MonoBehaviour
     }
 
     //RPC functions
-
-    public void RemoveWithId(int id)
-    {
-        inventory.Remove(itemTable.GetItemWithId(id));
-
-        UpdateUI();
-    }
-    public void AddWithId(int id)
-    {
-        inventory.Add(itemTable.GetItemWithId(id),1);
-
-        UpdateUI();
-    }
     public void ModifyCountWithId(int id, int countModifier)
     {
-        inventory[itemTable.GetItemWithId(id)] += countModifier;
+        if (countModifier == 0) return;
 
-        if (inventory[itemTable.GetItemWithId(id)] == 0)
+        Item item = itemTable.GetItemWithId(id);
+
+        if (item == null) Debug.LogWarning("ModifyCountWithId: Unexpected null item in inventory");
+
+        if(countModifier > 0)
         {
-            RemoveWithId(id);
+            if (inventory.ContainsKey(item))
+            {
+                //Si on veut ajouter un item qui est présent dans l'inventaire
+                inventory[item] += countModifier;
+            }
+            else
+            {
+                //Si on veut ajouter un item qui n'est pas présent dans l'inventaire
+                inventory.Add(item, countModifier);
+            }
         }
         else
         {
-            UpdateUI();
-        }        
+            //Dans le cas ou on diminue le nombre d'item
+            inventory[item] += countModifier;
+
+            if (inventory[item] <= 0)
+            {
+                //Si on supprimé tous les items d'un meme type
+                inventory.Remove(item);
+            }
+        }
+        //Met a jour l'inventaire
+        UpdateUI();
     }
 
 }

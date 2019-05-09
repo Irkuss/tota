@@ -580,7 +580,7 @@ public class SpiritHead : Photon.MonoBehaviour
     private void GeneralActionHandler(Interactable inter)
     {
         if (_selectedList.Count == 0) return; //Do nothing if no charas are selected
-        if (inter.PossibleActionNames.Length == 0) return; //Do nothing if no interaction exists
+        if (inter.ActionLength == 0) return; //Do nothing if no interaction exists
         //Processus de décision l'index d'action
         //Ouvre le dropDown Menu
         //Récupére les noms d'actions des strings (l'index du nom correspond à l'index d'action)
@@ -593,11 +593,11 @@ public class SpiritHead : Photon.MonoBehaviour
             Destroy(child.gameObject);
         }
 
-        Vector3 vec = new Vector3(inter.transform.position.x, 3, inter.transform.position.z);
+        Vector3 vec = new Vector3(inter.transform.position.x, inter.transform.position.y + 3, inter.transform.position.z);
         _actions.transform.position = _spiritCamera.GetComponent<Camera>().WorldToScreenPoint(vec);
 
         _actions.SetActive(true);
-        for (int i = 0; i < inter.PossibleActionNames.Length; i++)
+        for (int i = 0; i < inter.ActionLength; i++)
         {
             bool isAvailable = IsActionIndexAvailableByAll(inter, i);
 
@@ -605,7 +605,6 @@ public class SpiritHead : Photon.MonoBehaviour
             {
                 GameObject act = Instantiate(_button, _actions.transform.GetChild(0).GetChild(0));
                 act.transform.GetChild(0).GetComponent<Text>().text = inter.PossibleActionNames[i];
-
                 act.GetComponent<Button>().onClick.AddListener(() => Act(inter, act.transform.GetChild(0).GetComponent<Text>().text));
 
                 if (!isAvailable)
@@ -621,9 +620,9 @@ public class SpiritHead : Photon.MonoBehaviour
     public void Act(Interactable inter,string action)
     {
         List<string> actions = new List<string>();
-        foreach(var s in inter.PossibleActionNames)
+        foreach(string actionName in inter.PossibleActionNames)
         {
-            actions.Add(s);
+            actions.Add(actionName);
         }
         int i = actions.IndexOf(action);
 

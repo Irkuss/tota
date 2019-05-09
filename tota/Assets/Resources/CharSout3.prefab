@@ -455,9 +455,11 @@ MonoBehaviour:
   - Attack with  Remote 1
   - Attack with  Remote 2
   - Follow
-  _isDistanceAction: 0000010100
-  _isDoWhileAction: 0000000001
-  _makesActionNotAppearWhenUnavailable: 0101010101
+  - Amputate infected parts
+  - Treat bleeding wounds
+  _isDistanceAction: 00000101000000
+  _isDoWhileAction: 00000000010000
+  _makesActionNotAppearWhenUnavailable: 01010101010101
 --- !u!1001 &3013624492168413005
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -465,6 +467,22 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 9180920927353207022}
     m_Modifications:
+    - target: {fileID: 100050, guid: a190c6110b1c4b94aafb2395cfc74db5, type: 3}
+      propertyPath: m_Name
+      value: testperso4
+      objectReference: {fileID: 0}
+    - target: {fileID: 100050, guid: a190c6110b1c4b94aafb2395cfc74db5, type: 3}
+      propertyPath: m_Layer
+      value: 11
+      objectReference: {fileID: 0}
+    - target: {fileID: 100004, guid: a190c6110b1c4b94aafb2395cfc74db5, type: 3}
+      propertyPath: m_Layer
+      value: 11
+      objectReference: {fileID: 0}
+    - target: {fileID: 100052, guid: a190c6110b1c4b94aafb2395cfc74db5, type: 3}
+      propertyPath: m_Layer
+      value: 11
+      objectReference: {fileID: 0}
     - target: {fileID: 400050, guid: a190c6110b1c4b94aafb2395cfc74db5, type: 3}
       propertyPath: m_LocalPosition.x
       value: 0
@@ -520,22 +538,6 @@ PrefabInstance:
     - target: {fileID: 400050, guid: a190c6110b1c4b94aafb2395cfc74db5, type: 3}
       propertyPath: m_LocalScale.z
       value: 3.5
-      objectReference: {fileID: 0}
-    - target: {fileID: 100050, guid: a190c6110b1c4b94aafb2395cfc74db5, type: 3}
-      propertyPath: m_Name
-      value: testperso4
-      objectReference: {fileID: 0}
-    - target: {fileID: 100050, guid: a190c6110b1c4b94aafb2395cfc74db5, type: 3}
-      propertyPath: m_Layer
-      value: 11
-      objectReference: {fileID: 0}
-    - target: {fileID: 100004, guid: a190c6110b1c4b94aafb2395cfc74db5, type: 3}
-      propertyPath: m_Layer
-      value: 11
-      objectReference: {fileID: 0}
-    - target: {fileID: 100052, guid: a190c6110b1c4b94aafb2395cfc74db5, type: 3}
-      propertyPath: m_Layer
-      value: 11
       objectReference: {fileID: 0}
     - target: {fileID: 100044, guid: a190c6110b1c4b94aafb2395cfc74db5, type: 3}
       propertyPath: m_Layer
