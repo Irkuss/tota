@@ -5,9 +5,19 @@ using UnityEngine.UI;
 
 public class InterfaceManager : MonoBehaviour
 {
-    [SerializeField] private GameObject _craft = null;
-    [SerializeField] private GameObject _slot = null;
-    [SerializeField] private RecipeTable _data = null;
+    [SerializeField] private GameObject _craftLeft = null;
+    [SerializeField] private RecipeTable _dataLeft = null;
+
+    [SerializeField] private GameObject _craftMidLeft = null;
+    [SerializeField] private RecipeTable _dataMidLeft = null;
+
+    [SerializeField] private GameObject _craftMidRight = null;
+    [SerializeField] private RecipeTable _dataMidRight = null;
+
+    [SerializeField] private GameObject _craftRight = null;
+    [SerializeField] private RecipeTable _dataRight = null;
+
+    [SerializeField] private GameObject _slot = null;    
     [SerializeField] private GameObject _equipment = null;
     [SerializeField] private GameObject _injuries = null;
     [SerializeField] private GameObject _stats = null;
@@ -19,7 +29,7 @@ public class InterfaceManager : MonoBehaviour
     [SerializeField] private Sprite _fistR = null;
     [SerializeField] private Sprite _leg = null;
 
-    private GameObject _recipe;
+    
 
     //public GameObject tooltip => _tooltip;
     public enum SlotIndex
@@ -33,29 +43,38 @@ public class InterfaceManager : MonoBehaviour
         MissingInfo = 6
     }
 
-    //Instantion
+    //Instantiation
     public void InstantiateCraft(CharaInventory charaInventory)
     {
-        foreach (ItemRecipe recipe in _data.recipes)
+        RecipeTable[] allRecipeTable = new RecipeTable[4] { _dataLeft, _dataMidLeft, _dataMidRight, _dataRight };
+        GameObject[] allCraftGo = new GameObject[4] { _craftLeft, _craftMidLeft, _craftMidRight, _craftRight };
+
+        GameObject craftSlot;
+        for (int i = 0; i < allRecipeTable.Length; i++)
         {
-            //Instantie le slot (meme slot qu'un inventaire)
-            _recipe = Instantiate(_slot, _craft.transform.GetChild(0));
-            //Associe l'action de craft et l'image de l'item crafté
-            _recipe.transform.GetChild((int)SlotIndex.Item).GetComponent<Image>().sprite = recipe.result.icon;
-            _recipe.transform.GetChild((int)SlotIndex.Item).GetComponent<Button>().onClick.AddListener(() => ClickCraft(charaInventory,recipe));
-            //Desactive le bouton de suppression de l'item dans le slot ainsi que celui de description
-            _recipe.transform.GetChild((int)SlotIndex.RemoveButton).gameObject.SetActive(false);
-            _recipe.transform.GetChild((int)SlotIndex.PopDescription).gameObject.SetActive(false);
-            //Lie le compteur du slot au nombre d'item donné par la recipe
-            if (recipe.resultCount <= 1)
+            
+            foreach (ItemRecipe recipe in allRecipeTable[i].recipes)
             {
-                //Desactive quand la recipe donne 1 ou moins item
-                _recipe.transform.GetChild((int)SlotIndex.Stack).gameObject.SetActive(false);
-            }
-            else
-            {
-                //Sinon lie le resultCount au compteur du slot
-                _recipe.transform.GetChild((int)SlotIndex.Stack).GetComponent<Text>().text = recipe.resultCount.ToString();
+                craftSlot = Instantiate(_slot, allCraftGo[i].transform.GetChild(0));
+
+
+                //Associe l'action de craft et l'image de l'item crafté
+                craftSlot.transform.GetChild((int)SlotIndex.Item).GetComponent<Image>().sprite = recipe.result.icon;
+                craftSlot.transform.GetChild((int)SlotIndex.Item).GetComponent<Button>().onClick.AddListener(() => ClickCraft(charaInventory, recipe));
+                //Desactive le bouton de suppression de l'item dans le slot ainsi que celui de description
+                craftSlot.transform.GetChild((int)SlotIndex.RemoveButton).gameObject.SetActive(false);
+                craftSlot.transform.GetChild((int)SlotIndex.PopDescription).gameObject.SetActive(false);
+                //Lie le compteur du slot au nombre d'item donné par la recipe
+                if (recipe.resultCount <= 1)
+                {
+                    //Desactive quand la recipe donne 1 ou moins item
+                    craftSlot.transform.GetChild((int)SlotIndex.Stack).gameObject.SetActive(false);
+                }
+                else
+                {
+                    //Sinon lie le resultCount au compteur du slot
+                    craftSlot.transform.GetChild((int)SlotIndex.Stack).GetComponent<Text>().text = recipe.resultCount.ToString();
+                }
             }
         }
     }
@@ -78,31 +97,39 @@ public class InterfaceManager : MonoBehaviour
     //Updating
     public void UpdateCraft(CharaInventory charaInventory)
     {
+        RecipeTable[] allRecipeTable = new RecipeTable[4] { _dataLeft, _dataMidLeft, _dataMidRight, _dataRight };
+        GameObject[] allCraftGo = new GameObject[4] { _craftLeft, _craftMidLeft, _craftMidRight, _craftRight };
+
         ItemRecipe recipe;
         string missingMsg;
-        for (int i = 0; i < _data.recipes.Length; i++)
+        GameObject craftSlot;
+
+        for (int j = 0; j < allRecipeTable.Length; j++)
         {
-            recipe = _data.recipes[i];
-            _recipe = _craft.transform.GetChild(0).GetChild(i).gameObject;
-
-            missingMsg = "";
-            if (!recipe.CanBeCraftedWith(charaInventory.inventory)) missingMsg += "Missing Items\n";
-            if (!recipe.CanBeCraftedByWorkshop(charaInventory)) missingMsg += "Missing Workshop\n";
-            if (!recipe.CanBeCraftedBySkill(charaInventory)) missingMsg += "" + CharaRpg.statToString[recipe.statUsed] + " level (" + recipe.neededStatLevel + ")\n";
-
-            GameObject recipeMissingInfo = _recipe.transform.GetChild((int)SlotIndex.MissingInfo).gameObject;
-            if (missingMsg == "")
+            for (int i = 0; i < allRecipeTable[j].recipes.Length; i++)
             {
-                recipeMissingInfo.SetActive(false);
-                //Met le lock (image grise transparente)
-                _recipe.transform.GetChild((int)SlotIndex.Lock).gameObject.SetActive(false);
-            }
-            else
-            {
-                recipeMissingInfo.SetActive(true);
-                recipeMissingInfo.GetComponent<Text>().text = missingMsg;
-                //Enleve le lock
-                _recipe.transform.GetChild((int)SlotIndex.Lock).gameObject.SetActive(true);
+                recipe = allRecipeTable[j].recipes[i];
+                craftSlot = allCraftGo[j].transform.GetChild(0).GetChild(i).gameObject;
+
+                missingMsg = "";
+                if (!recipe.CanBeCraftedWith(charaInventory.inventory)) missingMsg += "Missing Items\n";
+                if (!recipe.CanBeCraftedByWorkshop(charaInventory)) missingMsg += "Missing Workshop\n";
+                if (!recipe.CanBeCraftedBySkill(charaInventory)) missingMsg += "" + CharaRpg.statToString[recipe.statUsed] + " level (" + recipe.neededStatLevel + ")\n";
+
+                GameObject recipeMissingInfo = craftSlot.transform.GetChild((int)SlotIndex.MissingInfo).gameObject;
+                if (missingMsg == "")
+                {
+                    recipeMissingInfo.SetActive(false);
+                    //Met le lock (image grise transparente)
+                    craftSlot.transform.GetChild((int)SlotIndex.Lock).gameObject.SetActive(false);
+                }
+                else
+                {
+                    recipeMissingInfo.SetActive(true);
+                    recipeMissingInfo.GetComponent<Text>().text = missingMsg;
+                    //Enleve le lock
+                    craftSlot.transform.GetChild((int)SlotIndex.Lock).gameObject.SetActive(true);
+                }
             }
         }
     }
@@ -267,14 +294,29 @@ public class InterfaceManager : MonoBehaviour
     //Opening inventory craft when interacting with workshop
     public void ForceOpenCraft(int index)
     {
-        GameObject parent = _craft.transform.parent.gameObject;
+        _craftLeft.transform.parent.SetAsLastSibling();
+        switch (index)
+        {
+            case 0:
+                _craftLeft.transform.SetAsLastSibling();
+                break;
+            case 1:
+                _craftMidLeft.transform.SetAsLastSibling();
+                break;
+            case 2:
+                _craftMidRight.transform.SetAsLastSibling();
+                break;
+            case 3:
+                _craftRight.transform.SetAsLastSibling();
+                break;
+        }
     }
 
-    
 
-    
 
-    
 
-    
+
+
+
+
 }

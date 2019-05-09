@@ -281,14 +281,6 @@ public class CharaInventory : MonoBehaviour
         //stat.GetComponent<ToolTip>().UpdateTool(stats);
     }
 
-    public void ForceOpenCraft(int index)
-    {
-        if(_interface != null)
-        {
-            _interface.GetComponent<InterfaceManager>().ForceOpenCraft(index);
-        }
-    }
-
     public void CloseInterface()
     {
         //Appelé CloseInventoryOnDeselected() pour fermer l'inventaire quand un Chara est deselectionné
