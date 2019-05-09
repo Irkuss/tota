@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class SpiritMovement : Photon.MonoBehaviour
 {
@@ -41,8 +42,8 @@ public class SpiritMovement : Photon.MonoBehaviour
 
         if (Mode.Instance.zqsd)
         {
-            moveHorizontal = Input.GetAxis("MoveH"); //Fleches horizontal ou 'a' / 'd'
-            moveVertical = Input.GetAxis("MoveV"); //Fleches vertical ou 'w' / 's'
+            moveHorizontal = Input.GetAxis("MoveH"); //Fleches horizontal ou 'q' / 'd'
+            moveVertical = Input.GetAxis("MoveV"); //Fleches vertical ou 'z' / 's'
         }
         else
         {
@@ -51,7 +52,12 @@ public class SpiritMovement : Photon.MonoBehaviour
         }
 
         if(moveHorizontal != 0 || moveVertical != 0)
-        {            
+        {
+            if (Mode.Instance.firstTime == 0 && !Mode.Instance.isSkip)
+            {
+                StartCoroutine(MoveTuto());
+            }
+
             GameObject _actions = GameObject.Find("eCentralManager").GetComponent<CentralManager>().Actions;
             foreach (Transform child in _actions.transform.GetChild(0).GetChild(0))
             {
@@ -65,5 +71,15 @@ public class SpiritMovement : Photon.MonoBehaviour
         
 
         rb.AddForce(movement * cameraSpeed, fm);
+    }
+
+    private IEnumerator MoveTuto()
+    {
+        yield return new WaitForSeconds(3f);
+
+        GameObject tuto = GameObject.Find("eCentralManager").GetComponent<CentralManager>().Tuto;
+        tuto.SetActive(true);
+        tuto.transform.GetChild(0).GetComponent<Text>().text = "You can also zoom or dezoom the vision of the camera of your current position";
+        Mode.Instance.firstTime = 1;
     }
 }

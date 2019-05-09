@@ -17,7 +17,7 @@ public class CharaRpg : MonoBehaviour
     public string NameFirst => _nameFirst;
     private string _nameLast = "McCree";
     public string NameLast => _nameLast;
-    public string NameFull => _nameFirst + " " + _nameLast;
+    public string NameFull => _nameFirst + _nameLast;
     //Age
     private int _age;
 
@@ -819,22 +819,20 @@ public class CharaRpg : MonoBehaviour
 
     public void Die()
     {
-        if(CheckIfInfected())
-        {
-            DieZombie();
-            return;
-        }
-
         _isDead = true;
         _movement = 0;
         //Chara dies
         PermissionsManager.Instance.spirit.CharaDie(gameObject);
+
+        if (CheckIfInfected())
+        {
+            DieZombie();
+            return;
+        }        
         Debug.Log("======================= CharaRpg: " + NameFull + " has died =======================");
     }
     public void DieZombie()
     {
-        _isDead = true;
-        _movement = 0;
         //Chara dies by death bite infection
         Debug.Log("======================= CharaRpg: " + NameFull + " has died of death bite infection =======================");
     }
