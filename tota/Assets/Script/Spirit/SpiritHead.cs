@@ -25,6 +25,8 @@ public class SpiritHead : Photon.MonoBehaviour
     private GameObject _button;
     private GameObject _tuto;
 
+    private Mode mode;
+
     //Le joueur qui contrôle ce Spirit (ne change pas)
     private PermissionsManager _permission = PermissionsManager.Instance;
     private PermissionsManager.Player _playerOwner = null;
@@ -55,15 +57,27 @@ public class SpiritHead : Photon.MonoBehaviour
         _actions = eManager.Actions;
         _button = eManager.Button;
         _tuto = eManager.Tuto;
+        
+        mode = Mode.Instance;
 
-        StartCoroutine(WaitForTuto());
-        _tuto.SetActive(true);
-        _tuto.transform.GetChild(0).GetComponent<Text>().text = "Now you can move yourself using the wqsd keys or the directional arrows";
+        if (!mode.online && !mode.isSkip)
+        {
+            StartCoroutine(FirstStepTuto());
+        }
+             
     }
 
     private IEnumerator WaitForTuto()
     {
         yield return new WaitForSeconds(3f);       
+    }
+
+    private IEnumerator FirstStepTuto()
+    {
+        yield return StartCoroutine(WaitForTuto());
+
+        _tuto.SetActive(true);
+        _tuto.transform.GetChild(0).GetComponent<Text>().text = "Now you can move yourself using the wqsd keys or the directional arrows";
     }
 
     //Unity Callback
@@ -116,14 +130,21 @@ public class SpiritHead : Photon.MonoBehaviour
             Vector3 lowPosition = new Vector3(gameObject.transform.position.x, 1, gameObject.transform.position.z);
             GameObject.Find("eCentralManager").GetComponent<CharaManager>().SpawnChara(lowPosition, _playerOwner.MyTeamName,_playerOwner.Name);
 
-            if(Mode.Instance.firstTime == 2)
+            if(mode.firstTime == 2)
             {
-                StartCoroutine(WaitForTuto());
-                _tuto.SetActive(true);
-                _tuto.transform.GetChild(0).GetComponent<Text>().text = "Nice, you have created a new character. You can select him by clicking left on him.";
-                Mode.Instance.firstTime = 3;
+                StartCoroutine(SpawnTuto());
+                
             }
         }
+    }
+
+    private IEnumerator SpawnTuto()
+    {
+        yield return StartCoroutine(WaitForTuto());
+
+        _tuto.SetActive(true);
+        _tuto.transform.GetChild(0).GetComponent<Text>().text = "Nice, you have created a new character. You can select him by clicking left on him.";
+        mode.firstTime = 3;
     }
 
     public void InstantiateCharaRef(string playerWhoSent,GameObject chara)
@@ -324,12 +345,9 @@ public class SpiritHead : Photon.MonoBehaviour
                     ClickOnChara(hit.transform.gameObject);
                 }
 
-                if(Mode.Instance.firstTime == 3)
+                if(mode.firstTime == 3 && !mode.isSkip)
                 {
-                    StartCoroutine(WaitForTuto());
-                    _tuto.SetActive(true);
-                    _tuto.transform.GetChild(0).GetComponent<Text>().text = "You can also move your character. Once you have selected him you can right click on a position and your character will walk until this point";
-                    Mode.Instance.firstTime = 4;
+                    StartCoroutine(MoveCharaTuto());                    
                 }
             }
             else
@@ -343,6 +361,15 @@ public class SpiritHead : Photon.MonoBehaviour
                 DeselectAll();
             }
         }
+    }
+
+    private IEnumerator MoveCharaTuto()
+    {
+        yield return StartCoroutine(WaitForTuto());
+
+        _tuto.SetActive(true);
+        _tuto.transform.GetChild(0).GetComponent<Text>().text = "You can also move your character. Once you have selected him you can right click on a position and your character will walk until this point";
+        mode.firstTime = 4;
     }
 
     private void RightClickUpdate()
@@ -382,19 +409,26 @@ public class SpiritHead : Photon.MonoBehaviour
                     ActionMoveAllTo(hit.point, true);
                 }
 
-                if(Mode.Instance.firstTime == 4)
+                if(mode.firstTime == 4 && !mode.isSkip)
                 {
-                    StartCoroutine(WaitForTuto());
-                    _tuto.SetActive(true);
-                    _tuto.transform.GetChild(0).GetComponent<Text>().text = "WOW some informations about your character appear on the screen. You can see more details by pressing the E key.\n"
-                        + "Other keys : \n"
-                        + "Press B to open the build mode.\n"
-                        + "Press ESCAPE to open the pause menu.";
-                    Mode.Instance.firstTime = 5;
+                    StartCoroutine(FinalTuto());
+                    
                 }
             }
         }
 
+    }
+
+    private IEnumerator FinalTuto()
+    {
+        yield return StartCoroutine(WaitForTuto());
+
+        _tuto.SetActive(true);
+        _tuto.transform.GetChild(0).GetComponent<Text>().text = "WOW some informations about your character appear on the screen. You can see more details by pressing the E key.\n"
+            + "Other keys : \n"
+            + "Press B to open the build mode.\n"
+            + "Press ESCAPE to open the pause menu.";
+        mode.firstTime = 5;
     }
 
     //Public methods
@@ -613,8 +647,7 @@ public class SpiritHead : Photon.MonoBehaviour
         {
             _interface.GetComponent<InterfaceManager>().ForceOpenCraft(index);
             _inventoryList.SetActive(true);
-        }        
-        
+        }    
     }
 
     public void MoveCamera(Vector3 pos)

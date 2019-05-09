@@ -716,7 +716,7 @@ MonoBehaviour:
   m_Content: {fileID: 1496412955136484387}
   m_Horizontal: 0
   m_Vertical: 1
-  m_MovementType: 0
+  m_MovementType: 1
   m_Elasticity: 0.1
   m_Inertia: 1
   m_DecelerationRate: 0.135
@@ -1421,12 +1421,15 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ab777a57ee136ef4680a5e3170e6a408, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _craftTop: {fileID: 1111413152691530828}
-  _craftMidTop: {fileID: 3518432052041724397}
-  _craftMidDown: {fileID: 4573056194612691490}
-  _craftDown: {fileID: 6166005237113571223}
+  _craftLeft: {fileID: 1111413152691530828}
+  _dataLeft: {fileID: 11400000, guid: 29a57b05dea0b8640847521ef3220e75, type: 2}
+  _craftMidLeft: {fileID: 3518432052041724397}
+  _dataMidLeft: {fileID: 11400000, guid: ae0b65f065ce2d747b056922f962b9ee, type: 2}
+  _craftMidRight: {fileID: 4573056194612691490}
+  _dataMidRight: {fileID: 11400000, guid: d570415db6e84fa4aba1ddfd622997a6, type: 2}
+  _craftRight: {fileID: 6166005237113571223}
+  _dataRight: {fileID: 11400000, guid: 22936b456c7a0c0428838b49ca99967f, type: 2}
   _slot: {fileID: 938139858139491608, guid: 5d8e418e2956c954ab009d941ca53e26, type: 3}
-  _data: {fileID: 11400000, guid: 29a57b05dea0b8640847521ef3220e75, type: 2}
   _equipment: {fileID: 7121560293366530043}
   _injuries: {fileID: 8635962927709977604}
   _stats: {fileID: 4756426412705717043}
@@ -3078,7 +3081,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_Material: {fileID: 0}
-  m_Color: {r: 1, g: 1, b: 1, a: 0.392}
+  m_Color: {r: 1, g: 1, b: 1, a: 0}
   m_RaycastTarget: 1
   m_OnCullStateChanged:
     m_PersistentCalls:
@@ -3127,7 +3130,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: 0, y: -0.000015259}
+  m_AnchoredPosition: {x: 0, y: -2.1100277e-10}
   m_SizeDelta: {x: 0, y: 230.8}
   m_Pivot: {x: 0, y: 1}
 --- !u!114 &3917844925373484794

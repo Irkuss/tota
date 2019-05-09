@@ -86,12 +86,9 @@ public class SpiritZoom : Photon.MonoBehaviour
     {
         if (Input.GetAxis("Mouse ScrollWheel") != 0)
         {
-            if (Mode.Instance.firstTime == 1)
+            if (Mode.Instance.firstTime == 1 && !Mode.Instance.isSkip)
             {
-                GameObject tuto = GameObject.Find("eCentralManager").GetComponent<CentralManager>().Tuto;
-                tuto.SetActive(true);
-                tuto.transform.GetChild(0).GetComponent<Text>().text = "Now that you understood the bases of the movements you can really enter into the game : Press space to spawn a character.";
-                Mode.Instance.firstTime = 2;
+                StartCoroutine(ZoomTuto());
             }
 
             GameObject _actions = GameObject.Find("eCentralManager").GetComponent<CentralManager>().Actions;
@@ -112,6 +109,16 @@ public class SpiritZoom : Photon.MonoBehaviour
                 ScrollNormal();
             }
         }
+    }
+
+    private IEnumerator ZoomTuto()
+    {
+        yield return new WaitForSeconds(3f);
+
+        GameObject tuto = GameObject.Find("eCentralManager").GetComponent<CentralManager>().Tuto;
+        tuto.SetActive(true);
+        tuto.transform.GetChild(0).GetComponent<Text>().text = "Now that you understood the bases of the movements you can really enter into the game : Press space to spawn a character.";
+        Mode.Instance.firstTime = 2;
     }
     private void ScrollNormal()
     {

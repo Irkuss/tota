@@ -12,6 +12,7 @@ public class Mode : MonoBehaviour
     [HideInInspector] public bool zqsd = false;
     [HideInInspector] public bool load = false;
     [HideInInspector] public int firstTime = 0;
+    [HideInInspector] public bool isSkip = false;
     [SerializeField] private GameObject _loadButton = null;
     [SerializeField] private GameObject _launchButton = null;
     [SerializeField] private GameObject _loadText = null;

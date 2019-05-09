@@ -5,13 +5,19 @@ using UnityEngine.UI;
 
 public class InterfaceManager : MonoBehaviour
 {
-    [SerializeField] private GameObject _craftTop = null;
-    [SerializeField] private GameObject _craftMidTop = null;
-    [SerializeField] private GameObject _craftMidDown = null;
-    [SerializeField] private GameObject _craftDown = null;
+    [SerializeField] private GameObject _craftLeft = null;
+    [SerializeField] private RecipeTable _dataLeft = null;
 
-    [SerializeField] private GameObject _slot = null;
-    [SerializeField] private RecipeTable _data = null;
+    [SerializeField] private GameObject _craftMidLeft = null;
+    [SerializeField] private RecipeTable _dataMidLeft = null;
+
+    [SerializeField] private GameObject _craftMidRight = null;
+    [SerializeField] private RecipeTable _dataMidRight = null;
+
+    [SerializeField] private GameObject _craftRight = null;
+    [SerializeField] private RecipeTable _dataRight = null;
+
+    [SerializeField] private GameObject _slot = null;    
     [SerializeField] private GameObject _equipment = null;
     [SerializeField] private GameObject _injuries = null;
     [SerializeField] private GameObject _stats = null;
@@ -28,18 +34,42 @@ public class InterfaceManager : MonoBehaviour
     //public GameObject tooltip => _tooltip;
 
     public void InstantiateCraft(CharaInventory charaInventory)
-    {
-        foreach (var recipe in _data.recipes)
+    {        
+        foreach(var recipe in _dataLeft.recipes)
         {
-            _recipe = Instantiate(_slot, _craftTop.transform.GetChild(0));
+            _recipe = Instantiate(_slot, _craftLeft.transform.GetChild(0));
             _recipe.transform.GetChild(0).GetComponent<Image>().sprite = recipe.result.icon;
-            _recipe.transform.GetChild(0).GetComponent<Button>().onClick.AddListener(() => ClickCraft(charaInventory,recipe));
+            _recipe.transform.GetChild(0).GetComponent<Button>().onClick.AddListener(() => ClickCraft(charaInventory, recipe));
             _recipe.transform.GetChild(1).gameObject.SetActive(false);
             _recipe.transform.GetChild(2).GetComponent<Text>().text = recipe.resultCount.ToString();
 
             if (recipe.type != RecipeTable.RecipeType.Base)
             {
                 _recipe.transform.GetChild(3).gameObject.SetActive(true);
+            }
+        }            
+        
+    }
+
+    public void ToAvoidConflict(CharaInventory charaInventory)
+    {
+        List<RecipeTable> tables = new List<RecipeTable> { _dataLeft, _dataMidLeft, _dataMidRight, _dataRight };
+        List<GameObject> crafts = new List<GameObject> { _craftLeft, _craftMidLeft, _craftMidRight, _craftRight };
+
+        for (int i = 0; i < tables.Count; i++)
+        {
+            foreach (var recipe in tables[i].recipes)
+            {
+                _recipe = Instantiate(_slot, crafts[i].transform.GetChild(0));
+                _recipe.transform.GetChild(0).GetComponent<Image>().sprite = recipe.result.icon;
+                _recipe.transform.GetChild(0).GetComponent<Button>().onClick.AddListener(() => ClickCraft(charaInventory, recipe));
+                _recipe.transform.GetChild(1).gameObject.SetActive(false);
+                _recipe.transform.GetChild(2).GetComponent<Text>().text = recipe.resultCount.ToString();
+
+                if (recipe.type != RecipeTable.RecipeType.Base)
+                {
+                    _recipe.transform.GetChild(3).gameObject.SetActive(true);
+                }
             }
         }
     }
@@ -60,9 +90,9 @@ public class InterfaceManager : MonoBehaviour
     public void UpdateCraft(CharaInventory charaInventory)
     {
         int i = 0;
-        foreach(var recipe in _data.recipes)
+        foreach(var recipe in _dataLeft.recipes)
         {
-            _recipe = _craftTop.transform.GetChild(0).GetChild(i).gameObject;
+            _recipe = _craftLeft.transform.GetChild(0).GetChild(i).gameObject;
             if (!recipe.CanBeCraftedWith(charaInventory.inventory) || recipe.type != RecipeTable.RecipeType.Base)
             {
                 _recipe.transform.GetChild(1).gameObject.SetActive(false);
@@ -79,20 +109,20 @@ public class InterfaceManager : MonoBehaviour
 
     public void ForceOpenCraft(int index)
     {
-        _craftTop.transform.parent.SetAsLastSibling();
+        _craftLeft.transform.parent.SetAsLastSibling();
         switch (index)
         {
             case 0:
-                _craftTop.transform.SetAsLastSibling();
+                _craftLeft.transform.SetAsLastSibling();
                 break;
             case 1:
-                _craftMidTop.transform.SetAsLastSibling();
+                _craftMidLeft.transform.SetAsLastSibling();
                 break;
             case 2:
-                _craftMidDown.transform.SetAsLastSibling();
+                _craftMidRight.transform.SetAsLastSibling();
                 break;
             case 3:
-                _craftDown.transform.SetAsLastSibling();
+                _craftRight.transform.SetAsLastSibling();
                 break;
         }
     }

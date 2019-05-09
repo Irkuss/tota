@@ -424,8 +424,13 @@ public class CentralManager : Photon.MonoBehaviour
         //Appelé par Generator/Start/*Received Package*/GenerateEnd une fois que le monde s'est généré
         tempButton.SetActive(true);
         _tuto.SetActive(true);
-        _tuto.transform.GetChild(0).GetComponent<Text>().text = "Welcome in the solo mode of Tales of the Apocalypse. This is short tutorial for you to understand the main commands of the game";
+        _tuto.transform.GetChild(0).GetComponent<Text>().text = "Welcome in the solo mode of Tales of the Apocalypse. This is a short tutorial for you to understand the main commands of the game";
         _tuto.transform.GetChild(1).GetComponent<Button>().onClick.AddListener(() => _tuto.SetActive(false));
+        _tuto.transform.GetChild(2).GetComponent<Button>().onClick.AddListener(delegate
+        {
+            Mode.Instance.isSkip = true;
+            _tuto.SetActive(false);
+        });
     }
 
     //Spawn le joueur (appelé par le bouton spawn)
