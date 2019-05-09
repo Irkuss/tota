@@ -61,6 +61,9 @@ public class CentralManager : Photon.MonoBehaviour
     [SerializeField] private GameObject _tuto = null;
     public GameObject Tuto { get { return _tuto; } }
 
+    [SerializeField] private RecipeTable _visuData = null;
+    public RecipeTable VisuData { get { return _visuData; } }    
+
     public void UpdateToolTip(string[] info,string quirks)
     {
         toolTip.SetActive(true);
@@ -410,7 +413,6 @@ public class CentralManager : Photon.MonoBehaviour
         }
     }
 
-
     //Temperature getters
     public int GetTemperatureAtCoord(Vector3 pos)
     {
@@ -422,15 +424,28 @@ public class CentralManager : Photon.MonoBehaviour
     public void OnGenerationFinished()
     {
         //Appelé par Generator/Start/*Received Package*/GenerateEnd une fois que le monde s'est généré
-        tempButton.SetActive(true);
-        _tuto.SetActive(true);
-        _tuto.transform.GetChild(0).GetComponent<Text>().text = "Welcome in the solo mode of Tales of the Apocalypse. This is a short tutorial for you to understand the main commands of the game";
-        _tuto.transform.GetChild(1).GetComponent<Button>().onClick.AddListener(() => _tuto.SetActive(false));
-        _tuto.transform.GetChild(2).GetComponent<Button>().onClick.AddListener(delegate
+        if (Mode.Instance.online)
         {
+            tempButton.SetActive(true);
             Mode.Instance.isSkip = true;
-            _tuto.SetActive(false);
-        });
+        }
+        else
+        {
+            _tuto.SetActive(true);
+            _tuto.transform.GetChild(0).GetComponent<Text>().text = "Welcome in the solo mode of Tales of the Apocalypse. This is a short tutorial for you to understand the main commands of the game";
+            _tuto.transform.GetChild(1).GetComponent<Button>().onClick.AddListener(SpawnButton);
+            _tuto.transform.GetChild(2).GetComponent<Button>().onClick.AddListener(delegate
+            {
+                Mode.Instance.isSkip = true;
+                SpawnButton();
+            });
+        }       
+    }
+
+    private void SpawnButton()
+    {
+        tempButton.SetActive(true);
+        _tuto.SetActive(false);
     }
 
     //Spawn le joueur (appelé par le bouton spawn)

@@ -29,8 +29,6 @@ public class InterfaceManager : MonoBehaviour
     [SerializeField] private Sprite _fistR = null;
     [SerializeField] private Sprite _leg = null;
 
-    
-
     //public GameObject tooltip => _tooltip;
     public enum SlotIndex
     {
@@ -56,7 +54,6 @@ public class InterfaceManager : MonoBehaviour
             foreach (ItemRecipe recipe in allRecipeTable[i].recipes)
             {
                 craftSlot = Instantiate(_slot, allCraftGo[i].transform.GetChild(0));
-
 
                 //Associe l'action de craft et l'image de l'item crafté
                 craftSlot.transform.GetChild((int)SlotIndex.Item).GetComponent<Image>().sprite = recipe.result.icon;
