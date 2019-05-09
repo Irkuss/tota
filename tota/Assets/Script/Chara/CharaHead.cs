@@ -78,7 +78,7 @@ public class CharaHead : Photon.PunBehaviour
     {
         if (needFill)
         {
-            Vector3 vec = new Vector3(gameObject.transform.position.x, 3, gameObject.transform.position.z);
+            Vector3 vec = new Vector3(gameObject.transform.position.x, gameObject.transform.position.y + 3, gameObject.transform.position.z);
             fillObj.transform.position = SpiritZoom.cam.WorldToScreenPoint(vec);
         }
     }
