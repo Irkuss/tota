@@ -64,7 +64,7 @@ public class Interactable : MonoBehaviour
             default: //Do nothing (should not be 
                 break;
         }
-        return true;
+        return false;
     }
 
     public virtual float GetActionTime(CharaHead chara, int actionIndex = 0)

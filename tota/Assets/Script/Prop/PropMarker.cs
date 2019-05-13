@@ -7,8 +7,17 @@ public class PropMarker : MonoBehaviour
     //PropMarker marks where the prop chosen by PropSpot is located, it also places the prop
 
     public PropSpot propSpot = null;
+    public bool isDecidingByItself = true;
 
     void Start()
+    {
+        if(isDecidingByItself)
+        {
+            StartPlacement();
+        }
+    }
+
+    public void StartPlacement()
     {
         if (PhotonNetwork.isMasterClient)
         {

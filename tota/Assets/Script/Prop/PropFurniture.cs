@@ -36,7 +36,7 @@ public class PropFurniture : PropHandler
 
     private void RandAddLoot()
     {
-        Item[] itemToAdd = lootTable.GetChosenPropsArray(Random.Range(8, 12));
+        Item[] itemToAdd = lootTable.GetChosenPropsArray();
         for (int i = 0; i < itemToAdd.Length; i++)
         {
             _furnitureInventory.Add(itemToAdd[i]);
@@ -60,11 +60,19 @@ public class PropFurniture : PropHandler
         }
         //ouvre l'inventaire
         _inventoryLayout.transform.parent.parent.gameObject.SetActive(true);
+
+        CharaInventory inv = chara.GetComponent<CharaInventory>();
+        if(inv.GetInterface() == null) inv.ToggleInterface(_inventoryLayout, chara.GetComponent<CharaRpg>().GetToolTipInfo()); //
+
         _furnitureInventory.ToggleInventory(_inventoryLayout);
+        
         if (_firstInteract && hasToRandAddLoot)
         {
+            //Spawn du loot
             RandAddLoot();
-
+            //Train la stat scavenger
+            chara.GetComponent<CharaRpg>().TrainStat(CharaRpg.Stat.sk_scavenger, GetActionTime(chara, 0));
+            //Indique à tout le monde que cette furniture a été interact
             CommandSend(new int[1] { (int)FurnitureCommand.FirstInteract });
         }
     }

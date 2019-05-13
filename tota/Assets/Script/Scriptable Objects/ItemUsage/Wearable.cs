@@ -70,28 +70,24 @@ public class Wearable : Item
 
         return true;
     }
-    public override bool Unequip(GameObject refInventChara)
+    public override bool Unequip(CharaInventory charaInventory)
     {
-        //Unequip the weapon, process as follows:
+        //Unequip the wearable
+        Debug.Log("Unequip: unequiping " + nickName + "(wearable), ");
+        if (!charaInventory.Add(this)) return false;
 
-        //if inventory has enough space (1)
-        //    return true
-        //return false
-
-        CharaInventory inv = refInventChara.GetComponent<CharaInventory>();
-        if (!inv.Add(this)) return false;
-
-        for (int i = 0; i < inv.wearables.Length; i++)
+        for (int i = 0; i < charaInventory.wearables.Length; i++)
         {
-            if (inv.wearables[i] == this)
+            if (charaInventory.wearables[i] == this)
             {
-                inv.wearables[i] = null;
+                charaInventory.wearables[i] = null;
+                break;
             }
         }
-
-        GameObject _interface = inv.GetInterface();
+        Debug.Log("Unequip: ending unequip " + nickName);
+        GameObject _interface = charaInventory.GetInterface();
         if (_interface == null) return false;
-        _interface.GetComponent<InterfaceManager>().UpdateEquipment(inv);
+        _interface.GetComponent<InterfaceManager>().UpdateEquipment(charaInventory);
 
         return true;
     }

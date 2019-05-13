@@ -59,6 +59,7 @@ public class VisuProp : PropHandler
 
     public void Construct(CharaHead chara)
     {
+        recipe.UpdateTraining(chara.GetComponent<CharaRpg>(), GetActionTime(chara, 1));
         Debug.Log("Construct: a visu has been built");
         //Crée un nouveau prop
         GameObject.Find("eCentralManager").

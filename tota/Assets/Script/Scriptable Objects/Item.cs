@@ -80,7 +80,7 @@ public class Item : ScriptableObject
         return useTime;
     }
 
-    public virtual bool Unequip(GameObject refInventChara)
+    public virtual bool Unequip(CharaInventory charaInventory)
     {
         //Only overriden by Equipable and Wearable
         return false;

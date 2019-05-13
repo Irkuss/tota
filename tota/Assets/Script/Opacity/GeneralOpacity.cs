@@ -7,4 +7,9 @@ public class GeneralOpacity : MonoBehaviour
     //Classe mere de FloorOpacity et OrganicOpacity
     protected int _currentFloorLevel;
     public int CurrentFloorLevel => _currentFloorLevel;
+
+    public virtual bool IsBelowFloor(int floor)
+    {
+        return false;
+    }
 }

@@ -119,10 +119,6 @@ public class CharaInventory : MonoBehaviour
     //Nombre d'emplacement (Tweakable)
     private int _inventorySpace = 12;
 
-    //Callback pour Update L'UI
-    public delegate void OnItemChanged();
-    public OnItemChanged onItemChangedCallback;
-
     //List and stuff (slots)
     private GameObject _slotParent;
     [SerializeField] private GameObject _inventoryPrefab = null;
@@ -213,6 +209,11 @@ public class CharaInventory : MonoBehaviour
     }
     public void UpdateCraft()
     {
+        if (_interface == null)
+        {
+            Debug.LogWarning("UpdateCraft: interface was null");
+            return;
+        }
         _interface.GetComponent<InterfaceManager>().UpdateCraft(this);
     }
 

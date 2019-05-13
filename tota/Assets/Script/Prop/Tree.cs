@@ -17,6 +17,10 @@ public class Tree : PropHandler
     {
         return baseCutTime * chara.GetComponent<CharaRpg>().GetTimeModifier(CharaRpg.Stat.ms_strength);
     }
+    public override bool CheckAvailability(CharaHead chara, int actionIndex = 0)
+    {
+        return true;
+    }
 
 
 

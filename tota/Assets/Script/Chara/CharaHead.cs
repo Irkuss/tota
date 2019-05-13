@@ -324,11 +324,14 @@ public class CharaHead : Photon.PunBehaviour
     }
     private IEnumerator Cor_CraftingItem(ItemRecipe recipe)
     {
-        _waitActionCor = WaitAction(recipe.GetCraftTime(GetComponent<CharaInventory>()));
+        float recipeTime = recipe.GetCraftTime(GetComponent<CharaInventory>());
+        Debug.Log("Cor_CraftingItem: starting craft of time " + recipeTime);
+        _waitActionCor = WaitAction(recipeTime);
 
         yield return StartCoroutine(_waitActionCor);
 
         recipe.CraftWith(GetComponent<CharaInventory>());
+        recipe.UpdateTraining(GetComponent<CharaRpg>(), recipeTime);
     }
     private IEnumerator Cor_UseItem(Item item)
     {

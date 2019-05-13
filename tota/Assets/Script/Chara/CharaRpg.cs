@@ -125,7 +125,6 @@ public class CharaRpg : MonoBehaviour
         }
     }
     private Stats _baseStat;
-    private Stats _statModifiers;
     private List<Quirk> _quirks;
     //Init Awake
     private void Awake()
@@ -176,10 +175,6 @@ public class CharaRpg : MonoBehaviour
         for (int i = 0; i < 5; i++) baseStat[i] = 50;
         for (int i = 5; i < c_statNumber; i++) baseStat[i] = 0;
         _baseStat = new Stats(baseStat);
-        //Stat modifiante
-        int[] modifStat = new int[c_statNumber];
-        for (int j = 0; j < c_statNumber; j++) modifStat[j] = 0;
-        _statModifiers = new Stats(modifStat);
     }
     private void ApplyQuirks()
     {
@@ -205,9 +200,9 @@ public class CharaRpg : MonoBehaviour
     {
         if(IsMainStat(stat))
         {
-            return Stats.GetMultiplyResult(_baseStat, _consciousness).GetStat(stat) + _statModifiers.GetStat(stat);
+            return Stats.GetMultiplyResult(_baseStat, _consciousness).GetStat(stat);
         }
-        return _baseStat.GetStat(stat) + _statModifiers.GetStat(stat);
+        return _baseStat.GetStat(stat);
     }
     public string GetQuirksInfo()
     {
@@ -230,7 +225,60 @@ public class CharaRpg : MonoBehaviour
             return 1.75f - statValue * 0.015f; //0 -> 1.75, 50 -> 1, 100 -> 0.25
         }
         Debug.Log("GetTimeModifier: returning " + (1f - statValue * 0.075f));
-        return 1f - statValue * 0.75f; //0 -> 1, 10 -> 0.25
+        return 1f - statValue * 0.075f; //0 -> 1, 10 -> 0.25
+    }
+
+    //Experience system
+    private Dictionary<Stat, float> _statExp = new Dictionary<Stat, float>
+    {
+        //Main stats (de 1 à 100)
+        { Stat.ms_strength, 0},
+        { Stat.ms_intelligence, 0},
+        { Stat.ms_perception, 0},
+        { Stat.ms_mental, 0},
+        { Stat.ms_social, 0},
+        //Skills (-1 à 10) (0 de base) (-1 desactive les actions liées) 
+        { Stat.sk_doctor, 0},
+        { Stat.sk_farmer, 0},
+        { Stat.sk_carpenter, 0},
+        { Stat.sk_scavenger, 0},
+        { Stat.sk_electrician, 0},
+        { Stat.sk_marksman, 0},
+        //Stats Level
+        { Stat.lv_stamina, 0},
+    };
+
+    public void TrainStat(Stat trainedStat, float trainValue)
+    {
+        if(trainValue > 0)
+        {
+            GetComponent<CharaConnect>().SendMsg(CharaConnect.CharaCommand.TrainStat, new int[1] { (int)trainedStat }, null, new float[1] { trainValue });
+        }
+    }
+
+    public void RPC_TrainStat(Stat trainedStat, float trainValue)
+    {
+        _statExp[trainedStat] += trainValue;
+
+        UpdateStatTraining(trainedStat);
+
+        Debug.Log("TrainStat: " + 
+            statToString[trainedStat] + " is now " + _statExp[trainedStat] + 
+            " (added " + trainValue + ")-> " + GetTrainingPurcent(trainedStat) + "%");
+    }
+    private void UpdateStatTraining(Stat trainedStat)
+    {
+        if(_statExp[trainedStat] > 10 * (1 + GetCurrentStat(trainedStat)) )
+        {
+            _statExp[trainedStat] = 0;
+            _baseStat.AddSpecific(trainedStat, 1);
+            Debug.Log("TrainStat: " + statToString[trainedStat] + " Level up !");
+            UpdateToolTip();
+        }
+    }
+    private float GetTrainingPurcent(Stat trainedStat)
+    {
+        return _statExp[trainedStat] / 10 * (1 + GetCurrentStat(trainedStat));
     }
 
     //Random Getters
@@ -259,9 +307,9 @@ public class CharaRpg : MonoBehaviour
         _feltTemperature = GetOutSideTemperature();
     }
     //Health Attribute
-    private readonly int maxBloodStock = 2000;
-    private int bloodStockGain = 30;
-    private int bloodStock;
+    private readonly int _maxBloodStock = 2000;
+    private int _bloodStockGain = 30;
+    private int _bloodStock;
     private float _consciousness = 1f; //if reaches 0.1, switch to shock state, *Social/Intelligence
     private float _shockTreshold = 0.1f;
     private float _pain = 0f;
@@ -653,7 +701,7 @@ public class CharaRpg : MonoBehaviour
         _bodyParts.Add(new BodyPart("Right Hand", BodyType.Hand,         150, 0.8f));//11
         _bodyParts.Add(new BodyPart("Left Hand", BodyType.Hand,          150, 0.8f));//12
 
-        bloodStock = maxBloodStock;
+        _bloodStock = _maxBloodStock;
 
         StartCoroutine(Cor_UpdateHealth());
     }
@@ -699,12 +747,12 @@ public class CharaRpg : MonoBehaviour
         //Blood lose
         if (totalBloodLose == 0)
         {
-            bloodStock += bloodStockGain;
-            if (bloodStock > maxBloodStock) bloodStock = maxBloodStock;
+            _bloodStock += _bloodStockGain;
+            if (_bloodStock > _maxBloodStock) _bloodStock = _maxBloodStock;
         }
         else
         {
-            bloodStock -= totalBloodLose;
+            _bloodStock -= totalBloodLose;
         }
     }
     private void UpdateHealthStatus()
@@ -734,8 +782,8 @@ public class CharaRpg : MonoBehaviour
             _consciousness,
             _movement,
             _manipulation,
-            bloodStock,
-            maxBloodStock
+            _bloodStock,
+            _maxBloodStock
         };
     }
 
@@ -745,7 +793,7 @@ public class CharaRpg : MonoBehaviour
         _consciousness = float.Parse(stats[1]);
         _movement = float.Parse(stats[2]);
         _manipulation = float.Parse(stats[3]);
-        bloodStock = int.Parse(stats[4]);
+        _bloodStock = int.Parse(stats[4]);
     }
 
     private bool CheckDeath()
@@ -770,7 +818,7 @@ public class CharaRpg : MonoBehaviour
             return true;
         }
         //BloodLose
-        if (bloodStock <= 0)
+        if (_bloodStock <= 0)
         {
             return true;
         }
@@ -834,7 +882,7 @@ public class CharaRpg : MonoBehaviour
                 maxInfection = infection;
             }
         }
-        _consciousness = _consciousness * (float)bloodStock / (float)maxBloodStock;
+        _consciousness = _consciousness * (float)_bloodStock / (float)_maxBloodStock;
         _consciousness -= (maxInfection / 100f);
 
 
@@ -983,10 +1031,10 @@ public class CharaRpg : MonoBehaviour
     {
         foreach (BodyPart bodyPart in _bodyParts)
         {
-            Debug.Log("HasWoundOfType: Checking " + bodyPart.name);
+            //Debug.Log("HasWoundOfType: Checking " + bodyPart.name);
             if(bodyPart.HasWoundsOfType(type))
             {
-                Debug.Log("HasWoundOfType: found wounds of type in " + bodyPart.name);
+                //Debug.Log("HasWoundOfType: found wounds of type in " + bodyPart.name);
                 return true;
             }
         }

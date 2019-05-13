@@ -23,7 +23,7 @@ public class CharaInteract : Interactable
 
     public override bool CheckAvailability(CharaHead chara, int actionIndex = 0)
     {
-        Debug.Log("CheckAvailability: checking index " + actionIndex);
+        //Debug.Log("CheckAvailability: checking index " + actionIndex);
         switch (actionIndex)
         {
             case 0: return CheckAttackWithSlot(chara, 0, true);//melee 0
@@ -155,7 +155,7 @@ public class CharaInteract : Interactable
     {
         bool isInfected = GetComponent<CharaRpg>().IsInfected();
 
-        Debug.Log("CheckAmputation: infected " + isInfected + ", has required skill " + (chara.GetComponent<CharaRpg>().GetCurrentStat(CharaRpg.Stat.sk_doctor) >= 2));
+        //Debug.Log("CheckAmputation: infected " + isInfected + ", has required skill " + (chara.GetComponent<CharaRpg>().GetCurrentStat(CharaRpg.Stat.sk_doctor) >= 2));
 
         _makesActionNotAppearWhenUnavailable[actionIndex] = !isInfected;
 
@@ -168,7 +168,7 @@ public class CharaInteract : Interactable
         _makesActionNotAppearWhenUnavailable[actionIndex] = !hasWound;
 
         Item requiredItem = CharaRpg.woundTable.GetInfo(type).treatment;
-        Debug.Log("CheckAmputation: bleeding " + hasWound + ", has bandage " + chara.GetComponent<CharaInventory>().Contains(requiredItem));
+        //Debug.Log("CheckAmputation: bleeding " + hasWound + ", has bandage " + chara.GetComponent<CharaInventory>().Contains(requiredItem));
         return hasWound && chara.GetComponent<CharaInventory>().Contains(requiredItem);
     }
 }

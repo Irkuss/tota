@@ -9,7 +9,9 @@ public class SpiritMovement : Photon.MonoBehaviour
     private Rigidbody rb;
 
     //Tweakable value (!)
-    private float cameraSpeed = 20.0f;
+    private float cameraSpeed = 5.0f;
+    private float cameraSpeedBase = 5f;
+    private float cameraSpeedFast = 15f;
     private ForceMode fm = ForceMode.VelocityChange;
 
     // Unity Callbacks
@@ -28,6 +30,8 @@ public class SpiritMovement : Photon.MonoBehaviour
     {
         if (Channel.isWriting) return;
         //Fixed update car on travaille avec de la physique (AddForce)
+        cameraSpeed = (Input.GetKey(KeyCode.LeftControl) || Input.GetKey(KeyCode.RightControl)) ? cameraSpeedFast : cameraSpeedBase ;
+
         Move();
     }
 

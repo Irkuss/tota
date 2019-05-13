@@ -28,6 +28,8 @@ public class zombieProp : MonoBehaviour
                     Instantiate(Resources.Load<GameObject>(path), transform.position, angle);
                 }
             }
+            
         }
+        Destroy(this.gameObject);
     }
 }

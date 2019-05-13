@@ -326,7 +326,7 @@ public class SpiritHead : Photon.MonoBehaviour
     {
         //Debug.Log("==========ClickedOnSomething: Starting new Raycast==========");
         //VER2_iterativeCasting_ClickedOnSomething
-        int currentFloorLevel = GetComponent<SpiritZoom>().FloorManagerRef.FloorLevel;
+        
         
         Ray ray = _spiritCamera.ScreenPointToRay(Input.mousePosition);
 
@@ -344,7 +344,7 @@ public class SpiritHead : Photon.MonoBehaviour
             Debug.DrawRay(origin, direction * 30, debugColor, 3f);
             if (Physics.Raycast(origin, direction, out RaycastHit possibleHit))
             {
-                if(IsHitValid(currentFloorLevel, possibleHit))
+                if(IsHitValid(possibleHit))
                 {
                     //Debug.Log("ClickedOnSomething: Step done " + step);
                     hit = possibleHit;
@@ -367,15 +367,19 @@ public class SpiritHead : Photon.MonoBehaviour
         hit = new RaycastHit();
         return false;
     }
-    private bool IsHitValid(int currentFloorLevel, RaycastHit hit)
+    private bool IsHitValid(RaycastHit hit)
     {
+        int currentFloorLevel = GetComponent<SpiritZoom>().FloorManagerRef.FloorLevel;
+
+
         GeneralOpacity generalOpacity = hit.transform.GetComponent<GeneralOpacity>();
         if (generalOpacity != null)
         {
-            if (generalOpacity.CurrentFloorLevel <= currentFloorLevel)
+            if(generalOpacity.IsBelowFloor(currentFloorLevel))
+            //if(generalOpacity.CurrentFloorLevel <= currentFloorLevel)
             {
 
-                //Debug.Log("IsHitValid: Returning hit with name " + hit.transform.name);
+                Debug.Log("IsHitValid: Returning hit with name " + hit.transform.name + " and floor " + generalOpacity.CurrentFloorLevel + " at floor " + currentFloorLevel);
                 return true;
             }
             //Debug.Log("IsHitValid: Cycled through '" + hit.transform.name + "' with floor " + generalOpacity.CurrentFloorLevel);
