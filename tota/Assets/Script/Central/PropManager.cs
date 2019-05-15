@@ -66,9 +66,9 @@ public class PropManager : MonoBehaviour
         }
 
         //Sending special command
-        public void ReceivePropCommand(int[] command, float[] commandFloat)
+        public void ReceivePropCommand(int[] command, float[] commandFloat, string[] commandString = null)
         {
-            if (_go != null) _go.GetComponentInChildren<PropHandler>().CommandReceive(command, commandFloat);
+            if (_go != null) _go.GetComponentInChildren<PropHandler>().CommandReceive(command, commandFloat, commandString);
         }
     }
 
@@ -207,25 +207,25 @@ public class PropManager : MonoBehaviour
         }
     }
     //Send command
-    public void SendPropCommand(int id, int[] command, float[] commandFloat)
+    public void SendPropCommand(int id, int[] command, float[] commandFloat, string[] commandString)
     {
         if (Mode.Instance.online)
         {
-            GetComponent<PhotonView>().RPC("RPC_SendPropCommand", PhotonTargets.AllBuffered, id, command, commandFloat);
+            GetComponent<PhotonView>().RPC("RPC_SendPropCommand", PhotonTargets.AllBuffered, id, command, commandFloat, commandString);
         }
         else
         {
-            RPC_SendPropCommand(id, command, commandFloat);
+            RPC_SendPropCommand(id, command, commandFloat, commandString);
         }
         
     }
-    [PunRPC] private void RPC_SendPropCommand(int id, int[] command, float[] commandFloat)
+    [PunRPC] private void RPC_SendPropCommand(int id, int[] command, float[] commandFloat, string[] commandString)
     {
         RealProp prop = FindPropWithId(id);
 
         if (prop != null)
         {
-            prop.ReceivePropCommand(command, commandFloat);
+            prop.ReceivePropCommand(command, commandFloat, commandString);
         }
     }
 }

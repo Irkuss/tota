@@ -41,6 +41,7 @@ public class CharaHead : Photon.PunBehaviour
         if(PhotonNetwork.isMasterClient)
         {
             StartCoroutine(CheckForAi());
+            StartCoroutine(UpdateForceOpenDoor());
         }
     }
 
@@ -73,6 +74,8 @@ public class CharaHead : Photon.PunBehaviour
         Gizmos.color = Color.yellow;
         Gizmos.DrawWireSphere(transform.position, c_radiusToActivate);
     }
+
+    
 
     private void Update()
     {
@@ -193,9 +196,9 @@ public class CharaHead : Photon.PunBehaviour
 
     public void SetFocus(Interactable inter, int actionIndex)
     {
-        RemoveFocus(true);
+        RemoveFocus(true, false);
 
-        bool isRunning = false;
+        bool isRunning = _movement.IsRunning;
         _focus = inter;
         //Prise de décision sur la speed and stoping distance of agent
         if (_focus.IsDoWhileAction[actionIndex])
@@ -233,14 +236,14 @@ public class CharaHead : Photon.PunBehaviour
         StartCoroutine(_useItemCor);
     }
 
-    public void RemoveFocus(bool alsoRemoveLastInter = true)
+    public void RemoveFocus(bool alsoRemoveLastInter = true, bool resetRunning = true)
     {
         //Called when setting a destination or when craftin an item (or when using an item)
         ForceRemoveFocus();
         ForceEndCraft();
         ForceEndWaitAction();
 
-        _movement.StopAgent();
+        _movement.StopAgent(resetRunning);
         if (alsoRemoveLastInter) _lastInteractedFocus = null; //tfalse when crafting an item only to keepworkshop busy (or when interacting with a focus oc)
 
         GetComponent<CharaInventory>().UpdateCraft();
@@ -291,7 +294,7 @@ public class CharaHead : Photon.PunBehaviour
             }
             yield return new WaitForSeconds(0.5f);
         }
-        Debug.Log("CharaHead: reached Inter, starting waiting time of " + _focus.GetActionTime(this, actionIndex));
+        //Debug.Log("CharaHead: reached Inter, starting waiting time of " + _focus.GetActionTime(this, actionIndex));
 
         _movement.StopAgent();
 
@@ -382,5 +385,41 @@ public class CharaHead : Photon.PunBehaviour
             }
         }
         return false;
+    }
+
+    //ForceOpenDoor
+    private IEnumerator UpdateForceOpenDoor()
+    {
+        //Called in Start
+        while(true)
+        {
+            //Si on n'a pas ou on n'interragis pas avec une porte
+            if ((_focus == null || _focus.GetComponent<DoorHandler>() == null) && (_lastInteractedFocus == null || _lastInteractedFocus.GetComponent<DoorHandler>() == null))
+            {
+                //Verifie s'il y a qqchose devant le chara
+                Debug.DrawRay(transform.position, transform.forward * 1f);
+                if (Physics.Raycast(transform.position, transform.forward, out RaycastHit possibleDoorHit, 1f))
+                {
+                    DoorHandler doorHandler = possibleDoorHit.transform.GetComponent<DoorHandler>();
+                    //Verifie si ce qqchose est une porte
+                    if (doorHandler != null)
+                    {
+                        if (doorHandler.CanForceOpen(this))
+                        {
+                            //Ouvre la porte
+                            doorHandler.ForceOpen(this);
+                        }
+                        else
+                        {
+                            //N'ouvre pas la porte et arrete l'agent
+                            _movement.StopAgent();
+                            yield return new WaitForSeconds(0.5f);//Important pour ne pas bloquer le chara
+                        }
+                    }
+                }
+            }
+            yield return null;
+        }
+        
     }
 }

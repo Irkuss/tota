@@ -105,7 +105,7 @@ public class WorkshopProp : PropHandler
     }
 
     //command
-    public override void CommandReceive(int[] command, float[] commandFloat)
+    public override void CommandReceive(int[] command, float[] commandFloat, string[] commandString = null)
     {
         switch((WorkShopCommand)command[0])
         {

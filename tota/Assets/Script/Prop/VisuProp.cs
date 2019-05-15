@@ -83,7 +83,7 @@ public class VisuProp : PropHandler
         hasAllItems = true;
     }
 
-    public override void CommandReceive(int[] command, float[] commandFloat)
+    public override void CommandReceive(int[] command, float[] commandFloat, string[] commandString = null)
     {
         switch ((VisuCommand)command[0])
         {

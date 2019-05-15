@@ -1,5 +1,35 @@
 %YAML 1.1
 %TAG !u! tag:unity3d.com,2011:
+--- !u!1 &2516191179008967631
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1077194762191053378}
+  m_Layer: 0
+  m_Name: inter
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1077194762191053378
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2516191179008967631}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 1, y: 0, z: -4}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_Children: []
+  m_Father: {fileID: 1848797630868011454}
+  m_RootOrder: 0
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &4943591048614064722
 GameObject:
   m_ObjectHideFlags: 0
@@ -12,8 +42,9 @@ GameObject:
   - component: {fileID: 8984858884541116395}
   - component: {fileID: 7068595331550233268}
   - component: {fileID: 4561072412983293316}
-  - component: {fileID: 980898926876697989}
+  - component: {fileID: 2895342931115527830}
   - component: {fileID: 6874647193325500047}
+  - component: {fileID: 1587142603701764605}
   m_Layer: 0
   m_Name: metal_door
   m_TagString: Untagged
@@ -31,7 +62,8 @@ Transform:
   m_LocalRotation: {x: 0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: 0.5, y: 0, z: 3}
   m_LocalScale: {x: 1, y: 1, z: 1}
-  m_Children: []
+  m_Children:
+  - {fileID: 1077194762191053378}
   m_Father: {fileID: 7968858962713914624}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -91,9 +123,9 @@ BoxCollider:
   m_IsTrigger: 0
   m_Enabled: 1
   serializedVersion: 2
-  m_Size: {x: 3, y: 4, z: 0.79999995}
+  m_Size: {x: 3, y: 4, z: 0.8}
   m_Center: {x: 0.90000004, y: 2, z: -3}
---- !u!114 &980898926876697989
+--- !u!114 &2895342931115527830
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -102,16 +134,24 @@ MonoBehaviour:
   m_GameObject: {fileID: 4943591048614064722}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 70c9328f7956ec84cbd5ec683cda3a0d, type: 3}
+  m_Script: {fileID: 11500000, guid: fbce6efc648e2e544a3428aad4632b73, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   isMoving: 0
-  _interTransform: {fileID: 0}
+  _interTransform: {fileID: 1077194762191053378}
   _radius: 5
-  _possibleActionNames: []
-  _isDistanceAction: 
-  _isDoWhileAction: 
-  _makesActionNotAppearWhenUnavailable: 
+  _possibleActionNames:
+  - Open
+  - Repair
+  - Consolidate
+  - Lock
+  - Break
+  _isDistanceAction: 0000000000
+  _isDoWhileAction: 0000000000
+  _makesActionNotAppearWhenUnavailable: 0001000000
+  maxBaseHitPoint: 100
+  neededItemToRepair: {fileID: 0}
+  transRotate: {fileID: 7968858962713914624}
 --- !u!114 &6874647193325500047
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -125,6 +165,22 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   isMoving: 0
+--- !u!114 &1587142603701764605
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4943591048614064722}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6d07ce676d7afda4dabb3b0f7dd5e654, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_OverrideArea: 0
+  m_Area: 0
+  m_IgnoreFromBuild: 1
+  m_AffectedAgents: ffffffff
 --- !u!1 &5228306470440145662
 GameObject:
   m_ObjectHideFlags: 0

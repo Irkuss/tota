@@ -1262,9 +1262,11 @@ public class Generator : MonoBehaviour
             yield return null;
             Debug.Log("Generate: Building Navmesh at '" + x + "," + y + "'");
             NavMeshSurface surface = worldNode.GetComponent<NavMeshSurface>();
-            
+
             //https://forum.unity.com/threads/building-navmeshes-in-separate-thread.489430/
 
+
+            surface.buildHeightMesh = true;//Lets try this
             surface.BuildNavMesh();
             Debug.Log("Generate: Ending Navmesh at '" + x + "," + y + "'");
             //Genere prop si master

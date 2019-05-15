@@ -16,6 +16,8 @@ GameObject:
   - component: {fileID: 1872293405454047566}
   - component: {fileID: 7044626114852344525}
   - component: {fileID: 4420901300170748017}
+  - component: {fileID: 2748461901934598470}
+  - component: {fileID: 497355344534800001}
   m_Layer: 0
   m_Name: woodcrate
   m_TagString: Untagged
@@ -174,6 +176,38 @@ MonoBehaviour:
   precomputeOutline: 0
   bakeKeys: []
   bakeValues: []
+--- !u!114 &2748461901934598470
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 740294281172057949}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6d07ce676d7afda4dabb3b0f7dd5e654, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_OverrideArea: 0
+  m_Area: 0
+  m_IgnoreFromBuild: 1
+  m_AffectedAgents: ffffffff
+--- !u!208 &497355344534800001
+NavMeshObstacle:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 740294281172057949}
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Shape: 1
+  m_Extents: {x: 0.725, y: 0.75000006, z: 0.725}
+  m_MoveThreshold: 0.1
+  m_Carve: 0
+  m_CarveOnlyStationary: 1
+  m_Center: {x: 0.025, y: 0.75000006, z: -1.1750001}
+  m_TimeToStationary: 0.5
 --- !u!1 &5032951289668306554
 GameObject:
   m_ObjectHideFlags: 0

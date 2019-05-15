@@ -9,8 +9,7 @@ public class CharaMovement : MonoBehaviour
     //Recuperer le NavMeshAgent Component attaché au Chara
     public NavMeshAgent navMeshAgent;
     public ThirdPersonCharacter character;
-
-
+    
     private bool _isRunning = false;
     public bool IsRunning => _isRunning;
     private float _baseAgentWalkingSpeed = 0.7f;
@@ -77,9 +76,9 @@ public class CharaMovement : MonoBehaviour
         SetDestination(inter.InterTransform.position, isRunning);
     }
 
-    public void StopAgent()
+    public void StopAgent(bool resetRunning = true)
     {
-        SetDestination(transform.position, false);
+        SetDestination(transform.position, !resetRunning && _isRunning);
     }
 
     //Update to network

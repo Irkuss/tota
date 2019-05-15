@@ -132,7 +132,7 @@ public class PotHandler : PropHandler
     }
 
     //Command
-    public override void CommandReceive(int[] command, float[] commandFloat)
+    public override void CommandReceive(int[] command, float[] commandFloat, string[] commandString = null)
     {
         switch((PotCommand)command[0])
         {

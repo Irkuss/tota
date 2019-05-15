@@ -346,14 +346,30 @@ public class SpiritHead : Photon.MonoBehaviour
             {
                 if(IsHitValid(possibleHit))
                 {
-                    //Debug.Log("ClickedOnSomething: Step done " + step);
+                    //Debug.Log("ClickedOnSomething: clicked on semething valid - Step done " + step);
+                    //Si on a cliqué sur un mur, on vérifie s'il n'y pas une porte plus bas
+                    if(possibleHit.transform.GetComponent<FloorOpacity>() != null)
+                    {
+                        //Debug.Log(("ClickedOnSomething: Clicked on wall, checking below for any possible door"));
+                        Debug.DrawRay(possibleHit.point, Vector3.down * 3.95f, debugColor, 3);
+                        if (Physics.Raycast(possibleHit.point, Vector3.down, out RaycastHit possibleDoorHit, 3.95f))
+                        {
+                            //Debug.Log(("ClickedOnSomething: found something below"));
+                            if (possibleDoorHit.transform.GetComponent<DoorHandler>() != null)
+                            {
+                                //Debug.Log(("ClickedOnSomething: found a door below! returning the door"));
+                                hit = possibleDoorHit;
+                                return true;
+                            }
+                        }
+                    }
                     hit = possibleHit;
                     return true;
                 }
                 else
                 {
                     //Debug.Log("ClickedOnSomething: Cycling from " + origin + " to " + possibleHit.point);
-                    origin = possibleHit.point + direction * 0.1f;
+                    origin = possibleHit.point + direction * 0.02f;
                 }
             }
             else
@@ -379,10 +395,10 @@ public class SpiritHead : Photon.MonoBehaviour
             //if(generalOpacity.CurrentFloorLevel <= currentFloorLevel)
             {
 
-                Debug.Log("IsHitValid: Returning hit with name " + hit.transform.name + " and floor " + generalOpacity.CurrentFloorLevel + " at floor " + currentFloorLevel);
+                //Debug.Log("IsHitValid: Returning hit with name " + hit.transform.name + " at floor " + currentFloorLevel);
                 return true;
             }
-            //Debug.Log("IsHitValid: Cycled through '" + hit.transform.name + "' with floor " + generalOpacity.CurrentFloorLevel);
+            //Debug.Log("IsHitValid: Cycled through '" + hit.transform.name);
             return false;
         }
         //Debug.Log("IsHitValid: Returning hit wihtout general opacity (" + hit.transform.name + ")");
@@ -654,7 +670,7 @@ public class SpiritHead : Photon.MonoBehaviour
 
     public void IndexActionHandler(Interactable inter, int actionIndex)
     {
-        Debug.Log("IndexActionHandler: Index chosen, giving order to all charas");
+        //Debug.Log("IndexActionHandler: Index chosen, giving order to all charas");
         if(inter.IsDistanceAction[actionIndex]) //Si l'action en question est une action à distance (on a déjà verifié qu'elle était available)
         {
             SetInteractAll(inter, actionIndex);
