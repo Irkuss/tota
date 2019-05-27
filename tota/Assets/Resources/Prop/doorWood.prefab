@@ -13,7 +13,6 @@ GameObject:
   - component: {fileID: 6764889460613778382}
   - component: {fileID: 4662573597463940078}
   - component: {fileID: 75094504565220204}
-  - component: {fileID: 8435630784036847542}
   - component: {fileID: 671688797563374602}
   m_Layer: 0
   m_Name: wood_door
@@ -120,22 +119,8 @@ MonoBehaviour:
   _isDoWhileAction: 0000000000
   _makesActionNotAppearWhenUnavailable: 0001000000
   maxBaseHitPoint: 100
-  doorReductionWhenOpen: 3.95
   neededItemToRepair: {fileID: 0}
   transRotate: {fileID: 2081572669181402505}
---- !u!114 &8435630784036847542
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 954038038166759313}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 94f63d646c3f7c04e83b1006e9a5982a, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  isMoving: 0
 --- !u!114 &671688797563374602
 MonoBehaviour:
   m_ObjectHideFlags: 0

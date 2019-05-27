@@ -4,6 +4,7 @@ using UnityEngine;
 
 public class OrganicOpacity : GeneralOpacity
 {
+    [Header("Is this object moving or not?")]
     public bool isMoving = false;
     private bool _wasAboveFloorLevel;
 

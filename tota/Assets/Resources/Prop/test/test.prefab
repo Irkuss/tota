@@ -1,6 +1,6 @@
 %YAML 1.1
 %TAG !u! tag:unity3d.com,2011:
---- !u!1 &2503566792534166206
+--- !u!1 &740294281172057949
 GameObject:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -8,47 +8,46 @@ GameObject:
   m_PrefabAsset: {fileID: 0}
   serializedVersion: 6
   m_Component:
-  - component: {fileID: 3003642651732057792}
-  - component: {fileID: 4177428135879539258}
-  - component: {fileID: 6918908494166176192}
-  - component: {fileID: 7213166518454711720}
-  - component: {fileID: 93691480610853183}
+  - component: {fileID: 6697841272338920600}
+  - component: {fileID: 4406712942767055740}
+  - component: {fileID: 2023630804222055568}
+  - component: {fileID: 8522010179449715272}
   m_Layer: 0
-  m_Name: bidon_bleu
+  m_Name: woodcrate
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!4 &3003642651732057792
+--- !u!4 &6697841272338920600
 Transform:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2503566792534166206}
-  m_LocalRotation: {x: 0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: -0.5, y: 0, z: -1.74}
+  m_GameObject: {fileID: 740294281172057949}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: -0.025000006, y: 0, z: 1.175}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
-  m_Father: {fileID: 7939701451612547877}
+  m_Father: {fileID: 8393097400633926290}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!33 &4177428135879539258
+--- !u!33 &4406712942767055740
 MeshFilter:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2503566792534166206}
-  m_Mesh: {fileID: 4300000, guid: e37a25bd62e8d554d805150c17442875, type: 3}
---- !u!23 &6918908494166176192
+  m_GameObject: {fileID: 740294281172057949}
+  m_Mesh: {fileID: 4300000, guid: bbfdbe4d10ce38042ab8bb3f90609ea5, type: 3}
+--- !u!23 &2023630804222055568
 MeshRenderer:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2503566792534166206}
+  m_GameObject: {fileID: 740294281172057949}
   m_Enabled: 1
   m_CastShadows: 1
   m_ReceiveShadows: 1
@@ -59,7 +58,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: 851673bab517b7c4ebd58cd33292e032, type: 2}
+  - {fileID: 2100000, guid: f9b59f350587f414ea950c96778a5fc8, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -79,39 +78,22 @@ MeshRenderer:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 0
---- !u!65 &7213166518454711720
-BoxCollider:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2503566792534166206}
-  m_Material: {fileID: 0}
-  m_IsTrigger: 0
-  m_Enabled: 1
-  serializedVersion: 2
-  m_Size: {x: 1.55, y: 2.3, z: 1.55}
-  m_Center: {x: 0.475, y: 1.15, z: 1.725}
---- !u!114 &93691480610853183
+--- !u!114 &8522010179449715272
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2503566792534166206}
+  m_GameObject: {fileID: 740294281172057949}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 70c9328f7956ec84cbd5ec683cda3a0d, type: 3}
+  m_Script: {fileID: 11500000, guid: ea63726c166baf64d84370434354a8de, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  isMoving: 0
-  _interTransform: {fileID: 3003642651732057792}
-  _radius: 5
-  _possibleActionNames: []
-  _isDistanceAction: 
-  _isDoWhileAction: 
-  _makesActionNotAppearWhenUnavailable: 
---- !u!1 &6904992068380478574
+  actionCount: 2
+  propFolder: fridge
+  originalPrefab: {fileID: 5032951289668306554}
+--- !u!1 &5032951289668306554
 GameObject:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -119,26 +101,26 @@ GameObject:
   m_PrefabAsset: {fileID: 0}
   serializedVersion: 6
   m_Component:
-  - component: {fileID: 7939701451612547877}
+  - component: {fileID: 8393097400633926290}
   m_Layer: 0
-  m_Name: bidonBlue
+  m_Name: test
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!4 &7939701451612547877
+--- !u!4 &8393097400633926290
 Transform:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 6904992068380478574}
+  m_GameObject: {fileID: 5032951289668306554}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
-  - {fileID: 3003642651732057792}
+  - {fileID: 6697841272338920600}
   m_Father: {fileID: 0}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}

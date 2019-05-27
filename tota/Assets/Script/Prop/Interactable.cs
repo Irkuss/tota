@@ -2,14 +2,15 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class Interactable : MonoBehaviour
+public class Interactable : OrganicOpacity
 {
     //Characteristics of Interactable
-    [Header("Is this object moving or not?")]
-    public bool isMoving = false; //Used to determine if chara have to get this transform.position when moving
+    //[Header("Is this object moving or not?")]
+    //public bool isMoving = false; //Used to determine if chara have to get this transform.position when moving + org opacity
     [Header("Interaction center")]
     [SerializeField] protected Transform _interTransform = null;
     public Transform InterTransform => _interTransform;
+
 
     [Header("Radius of interaction, from interaction center")]
     [SerializeField] protected float _radius = 5;
@@ -71,4 +72,18 @@ public class Interactable : MonoBehaviour
     {
         return 0f;
     }
+
+
+    //Called when building the Component
+    public void ForceArrays(int actionCount)
+    {
+        if(actionCount > 0)
+        {
+            _possibleActionNames = new string[actionCount];
+            _isDistanceAction = new bool[actionCount];
+            _isDoWhileAction = new bool[actionCount];
+            _makesActionNotAppearWhenUnavailable = new bool[actionCount];
+        }
+    }
+
 }
