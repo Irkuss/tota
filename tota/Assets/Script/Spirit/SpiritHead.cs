@@ -215,7 +215,8 @@ public class SpiritHead : Photon.MonoBehaviour
     private void TestBuildInput()
     {
         //Entree et sortie du buildMode
-        if (Input.GetKeyDown(KeyCode.B))
+        //if (Input.GetKeyDown(KeyCode.B))
+        if(Input.inputString == mode.build)
         {
             if (_build.activeSelf)
             {
@@ -714,7 +715,8 @@ public class SpiritHead : Photon.MonoBehaviour
 
     private void InventoryUpdate()
     {
-        if (Input.GetKeyDown(KeyCode.E))
+        //if (Input.GetKeyDown(KeyCode.E))
+        if (Input.inputString == mode.interfaCe)
         {
             _inventoryList.SetActive(!_inventoryList.activeSelf);            
         }
@@ -754,7 +756,8 @@ public class SpiritHead : Photon.MonoBehaviour
 
     private void DisplayChannel()
     {
-        if (Mode.Instance.online && Input.GetKeyDown(KeyCode.C))
+        //if (Mode.Instance.online && Input.GetKeyDown(KeyCode.C))
+        if (mode.online && Input.inputString == mode.channel)
         {
             _channel.SetActive(!_channel.activeSelf);
         }

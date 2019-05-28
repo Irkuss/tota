@@ -43,6 +43,10 @@ public class CharaInventory : MonoBehaviour
 
         public void AddItem(Item item, int itemCount) //(Item newItem)
         {
+            if (_linkedCharaInventory._interface == null) return;
+
+
+
             _item = item;
             _itemCount = itemCount;
 
@@ -64,11 +68,15 @@ public class CharaInventory : MonoBehaviour
             _removeButton.interactable = true;
             isEmpty = false;
 
-            _itemButton.transform.parent.GetChild(4).GetChild(0).GetComponent<Text>().text = _item.description;
+            _itemButton.transform.parent.GetChild(4).GetChild(0).GetComponent<Text>().text = item.description;
+
+            _itemButton.transform.parent.GetComponent<SlotDescription>().description = item.description;
         }
 
         public void ClearSlot()
         {
+            if (_linkedCharaInventory._interface == null) return;
+
             _item = null;
 
             //Clear Icon
@@ -223,12 +231,18 @@ public class CharaInventory : MonoBehaviour
     }
     public void UpdateCraft()
     {
-        _interface.GetComponent<InterfaceManager>().UpdateCraft(this);
+        if(_interface != null)
+        {
+            _interface.GetComponent<InterfaceManager>().UpdateCraft(this);
+        }
+        
     }
 
     //Openning and closing Inventory (canvas)
     public void ToggleInterface(GameObject parent, string[] stats)
     {
+        if (_interface != null) return;
+
         _interface = Instantiate(_interfacePrefab);
         _interface.transform.SetParent(parent.transform, false);
         _interface.transform.GetChild(1).GetChild(0).GetComponent<Text>().text = gameObject.GetComponent<CharaRpg>().NameFull;
@@ -247,7 +261,7 @@ public class CharaInventory : MonoBehaviour
     }
 
     public void ToggleInventory(GameObject parent)
-    {
+    {        
         _inventory = Instantiate(_inventoryPrefab);
         _inventory.transform.SetParent(parent.transform, false);
         _inventory.GetComponent<Image>().color = Color.gray;

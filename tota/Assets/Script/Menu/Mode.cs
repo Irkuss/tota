@@ -8,8 +8,14 @@ public class Mode : MonoBehaviour
 {
     public static Mode Instance;
     private string _mode = null;
+    
     [HideInInspector] public bool online;   
+
     [HideInInspector] public bool zqsd = false;
+    [HideInInspector] public string interfaCe = "e";
+    [HideInInspector] public string channel = "c";
+    [HideInInspector] public string build = "b";
+
     [HideInInspector] public bool load = false;
     [HideInInspector] public int firstTime = 0;
     [HideInInspector] public bool isSkip = false;

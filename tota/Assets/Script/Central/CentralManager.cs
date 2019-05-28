@@ -62,7 +62,10 @@ public class CentralManager : Photon.MonoBehaviour
     public GameObject Tuto { get { return _tuto; } }
 
     [SerializeField] private RecipeTable _visuData = null;
-    public RecipeTable VisuData { get { return _visuData; } }    
+    public RecipeTable VisuData { get { return _visuData; } }
+
+    [SerializeField] private GameObject _description = null;
+    public GameObject Description { get { return _description; } }
 
     public void UpdateToolTip(string[] info,string quirks)
     {
@@ -161,10 +164,57 @@ public class CentralManager : Photon.MonoBehaviour
 
     public void Controls()
     {
+        Move();
+        Interface();
+        ChannelOption();
+        BuildOption();
+    }
+
+    public void Move()
+    {
+        if(_options.transform.GetChild(0).GetChild(0).GetComponent<InputField>().text == "")
+        {
+            _options.transform.GetChild(0).GetChild(0).GetComponent<InputField>().text = Mode.Instance.zqsd ? "z" : "w";
+            return;
+        }
+
         if (_options.transform.GetChild(0).GetChild(0).GetComponent<InputField>().text == "z")
         {
             Mode.Instance.zqsd = true;
         }
+    }
+
+    public void Interface()
+    {
+        if(_options.transform.GetChild(1).GetChild(0).GetComponent<InputField>().text == "")
+        {
+            _options.transform.GetChild(1).GetChild(0).GetComponent<InputField>().text = Mode.Instance.interfaCe;
+            return;
+        }
+
+        Mode.Instance.interfaCe = _options.transform.GetChild(1).GetChild(0).GetComponent<InputField>().text;
+    }
+
+    public void ChannelOption()
+    {
+        if (_options.transform.GetChild(2).GetChild(0).GetComponent<InputField>().text == "")
+        {
+            _options.transform.GetChild(2).GetChild(0).GetComponent<InputField>().text = Mode.Instance.channel;
+            return;
+        }
+
+        Mode.Instance.channel = _options.transform.GetChild(2).GetChild(0).GetComponent<InputField>().text;
+    }
+
+    public void BuildOption()
+    {
+        if (_options.transform.GetChild(3).GetChild(0).GetComponent<InputField>().text == "")
+        {
+            _options.transform.GetChild(3).GetChild(0).GetComponent<InputField>().text = Mode.Instance.build;
+            return;
+        }
+
+        Mode.Instance.build = _options.transform.GetChild(3).GetChild(0).GetComponent<InputField>().text;
     }
 
     public void Quit()
