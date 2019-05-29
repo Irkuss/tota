@@ -41,6 +41,7 @@ public class CharaMovement : MonoBehaviour
     //Deplacement clic droit
     public void MoveTo(Vector3 position, bool isRunning)
     {
+        //Debug.Log("MoveTo: moving");
         SetDestination(position, isRunning);
     }
 
@@ -73,11 +74,13 @@ public class CharaMovement : MonoBehaviour
     //Deplacement vers un Interactable
     public void MoveToInter(Interactable inter, bool isRunning = false)
     {
+        //Debug.Log("MoveToInter: moving");
         SetDestination(inter.InterTransform.position, isRunning);
     }
 
     public void StopAgent(bool resetRunning = true)
     {
+        //Debug.Log("StopAgent: moving");
         SetDestination(transform.position, !resetRunning && _isRunning);
     }
 
@@ -88,8 +91,29 @@ public class CharaMovement : MonoBehaviour
     {
         int runInt = isRunning ? 1 : 0;
 
+        dest = CorrectDestination(dest);
+        if(dest == null)
+        {
+            Debug.LogWarning("SetDestination: No destination close were found");
+            return;
+        }
+
         GetComponent<CharaConnect>().SendMsg(CharaConnect.CharaCommand.RPC_SetDestination, new int[1] { runInt}, null, new float[3] { dest.x, dest.y, dest.z });
         //GetComponent<PhotonView>().RPC("RPC_SetDestination", PhotonTargets.AllBuffered, dest.x, dest.y, dest.z);
+    }
+    private static Vector3 CorrectDestination(Vector3 dest)
+    {
+        //Debug.Log("CorrectDestination: Correcting at " + dest);
+        NavMeshHit hit;
+        
+        if(NavMesh.SamplePosition(dest, out hit, 4, -1))
+        {
+            //Debug.Log("CorrectDestination: Found closest at " + hit.position);
+            return hit.position;
+        }
+
+        //Debug.LogWarning("CorrectDestination: Could not find valid close point on navMesh");
+        return dest;
     }
     public void RPC_SetDestination(int runInt, float x, float y, float z)
     {
@@ -97,6 +121,4 @@ public class CharaMovement : MonoBehaviour
         UpdateSpeed();
         navMeshAgent.SetDestination(new Vector3(x, y, z));
     }
-
-
 }

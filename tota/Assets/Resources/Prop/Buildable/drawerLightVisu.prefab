@@ -13,10 +13,10 @@ GameObject:
   - component: {fileID: 3838855990529580}
   - component: {fileID: 4803869276009826482}
   - component: {fileID: 3738462092986816793}
-  - component: {fileID: 6200682569096122398}
   - component: {fileID: 7350979005176815389}
   - component: {fileID: 3277275346936792891}
   - component: {fileID: 8470259031100629756}
+  - component: {fileID: 5372447295002145299}
   m_Layer: 0
   m_Name: light_drawer
   m_TagString: Untagged
@@ -119,19 +119,6 @@ MonoBehaviour:
   lootTable: {fileID: 11400000, guid: f21d91e5da6913646ae33da840a0ec33, type: 2}
   hasToRandAddLoot: 0
   baseTimeFirstLoot: 0.5
---- !u!114 &6200682569096122398
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2118674179934848468}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 94f63d646c3f7c04e83b1006e9a5982a, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  isMoving: 0
 --- !u!114 &7350979005176815389
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -191,6 +178,22 @@ MonoBehaviour:
   m_Area: 0
   m_IgnoreFromBuild: 1
   m_AffectedAgents: ffffffff
+--- !u!208 &5372447295002145299
+NavMeshObstacle:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2118674179934848468}
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Shape: 1
+  m_Extents: {x: 1.35, y: 0.87500006, z: 0.625}
+  m_MoveThreshold: 0.1
+  m_Carve: 1
+  m_CarveOnlyStationary: 1
+  m_Center: {x: 1.1500001, y: 0.87500006, z: 1.8750001}
+  m_TimeToStationary: 0.5
 --- !u!1 &3689327200352677937
 GameObject:
   m_ObjectHideFlags: 0

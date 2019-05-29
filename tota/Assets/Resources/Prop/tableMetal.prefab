@@ -12,8 +12,7 @@ GameObject:
   - component: {fileID: 8797567141051266503}
   - component: {fileID: 8311465369875846583}
   - component: {fileID: 8151807033344179686}
-  - component: {fileID: 7932134636679961037}
-  - component: {fileID: 1843516016066754563}
+  - component: {fileID: 2976301645800243921}
   m_Layer: 0
   m_Name: metaltable
   m_TagString: Untagged
@@ -93,7 +92,7 @@ BoxCollider:
   serializedVersion: 2
   m_Size: {x: 4.2599998, y: 1.68, z: 2.58}
   m_Center: {x: 1.47, y: 0.84, z: 0.45000002}
---- !u!114 &7932134636679961037
+--- !u!114 &2976301645800243921
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -102,29 +101,20 @@ MonoBehaviour:
   m_GameObject: {fileID: 3394992738980967186}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 70c9328f7956ec84cbd5ec683cda3a0d, type: 3}
+  m_Script: {fileID: 11500000, guid: bf00aab44ca304b4991250e72be1615b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   isMoving: 0
-  _interTransform: {fileID: 0}
-  _radius: 5
-  _possibleActionNames: []
-  _isDistanceAction: 
-  _isDoWhileAction: 
-  _makesActionNotAppearWhenUnavailable: 
---- !u!114 &1843516016066754563
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 3394992738980967186}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 94f63d646c3f7c04e83b1006e9a5982a, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  isMoving: 0
+  _interTransform: {fileID: 7499098275219338933}
+  _radius: 4
+  _possibleActionNames:
+  - Salvage
+  _isDistanceAction: 00
+  _isDoWhileAction: 00
+  _makesActionNotAppearWhenUnavailable: 00
+  salvageTime: 5
+  salvagedItem: {fileID: 11400000, guid: 4e8b23ecd7c806b44a0c762728a04a3f, type: 2}
+  salvagedItemCount: 2
 --- !u!1 &6179341974949726978
 GameObject:
   m_ObjectHideFlags: 0

@@ -12,7 +12,7 @@ GameObject:
   - component: {fileID: 8572741148495578586}
   - component: {fileID: 2467338654539678496}
   - component: {fileID: 9091650428928742322}
-  - component: {fileID: 7610763796475902803}
+  - component: {fileID: 2933712482976029670}
   m_Layer: 0
   m_Name: whiteclassical
   m_TagString: Untagged
@@ -92,7 +92,7 @@ BoxCollider:
   serializedVersion: 2
   m_Size: {x: 2.1825104, y: 2.458837, z: 2.2731118}
   m_Center: {x: -1.2455311, y: 1.2294185, z: 1.6243427}
---- !u!114 &7610763796475902803
+--- !u!114 &2933712482976029670
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -101,16 +101,20 @@ MonoBehaviour:
   m_GameObject: {fileID: 5605447082096936022}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 70c9328f7956ec84cbd5ec683cda3a0d, type: 3}
+  m_Script: {fileID: 11500000, guid: bf00aab44ca304b4991250e72be1615b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   isMoving: 0
-  _interTransform: {fileID: 0}
-  _radius: 5
-  _possibleActionNames: []
-  _isDistanceAction: 
-  _isDoWhileAction: 
-  _makesActionNotAppearWhenUnavailable: 
+  _interTransform: {fileID: 2828214381933242078}
+  _radius: 3
+  _possibleActionNames:
+  - Salvage
+  _isDistanceAction: 00
+  _isDoWhileAction: 00
+  _makesActionNotAppearWhenUnavailable: 00
+  salvageTime: 8
+  salvagedItem: {fileID: 11400000, guid: 4e8b23ecd7c806b44a0c762728a04a3f, type: 2}
+  salvagedItemCount: 2
 --- !u!1 &5617870429120391905
 GameObject:
   m_ObjectHideFlags: 0

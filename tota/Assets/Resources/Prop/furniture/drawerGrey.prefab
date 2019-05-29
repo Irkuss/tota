@@ -43,7 +43,6 @@ GameObject:
   - component: {fileID: 6144214553995489878}
   - component: {fileID: 4031022487267969485}
   - component: {fileID: 6701253702881035812}
-  - component: {fileID: 4066764424972409327}
   - component: {fileID: 843992407185283902}
   - component: {fileID: 8918299724446275929}
   - component: {fileID: 4101635128896836285}
@@ -150,19 +149,6 @@ MonoBehaviour:
   lootTable: {fileID: 11400000, guid: f21d91e5da6913646ae33da840a0ec33, type: 2}
   hasToRandAddLoot: 1
   baseTimeFirstLoot: 5
---- !u!114 &4066764424972409327
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 3971436359680395910}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 94f63d646c3f7c04e83b1006e9a5982a, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  isMoving: 0
 --- !u!114 &843992407185283902
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -234,7 +220,7 @@ NavMeshObstacle:
   m_Shape: 1
   m_Extents: {x: 0.55, y: 0.9250001, z: 1.575}
   m_MoveThreshold: 0.1
-  m_Carve: 0
+  m_Carve: 1
   m_CarveOnlyStationary: 1
   m_Center: {x: 1.95, y: 0.9250001, z: -0.9250001}
   m_TimeToStationary: 0.5

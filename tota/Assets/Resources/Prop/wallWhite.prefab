@@ -44,7 +44,6 @@ GameObject:
   - component: {fileID: 754456986659522470}
   - component: {fileID: 548039794523857264}
   - component: {fileID: 4272358547101499784}
-  - component: {fileID: 7514062009823272998}
   - component: {fileID: 6107757127989742866}
   m_Layer: 0
   m_Name: Whitebrickwall
@@ -143,19 +142,7 @@ MonoBehaviour:
   _possibleActionNames: []
   _isDistanceAction: 
   _isDoWhileAction: 
---- !u!114 &7514062009823272998
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 3903921051610610386}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 94f63d646c3f7c04e83b1006e9a5982a, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  isMoving: 0
+  _makesActionNotAppearWhenUnavailable: 
 --- !u!208 &6107757127989742866
 NavMeshObstacle:
   m_ObjectHideFlags: 0

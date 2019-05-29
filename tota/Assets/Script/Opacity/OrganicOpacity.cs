@@ -20,6 +20,11 @@ public class OrganicOpacity : GeneralOpacity
     // Unity Callback
     private void Start()
     {
+        BeginOpacity();
+    }
+
+    protected void BeginOpacity()
+    {
         _renderers = GetComponentsInChildren<Renderer>();
         _collider = GetComponent<Collider>();
         _renderer = GetComponent<Renderer>();
@@ -27,7 +32,7 @@ public class OrganicOpacity : GeneralOpacity
         FloorManager.onFloorLevelChanged += UpdateFloorLevel;
 
         //Init le floor level (pas ouf mais n'arrive qu'une fois par organic)
-        _spiritFloorLevel = GameObject.Find("eCentralManager").GetComponent<FloorManager>().GetFloorLevel();
+        _spiritFloorLevel = GameObject.Find("eCentralManager").GetComponent<FloorManager>().FloorLevel;
         _wasAboveFloorLevel = IsAboveFloorLevel(_spiritFloorLevel);
         UpdateRenderer();
         if (isMoving)
@@ -41,7 +46,7 @@ public class OrganicOpacity : GeneralOpacity
 
     private void OnDestroy()
     {
-        Debug.Log("OrganicOpacity: destroying organic opacity with name " + name);
+        //Debug.Log("OrganicOpacity: destroying organic opacity with name " + name);
         //if (_renderers.Length > 0 && _collider != null) FloorManager.onFloorLevelChanged -= UpdateFloorLevel; //Unsubscribe to prevent memory leak
         FloorManager.onFloorLevelChanged -= UpdateFloorLevel;
         if (_cor_updateRender != null)

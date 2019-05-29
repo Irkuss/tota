@@ -12,8 +12,9 @@ GameObject:
   - component: {fileID: 8565092086276436615}
   - component: {fileID: 7525420617992887269}
   - component: {fileID: 6670439662622128279}
-  - component: {fileID: 1148241068849086400}
-  - component: {fileID: 7804751390583001364}
+  - component: {fileID: 4866351103864177877}
+  - component: {fileID: 2906614099693089268}
+  - component: {fileID: 1846890836789211708}
   m_Layer: 0
   m_Name: Whitebrickwall
   m_TagString: Untagged
@@ -93,7 +94,7 @@ BoxCollider:
   serializedVersion: 2
   m_Size: {x: 5.12, y: 5.68, z: 0.47999996}
   m_Center: {x: -2.3200002, y: 2.84, z: 1.1999999}
---- !u!114 &1148241068849086400
+--- !u!114 &4866351103864177877
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -102,17 +103,21 @@ MonoBehaviour:
   m_GameObject: {fileID: 2531109253882938806}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 70c9328f7956ec84cbd5ec683cda3a0d, type: 3}
+  m_Script: {fileID: 11500000, guid: 41ccc68417a9f644c90191e750822af2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   isMoving: 0
-  _interTransform: {fileID: 0}
-  _radius: 5
-  _possibleActionNames: []
-  _isDistanceAction: 
-  _isDoWhileAction: 
-  _makesActionNotAppearWhenUnavailable: 
---- !u!114 &7804751390583001364
+  _interTransform: {fileID: 2460575329999124144}
+  _radius: 2
+  _possibleActionNames:
+  - Break
+  - Repair
+  _isDistanceAction: 0000
+  _isDoWhileAction: 0000
+  _makesActionNotAppearWhenUnavailable: 0000
+  maxHitPoint: 500
+  needItemToRepair: {fileID: 0}
+--- !u!114 &2906614099693089268
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -121,10 +126,29 @@ MonoBehaviour:
   m_GameObject: {fileID: 2531109253882938806}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 94f63d646c3f7c04e83b1006e9a5982a, type: 3}
+  m_Script: {fileID: 11500000, guid: 6d07ce676d7afda4dabb3b0f7dd5e654, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  isMoving: 0
+  m_OverrideArea: 0
+  m_Area: 0
+  m_IgnoreFromBuild: 1
+  m_AffectedAgents: ffffffff
+--- !u!208 &1846890836789211708
+NavMeshObstacle:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2531109253882938806}
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Shape: 1
+  m_Extents: {x: 2.5600002, y: 2.8400002, z: 0.24000001}
+  m_MoveThreshold: 0.1
+  m_Carve: 1
+  m_CarveOnlyStationary: 1
+  m_Center: {x: -2.3200002, y: 2.8400002, z: 1.2}
+  m_TimeToStationary: 0.5
 --- !u!1 &6927139800444994738
 GameObject:
   m_ObjectHideFlags: 0

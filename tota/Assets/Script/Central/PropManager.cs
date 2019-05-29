@@ -50,11 +50,19 @@ public class PropManager : MonoBehaviour
 
         public void InstantSelf()
         {
-            Debug.Log("InstantSelf: instantiating " + _propPath);
+            //Debug.Log("InstantSelf: instantiating " + _propPath);
             if (_go != null) return;
             Quaternion rotation = Quaternion.Euler(0, _propRotation, 0);
-            _go = Instantiate(Resources.Load<GameObject>(_propPath), _propPosition, rotation);
-            _go.GetComponentInChildren<PropHandler>().SetId(_id);
+            try
+            {
+                _go = Instantiate(Resources.Load<GameObject>(_propPath), _propPosition, rotation);
+                _go.GetComponentInChildren<PropHandler>().SetId(_id);
+            }
+            catch
+            {
+                Debug.LogError("Failed To Instantiate resources with path " + _propPath);
+            }
+            
         }
 
         public void DestroySelf()
@@ -135,7 +143,7 @@ public class PropManager : MonoBehaviour
 
     public void PlaceProp(Vector3 pos, float rot, string name)
     {
-        Debug.Log("PlaceProp: placing a new prop with path: " + name);
+        //Debug.Log("PlaceProp: placing a new prop with path: " + name);
         //Make all players place the new prop
         if (Mode.Instance.online)
         {

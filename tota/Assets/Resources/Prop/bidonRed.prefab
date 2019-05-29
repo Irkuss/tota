@@ -43,7 +43,7 @@ GameObject:
   - component: {fileID: 9125112726197950818}
   - component: {fileID: 4832890031431449045}
   - component: {fileID: 5834695643751015538}
-  - component: {fileID: 1112209908186262765}
+  - component: {fileID: 883120668255583217}
   m_Layer: 0
   m_Name: bidon_rouge_jaune
   m_TagString: Untagged
@@ -123,7 +123,7 @@ BoxCollider:
   serializedVersion: 2
   m_Size: {x: 1.75, y: 2.25, z: 1.7500001}
   m_Center: {x: 0.57500005, y: 1.125, z: -0.675}
---- !u!114 &1112209908186262765
+--- !u!114 &883120668255583217
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -132,13 +132,17 @@ MonoBehaviour:
   m_GameObject: {fileID: 8204851313719110512}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 70c9328f7956ec84cbd5ec683cda3a0d, type: 3}
+  m_Script: {fileID: 11500000, guid: bf00aab44ca304b4991250e72be1615b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   isMoving: 0
   _interTransform: {fileID: 8509598009951245037}
-  _radius: 5
-  _possibleActionNames: []
-  _isDistanceAction: 
-  _isDoWhileAction: 
-  _makesActionNotAppearWhenUnavailable: 
+  _radius: 3
+  _possibleActionNames:
+  - Salvage
+  _isDistanceAction: 00
+  _isDoWhileAction: 00
+  _makesActionNotAppearWhenUnavailable: 00
+  salvageTime: 5
+  salvagedItem: {fileID: 11400000, guid: 4e8b23ecd7c806b44a0c762728a04a3f, type: 2}
+  salvagedItemCount: 1

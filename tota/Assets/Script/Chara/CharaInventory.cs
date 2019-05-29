@@ -357,6 +357,14 @@ public class CharaInventory : MonoBehaviour
         }
         return minTempModifier;
     }
+    //Break Getters
+    public float GetMaxBreakDamage()
+    {
+        float damageLeft = equipments[0] == null ? 5 : equipments[0].BreakDamage;
+        float damageRight = equipments[1] == null ? 5 : equipments[1].BreakDamage;
+        Debug.Log("GetMaxBreakDamage: returning " + Mathf.Max(damageLeft, damageRight));
+        return Mathf.Max(damageLeft, damageRight);
+    }
 
     //Item Getters
     public bool Contains(Item item, int quantity = 1)
@@ -399,6 +407,17 @@ public class CharaInventory : MonoBehaviour
 
     public void Remove(Item item)
     {
+        if(item == null)
+        {
+            Debug.LogWarning("CharaInventory: Unexpected null item");
+            return;
+        }
+        if(!Contains(item))
+        {
+            Debug.LogWarning("CharaInventory: Unexpected item not present");
+            return;
+        }
+
         Debug.Log("CharaInventory: Removing item " + item.nickName);
         ModifyCount(item, -1);
     }

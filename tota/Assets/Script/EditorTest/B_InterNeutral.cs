@@ -3,16 +3,25 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEditor;
 using System.IO;
+using UnityEngine.AI;
 
 public class B_InterNeutral : MonoBehaviour
 {
-    public int actionCount = 0;
+    [Header("Prop context")]
     public string propFolder = "";
-    public GameObject originalPrefab = null;
+    public string subPropFolder = "";
+    [Header("NavMeshModifier")]
+    public bool canChangeLocation = false;
+    public bool isAnObstacle = true;
+    [Header("Auto-fill Interactable")]
+    public int actionCount = 0;
+    [Header("Auto-fill Furniture")]
+    public LootTable lootTable = null;
 
     private static string propSoPathFromAssets = "/General/Prop/Prop";
 
     //Component to add to neutral interactable
+    
     public void BuildInterNeutral()
     {
         Debug.Log("BuildInterNeutral: Building PropHandler Components");
@@ -28,31 +37,62 @@ public class B_InterNeutral : MonoBehaviour
             }
         }
         else Debug.LogWarning("BuildInterNeutral: Unexpected missing propFolder, this should be normal only when testing!");
-
-        //Reset les positions du parent et sa propre postion
-        ResetTransform(transform.parent.transform);
-        ResetTransform(transform);
-        Debug.Log("BuildInterNeutral: Successfuly updated transform of parent/child");
-
-        //Ajoute les components
-        BoxCollider boxColl = gameObject.AddComponent<BoxCollider>();
-        transform.position = new Vector3(-boxColl.center.x, 0, -boxColl.center.z);
-
-        Interactable inter = gameObject.AddComponent<PropHandler>();
-        inter.ForceArrays(actionCount);
-        Debug.Log("BuildInterNeutral: Successfuly added Components");
-
-        //Ajoute le prop équivalent
+        if (subPropFolder != "")
+        {
+            //Rajoute un '/' devant le chemin du folder s'il est oublié
+            if (subPropFolder[0] != '/')
+            {
+                subPropFolder = "/" + subPropFolder;
+                Debug.Log("BuildInterNeutral: Unexpected missing '/', added '/' to subPropFolder");
+            }
+        }
+        //==========Ajoute le prop équivalent==========
         string nickName = transform.parent.name;
         Prop createdPropSo = CreateProp(nickName, propFolder);
         createdPropSo.nickName = nickName;
 
-        string fullPath = AssetDatabase.GetAssetPath(originalPrefab);
-        fullPath = fullPath.Substring(17);
-        fullPath = fullPath.Substring(0, fullPath.IndexOf('.'));
-        createdPropSo.path = fullPath;
+        createdPropSo.path = "Prop" + subPropFolder + "/" + nickName;
 
-        Debug.Log("BuildInterNeutral: Successfuly added Prop to " + AssetDatabase.GetAssetPath(originalPrefab));
+        Debug.Log("BuildInterNeutral: Successfuly added Prop to " + createdPropSo.path);
+
+        //==========Reset les positions du parent et sa propre postion==========
+        ResetTransform(transform.parent.transform);
+        ResetTransform(transform);
+        Debug.Log("BuildInterNeutral: Successfuly updated transform of parent/child");
+
+        //==========Ajoute les components==========
+        //Collider et transform
+        BoxCollider boxColl = gameObject.AddComponent<BoxCollider>();
+        transform.position = new Vector3(-boxColl.center.x, 0, -boxColl.center.z);
+
+        //Interactable et furniture
+        Interactable inter;
+        if(lootTable == null)
+        {
+            inter = gameObject.AddComponent<PropHandler>();
+        }
+        else
+        {
+            Debug.LogWarning("BuildInterNeutral: creating a furniture without CharaInventory, don't forget to add it!");
+            inter = gameObject.AddComponent<PropFurniture>();
+            gameObject.AddComponent<Outline>();
+            (inter as PropFurniture).lootTable = lootTable;
+        }
+        inter.ForceArrays(actionCount);
+        //NavmeshModifier
+        if (canChangeLocation)
+        {
+            NavMeshModifier navMod = gameObject.AddComponent<NavMeshModifier>();
+            navMod.ignoreFromBuild = true;
+        }
+        if(isAnObstacle)
+        {
+            gameObject.AddComponent<NavMeshObstacle>();
+        }
+        
+
+        Debug.Log("BuildInterNeutral: Successfuly added Components");
+        
         DestroyImmediate(this);
     }
 
@@ -86,7 +126,7 @@ public class B_InterNeutral : MonoBehaviour
         AssetDatabase.SaveAssets();
         AssetDatabase.Refresh();
         EditorUtility.FocusProjectWindow();
-        Selection.activeObject = asset;
+        //Selection.activeObject = asset;
 
         return asset;
     }

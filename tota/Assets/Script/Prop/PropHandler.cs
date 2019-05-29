@@ -7,6 +7,11 @@ public class PropHandler : Interactable
     private int _id;
     public int ID => _id;
 
+    private void Start()
+    {
+        BeginOpacity();
+    }
+
     //Called by PropManager when init or updating
     public void SetId(int id)
     {
@@ -24,6 +29,7 @@ public class PropHandler : Interactable
     {
         //overwrite to parse command
     }
+    
 
     //Have to be called to destroy this gameobject
     public void DestroySelf()

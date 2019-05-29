@@ -44,7 +44,6 @@ GameObject:
   - component: {fileID: 3113128558975209097}
   - component: {fileID: 5837706671618040779}
   - component: {fileID: 6859063093504981868}
-  - component: {fileID: 6604170031159907052}
   - component: {fileID: 926393279203352773}
   m_Layer: 0
   m_Name: Redbrickwall
@@ -143,19 +142,7 @@ MonoBehaviour:
   _possibleActionNames: []
   _isDistanceAction: 
   _isDoWhileAction: 
---- !u!114 &6604170031159907052
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 7226661433629389821}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 94f63d646c3f7c04e83b1006e9a5982a, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  isMoving: 0
+  _makesActionNotAppearWhenUnavailable: 
 --- !u!208 &926393279203352773
 NavMeshObstacle:
   m_ObjectHideFlags: 0

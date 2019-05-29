@@ -24,7 +24,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1165080253418993264}
   m_LocalRotation: {x: -0, y: 1, z: -0, w: 0}
-  m_LocalPosition: {x: 3, y: 0, z: -1}
+  m_LocalPosition: {x: 3, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 5537153229633436470}
@@ -75,7 +75,6 @@ GameObject:
   - component: {fileID: 2912906407838209827}
   - component: {fileID: 1497251360316371707}
   - component: {fileID: 4637983119142561278}
-  - component: {fileID: 9099444928518485607}
   - component: {fileID: 8983848136937678680}
   - component: {fileID: 8546083008526805432}
   m_Layer: 0
@@ -180,19 +179,6 @@ MonoBehaviour:
   lootTable: {fileID: 11400000, guid: 3c0f09f16d88acc47a2ea37122f0b55d, type: 2}
   hasToRandAddLoot: 1
   baseTimeFirstLoot: 3
---- !u!114 &9099444928518485607
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 8512584150124527374}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 94f63d646c3f7c04e83b1006e9a5982a, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  isMoving: 0
 --- !u!114 &8983848136937678680
 MonoBehaviour:
   m_ObjectHideFlags: 0

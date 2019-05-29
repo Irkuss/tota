@@ -135,7 +135,7 @@ public class InterfaceManager : MonoBehaviour
     }
     public void UpdateEquipment(CharaInventory charaInventory)
     {
-        Debug.Log("UpdateEquipment: ==================updating equipment==================");
+        //Debug.Log("UpdateEquipment: ==================updating equipment==================");
         //====================Partie Wearable====================
         if (charaInventory.wearables[0] != null) LinkWearSlot(_equipment.transform.GetChild(0), charaInventory.wearables[0], charaInventory);
         else UnlinkWearSlot(_equipment.transform.GetChild(0), _head);
@@ -169,7 +169,7 @@ public class InterfaceManager : MonoBehaviour
         transRightSlot.GetChild((int)SlotIndex.Lock).gameObject.SetActive(deactivateRightSlot);
         transRightSlot.GetChild((int)SlotIndex.Item).GetComponent<Button>().interactable = !deactivateRightSlot;
 
-        Debug.Log("UpdateEquipment: ==================ending updating equipment==================");
+        //Debug.Log("UpdateEquipment: ==================ending updating equipment==================");
     }
 
     private static void LinkWearSlot(Transform transSlot, Item itemWorn, CharaInventory charaInventory)

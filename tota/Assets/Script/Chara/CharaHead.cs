@@ -306,23 +306,22 @@ public class CharaHead : Photon.PunBehaviour
             yield return StartCoroutine(_waitActionCor);
         }
 
+        
         //Interragis une fois le waiting time passé
         _lastInteractedFocus = _focus;
-        _focus.Interact(this, actionIndex);
+
+        //Remove le focus (avant d'interragir pour permettre de relancer à la fin
+        RemoveFocus(false);
+
+        _lastInteractedFocus.Interact(this, actionIndex);
         
         GetComponent<CharaInventory>().UpdateCraft(); //Update les recipe au cas ou on interagis avec un workshop
 
-        if (_focus.IsDoWhileAction[actionIndex])
+        if (_lastInteractedFocus != null && _lastInteractedFocus.IsDoWhileAction[actionIndex])
         {
             //L'action est à continuer
             yield return new WaitForSeconds(0.4f);
-            SetFocus(_focus, actionIndex);
-        }
-        else
-        {
-            //Fin de l'action
-            //Reset le focus
-            RemoveFocus(false);
+            SetFocus(_lastInteractedFocus, actionIndex);
         }
     }
     private IEnumerator Cor_CraftingItem(ItemRecipe recipe)
@@ -391,6 +390,9 @@ public class CharaHead : Photon.PunBehaviour
     private IEnumerator UpdateForceOpenDoor()
     {
         //Called in Start
+
+        //Ouvre les portes en marchant
+
         while(true)
         {
             //Si on n'a pas ou on n'interragis pas avec une porte

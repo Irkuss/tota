@@ -141,15 +141,15 @@ MonoBehaviour:
   _radius: 5
   _possibleActionNames:
   - Open
-  - Repair
-  - Consolidate
-  - Lock
   - Break
+  - Repair
+  - Lock
+  - Barricade
   _isDistanceAction: 0000000000
   _isDoWhileAction: 0000000000
   _makesActionNotAppearWhenUnavailable: 0001000000
-  maxBaseHitPoint: 100
-  neededItemToRepair: {fileID: 0}
+  maxHitPoint: 200
+  needItemToRepair: {fileID: 11400000, guid: 4e8b23ecd7c806b44a0c762728a04a3f, type: 2}
   transRotate: {fileID: 7968858962713914624}
 --- !u!114 &1587142603701764605
 MonoBehaviour:

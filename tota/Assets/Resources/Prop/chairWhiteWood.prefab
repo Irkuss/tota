@@ -43,7 +43,7 @@ GameObject:
   - component: {fileID: 7993942581607321916}
   - component: {fileID: 8764125240151941559}
   - component: {fileID: 4680702856164950331}
-  - component: {fileID: 4573093868545643086}
+  - component: {fileID: 7862363433981805323}
   m_Layer: 0
   m_Name: whitewood
   m_TagString: Untagged
@@ -123,7 +123,7 @@ BoxCollider:
   serializedVersion: 2
   m_Size: {x: 1.1, y: 2.15, z: 1.1}
   m_Center: {x: 0.65000004, y: 1.075, z: -1}
---- !u!114 &4573093868545643086
+--- !u!114 &7862363433981805323
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -132,13 +132,17 @@ MonoBehaviour:
   m_GameObject: {fileID: 1579193598850417509}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 70c9328f7956ec84cbd5ec683cda3a0d, type: 3}
+  m_Script: {fileID: 11500000, guid: bf00aab44ca304b4991250e72be1615b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   isMoving: 0
-  _interTransform: {fileID: 0}
-  _radius: 5
-  _possibleActionNames: []
-  _isDistanceAction: 
-  _isDoWhileAction: 
-  _makesActionNotAppearWhenUnavailable: 
+  _interTransform: {fileID: 1724517784068387457}
+  _radius: 4
+  _possibleActionNames:
+  - Salvage
+  _isDistanceAction: 00
+  _isDoWhileAction: 00
+  _makesActionNotAppearWhenUnavailable: 00
+  salvageTime: 5
+  salvagedItem: {fileID: 11400000, guid: 433a409a197ca2243b17007671504644, type: 2}
+  salvagedItemCount: 1

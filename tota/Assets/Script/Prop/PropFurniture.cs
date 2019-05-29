@@ -4,52 +4,85 @@ using UnityEngine;
 
 public class PropFurniture : PropHandler
 {
-    [Header("PropFurniture Attribute")]
     //Defining attribute
+    [Header("PropFurniture Attribute")]
     public LootTable lootTable = null;
     public bool hasToRandAddLoot = true;
     public float baseTimeFirstLoot = 0.5f;
 
-    //Private Attribute
+    //Reference
     private CharaInventory _furnitureInventory;
     private GameObject _inventoryLayout;
     private Outline _outline;
 
-    private bool _firstInteract = true;
-
+    //Private attribute
+    private bool _firstInteract = true; //Set to false after a chara interact with this furniture
+    private List<CharaHead> _charasUsing; //List of charas using that furniture (used to close itself)
+    private bool isFurnitureInvOpen = false;
+    
+    //Command enum
     public enum FurnitureCommand
     {
         Modify,
         FirstInteract
     }
-    private List<CharaHead> _charasUsing;
 
     //Start
     private void Start()
     {
-        _charasUsing = new List<CharaHead>();
+        //Call the Init for OrganicOpacity
+        BeginOpacity();
+
+        //Set the references
         _furnitureInventory = GetComponent<CharaInventory>();
         _inventoryLayout = GameObject.Find("eCentralManager").GetComponent<CentralManager>().InventoryLayout;
         _outline = GetComponent<Outline>();
+
         _outline.enabled = false;
+
+        //Init the Private attributes
+        _charasUsing = new List<CharaHead>();
     }
 
     private void RandAddLoot()
     {
+        //Genere les items dans ce furniture (appelé une seule fois par meuble placé naturellement)
         Item[] itemToAdd = lootTable.GetChosenPropsArray();
         for (int i = 0; i < itemToAdd.Length; i++)
         {
             _furnitureInventory.Add(itemToAdd[i]);
         }
     }
-    
+
+    //====================Override Interactable====================
     public override void Interact(CharaHead chara, int actionIndex)
     {
         switch(actionIndex)
         {
-            case 0: Open(chara); break;
+            case 0: Open(chara); break; //Open
         }
     }
+    
+    public override bool CheckAvailability(CharaHead chara, int actionIndex = 0)
+    {
+        switch (actionIndex)
+        {
+            case 0: return true; //Open
+        }
+        return false;
+    }
+
+    public override float GetActionTime(CharaHead chara, int actionIndex = 0)
+    {
+        switch(actionIndex)
+        {
+            case 0: return GetOpenTime(chara); //Open
+        }
+        return 1f;
+    }
+    
+    //====================Action Method====================
+    //Open
     private void Open(CharaHead chara)
     {
         if (_charasUsing.Contains(chara)) return;
@@ -62,10 +95,10 @@ public class PropFurniture : PropHandler
         _inventoryLayout.transform.parent.parent.gameObject.SetActive(true);
 
         CharaInventory inv = chara.GetComponent<CharaInventory>();
-        if(inv.GetInterface() == null) inv.ToggleInterface(_inventoryLayout, chara.GetComponent<CharaRpg>().GetToolTipInfo()); //
+        if (inv.GetInterface() == null) inv.ToggleInterface(_inventoryLayout, chara.GetComponent<CharaRpg>().GetToolTipInfo()); //
 
         _furnitureInventory.ToggleInventory(_inventoryLayout);
-        
+
         if (_firstInteract && hasToRandAddLoot)
         {
             //Spawn du loot
@@ -78,32 +111,23 @@ public class PropFurniture : PropHandler
     }
     private void SetFirstInteract()
     {
+        //Received after Open
         _firstInteract = false;
     }
 
-    public override bool CheckAvailability(CharaHead chara, int actionIndex = 0)
+    private float GetOpenTime(CharaHead chara)
     {
-        return true;
-    }
-    public override float GetActionTime(CharaHead chara, int actionIndex = 0)
-    {
-        switch(actionIndex)
-        {
-            case 0: return _firstInteract && hasToRandAddLoot 
+        return _firstInteract && hasToRandAddLoot
                     ? baseTimeFirstLoot * chara.GetComponent<CharaRpg>().GetTimeModifier(CharaRpg.Stat.sk_scavenger)
                     : 0.5f;
-        }
-        return 0f;
     }
 
-    //Close process
-    private bool isFurnitureInvOpen = false;
-
+    //(Close : Not an action but happens after Open)
     private IEnumerator Cor_UpdateClose()
     {
         _outline.enabled = true;
 
-        while(_charasUsing.Count > 0)
+        while (_charasUsing.Count > 0)
         {
             List<CharaHead> charaToRemove = new List<CharaHead>();
             //Choisis les charas qui n'interact plus avec ce meuble
@@ -117,7 +141,7 @@ public class PropFurniture : PropHandler
                 }
             }
             //Les enleve de la liste
-            foreach(CharaHead chara in charaToRemove)
+            foreach (CharaHead chara in charaToRemove)
             {
                 _charasUsing.Remove(chara);
             }
@@ -130,7 +154,7 @@ public class PropFurniture : PropHandler
         _outline.enabled = false;
     }
 
-    //Receive
+    //====================Override PropHandler====================
     public override void CommandReceive(int[] command, float[] commandFloat, string[] commandString = null)
     {
         switch ((FurnitureCommand) command[0])

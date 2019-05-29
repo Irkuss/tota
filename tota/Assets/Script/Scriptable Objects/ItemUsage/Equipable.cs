@@ -20,19 +20,11 @@ public class Equipable : Item
         OneHanded,
         TwoHanded
     }
-    public enum SpecificType //Used with the trait system
-    {
-        Unspecific,
-        Bow,
-        Blade,
-        Fist,
-    }
     //Type d'arme
     [Header("Weapon attribute")]
     public EquipType equipType = EquipType.Melee;
     public DamageType dmgType = DamageType.Sharp;
     public EquipSpace equipSpace = EquipSpace.OneHanded;
-    public SpecificType specificType = SpecificType.Unspecific;
     [Header("Common melee/remote attribute")]
     public int damage = 0;
     public int accuracyModifier = 0;
@@ -47,7 +39,10 @@ public class Equipable : Item
     public float remoteMaxRange = 0;
     public bool useAmmo = false;
     public Item ammo = null;
-   
+    [Header("Break attribute")]
+    public float breakModifier = 1f;
+    public float BreakDamage => breakModifier * damage;
+
     //Use (Equip)
     public override bool UseAsChara(CharaInventory charaInventory)
     {

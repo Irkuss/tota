@@ -167,6 +167,25 @@ public class CharaRpg : MonoBehaviour
         ApplyQuirks();
     }
     
+    public void ForceStats(int[] statsForced)
+    {
+        //Force stats when loading a saved chara
+
+        int[] baseStat = new int[c_statNumber];
+        for (int i = 0; i < 5; i++) baseStat[i] = statsForced[i];
+
+        _hunger = statsForced[5];
+
+        baseStat[(int)Stat.sk_carpenter] = statsForced[6];
+        baseStat[(int)Stat.sk_doctor] = statsForced[7];
+        baseStat[(int)Stat.sk_electrician] = statsForced[8];
+        baseStat[(int)Stat.sk_farmer] = statsForced[9];
+        baseStat[(int)Stat.sk_marksman] = statsForced[10];
+        baseStat[(int)Stat.sk_scavenger] = statsForced[11];
+
+        //no stamina here
+    }
+
     //common part of init
     private void InitStat()
     {
@@ -226,6 +245,10 @@ public class CharaRpg : MonoBehaviour
         }
         Debug.Log("GetTimeModifier: returning " + (1f - statValue * 0.075f));
         return 1f - statValue * 0.075f; //0 -> 1, 10 -> 0.25
+    }
+    public float GetStrengthModifier()
+    {
+        return  0.25f + GetCurrentStat(Stat.ms_strength) * 0.015f; //0 -> 0.25, 50 -> 1, 100 -> 1.75
     }
 
     //Experience system

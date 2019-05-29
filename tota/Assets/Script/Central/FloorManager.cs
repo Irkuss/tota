@@ -9,7 +9,7 @@ public class FloorManager : MonoBehaviour
     private int _floorLevel = 8;
     public int FloorLevel => _floorLevel;
 
-    private readonly int _maxFloorLevel = 8; //A MODIFIER SI ON A DES BATIMENTS AVEC PLUS D'ETAGES
+    public const int c_maxFloorLevel = 8; //A MODIFIER SI ON A DES BATIMENTS AVEC PLUS D'ETAGES
 
     //Callback creation: when floorLevel is modified
 
@@ -24,26 +24,14 @@ public class FloorManager : MonoBehaviour
         }
     }
 
-    //Getters
-
-    public int GetFloorLevel()
-    {
-        return _floorLevel;
-    }
-
-    public int GetMaxFloorLevel()
-    {
-        return _maxFloorLevel;
-    }
-
     //Setters
 
     public void TryDecrease()
     {
-        if (_floorLevel < _maxFloorLevel)
+        if (_floorLevel < c_maxFloorLevel)
         {
             _floorLevel++;
-            //Debug.Log("FloorManager: downed to " + floorLevel);
+            //Debug.Log("FloorManager: downed to " + _floorLevel);
 
             //Call callbacks to everyone listening
             UpdateCallback();
@@ -55,7 +43,7 @@ public class FloorManager : MonoBehaviour
         if (_floorLevel > 0)
         {
             _floorLevel--;
-            //Debug.Log("FloorManager: upped to " + floorLevel);
+            //Debug.Log("FloorManager: upped to " + _floorLevel);
 
             //Call callbacks to everyone listening
             UpdateCallback();
@@ -64,10 +52,13 @@ public class FloorManager : MonoBehaviour
 
     public void TrySet(int newLevel)
     {
-        if (newLevel >= 0 && newLevel <= _maxFloorLevel)
+        if (newLevel >= 0 && newLevel <= c_maxFloorLevel)
         {
             _floorLevel = newLevel;
-            onFloorLevelChanged(_floorLevel);
+            Debug.Log("FloorManager: hard set to " + _floorLevel);
+
+            //Call callbacks to everyone listening
+            UpdateCallback();
         }
     }
 }

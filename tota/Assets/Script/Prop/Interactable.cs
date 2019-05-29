@@ -26,6 +26,7 @@ public class Interactable : OrganicOpacity
     public bool[] IsDoWhileAction => _isDoWhileAction;
     [SerializeField] protected bool[] _makesActionNotAppearWhenUnavailable = null;
     public bool[] MakesActionNotAppearWhenUnavailable => _makesActionNotAppearWhenUnavailable;
+    
 
     //Interact, has to be overwritten
     public virtual string GetActionName(CharaHead chara, int actionIndex = 0)

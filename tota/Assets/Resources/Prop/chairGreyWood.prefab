@@ -12,7 +12,7 @@ GameObject:
   - component: {fileID: 5054917397176592099}
   - component: {fileID: 6713251535026010875}
   - component: {fileID: 729342399113329132}
-  - component: {fileID: 5712733929532570744}
+  - component: {fileID: 4124535690618589654}
   m_Layer: 0
   m_Name: greywood+silk
   m_TagString: Untagged
@@ -92,7 +92,7 @@ BoxCollider:
   serializedVersion: 2
   m_Size: {x: 1.2, y: 2.25, z: 1.1999999}
   m_Center: {x: -1.4, y: 1.125, z: -1.05}
---- !u!114 &5712733929532570744
+--- !u!114 &4124535690618589654
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -101,16 +101,20 @@ MonoBehaviour:
   m_GameObject: {fileID: 5031235712884819654}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 70c9328f7956ec84cbd5ec683cda3a0d, type: 3}
+  m_Script: {fileID: 11500000, guid: bf00aab44ca304b4991250e72be1615b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   isMoving: 0
-  _interTransform: {fileID: 0}
-  _radius: 5
-  _possibleActionNames: []
-  _isDistanceAction: 
-  _isDoWhileAction: 
-  _makesActionNotAppearWhenUnavailable: 
+  _interTransform: {fileID: 1994718211508301586}
+  _radius: 4
+  _possibleActionNames:
+  - Salvage
+  _isDistanceAction: 00
+  _isDoWhileAction: 00
+  _makesActionNotAppearWhenUnavailable: 00
+  salvageTime: 5
+  salvagedItem: {fileID: 11400000, guid: 433a409a197ca2243b17007671504644, type: 2}
+  salvagedItemCount: 1
 --- !u!1 &8515176128066059811
 GameObject:
   m_ObjectHideFlags: 0
