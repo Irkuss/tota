@@ -118,7 +118,7 @@ public class Zombie : MonoBehaviour
                     //Zombie is chasing a chara
                     if (alert == null)
                     {
-                        AudioManager.instance.Play("Ping");
+                        AudioManager.instance.PlayAtPosition("Ping", transform.position);
                         alert = new GameObject("Alert");
                     }
                     _wanderPoint = player.position;

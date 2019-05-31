@@ -615,9 +615,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4270e47b2dac188499826ad578d835a5, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  speed: 500
+  _rotationSpeedModifier: 0
   heure: 0
-  day: 1
 --- !u!1 &744944196
 GameObject:
   m_ObjectHideFlags: 0
@@ -1362,6 +1361,7 @@ GameObject:
   - component: {fileID: 1735130889}
   - component: {fileID: 1735130888}
   - component: {fileID: 1735130894}
+  - component: {fileID: 1735130895}
   m_Layer: 9
   m_Name: zombie
   m_TagString: Untagged
@@ -1478,7 +1478,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1735130887}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 1, z: -0.98}
+  m_LocalPosition: {x: -5.02, y: 1, z: -0.98}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 0}
@@ -1491,7 +1491,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1735130887}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 316df1fa38fe05b4ab14acd20b78bfdc, type: 3}
   m_Name: 
@@ -1505,6 +1505,18 @@ MonoBehaviour:
   obstacleMask:
     serializedVersion: 2
     m_Bits: 1024
+--- !u!114 &1735130895
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1735130887}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 722f9f1f83cdf484d8e9655e8b52f1b3, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1001 &1935682902
 PrefabInstance:
   m_ObjectHideFlags: 0
