@@ -18,13 +18,16 @@ MonoBehaviour:
   strength: 0
   intelligence: 0
   perception: 0
-  mental: 0
+  mental: -10
   social: 0
-  doctor: -1
+  doctor: 0
   farmer: 0
   carpenter: 0
   scavenger: 0
   electrician: 0
   marksman: 0
   stamina: 0
-  nonCompatQuirks: []
+  nonCompatQuirks:
+  - {fileID: 11400000, guid: 3d426510dfad6724d9170c7d31e1d79b, type: 2}
+  - {fileID: 11400000, guid: cd5f70a4a3782dc4faf480ef116e6609, type: 2}
+  - {fileID: 11400000, guid: 996cb2f70d5d5ef41af5e0d01b6a9f73, type: 2}

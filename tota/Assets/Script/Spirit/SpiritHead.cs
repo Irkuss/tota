@@ -23,6 +23,9 @@ public class SpiritHead : Photon.MonoBehaviour
     private GameObject _build;
     private GameObject _actions;
     private GameObject _button;
+    private GameObject _tuto;
+
+    private Mode mode;
 
     //Le joueur qui contrôle ce Spirit (ne change pas)
     private PermissionsManager _permission = PermissionsManager.Instance;
@@ -53,7 +56,30 @@ public class SpiritHead : Photon.MonoBehaviour
         _build = eManager.Build;
         _actions = eManager.Actions;
         _button = eManager.Button;
+        _tuto = eManager.Tuto;
+        
+        mode = Mode.Instance;
+
+        if (!mode.online && !mode.isSkip)
+        {
+            StartCoroutine(FirstStepTuto());
+        }
+             
     }
+
+    private IEnumerator WaitForTuto()
+    {
+        yield return new WaitForSeconds(3f);       
+    }
+
+    private IEnumerator FirstStepTuto()
+    {
+        yield return StartCoroutine(WaitForTuto());
+
+        _tuto.SetActive(true);
+        _tuto.transform.GetChild(0).GetComponent<Text>().text = "Now you can move yourself using the wqsd keys or the directional arrows";
+    }
+
     //Unity Callback
     void Start()
     {
@@ -70,8 +96,6 @@ public class SpiritHead : Photon.MonoBehaviour
             ClickUpdate();
             DoubleClickUpdate();
         }
-
-
 
         //Do all test functions
         TestAll();
@@ -105,7 +129,22 @@ public class SpiritHead : Photon.MonoBehaviour
             //Projection des positions sur le sol
             Vector3 lowPosition = new Vector3(gameObject.transform.position.x, 1, gameObject.transform.position.z);
             GameObject.Find("eCentralManager").GetComponent<CharaManager>().SpawnChara(lowPosition, _playerOwner.MyTeamName,_playerOwner.Name);
+
+            if(mode.firstTime == 2)
+            {
+                StartCoroutine(SpawnTuto());
+                
+            }
         }
+    }
+
+    private IEnumerator SpawnTuto()
+    {
+        yield return StartCoroutine(WaitForTuto());
+
+        _tuto.SetActive(true);
+        _tuto.transform.GetChild(0).GetComponent<Text>().text = "Nice, you have created a new character. You can select him by clicking left on him.";
+        mode.firstTime = 3;
     }
 
     public void InstantiateCharaRef(string playerWhoSent,GameObject chara)
@@ -265,13 +304,13 @@ public class SpiritHead : Photon.MonoBehaviour
         {
             if (Time.time - _timeWhenDoubleRightClick > c_doubleClickDelay)
             {
-                Debug.Log("DoubleClickUpdate: double right click expired");
+                //Debug.Log("DoubleClickUpdate: double right click expired");
                 _isReadyToDoubleRightClick = false;
             }
         }
     }
 
-    private bool ClickedOnSomething(out RaycastHit hit)
+    private bool DEPRE_ClickedOnSomething(out RaycastHit hit)
     {
         //Useful function for the rest of SpiritHead
         Ray ray = _spiritCamera.ScreenPointToRay(Input.mousePosition);
@@ -279,7 +318,71 @@ public class SpiritHead : Photon.MonoBehaviour
         {
             return true;
         }
+        Debug.Log("ClickedOnSomething: Unexpected spiritRaycast hit nothing");
         return false;
+    }
+
+    private bool ClickedOnSomething(out RaycastHit hit)
+    {
+        //Debug.Log("==========ClickedOnSomething: Starting new Raycast==========");
+        //VER2_iterativeCasting_ClickedOnSomething
+        int currentFloorLevel = GetComponent<SpiritZoom>().FloorManagerRef.FloorLevel;
+        
+        Ray ray = _spiritCamera.ScreenPointToRay(Input.mousePosition);
+
+        Vector3 direction = ray.direction; //Will not change as the raycast goes through unvalid hits
+        Vector3 origin = ray.origin; //Will update after hitting an unvalid hit
+
+        bool hitSomethingValid = false;
+
+        int maxStep = 20;
+        int step = 0;
+        //Debug.Log("ClickedOnSomething: Starting direction is " + direction + ", starting origin is " + origin);
+        while (!hitSomethingValid && step < maxStep)
+        {
+            Color debugColor = new Color(Random.Range(0f, 1f), Random.Range(0f, 1f), Random.Range(0f, 1f));
+            Debug.DrawRay(origin, direction * 30, debugColor, 3f);
+            if (Physics.Raycast(origin, direction, out RaycastHit possibleHit))
+            {
+                if(IsHitValid(currentFloorLevel, possibleHit))
+                {
+                    //Debug.Log("ClickedOnSomething: Step done " + step);
+                    hit = possibleHit;
+                    return true;
+                }
+                else
+                {
+                    //Debug.Log("ClickedOnSomething: Cycling from " + origin + " to " + possibleHit.point);
+                    origin = possibleHit.point + direction * 0.1f;
+                }
+            }
+            else
+            {
+                break;
+            }
+            step++;
+        }
+        if (step == maxStep) Debug.LogWarning("ClickedOnSomething: Unexpected reached maxStep ! ");
+        Debug.LogWarning("ClickedOnSomething: Unexpected spiritRaycast hit nothing");
+        hit = new RaycastHit();
+        return false;
+    }
+    private bool IsHitValid(int currentFloorLevel, RaycastHit hit)
+    {
+        GeneralOpacity generalOpacity = hit.transform.GetComponent<GeneralOpacity>();
+        if (generalOpacity != null)
+        {
+            if (generalOpacity.CurrentFloorLevel <= currentFloorLevel)
+            {
+
+                //Debug.Log("IsHitValid: Returning hit with name " + hit.transform.name);
+                return true;
+            }
+            //Debug.Log("IsHitValid: Cycled through '" + hit.transform.name + "' with floor " + generalOpacity.CurrentFloorLevel);
+            return false;
+        }
+        //Debug.Log("IsHitValid: Returning hit wihtout general opacity (" + hit.transform.name + ")");
+        return true;
     }
 
     private void LeftClickUpdate()
@@ -305,6 +408,11 @@ public class SpiritHead : Photon.MonoBehaviour
                 {
                     ClickOnChara(hit.transform.gameObject);
                 }
+
+                if(mode.firstTime == 3 && !mode.isSkip)
+                {
+                    StartCoroutine(MoveCharaTuto());                    
+                }
             }
             else
             {
@@ -319,22 +427,31 @@ public class SpiritHead : Photon.MonoBehaviour
         }
     }
 
+    private IEnumerator MoveCharaTuto()
+    {
+        yield return StartCoroutine(WaitForTuto());
+
+        _tuto.SetActive(true);
+        _tuto.transform.GetChild(0).GetComponent<Text>().text = "You can also move your character. Once you have selected him you can right click on a position and your character will walk until this point";
+        mode.firstTime = 4;
+    }
+
     private void RightClickUpdate()
     {
         RaycastHit hit;
         if (ClickedOnSomething(out hit))
         {
-            Debug.Log("RightClickUpdate: clicked on something");
+            //Debug.Log("RightClickUpdate: clicked on something");
             Interactable inter = hit.collider.GetComponent<Interactable>();
 
-            Debug.Log("RightClickUpdate: clicking on " + hit.transform.name);
+            //Debug.Log("RightClickUpdate: clicking on " + hit.transform.name);
             if (inter != null)
             {
                 GeneralActionHandler(inter);
             }
             else
             {
-                Debug.Log("RightClickUpdate: removing focus, pointing a destination to charas");
+                //Debug.Log("RightClickUpdate: removing focus, pointing a destination to charas");
                 foreach (Transform child in _actions.transform.GetChild(0).GetChild(0))
                 {
                     Destroy(child.gameObject);
@@ -355,9 +472,27 @@ public class SpiritHead : Photon.MonoBehaviour
                     //Fait courir les charas dans le cas ou on double click droit
                     ActionMoveAllTo(hit.point, true);
                 }
+
+                if(mode.firstTime == 4 && !mode.isSkip)
+                {
+                    StartCoroutine(FinalTuto());
+                    
+                }
             }
         }
 
+    }
+
+    private IEnumerator FinalTuto()
+    {
+        yield return StartCoroutine(WaitForTuto());
+
+        _tuto.SetActive(true);
+        _tuto.transform.GetChild(0).GetComponent<Text>().text = "WOW some informations about your character appear on the screen. You can see more details by pressing the E key.\n"
+            + "Other keys : \n"
+            + "Press B to open the build mode.\n"
+            + "Press ESCAPE to open the pause menu.";
+        mode.firstTime = 5;
     }
 
     //Public methods
@@ -566,6 +701,17 @@ public class SpiritHead : Photon.MonoBehaviour
         {
             _inventoryList.SetActive(false);
         }
+    }
+
+    public void ForceOpenCraft(GameObject chara, int index)
+    {
+        chara.GetComponent<CharaInventory>().ToggleInterface(_inventoryLayout, chara.GetComponent<CharaRpg>().GetToolTipInfo());
+        GameObject _interface = chara.GetComponent<CharaInventory>().GetInterface();
+        if (_interface != null)
+        {
+            _interface.GetComponent<InterfaceManager>().ForceOpenCraft(index);
+            _inventoryList.SetActive(true);
+        }    
     }
 
     public void MoveCamera(Vector3 pos)

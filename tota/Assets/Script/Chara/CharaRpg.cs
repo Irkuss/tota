@@ -17,7 +17,7 @@ public class CharaRpg : MonoBehaviour
     public string NameFirst => _nameFirst;
     private string _nameLast = "McCree";
     public string NameLast => _nameLast;
-    public string NameFull => _nameFirst + " " + _nameLast;
+    public string NameFull => _nameFirst + _nameLast;
     //Age
     private int _age;
 
@@ -47,6 +47,24 @@ public class CharaRpg : MonoBehaviour
         //Stats Level
         lv_stamina,
     }
+    public static Dictionary<Stat, string> statToString = new Dictionary<Stat, string>
+    {
+        //Main stats (de 1 à 100)
+        { Stat.ms_strength, "Strength"},
+        { Stat.ms_intelligence, "Intelligence"},
+        { Stat.ms_perception, "Perception"},
+        { Stat.ms_mental, "Mental"},
+        { Stat.ms_social, "Social"},
+        //Skills (-1 à 10) (0 de base) (-1 desactive les actions liées) 
+        { Stat.sk_doctor, "Doctor"},
+        { Stat.sk_farmer, "Farmer"},
+        { Stat.sk_carpenter, "Carpenter"},
+        { Stat.sk_scavenger, "Scavenger"},
+        { Stat.sk_electrician, "Electrician"},
+        { Stat.sk_marksman, "Marksman"},
+        //Stats Level
+        { Stat.lv_stamina, "Stamina"},
+    };
     public static bool IsMainStat(Stat stat)
     {
         return (int)stat < 5;
@@ -211,7 +229,7 @@ public class CharaRpg : MonoBehaviour
             Debug.Log("GetTimeModifier: returning " + (1.75f - statValue * 0.015f));
             return 1.75f - statValue * 0.015f; //0 -> 1.75, 50 -> 1, 100 -> 0.25
         }
-        Debug.Log("GetTimeModifier: returning " + (1f - statValue * 0.75f));
+        Debug.Log("GetTimeModifier: returning " + (1f - statValue * 0.075f));
         return 1f - statValue * 0.75f; //0 -> 1, 10 -> 0.25
     }
 
@@ -229,8 +247,6 @@ public class CharaRpg : MonoBehaviour
         //Hunger
         _hunger = _hunger < _maxHunger ? _hunger + 1 : _maxHunger;
         //tiredness
-        //temperature
-        UpdateTemperature();
     }
 
     //Hunger and tiredness
@@ -240,7 +256,7 @@ public class CharaRpg : MonoBehaviour
     {
         _hunger = _maxHunger / 5;
 
-        _bodyTemperature = GetOutSideTemperature();
+        _feltTemperature = GetOutSideTemperature();
     }
     //Health Attribute
     private readonly int maxBloodStock = 2000;
@@ -257,11 +273,11 @@ public class CharaRpg : MonoBehaviour
     //Status
     private bool _isInShock = false;
     private bool _isDead = false;
-    public bool IsDead { get { return _isDead; } }
+    public bool IsDead => _isDead;
     //Bodyparts
     private List<BodyPart> _bodyParts;
-    //body temperature
-    private int _bodyTemperature;
+    //Temperature Handler
+    private float _feltTemperature;
     private readonly int _minTemp = -5;
     private readonly int _maxTemp = 35;
     private int GetOutSideTemperature()
@@ -272,15 +288,52 @@ public class CharaRpg : MonoBehaviour
     {
         return GetComponent<CharaInventory>().GetMinTemperatureModifier();
     }
+    private int _cycleBeforeAddingFrostbite = 0;
     private void UpdateTemperature()
     {
         int outsiteTemp = GetOutSideTemperature();
         //Update bodyTemperature
-        if(_bodyTemperature != outsiteTemp)
+        if(_feltTemperature != outsiteTemp)
         {
-            _bodyTemperature = _bodyTemperature > outsiteTemp ? _bodyTemperature - 1 : _bodyTemperature + 1;
+            _feltTemperature = FloatIsSup(_feltTemperature, outsiteTemp, 1) ? _feltTemperature - 0.5f : _feltTemperature + 0.5f;
         }
         //Update possible wound related to temperature
+        if(IsBelowMinTemp()) //Si il fait trop froid
+        {
+            if(_cycleBeforeAddingFrostbite == 0)
+            {
+                _cycleBeforeAddingFrostbite = 50;
+                //Ajoute une Frostbite
+                AddRandomFrostBite();
+            }
+            else
+            {
+                _cycleBeforeAddingFrostbite--;
+            }
+        }
+
+    }
+    private bool IsBelowMinTemp()
+    {
+        return _feltTemperature + GetMinTempResistance() <= _minTemp;
+    }
+    private void AddRandomFrostBite()
+    {
+        if (!PhotonNetwork.isMasterClient) return;
+
+        Debug.Log("AddRandomFrostBite: Adding Frostbite wound to " + NameFull);
+
+        BodyPart bodyPart = _bodyParts[Random.Range(3, 13)]; //3-12 (not taking head nor torso
+
+        Wound frostBiteWound = new Wound(WoundInfo.WoundType.FrostBite, 5, "(Cold Temperature)");
+
+        AddWound(frostBiteWound, bodyPart);
+
+    }
+
+    private static bool FloatIsSup(float a, float b, float epsilon)
+    {
+        return a > b && a > b + epsilon;
     }
 
     //BodyParts and Wound
@@ -329,15 +382,24 @@ public class CharaRpg : MonoBehaviour
             if (infectionIncrement > 0) deathInfectionLevel = 0;
         }
         //Treating the wound
-        public void Update(bool isResting = false)
+        public void Update(bool isResting, bool isBelowMinTemp)
         {
+            //Temperature temporaire
             tempPain = tempPain > 0 ? tempPain - 1 : 0;
+            //Frostbite increment
+            if (type == WoundInfo.WoundType.FrostBite && isBelowMinTemp)
+            {
+                damage++;
+                return;
+            }
+            //Healing process (impossible if bleeding)
             if (bloodLose == 0)
             {
                 damage--;
                 if (isTreated) damage--;
                 if (isResting) damage -= 2;
             }
+            //Infection level
             deathInfectionLevel += deathInfectionIncrement;
             if (deathInfectionLevel > 100f) deathInfectionLevel = 100f;
         }
@@ -395,12 +457,12 @@ public class CharaRpg : MonoBehaviour
             wounds.Add(wound);
         }
         //Updating wound
-        public void Update(bool isRested)
+        public void Update(bool isRested, bool isBelowMinTemp)
         {
             List<Wound> woundToRemove = new List<Wound>();
             foreach (Wound wound in wounds)
             {
-                wound.Update(isRested);
+                wound.Update(isRested, isBelowMinTemp);
                 if (wound.IsHealed())
                 {
                     woundToRemove.Add(wound);
@@ -599,7 +661,7 @@ public class CharaRpg : MonoBehaviour
         while(!_isDead)
         {
             UpdateHealth();
-            yield return new WaitForSeconds(10);
+            yield return new WaitForSeconds(1);
         }
         foreach(BodyPart bp in _bodyParts)
         {
@@ -610,25 +672,28 @@ public class CharaRpg : MonoBehaviour
     private void UpdateHealth()
     {
         UpdateWounds();
+        UpdateTemperature();
 
         UpdateHealthStatus();
     }
+
+    int cycleBeforeUpdatingWounds = 0;
+
     private void UpdateWounds()
     {
-        bool isRested = false;
-
-        foreach (BodyPart bodyPart in _bodyParts)
+        if(cycleBeforeUpdatingWounds > 0)
         {
-            bodyPart.Update(isRested || _isInShock);
+            cycleBeforeUpdatingWounds--;
+            return;
         }
-    }
-    private void UpdateHealthStatus()
-    {
+        cycleBeforeUpdatingWounds = 10;
+
+        bool isRested = false;
         int totalBloodLose = 0;
-        //Main Update
         foreach (BodyPart bodyPart in _bodyParts)
         {
-            if(!bodyPart.CheckDestroyed()) totalBloodLose += bodyPart.GetTotalBloodLose();
+            bodyPart.Update(isRested || _isInShock, IsBelowMinTemp());
+            if (!bodyPart.CheckDestroyed()) totalBloodLose += bodyPart.GetTotalBloodLose();
         }
         //Blood lose
         if (totalBloodLose == 0)
@@ -640,6 +705,9 @@ public class CharaRpg : MonoBehaviour
         {
             bloodStock -= totalBloodLose;
         }
+    }
+    private void UpdateHealthStatus()
+    {
         //Check Death
         if (_isDead || CheckDeath()) return;
         //Make limb falloff
@@ -773,24 +841,6 @@ public class CharaRpg : MonoBehaviour
 
         _isInShock = _consciousness < _shockTreshold;
     }
-    private void UpdateMovement()
-    {
-        if (_isDead || _isInShock)
-        {
-            _movement = 0f;
-        }
-        else
-        {
-            _movement = 1 - 0.5f * (2 - _bodyParts[3].GetFuncPurcent() - _bodyParts[4].GetFuncPurcent()) //Mains
-                      - 0.3f * (4 - _bodyParts[7].GetFuncPurcent() //Rigth Shoulder
-                                  - _bodyParts[8].GetFuncPurcent() //Left Shoulder
-                                  - _bodyParts[9].GetFuncPurcent() //Right Arm
-                                  - _bodyParts[10].GetFuncPurcent()); //Left Arm
-            if (_movement <= 0) _movement = 0f;
-        }
-        //Debug.Log("UpdateMovement: movement=" + _movement + ", consciousness=" + _consciousness);
-        if (_charaMov != null) _charaMov.ModifyAgentSpeed(_movement * _consciousness);
-    }
     private void UpdateManipulation()
     {
         if (_isDead || _isInShock)
@@ -799,9 +849,27 @@ public class CharaRpg : MonoBehaviour
         }
         else
         {
-            _manipulation = 1 - 0.5f * (2 - _bodyParts[9].GetFuncPurcent() - _bodyParts[10].GetFuncPurcent())
-                      - 0.25f * (2 - _bodyParts[5].GetFuncPurcent() - _bodyParts[6].GetFuncPurcent());
+            _manipulation = 1 - 0.5f * (2 - _bodyParts[3].GetFuncPurcent() - _bodyParts[4].GetFuncPurcent()) //Mains
+                      - 0.3f * (4 - _bodyParts[7].GetFuncPurcent() //Rigth Shoulder
+                                  - _bodyParts[8].GetFuncPurcent() //Left Shoulder
+                                  - _bodyParts[9].GetFuncPurcent() //Right Arm
+                                  - _bodyParts[10].GetFuncPurcent()); //Left Arm
             if (_manipulation <= 0) _manipulation = 0f;
+        }
+        //Debug.Log("UpdateMovement: movement=" + _movement + ", consciousness=" + _consciousness);
+        if (_charaMov != null) _charaMov.ModifyAgentSpeed(_movement * _consciousness);
+    }
+    private void UpdateMovement()
+    {
+        if (_isDead || _isInShock)
+        {
+            _movement = 0f;
+        }
+        else
+        {
+            _movement = 1 - 0.5f * (2 - _bodyParts[9].GetFuncPurcent() - _bodyParts[10].GetFuncPurcent())
+                      - 0.25f * (2 - _bodyParts[5].GetFuncPurcent() - _bodyParts[6].GetFuncPurcent());
+            if (_movement <= 0) _movement = 0f;
         }
     }
 
@@ -819,22 +887,20 @@ public class CharaRpg : MonoBehaviour
 
     public void Die()
     {
-        if(CheckIfInfected())
-        {
-            DieZombie();
-            return;
-        }
-
         _isDead = true;
         _movement = 0;
         //Chara dies
         PermissionsManager.Instance.spirit.CharaDie(gameObject);
+
+        if (CheckIfInfected())
+        {
+            DieZombie();
+            return;
+        }        
         Debug.Log("======================= CharaRpg: " + NameFull + " has died =======================");
     }
     public void DieZombie()
     {
-        _isDead = true;
-        _movement = 0;
         //Chara dies by death bite infection
         Debug.Log("======================= CharaRpg: " + NameFull + " has died of death bite infection =======================");
     }
@@ -963,7 +1029,7 @@ public class CharaRpg : MonoBehaviour
     }
     public void GetAttackedWith(Equipable weapon, int damage)
     {
-        BodyPart bodyPart = _bodyParts[Random.Range(1, 13)]; //1-12 
+        BodyPart bodyPart = _bodyParts[Random.Range(0, 13)]; //1-12 
         //<------------------Doit réduire les dégats avec la liste des protections de la partie du corps correspondant
         WoundInfo.WoundType type;
         switch(weapon.dmgType)
@@ -1058,6 +1124,7 @@ public class CharaRpg : MonoBehaviour
         }
         if (debug == "") debug = " healthy!";
         //Debug.Log("DebugWounds: " + debug);
+        //Debug.Log("DebugWounds: felt temperature by " + NameFull + ", " + _feltTemperature + " (outside temp: " + GetOutSideTemperature() + ")");
     }
     public void UpdateInterfaceHealth()
     {

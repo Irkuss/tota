@@ -49,7 +49,7 @@ public class Equipable : Item
     public Item ammo = null;
    
     //Use (Equip)
-    protected override bool UseAsChara(GameObject refInventChara)
+    public override bool UseAsChara(CharaInventory charaInventory)
     {
         //Equip the weapon, process as follows:
 
@@ -60,66 +60,62 @@ public class Equipable : Item
         //    return true
         //return false;
 
-        refInventChara.GetComponent<CharaHead>().CallCoroutine(useTime);
-
-        CharaInventory inv = refInventChara.GetComponent<CharaInventory>();
-
         if(equipSpace == EquipSpace.OneHanded)
         {
-            if(inv.equipments[0] != null && inv.equipments[0].equipSpace == EquipSpace.TwoHanded)
+            if(charaInventory.equipments[0] != null && charaInventory.equipments[0].equipSpace == EquipSpace.TwoHanded)
             {
-                inv.Add(inv.equipments[0]);
+                charaInventory.Add(charaInventory.equipments[0]);
 
-                inv.equipments[0] = this;
-                inv.equipments[1] = null;
+                charaInventory.equipments[0] = this;
+                charaInventory.equipments[1] = null;
             }
             else
             {
-                if (inv.equipments[0] != null && inv.equipments[1] == null)
+                if (charaInventory.equipments[0] != null && charaInventory.equipments[1] == null)
                 {
-                    inv.equipments[1] = this;
+                    charaInventory.equipments[1] = this;
                 }
                 else
                 {
-                    if (inv.equipments[1] != null)
+                    if (charaInventory.equipments[1] != null)
                     {
-                        inv.Add(inv.equipments[1]);
+                        charaInventory.Add(charaInventory.equipments[1]);
                     }
-                    inv.equipments[1] = inv.equipments[0];
-                    inv.equipments[0] = this;
+                    charaInventory.equipments[1] = charaInventory.equipments[0];
+                    charaInventory.equipments[0] = this;
                 }
             }            
         }
         else
         {
-            if (inv.equipments[0] != null)
+            if (charaInventory.equipments[0] != null)
             {
-                if (inv.equipments[0].equipSpace == EquipSpace.TwoHanded)
+                if (charaInventory.equipments[0].equipSpace == EquipSpace.TwoHanded)
                 {
-                    inv.Add(inv.equipments[0]);
-                    inv.equipments[0] = this;
-                    inv.equipments[1] = this;
+                    charaInventory.Add(charaInventory.equipments[0]);
+                    charaInventory.equipments[0] = this;
+                    charaInventory.equipments[1] = this;
                 }
                 else
                 {
-                    if (inv.equipments[1] != null)
+                    if (charaInventory.equipments[1] != null)
                     {
-                        inv.Add(inv.equipments[1]);
+                        charaInventory.Add(charaInventory.equipments[1]);
                     }
-                    inv.equipments[1] = this;
-                    inv.equipments[0] = this;
+                    charaInventory.equipments[1] = this;
+                    charaInventory.equipments[0] = this;
                 }
             }
             else
             {
-                inv.equipments[0] = this;
-                inv.equipments[1] = this;
+                charaInventory.equipments[0] = this;
+                charaInventory.equipments[1] = this;
             }
         }
 
-        GameObject _interface = inv.GetInterface();
+        GameObject _interface = charaInventory.GetInterface();
         if (_interface == null) return false;
-        _interface.GetComponent<InterfaceManager>().UpdateEquipment(inv);
+        _interface.GetComponent<InterfaceManager>().UpdateEquipment(charaInventory);
 
         return true;
     }

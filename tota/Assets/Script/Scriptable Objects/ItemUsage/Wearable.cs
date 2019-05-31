@@ -22,7 +22,7 @@ public class Wearable : Item
     public int minTempModifier = 0;
 
     //Use (Equip)
-    protected override bool UseAsChara(GameObject refInventChara)
+    public override bool UseAsChara(CharaInventory charaInventory)
     {
         //Equip the wearable, process as follows:
 
@@ -30,46 +30,43 @@ public class Wearable : Item
         //    equip this wearable to chara
         //    return true
         //return false;
-
-        refInventChara.GetComponent<CharaHead>().CallCoroutine(useTime);
-
-        CharaInventory inv = refInventChara.GetComponent<CharaInventory>();
+        
         switch (inventorySpotTaken)
         {
             case BodyInvSpace.Head:
-                if (inv.wearables[0] != null)
+                if (charaInventory.wearables[0] != null)
                 {
-                    inv.Add(inv.wearables[0]);
+                    charaInventory.Add(charaInventory.wearables[0]);
                 }
-                inv.wearables[0] = this;
+                charaInventory.wearables[0] = this;
                 break;
             case BodyInvSpace.Torso:
-                if (inv.wearables[1] != null && inv.wearables[2] == null)
+                if (charaInventory.wearables[1] != null && charaInventory.wearables[2] == null)
                 {
-                    inv.wearables[2] = this;
+                    charaInventory.wearables[2] = this;
                 }
                 else
                 {
-                    if (inv.wearables[2] != null)
+                    if (charaInventory.wearables[2] != null)
                     {
-                        inv.Add(inv.wearables[2]);
+                        charaInventory.Add(charaInventory.wearables[2]);
                     }
-                    inv.wearables[2] = inv.wearables[1];
-                    inv.wearables[1] = this;
+                    charaInventory.wearables[2] = charaInventory.wearables[1];
+                    charaInventory.wearables[1] = this;
                 }
                 break;
             case BodyInvSpace.Leg:
-                if (inv.wearables[3] != null)
+                if (charaInventory.wearables[3] != null)
                 {
-                    inv.Add(inv.wearables[3]);
+                    charaInventory.Add(charaInventory.wearables[3]);
                 }
-                inv.wearables[3] = this;
+                charaInventory.wearables[3] = this;
                 break;
         }
 
-        GameObject _interface = inv.GetInterface();
+        GameObject _interface = charaInventory.GetInterface();
         if (_interface == null) return false;
-        _interface.GetComponent<InterfaceManager>().UpdateEquipment(inv);
+        _interface.GetComponent<InterfaceManager>().UpdateEquipment(charaInventory);
 
         return true;
     }

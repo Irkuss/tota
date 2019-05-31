@@ -5,12 +5,12 @@ using UnityEngine;
 [CreateAssetMenu(menuName = "Inventory/Item/Food")]
 public class Food : Item
 {
+    [Header("Food Attribute")]
     public int foodValue = 0;
     
-    protected override bool UseAsChara(GameObject refInventChara)
+    public override bool UseAsChara(CharaInventory charaInventory)
     {
-        Debug.Log("Using food:" + this.nickName);
-        refInventChara.GetComponent<CharaHead>().CallCoroutine(useTime);
-        return refInventChara.GetComponentInParent<CharaRpg>().Eat(foodValue);
+        Debug.Log("Using food: " + this.nickName + " with foodValue " + foodValue);
+        return charaInventory.GetComponent<CharaRpg>().Eat(foodValue);
     }
 }
