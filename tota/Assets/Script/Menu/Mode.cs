@@ -7,7 +7,7 @@ using UnityEngine.SceneManagement;
 public class Mode : MonoBehaviour
 {
     public static Mode Instance;
-    private string _mode = null;
+    private string _mode = "";
     
     [HideInInspector] public bool online;   
 
@@ -52,9 +52,9 @@ public class Mode : MonoBehaviour
         if (!online) SceneManager.LoadScene(3);
     }
 
-    public void Other()
+    public void Zombie()
     {
-        _mode = "other";
+        _mode = "zombie";
         if (!online) SceneManager.LoadScene(3);
     }
 
