@@ -119,17 +119,13 @@ public class Zombie : MonoBehaviour
                     _closestPlayer = CharaAi.FindClosestTransform(_visibleTargets, transform.position);
 
                     //Zombie is chasing a chara
-<<<<<<< HEAD
+
                     if (alert == null)
                     {
                         AudioManager.instance.PlayAtPosition("Ping", transform.position);
                         alert = new GameObject("Alert");
                     }
-                    _wanderPoint = player.position;
-=======
-                    //if (alert == null){AudioManager.instance.Play("Ping");alert = new GameObject("Alert");}
                     _wanderPoint = _closestPlayer.position;
->>>>>>> bfc04a6465382cdfbdd6b1087cca62e2b8803e02
 
                     SetDestination(_wanderPoint);
 
