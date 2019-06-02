@@ -40,14 +40,13 @@ public class MainMenu : MonoBehaviour
         Mode.Instance.Cold();
     }
 
-    public void Other()
+    public void Zombie()
     {
-        Mode.Instance.Other();
+        Mode.Instance.Zombie();
     }
 
     public void BackMenu()
     {
-        Debug.Log("back");
         _modes.SetActive(false);
         gameObject.SetActive(true);
         _loadButton.SetActive(true);

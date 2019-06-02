@@ -61,6 +61,12 @@ public class CentralManager : Photon.MonoBehaviour
     [SerializeField] private GameObject _tuto = null;
     public GameObject Tuto { get { return _tuto; } }
 
+    [SerializeField] private RecipeTable _visuData = null;
+    public RecipeTable VisuData { get { return _visuData; } }
+
+    [SerializeField] private GameObject _description = null;
+    public GameObject Description { get { return _description; } }
+
     public void UpdateToolTip(string[] info,string quirks)
     {
         toolTip.SetActive(true);
@@ -143,11 +149,12 @@ public class CentralManager : Photon.MonoBehaviour
     }
 
     public void LoadMenu()
-    {
+    {        
         PhotonNetwork.Destroy(gameObject);
         PhotonNetwork.Destroy(PermissionsManager.Instance.gameObject);
         PhotonNetwork.Destroy(Mode.Instance.gameObject);
-        SceneManager.LoadScene(2);
+        PhotonNetwork.Disconnect();
+        SceneManager.LoadScene(0);
     }
 
     public void Options()
@@ -158,10 +165,57 @@ public class CentralManager : Photon.MonoBehaviour
 
     public void Controls()
     {
+        Move();
+        Interface();
+        ChannelOption();
+        BuildOption();
+    }
+
+    public void Move()
+    {
+        if(_options.transform.GetChild(0).GetChild(0).GetComponent<InputField>().text == "")
+        {
+            _options.transform.GetChild(0).GetChild(0).GetComponent<InputField>().text = Mode.Instance.zqsd ? "z" : "w";
+            return;
+        }
+
         if (_options.transform.GetChild(0).GetChild(0).GetComponent<InputField>().text == "z")
         {
             Mode.Instance.zqsd = true;
         }
+    }
+
+    public void Interface()
+    {
+        if(_options.transform.GetChild(1).GetChild(0).GetComponent<InputField>().text == "")
+        {
+            _options.transform.GetChild(1).GetChild(0).GetComponent<InputField>().text = Mode.Instance.interfaCe;
+            return;
+        }
+
+        Mode.Instance.interfaCe = _options.transform.GetChild(1).GetChild(0).GetComponent<InputField>().text;
+    }
+
+    public void ChannelOption()
+    {
+        if (_options.transform.GetChild(2).GetChild(0).GetComponent<InputField>().text == "")
+        {
+            _options.transform.GetChild(2).GetChild(0).GetComponent<InputField>().text = Mode.Instance.channel;
+            return;
+        }
+
+        Mode.Instance.channel = _options.transform.GetChild(2).GetChild(0).GetComponent<InputField>().text;
+    }
+
+    public void BuildOption()
+    {
+        if (_options.transform.GetChild(3).GetChild(0).GetComponent<InputField>().text == "")
+        {
+            _options.transform.GetChild(3).GetChild(0).GetComponent<InputField>().text = Mode.Instance.build;
+            return;
+        }
+
+        Mode.Instance.build = _options.transform.GetChild(3).GetChild(0).GetComponent<InputField>().text;
     }
 
     public void Quit()
@@ -410,7 +464,6 @@ public class CentralManager : Photon.MonoBehaviour
         }
     }
 
-
     //Temperature getters
     public int GetTemperatureAtCoord(Vector3 pos)
     {
@@ -422,15 +475,28 @@ public class CentralManager : Photon.MonoBehaviour
     public void OnGenerationFinished()
     {
         //Appelé par Generator/Start/*Received Package*/GenerateEnd une fois que le monde s'est généré
-        tempButton.SetActive(true);
-        _tuto.SetActive(true);
-        _tuto.transform.GetChild(0).GetComponent<Text>().text = "Welcome in the solo mode of Tales of the Apocalypse. This is a short tutorial for you to understand the main commands of the game";
-        _tuto.transform.GetChild(1).GetComponent<Button>().onClick.AddListener(() => _tuto.SetActive(false));
-        _tuto.transform.GetChild(2).GetComponent<Button>().onClick.AddListener(delegate
+        if (Mode.Instance.online)
         {
+            tempButton.SetActive(true);
             Mode.Instance.isSkip = true;
-            _tuto.SetActive(false);
-        });
+        }
+        else
+        {
+            _tuto.SetActive(true);
+            _tuto.transform.GetChild(0).GetComponent<Text>().text = "Welcome in the solo mode of Tales of the Apocalypse. This is a short tutorial for you to understand the main commands of the game";
+            _tuto.transform.GetChild(1).GetComponent<Button>().onClick.AddListener(SpawnButton);
+            _tuto.transform.GetChild(2).GetComponent<Button>().onClick.AddListener(delegate
+            {
+                Mode.Instance.isSkip = true;
+                SpawnButton();
+            });
+        }       
+    }
+
+    private void SpawnButton()
+    {
+        tempButton.SetActive(true);
+        _tuto.SetActive(false);
     }
 
     //Spawn le joueur (appelé par le bouton spawn)

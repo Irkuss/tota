@@ -5,13 +5,17 @@ using UnityEngine;
 [CreateAssetMenu(fileName = "new Recipe", menuName = "Recipe")]
 public class ItemRecipe : ScriptableObject
 {
+    [Header("Visu attributes")]
+    public string visuPath = "Visu/";
+    public Sprite visuSprite = null;
+
     [Header("Recipe result (if it has one)")]
     //Item donné par le craft
     public Item result = null;
     public int resultCount;
 
     [Header("Recipe path (if it has one)")]
-    public string resultPath = "";
+    public string resultPath = "";    
 
     [Header("Recipe needed items")]
     //A chaque index des deux arrays se trouvent un Item requis et la quantité de cet Item requise

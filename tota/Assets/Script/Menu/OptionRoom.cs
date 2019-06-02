@@ -145,27 +145,30 @@ public class OptionRoom : MonoBehaviour
         }
 
         roomOptions.CustomRoomProperties.Add("numberChara", (int)randomChara.value);
-        PermissionsManager.Instance.numberChara = (int) randomChara.value;        
+        PermissionsManager.Instance.numberChara = (int) randomChara.value;
+
+        int mode = _dropdown.GetComponent<Dropdown>().value;
+        roomOptions.CustomRoomProperties.Add("mode", mode);
 
         roomOptions.CustomRoomPropertiesForLobby = new string[]
         {
             "password",
             "maxInTeam",
             "heightMap",
-            "numberChara"
+            "numberChara",
+            "mode"
         };
 
-        switch (_dropdown.GetComponent<Dropdown>().value)
+        switch (mode)
         {
-            case 0:
-            case 1:
+            case 0:            
                 Mode.Instance.Solo();
                 break;
-            case 2:
+            case 1:
                 Mode.Instance.Cold();
                 break;
-            case 3:
-                Mode.Instance.Other();
+            case 2:
+                Mode.Instance.Zombie();
                 break;
         }
 

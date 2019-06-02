@@ -3890,8 +3890,12 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   online: 0
   zqsd: 0
+  interfaCe: e
+  channel: c
+  build: b
   load: 0
   firstTime: 0
+  isSkip: 0
   _loadButton: {fileID: 1410910633}
   _launchButton: {fileID: 1556043584}
   _loadText: {fileID: 2063619320}
@@ -4180,7 +4184,7 @@ GameObject:
   - component: {fileID: 1323600840}
   - component: {fileID: 1323600842}
   m_Layer: 5
-  m_Name: Other
+  m_Name: Zombie
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -4283,7 +4287,7 @@ MonoBehaviour:
     m_PersistentCalls:
       m_Calls:
       - m_Target: {fileID: 1030348538}
-        m_MethodName: Other
+        m_MethodName: Zombie
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}

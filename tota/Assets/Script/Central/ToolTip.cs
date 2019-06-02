@@ -16,7 +16,6 @@ public class ToolTip : MonoBehaviour
     [SerializeField] private Text _farmer = null;
     [SerializeField] private Text _marksman = null;
     [SerializeField] private Text _scavenger = null;
-    [SerializeField] private Slider _stamina = null;
 
 
     [SerializeField] private Slider _strengthSlider = null;
@@ -42,16 +41,6 @@ public class ToolTip : MonoBehaviour
         _farmer.text = "Farmer : " + info[3] + " / 10";
         _marksman.text = "Marksman : " + info[4] + " / 10";
         _scavenger.text = "Scavenger : " + info[5] + " / 10";
-
-        if (_stamina != null) return;
-        _stamina.value = int.Parse(info[6]);
-
-        switch (_stamina.value)
-        {
-            case -2: case -1: _stamina.gameObject.transform.GetChild(1).GetChild(0).GetComponent<Image>().color = Color.red; break;
-            case 0: _stamina.gameObject.transform.GetChild(1).GetChild(0).GetComponent<Image>().color = Color.yellow; break;
-            case 1: case 2:  _stamina.gameObject.transform.GetChild(1).GetChild(0).GetComponent<Image>().color = Color.green; break;
-        }
     }
 
 

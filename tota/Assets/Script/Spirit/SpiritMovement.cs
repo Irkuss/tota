@@ -79,7 +79,7 @@ public class SpiritMovement : Photon.MonoBehaviour
 
     private IEnumerator MoveTuto()
     {
-        yield return new WaitForSeconds(3f);
+        yield return new WaitForSeconds(1f);
 
         GameObject tuto = GameObject.Find("eCentralManager").GetComponent<CentralManager>().Tuto;
         tuto.SetActive(true);

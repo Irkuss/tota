@@ -7,9 +7,15 @@ using UnityEngine.SceneManagement;
 public class Mode : MonoBehaviour
 {
     public static Mode Instance;
-    private string _mode = null;
+    private string _mode = "";
+    
     [HideInInspector] public bool online;   
+
     [HideInInspector] public bool zqsd = false;
+    [HideInInspector] public string interfaCe = "e";
+    [HideInInspector] public string channel = "c";
+    [HideInInspector] public string build = "b";
+
     [HideInInspector] public bool load = false;
     [HideInInspector] public int firstTime = 0;
     [HideInInspector] public bool isSkip = false;
@@ -46,9 +52,9 @@ public class Mode : MonoBehaviour
         if (!online) SceneManager.LoadScene(3);
     }
 
-    public void Other()
+    public void Zombie()
     {
-        _mode = "other";
+        _mode = "zombie";
         if (!online) SceneManager.LoadScene(3);
     }
 

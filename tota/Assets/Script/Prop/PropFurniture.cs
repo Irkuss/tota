@@ -122,7 +122,8 @@ public class PropFurniture : SalvageHandler
         _inventoryLayout.transform.parent.parent.gameObject.SetActive(true);
 
         CharaInventory inv = chara.GetComponent<CharaInventory>();
-        if (inv.GetInterface() == null) inv.ToggleInterface(_inventoryLayout, chara.GetComponent<CharaRpg>().GetToolTipInfo()); //
+
+        if (inv.GetInterface() == null) inv.ToggleInterface(_inventoryLayout, chara.GetComponent<CharaRpg>().GetToolTipInfo());
 
         _furnitureInventory.ToggleInventory(_inventoryLayout);
 
