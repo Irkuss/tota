@@ -696,7 +696,7 @@ public class CharaRpg : MonoBehaviour
     private float _shockTreshold = 0.1f;
 
     //Rest
-    private const int c_secInHour = 41;
+    public const int c_secInHour = 41;
     private static int maxRest = 18 * c_secInHour; //16 * 41 (41 -> nb de sec en 1h)
     private static int maxSleepDeprivationProgressBeforeNextLevel = 24 * c_secInHour;
 
