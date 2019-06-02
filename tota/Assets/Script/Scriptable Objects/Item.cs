@@ -33,11 +33,13 @@ public class Item : ScriptableObject
     {
         //Clique Handler
         //dans un inventaire de furniture
-        if (refInvent.GetComponent<CharaRpg>() == null)
+        PropFurniture possibleFurnitureComp = refInvent.GetComponent<PropFurniture>();
+
+        if (possibleFurnitureComp != null)
         {
-            if (SpiritHead.SelectedList.Count != 0)
+            if(possibleFurnitureComp.CharaUsing != null)
             {
-                return SpiritHead.SelectedList[0].GetComponent<CharaInventory>().Add(this);
+                return possibleFurnitureComp.CharaUsing.GetComponent<CharaInventory>().Add(this);
             }
             return false;
         }

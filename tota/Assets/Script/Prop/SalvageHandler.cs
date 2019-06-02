@@ -7,8 +7,12 @@ public class SalvageHandler : PropHandler
     //Defining attribute
     [Header("Salvage attribute")]
     public float salvageTime = 2;
-    public Item salvagedItem = null;
-    public int salvagedItemCount = 1;
+
+    public Item salvagedItem1 = null;
+    public int salvagedItemCount1 = 1;
+
+    public Item salvagedItem2 = null;
+    public int salvagedItemCount2 = 1;
 
     //Start
     private void Start()
@@ -50,9 +54,20 @@ public class SalvageHandler : PropHandler
     {
         CharaInventory inv = chara.GetComponent<CharaInventory>();
 
-        for (int i = 0; i < salvagedItemCount; i++)
+        if(salvagedItem1 != null)
         {
-            inv.Add(salvagedItem);
+            for (int i = 0; i < salvagedItemCount1; i++)
+            {
+                inv.Add(salvagedItem1);
+            }
+        }
+
+        if (salvagedItem2 != null)
+        {
+            for (int i = 0; i < salvagedItemCount2; i++)
+            {
+                inv.Add(salvagedItem2);
+            }
         }
 
         DestroySelf();

@@ -12,7 +12,8 @@ GameObject:
   - component: {fileID: 4993385260646900909}
   - component: {fileID: 682346385571276732}
   - component: {fileID: 1367941485280488888}
-  - component: {fileID: 1466645137674192866}
+  - component: {fileID: 8370170523171107157}
+  - component: {fileID: 4931207375759819055}
   m_Layer: 0
   m_Name: bluebed
   m_TagString: Untagged
@@ -92,7 +93,7 @@ BoxCollider:
   serializedVersion: 2
   m_Size: {x: 2.1791654, y: 2.13815, z: 4.1972075}
   m_Center: {x: 1.115977, y: 1.069075, z: -0.42557}
---- !u!114 &1466645137674192866
+--- !u!114 &8370170523171107157
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -101,16 +102,41 @@ MonoBehaviour:
   m_GameObject: {fileID: 981160652717874408}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 70c9328f7956ec84cbd5ec683cda3a0d, type: 3}
+  m_Script: {fileID: 11500000, guid: 021caf11e95b9264aa8e1b114d4a06f0, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   isMoving: 0
-  _interTransform: {fileID: 0}
-  _radius: 5
-  _possibleActionNames: []
-  _isDistanceAction: 
-  _isDoWhileAction: 
-  _makesActionNotAppearWhenUnavailable: 
+  _interTransform: {fileID: 7037697357775979356}
+  _radius: 3
+  _possibleActionNames:
+  - Sleep
+  - Salvage
+  _isDistanceAction: 0000
+  _isDoWhileAction: 0000
+  _makesActionNotAppearWhenUnavailable: 0000
+  salvageTime: 6
+  salvagedItem1: {fileID: 11400000, guid: b9a4498b9cf7da748ad2ddd6a0b3bb55, type: 2}
+  salvagedItemCount1: 8
+  salvagedItem2: {fileID: 11400000, guid: 4e8b23ecd7c806b44a0c762728a04a3f, type: 2}
+  salvagedItemCount2: 2
+--- !u!114 &4931207375759819055
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 981160652717874408}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5fea29bb7c508c244a1f805a5fd3fc4d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  outlineMode: 1
+  outlineColor: {r: 0.9811321, g: 0.6966839, b: 0.14346743, a: 1}
+  outlineWidth: 4
+  precomputeOutline: 0
+  bakeKeys: []
+  bakeValues: []
 --- !u!1 &8291699984940105662
 GameObject:
   m_ObjectHideFlags: 0

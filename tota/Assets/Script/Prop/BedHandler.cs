@@ -2,31 +2,8 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class WorkshopProp : SalvageHandler
+public class BedHandler : SalvageHandler
 {
-    public enum WorkshopType
-    {
-        Undecided,
-        ElecWork,
-        ForgeWork,
-        MecaWork,
-        WoodWork
-    }
-    public static Dictionary<WorkshopType, int> workTypeToTabIndex = new Dictionary<WorkshopType, int>
-    {
-        { WorkshopType.Undecided, 0},
-        { WorkshopType.WoodWork, 1},
-        { WorkshopType.MecaWork, 2},
-        { WorkshopType.ElecWork, 3},
-
-        { WorkshopType.ForgeWork, 0}, //will probably not be used
-    };
-
-
-    //Defining attribute
-    [Header("Workshop attribute")]
-    public WorkshopType workType = WorkshopType.Undecided;
-
     //Reference
     private Outline _outline;
 
@@ -36,7 +13,7 @@ public class WorkshopProp : SalvageHandler
     private IEnumerator _currentCloseUpdate = null;
 
     //Command enum
-    public enum WorkShopCommand
+    public enum BedCommand
     {
         Usage
     }
@@ -55,9 +32,9 @@ public class WorkshopProp : SalvageHandler
     //====================Override Interactable====================
     public override void Interact(CharaHead chara, int actionIndex)
     {
-        switch(actionIndex)
+        switch (actionIndex)
         {
-            case 0: StartUsage(chara); break; //Use Workshop
+            case 0: StartUsage(chara); break; //Use Bed
             case 1: Salvage(chara); break;//Salvage
         }
     }
@@ -66,7 +43,7 @@ public class WorkshopProp : SalvageHandler
     {
         switch (actionIndex)
         {
-            case 0: return !_isBeingUsed; //Use Workshop
+            case 0: return !_isBeingUsed; //Use Bed
             case 1: return true; //Salvage
         }
         return false;
@@ -83,15 +60,13 @@ public class WorkshopProp : SalvageHandler
     }
 
     //====================Action Method====================
-    //Use Workshop
+    //Use Bed
     private void StartUsage(CharaHead chara)
     {
-        if (!CheckAvailability(chara, 0)) return; //Si au moment d'arriver, l'établi est finalement utilisé annule tout
+        if (!CheckAvailability(chara, 0)) return; //Si au moment d'arriver, le lit est finalement utilisé annule tout
 
         SendToggleUsage(true);
         _charaUsing = chara;
-
-        //ICI -> OUVRE LONGLET, UTILISER LE DICTIONNAIRE 'workTypeToTabIndex' EN PARAMETRE
 
         _currentCloseUpdate = Cor_UpdateClose();
         StartCoroutine(_currentCloseUpdate);
@@ -117,7 +92,7 @@ public class WorkshopProp : SalvageHandler
     }
     private void SendToggleUsage(bool isUsed)
     {
-        CommandSend(new int[2] { (int)WorkShopCommand.Usage, isUsed ? 1 : 0 });
+        CommandSend(new int[2] { (int)BedCommand.Usage, isUsed ? 1 : 0 });
     }
     private void ToggleUsage(bool isUsed)
     {
@@ -127,9 +102,9 @@ public class WorkshopProp : SalvageHandler
     //====================Override PropHandler====================
     public override void CommandReceive(int[] command, float[] commandFloat, string[] commandString = null)
     {
-        switch((WorkShopCommand)command[0])
+        switch ((BedCommand)command[0])
         {
-            case WorkShopCommand.Usage: ToggleUsage(command[1] == 1); break;
+            case BedCommand.Usage: ToggleUsage(command[1] == 1); break;
         }
     }
 }

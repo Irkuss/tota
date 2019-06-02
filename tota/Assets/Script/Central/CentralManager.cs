@@ -210,7 +210,7 @@ public class CentralManager : Photon.MonoBehaviour
 
                 writer.WriteLine(head.NameFull);
 
-                float[] healthStats = head.UpdateStats();
+                float[] healthStats = head.GetHealthStats();
                 writer.WriteLine(healthStats[0] + "/" + healthStats[1] + "/" + healthStats[2] +
                     "/" + healthStats[3] + "/" + healthStats[4]);
 
@@ -324,7 +324,7 @@ public class CentralManager : Photon.MonoBehaviour
                 rpg.SetIdentity(name[0], name[1]);
 
                 string[] healthStats = reader.ReadLine().Split('/');
-                rpg.SetStats(healthStats);
+                rpg.SetHealthStats(healthStats);
 
                 string[] info = reader.ReadLine().Split('/');
                 int[] setInfo = new int[info.Length];

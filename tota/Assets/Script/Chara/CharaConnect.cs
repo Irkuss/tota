@@ -15,7 +15,6 @@ public class CharaConnect : MonoBehaviour
         SetOutlineToSelected,
         SetOutlineToNotSelected,
         RPC_SetTeam,
-        RPC_SetTeamNull,
         SetOwner,
         SetOwnerNull,
         ModifyCountWithId,
@@ -42,7 +41,6 @@ public class CharaConnect : MonoBehaviour
             case CharaCommand.SetOutlineToSelected: GetComponent<CharaOutline>().SetOutlineToSelected(); break;
             case CharaCommand.SetOutlineToNotSelected: GetComponent<CharaOutline>().SetOutlineToNotSelected(); break;
             case CharaCommand.RPC_SetTeam: GetComponent<CharaPermissions>().RPC_SetTeam(s[0]); break;
-            case CharaCommand.RPC_SetTeamNull: GetComponent<CharaPermissions>().RPC_SetTeamNull(); break;
             case CharaCommand.SetOwner: GetComponent<CharaPermissions>().SetOwner(s[0]); break;
             case CharaCommand.SetOwnerNull: GetComponent<CharaPermissions>().SetOwnerNull(); break;
             case CharaCommand.ModifyCountWithId: GetComponent<CharaInventory>().ModifyCountWithId(i[0],i[1]); break;

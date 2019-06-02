@@ -128,7 +128,27 @@ public class SpiritHead : Photon.MonoBehaviour
         {
             //Projection des positions sur le sol
             Vector3 lowPosition = new Vector3(gameObject.transform.position.x, 1, gameObject.transform.position.z);
-            GameObject.Find("eCentralManager").GetComponent<CharaManager>().SpawnChara(lowPosition, _playerOwner.MyTeamName,_playerOwner.Name);
+            
+            if(Input.GetKey(KeyCode.R))
+            {
+                if(PhotonNetwork.offlineMode)
+                {
+                    Instantiate(Resources.Load("Prop/ratProp"), lowPosition, Quaternion.identity);
+                }
+                else
+                {
+                    PhotonNetwork.Instantiate("Prop/ratProp", lowPosition, Quaternion.identity, 0);
+                }
+                return;
+            }
+
+            bool setToAI = (Input.GetKey(KeyCode.LeftShift) || Input.GetKey(KeyCode.RightShift));
+            string teamOfNewChara = setToAI ? "" : _playerOwner.MyTeamName;
+
+            if (setToAI) Debug.Log("TestCharaSpawn: spawning AI chara");
+
+
+            GameObject.Find("eCentralManager").GetComponent<CharaManager>().SpawnChara(lowPosition, teamOfNewChara,_playerOwner.Name);
 
             if(mode.firstTime == 2)
             {
@@ -340,8 +360,8 @@ public class SpiritHead : Photon.MonoBehaviour
         //Debug.Log("ClickedOnSomething: Starting direction is " + direction + ", starting origin is " + origin);
         while (!hitSomethingValid && step < maxStep)
         {
-            Color debugColor = new Color(Random.Range(0f, 1f), Random.Range(0f, 1f), Random.Range(0f, 1f));
-            Debug.DrawRay(origin, direction * 30, debugColor, 3f);
+            //Color debugColor = new Color(Random.Range(0f, 1f), Random.Range(0f, 1f), Random.Range(0f, 1f));
+            //Debug.DrawRay(origin, direction * 30, debugColor, 3f);
             if (Physics.Raycast(origin, direction, out RaycastHit possibleHit))
             {
                 if(IsHitValid(possibleHit))
@@ -351,7 +371,7 @@ public class SpiritHead : Photon.MonoBehaviour
                     if(possibleHit.transform.GetComponent<FloorOpacity>() != null)
                     {
                         //Debug.Log(("ClickedOnSomething: Clicked on wall, checking below for any possible door"));
-                        Debug.DrawRay(possibleHit.point, Vector3.down * 3.95f, debugColor, 3);
+                        //Debug.DrawRay(possibleHit.point, Vector3.down * 3.95f, debugColor, 3);
                         if (Physics.Raycast(possibleHit.point, Vector3.down, out RaycastHit possibleDoorHit, 3.95f))
                         {
                             //Debug.Log(("ClickedOnSomething: found something below"));
@@ -590,10 +610,10 @@ public class SpiritHead : Photon.MonoBehaviour
     {
         //Deplace tous les charas selectionnés à une position donnée
         float stopDistance = 0.2f + (_selectedList.Count - 1) * 0.4f; //Temporaire
-        foreach (GameObject Chara in _selectedList)
+        foreach (GameObject chara in _selectedList)
         {
-            Chara.GetComponent<CharaHead>().SetDestination(destination, isRunning);
-            Chara.GetComponent<CharaHead>().SetStopDistance(stopDistance);
+            chara.GetComponent<CharaHead>().SetDestination(destination, isRunning);
+            chara.GetComponent<CharaHead>().SetStopDistance(stopDistance);
         }
     }
 

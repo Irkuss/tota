@@ -8,9 +8,10 @@ using UnityEngine.EventSystems;
 public class CharaHead : Photon.PunBehaviour
 {
     //Chara Family (Component attaché à Chara)
-    [SerializeField] private CharaMovement _movement = null;
-    [SerializeField] private CharaPermissions _permissions = null;
-    [SerializeField] private CharaOutline _outline = null;
+    private CharaMovement _movement = null;
+    private CharaPermissions _permissions = null;
+    private CharaOutline _outline = null;
+    private CharaAi _aiHead = null;
 
     //Autre ref
     [SerializeField] private LayerMask _aiActivationLayer;
@@ -26,7 +27,6 @@ public class CharaHead : Photon.PunBehaviour
     //Unity Callbacks
     private void Awake()
     {
-        _baseStoppingDistance = _movement.navMeshAgent.stoppingDistance;
         CentralManager central = GameObject.Find("eCentralManager").GetComponent<CentralManager>();
         GameObject canvas = central.Canvas;
 
@@ -35,6 +35,13 @@ public class CharaHead : Photon.PunBehaviour
     }
     private void Start()
     {
+        _movement = GetComponent<CharaMovement>();
+        _permissions = GetComponent<CharaPermissions>();
+        _outline = GetComponent<CharaOutline>();
+        _aiHead = GetComponent<CharaAi>();
+
+        _baseStoppingDistance = _movement.AgentStoppingDistance;
+
         _eManager = GameObject.Find("eCentralManager"); //pas ouf comm methode, mieux vaux avec un tag
         _permManager = PermissionsManager.Instance;
 
@@ -79,6 +86,12 @@ public class CharaHead : Photon.PunBehaviour
 
     private void Update()
     {
+        if(_permissions.Team == null && PhotonNetwork.isMasterClient)
+        {
+            _aiHead.UpdateAi();
+        }
+
+
         if (needFill)
         {
             Vector3 vec = new Vector3(gameObject.transform.position.x, gameObject.transform.position.y + 3, gameObject.transform.position.z);
@@ -102,7 +115,7 @@ public class CharaHead : Photon.PunBehaviour
         if (team.ContainsPlayer(playerWhoClickedUs))
         {
             //Si le joueur qui a cliqué sur Chara appartient à notre équipe
-            if (!_permissions.HasOwner())
+            if (!_permissions.HasOwner)
             {
                 //Si personne controle Chara, le joueur prend controle de Chara
                 //Debug.Log("Chara: now controlled by "+ playerWhoClickedUs.Name + " (was empty)");
@@ -183,16 +196,16 @@ public class CharaHead : Photon.PunBehaviour
     }
 
     //Focus on Interactable
-    private IEnumerator _checkFocusDistanceCor = null;
-    private IEnumerator _craftingItemCor = null;
-    private IEnumerator _useItemCor = null;
-    private IEnumerator _waitActionCor = null;
+    private IEnumerator _cor_interaction = null;
+    private IEnumerator _cor_craftingItem = null;
+    private IEnumerator _cor_useItem = null;
+    private IEnumerator _cor_waitAction = null;
 
     //Focus
     private Interactable _focus;
     private Interactable _lastInteractedFocus = null;
     public Interactable LastInteractedFocus => _lastInteractedFocus;
-    
+    public bool IsFree => _cor_interaction == null && _cor_craftingItem == null && _cor_useItem == null;
 
     public void SetFocus(Interactable inter, int actionIndex)
     {
@@ -201,7 +214,7 @@ public class CharaHead : Photon.PunBehaviour
         bool isRunning = _movement.IsRunning;
         _focus = inter;
         //Prise de décision sur la speed and stoping distance of agent
-        if (_focus.IsDoWhileAction[actionIndex])
+        if (actionIndex >= 0 && _focus.IsDoWhileAction[actionIndex])
         {
             SetStopDistance(_focus.Radius * 2f / 3f);
 
@@ -216,24 +229,24 @@ public class CharaHead : Photon.PunBehaviour
         //Starting coroutine
         _movement.MoveToInter(_focus, isRunning);
 
-        _checkFocusDistanceCor = CheckDistanceInter(actionIndex);
-        StartCoroutine(_checkFocusDistanceCor);
+        _cor_interaction = Cor_Interaction(actionIndex);
+        StartCoroutine(_cor_interaction);
     }
     public void CraftItem(ItemRecipe recipe)
     {
         //Called when crafting an item (when the craft is already available)
         RemoveFocus(false);
 
-        _craftingItemCor = Cor_CraftingItem(recipe);
-        StartCoroutine(_craftingItemCor);
+        _cor_craftingItem = Cor_CraftingItem(recipe);
+        StartCoroutine(_cor_craftingItem);
     }
     public void UseItem(Item item)
     {
         //Called by food, equipable, wearable
         RemoveFocus(true);
 
-        _useItemCor = Cor_UseItem(item);
-        StartCoroutine(_useItemCor);
+        _cor_useItem = Cor_UseItem(item);
+        StartCoroutine(_cor_useItem);
     }
 
     public void RemoveFocus(bool alsoRemoveLastInter = true, bool resetRunning = true)
@@ -250,34 +263,34 @@ public class CharaHead : Photon.PunBehaviour
     }
     private void ForceRemoveFocus()
     {
-        if (_focus != null || _checkFocusDistanceCor != null)
+        if (_focus != null || _cor_interaction != null)
         {
-            StopCoroutine(_checkFocusDistanceCor);
-            _checkFocusDistanceCor = null;
+            StopCoroutine(_cor_interaction);
+            _cor_interaction = null;
             _focus = null;
         }
     }
     private void ForceEndCraft()
     {
-        if (_craftingItemCor != null)
+        if (_cor_craftingItem != null)
         {
-            StopCoroutine(_craftingItemCor);
-            _craftingItemCor = null;
+            StopCoroutine(_cor_craftingItem);
+            _cor_craftingItem = null;
         }
     }
     private void ForceEndWaitAction()
     {
-        if (_waitActionCor != null)
+        if (_cor_waitAction != null)
         {
-            StopCoroutine(_waitActionCor);
-            _waitActionCor = null;
+            StopCoroutine(_cor_waitAction);
+            _cor_waitAction = null;
         }
         fillObj.SetActive(false);
         needFill = false;
         fillObj.GetComponent<Image>().fillAmount = 0;
     }
 
-    private IEnumerator CheckDistanceInter(int actionIndex)
+    private IEnumerator Cor_Interaction(int actionIndex)
     {
         if (_focus == null) Debug.LogWarning("CheckDistanceInter: Unexpected null focus");
 
@@ -302,13 +315,14 @@ public class CharaHead : Photon.PunBehaviour
         float actionTime = _focus.GetActionTime(this, actionIndex);
         if (actionTime > 0)
         {
-            _waitActionCor = WaitAction(actionTime);
-            yield return StartCoroutine(_waitActionCor);
+            _cor_waitAction = WaitAction(actionTime);
+            yield return StartCoroutine(_cor_waitAction);
         }
-
         
         //Interragis une fois le waiting time passé
         _lastInteractedFocus = _focus;
+
+        StartCoroutine(LootAtFocus());
 
         //Remove le focus (avant d'interragir pour permettre de relancer à la fin
         RemoveFocus(false);
@@ -317,7 +331,7 @@ public class CharaHead : Photon.PunBehaviour
         
         GetComponent<CharaInventory>().UpdateCraft(); //Update les recipe au cas ou on interagis avec un workshop
 
-        if (_lastInteractedFocus != null && _lastInteractedFocus.IsDoWhileAction[actionIndex])
+        if (_lastInteractedFocus != null && actionIndex >= 0 && _lastInteractedFocus.IsDoWhileAction[actionIndex])
         {
             //L'action est à continuer
             yield return new WaitForSeconds(0.4f);
@@ -328,18 +342,18 @@ public class CharaHead : Photon.PunBehaviour
     {
         float recipeTime = recipe.GetCraftTime(GetComponent<CharaInventory>());
         Debug.Log("Cor_CraftingItem: starting craft of time " + recipeTime);
-        _waitActionCor = WaitAction(recipeTime);
+        _cor_waitAction = WaitAction(recipeTime);
 
-        yield return StartCoroutine(_waitActionCor);
+        yield return StartCoroutine(_cor_waitAction);
 
         recipe.CraftWith(GetComponent<CharaInventory>());
         recipe.UpdateTraining(GetComponent<CharaRpg>(), recipeTime);
     }
     private IEnumerator Cor_UseItem(Item item)
     {
-        _waitActionCor = WaitAction(item.GetUseTime());
+        _cor_waitAction = WaitAction(item.GetUseTime());
 
-        yield return StartCoroutine(_waitActionCor);
+        yield return StartCoroutine(_cor_waitAction);
 
         CharaInventory inv = GetComponent<CharaInventory>();
 
@@ -349,6 +363,7 @@ public class CharaHead : Photon.PunBehaviour
         }
 
     }
+
     private IEnumerator WaitAction(float waitingTime)
     {
         Image fill = fillObj.GetComponent<Image>();
@@ -370,7 +385,32 @@ public class CharaHead : Photon.PunBehaviour
         needFill = false;
     }
 
-    
+    private IEnumerator LootAtFocus()
+    {
+        Debug.Log("LootAtFocus: starting coroutine, " 
+            + transform.position + " to " + _focus.transform.position 
+            + " (" + (_focus.transform.position - transform.position) + ")");
+        Vector3 direction = (_focus.InterTransform.position - transform.position).normalized;
+
+        Debug.Log("LootAtFocus: direction " + direction);
+
+        Quaternion desiredRotation = Quaternion.LookRotation(direction);
+        float desiredYRotation = desiredRotation.eulerAngles.y;
+        Debug.Log("LootAtFocus: desired Rotation " + desiredYRotation);
+
+        float currentRotation = transform.eulerAngles.y;
+
+
+        while (!DoorHandler.FloatEqual(transform.eulerAngles.y, desiredYRotation))
+        {
+            currentRotation = Mathf.LerpAngle(transform.eulerAngles.y, desiredYRotation, 0.5f);
+
+            transform.eulerAngles = new Vector3(transform.eulerAngles.x, currentRotation, transform.eulerAngles.z);
+
+            yield return null;
+        }
+        Debug.Log("LootAtFocus: ending coroutine with rotation " + transform.eulerAngles.y + " (aiming for " + desiredYRotation + ")");
+    }
 
     //Special Interact
     public bool TryAddItemToFurniture(Item item)
@@ -387,6 +427,8 @@ public class CharaHead : Photon.PunBehaviour
     }
 
     //ForceOpenDoor
+    public List<DoorHandler> doorsOnPath = null;//Mis a jours depuis CharaMovement quand on décide d'un chemin
+
     private IEnumerator UpdateForceOpenDoor()
     {
         //Called in Start
@@ -395,17 +437,20 @@ public class CharaHead : Photon.PunBehaviour
 
         while(true)
         {
-            //Si on n'a pas ou on n'interragis pas avec une porte
-            if ((_focus == null || _focus.GetComponent<DoorHandler>() == null) && (_lastInteractedFocus == null || _lastInteractedFocus.GetComponent<DoorHandler>() == null))
+            
+            //Verifie s'il y a qqchose devant le chara
+            Debug.DrawRay(transform.position, transform.forward * 1f);
+            if (Physics.Raycast(transform.position, transform.forward, out RaycastHit possibleDoorHit, 1f))
             {
-                //Verifie s'il y a qqchose devant le chara
-                Debug.DrawRay(transform.position, transform.forward * 1f);
-                if (Physics.Raycast(transform.position, transform.forward, out RaycastHit possibleDoorHit, 1f))
+                DoorHandler doorHandler = possibleDoorHit.transform.GetComponent<DoorHandler>();
+                //Verifie si ce qqchose est une porte
+                if (doorHandler != null)
                 {
-                    DoorHandler doorHandler = possibleDoorHit.transform.GetComponent<DoorHandler>();
-                    //Verifie si ce qqchose est une porte
-                    if (doorHandler != null)
+                    Debug.Log("UpdateForceOpenDoor: Close to a door");
+
+                    if(doorsOnPath.Contains(doorHandler))
                     {
+                        Debug.Log("UpdateForceOpenDoor: door on path, trying to oopen door");
                         if (doorHandler.CanForceOpen(this))
                         {
                             //Ouvre la porte
@@ -418,8 +463,13 @@ public class CharaHead : Photon.PunBehaviour
                             yield return new WaitForSeconds(0.5f);//Important pour ne pas bloquer le chara
                         }
                     }
+                    else
+                    {
+                        Debug.Log("UpdateForceOpenDoor: door not on path");
+                    }
                 }
             }
+            
             yield return null;
         }
         

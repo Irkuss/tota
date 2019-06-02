@@ -44,6 +44,7 @@ GameObject:
   - component: {fileID: 4561072412983293316}
   - component: {fileID: 2895342931115527830}
   - component: {fileID: 1587142603701764605}
+  - component: {fileID: 6031938553626428980}
   m_Layer: 0
   m_Name: metal_door
   m_TagString: Untagged
@@ -167,6 +168,22 @@ MonoBehaviour:
   m_Area: 0
   m_IgnoreFromBuild: 1
   m_AffectedAgents: ffffffff
+--- !u!208 &6031938553626428980
+NavMeshObstacle:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4943591048614064722}
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Shape: 1
+  m_Extents: {x: 1.5000001, y: 2, z: 0.4}
+  m_MoveThreshold: 0.1
+  m_Carve: 1
+  m_CarveOnlyStationary: 1
+  m_Center: {x: 0.90000004, y: 2, z: -3.0000002}
+  m_TimeToStationary: 0.5
 --- !u!1 &5228306470440145662
 GameObject:
   m_ObjectHideFlags: 0

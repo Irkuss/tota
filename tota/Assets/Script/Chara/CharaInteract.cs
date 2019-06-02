@@ -4,7 +4,16 @@ using UnityEngine;
 
 public class CharaInteract : Interactable
 {
-    
+    //Private attribute
+
+    //Start
+    private void Start()
+    {
+        //Call the Init for OrganicOpacity
+        BeginOpacity();
+    }
+
+    //====================Override Interactable====================
     public override void Interact(CharaHead chara, int actionIndex = 0)
     {
         //TO CHANGE WHEN MULTIPLE INTERACT ARE POSSIBLE
@@ -18,6 +27,7 @@ public class CharaInteract : Interactable
             case 4: break; //Follow target
             case 5: GetComponent<CharaRpg>().AmputateEveryInfectedPart(); break; //Amputate infected parts
             case 6: TreatWoundsOfType(WoundInfo.WoundType.Bleeding); break; //Treat Bleeding
+            case 7: Convince(chara, actionIndex); break; //Interaction social
         }
     }
 
@@ -33,6 +43,7 @@ public class CharaInteract : Interactable
             case 4: return (chara != GetComponent<CharaHead>()); //Follow
             case 5: return CheckAmputation(chara, actionIndex);//Amputate infected parts
             case 6: return CheckWoundsOfType(chara, WoundInfo.WoundType.Bleeding, actionIndex); //Treat Bleeding
+            case 7: return CheckConvince(chara, actionIndex); //Interaction social
         }
         return false;
     }
@@ -50,11 +61,12 @@ public class CharaInteract : Interactable
             case 4: return 0f; //Follow
             case 5: return 10 * rpg.GetTimeModifier(CharaRpg.Stat.sk_doctor); //Amputate infected parts
             case 6: return GetComponent<CharaRpg>().GetCountWoundsOfType(WoundInfo.WoundType.Bleeding) * 2 * rpg.GetTimeModifier(CharaRpg.Stat.sk_doctor); //Treat Bleeding
+            case 7: return GetTimeConvince(chara, actionIndex); //Interaction social
         }
         return 0f;
     }
 
-    //Actions
+    //====================Action Method====================
 
     public void AttackWithSlot(CharaHead chara, int slot)//Get attacked
     {
@@ -147,6 +159,7 @@ public class CharaInteract : Interactable
         return false;
     }
 
+
     public void TreatWoundsOfType(WoundInfo.WoundType type)
     {
         GetComponent<CharaRpg>().TreatAllWoundsOfType(type);
@@ -170,5 +183,45 @@ public class CharaInteract : Interactable
         Item requiredItem = CharaRpg.woundTable.GetInfo(type).treatment;
         //Debug.Log("CheckAmputation: bleeding " + hasWound + ", has bandage " + chara.GetComponent<CharaInventory>().Contains(requiredItem));
         return hasWound && chara.GetComponent<CharaInventory>().Contains(requiredItem);
+    }
+
+
+    private void Convince(CharaHead chara, int actionIndex)
+    {
+        if (GetComponent<CharaPermissions>().Team == null)
+        {
+            PermissionsManager.Team teamToJoin = chara.GetComponent<CharaPermissions>().Team;
+
+            if (teamToJoin != null)
+            {
+                GetComponent<CharaPermissions>().SetTeam(teamToJoin.Name);
+            }
+        }
+        else
+        {
+            GetComponent<CharaPermissions>().SetTeam("");
+        }
+
+        GetComponent<CharaMovement>().StopAgent();
+    }
+    private bool CheckConvince(CharaHead chara, int actionIndex)
+    {
+        if (chara == GetComponent<CharaHead>())
+        {
+            return false;
+        }
+
+        if(GetComponent<CharaPermissions>().Team == null)
+        {
+            PossibleActionNames[actionIndex] = "Enroll";
+            return true;
+        }
+        PossibleActionNames[actionIndex] = "Exile";
+
+        return true;
+    }
+    private float GetTimeConvince(CharaHead chara, int actionIndex)
+    {
+        return 1;
     }
 }

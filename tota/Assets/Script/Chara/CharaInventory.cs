@@ -227,7 +227,7 @@ public class CharaInventory : MonoBehaviour
         _interface.GetComponent<InterfaceManager>().InstantiateEquipment();
         _interface.GetComponent<InterfaceManager>().UpdateEquipment(this);
         _interface.GetComponent<InterfaceManager>().UpdateInjuries(GetComponent<CharaRpg>().GetWoundsInfo());
-        _interface.GetComponent<InterfaceManager>().UpdateStats(GetComponent<CharaRpg>().UpdateStats());
+        _interface.GetComponent<InterfaceManager>().UpdateStats(GetComponent<CharaRpg>().GetHealthStats());
 
         _inventory = Instantiate(_inventoryPrefab);
         _inventory.transform.SetParent(_interface.transform.GetChild(0).GetChild(3).GetChild(0), false);

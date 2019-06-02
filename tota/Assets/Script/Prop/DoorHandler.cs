@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.AI;
 
 public class DoorHandler : WallHandler
 {
@@ -10,6 +11,7 @@ public class DoorHandler : WallHandler
 
     //Reference
     private BoxCollider boxColl = null;
+    private NavMeshObstacle navObstacle = null;
     private float _doorBaseColliderHeight;
     
     //Private attribute
@@ -39,9 +41,13 @@ public class DoorHandler : WallHandler
         boxColl = GetComponent<BoxCollider>();
         if (boxColl == null) Debug.LogWarning("DoorHandler: unexpected null Box collider");
         _doorBaseColliderHeight = boxColl.size.y;
-        
+
+        navObstacle = GetComponent<NavMeshObstacle>();
+        if (navObstacle == null) Debug.LogWarning("DoorHandler: unexpected null Navmesh Obstacle");
+
         //Init the Private attributes
         _baseYRotation = transRotate.eulerAngles.y;
+        navObstacle.enabled = _isOpen;
         
         _currentHitPoint = maxHitPoint; //(override from WallHandler)
     }
@@ -134,7 +140,7 @@ public class DoorHandler : WallHandler
     {
         //Desactive le collider le temps de la rotation
         boxColl.enabled = false;
-        
+
         float desiredY = _baseYRotation;
         //Decider la rotation de la porte
         if(isOpening)
@@ -163,11 +169,14 @@ public class DoorHandler : WallHandler
         Vector3 currSize = boxColl.size;
         boxColl.size = new Vector3(currSize.x, currSize.y, _isOpen ? 0.4f : 0.8f);
 
+        navObstacle.enabled = _isOpen;//Active le navObstacle que quand ouvert
+
         //Fin de la coroutine
         _rotationCor = null;
     }
-    private static bool FloatEqual(float f1, float f2)
+    public static bool FloatEqual(float f1, float f2)
     {
+        //Also used when facing a focus at the start of an interaction
         return (Mathf.Abs(f1 - f2) % 360) < 0.2f;
     }
 
