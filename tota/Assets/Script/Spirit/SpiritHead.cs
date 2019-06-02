@@ -24,6 +24,8 @@ public class SpiritHead : Photon.MonoBehaviour
     private GameObject _actions;
     private GameObject _button;
     private GameObject _tuto;
+    private RecipeTable _visuData;
+    private GameObject _charaRef;
 
     private Mode mode;
 
@@ -57,29 +59,36 @@ public class SpiritHead : Photon.MonoBehaviour
         _actions = eManager.Actions;
         _button = eManager.Button;
         _tuto = eManager.Tuto;
+        _visuData = eManager.VisuData;
+        _charaRef = Resources.Load<GameObject>("CharaRef");
         
         mode = Mode.Instance;
+
+        _tuto.transform.GetChild(1).GetComponent<Button>().onClick.RemoveAllListeners();
+        _tuto.transform.GetChild(2).GetComponent<Button>().onClick.RemoveAllListeners();
+
+        _tuto.transform.GetChild(1).GetComponent<Button>().onClick.AddListener(() => _tuto.SetActive(false));
+        _tuto.transform.GetChild(2).GetComponent<Button>().onClick.AddListener(delegate
+        {
+            mode.isSkip = true;
+            _tuto.SetActive(false);
+        });
 
         if (!mode.online && !mode.isSkip)
         {
             StartCoroutine(FirstStepTuto());
         }
-             
-    }
 
-    private IEnumerator WaitForTuto()
-    {
-        yield return new WaitForSeconds(3f);       
+        InitiateBuild();
     }
 
     private IEnumerator FirstStepTuto()
     {
-        yield return StartCoroutine(WaitForTuto());
+        yield return new WaitForSeconds(1f);
 
         _tuto.SetActive(true);
         _tuto.transform.GetChild(0).GetComponent<Text>().text = "Now you can move yourself using the wqsd keys or the directional arrows";
     }
-
     //Unity Callback
     void Start()
     {
@@ -140,7 +149,7 @@ public class SpiritHead : Photon.MonoBehaviour
 
     private IEnumerator SpawnTuto()
     {
-        yield return StartCoroutine(WaitForTuto());
+        yield return new WaitForSeconds(1f);
 
         _tuto.SetActive(true);
         _tuto.transform.GetChild(0).GetComponent<Text>().text = "Nice, you have created a new character. You can select him by clicking left on him.";
@@ -154,7 +163,7 @@ public class SpiritHead : Photon.MonoBehaviour
 
         if (team.ContainsPlayer(_permission.GetPlayerWithName(playerWhoSent)))
         {
-            GameObject charaLayout = Instantiate(Resources.Load<GameObject>("CharaRef"));
+            GameObject charaLayout = Instantiate(_charaRef);
             charaLayout.transform.SetParent(_charaLayout.transform, false);
             charaLayout.GetComponent<LinkChara>().spirit = this;
             charaLayout.GetComponent<LinkChara>().chara = chara;
@@ -191,10 +200,23 @@ public class SpiritHead : Photon.MonoBehaviour
     private IEnumerator _currentBuildModeCor;
     private GameObject _currentBuild = null;
 
+    private void InitiateBuild()
+    {
+        foreach (ItemRecipe recipe in _visuData.recipes)
+        {
+            if (recipe.visuSprite == null || recipe.visuPath == "") return;
+
+            GameObject visuSlot = Instantiate(Resources.Load<GameObject>("BuildPref"), _build.transform.GetChild(0).GetChild(0));
+            visuSlot.GetComponent<Image>().sprite = recipe.visuSprite;
+            visuSlot.GetComponent<Button>().onClick.AddListener(() => EnterBuildMode(recipe.visuPath));
+        }
+    }
+
     private void TestBuildInput()
     {
         //Entree et sortie du buildMode
-        if (Input.GetKeyDown(KeyCode.B))
+        //if (Input.GetKeyDown(KeyCode.B))
+        if(Input.inputString == mode.build)
         {
             if (_build.activeSelf)
             {
@@ -429,7 +451,7 @@ public class SpiritHead : Photon.MonoBehaviour
 
     private IEnumerator MoveCharaTuto()
     {
-        yield return StartCoroutine(WaitForTuto());
+        yield return new WaitForSeconds(1f);
 
         _tuto.SetActive(true);
         _tuto.transform.GetChild(0).GetComponent<Text>().text = "You can also move your character. Once you have selected him you can right click on a position and your character will walk until this point";
@@ -473,7 +495,7 @@ public class SpiritHead : Photon.MonoBehaviour
                     ActionMoveAllTo(hit.point, true);
                 }
 
-                if(mode.firstTime == 4 && !mode.isSkip)
+                if(mode.firstTime == 4 && !mode.isSkip && _selectedList.Count != 0)
                 {
                     StartCoroutine(FinalTuto());
                     
@@ -485,7 +507,7 @@ public class SpiritHead : Photon.MonoBehaviour
 
     private IEnumerator FinalTuto()
     {
-        yield return StartCoroutine(WaitForTuto());
+        yield return new WaitForSeconds(1f);
 
         _tuto.SetActive(true);
         _tuto.transform.GetChild(0).GetComponent<Text>().text = "WOW some informations about your character appear on the screen. You can see more details by pressing the E key.\n"
@@ -693,7 +715,8 @@ public class SpiritHead : Photon.MonoBehaviour
 
     private void InventoryUpdate()
     {
-        if (Input.GetKeyDown(KeyCode.E))
+        //if (Input.GetKeyDown(KeyCode.E))
+        if (Input.inputString == mode.interfaCe)
         {
             _inventoryList.SetActive(!_inventoryList.activeSelf);            
         }
@@ -733,7 +756,8 @@ public class SpiritHead : Photon.MonoBehaviour
 
     private void DisplayChannel()
     {
-        if (Mode.Instance.online && Input.GetKeyDown(KeyCode.C))
+        //if (Mode.Instance.online && Input.GetKeyDown(KeyCode.C))
+        if (mode.online && Input.inputString == mode.channel)
         {
             _channel.SetActive(!_channel.activeSelf);
         }

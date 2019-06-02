@@ -62,6 +62,10 @@ public class PropFurniture : PropHandler
         }
         //ouvre l'inventaire
         _inventoryLayout.transform.parent.parent.gameObject.SetActive(true);
+
+        CharaInventory inv = chara.GetComponent<CharaInventory>();
+        if (inv.GetInterface() == null) inv.ToggleInterface(_inventoryLayout, chara.GetComponent<CharaRpg>().GetToolTipInfo());
+
         _furnitureInventory.ToggleInventory(_inventoryLayout);
         if (_firstInteract && hasToRandAddLoot)
         {
