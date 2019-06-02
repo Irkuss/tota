@@ -45,6 +45,7 @@ public class CentralManager : Photon.MonoBehaviour
     public GameObject Channel { get { return _channel; } }
 
     [SerializeField] private GameObject _tooltipL = null;
+    [SerializeField] private GameObject _background = null;
 
     [SerializeField] private GameObject _build = null;
     public GameObject Build { get { return _build; } }
@@ -86,6 +87,7 @@ public class CentralManager : Photon.MonoBehaviour
     public void ClipDown()
     {
         _tooltipL.SetActive(!_tooltipL.activeSelf);
+        _background.SetActive(!_background.activeSelf);
     }
     
     //Unity Callbacks
