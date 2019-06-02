@@ -5,41 +5,31 @@ using UnityEngine;
 public class PermissionsManager : MonoBehaviour
 {
     //Classes
+    public static int[] GetRandomColor()
+    {
+        return new int[4]
+        {
+                Random.Range(0, 255),
+                Random.Range(0, 255),
+                Random.Range(0, 255),
+                255
+        };
+    }
 
     public class Player
     {
         private string _name;
-        public string Name
-        {
-            get => _name;
-        }
+        public string Name => _name;
         private string _myTeamName;
-        public string MyTeamName
-        {
-            get => _myTeamName;
-        }
+        public string MyTeamName => _myTeamName;
         private int[] _linkedColor;
-        public int[] LinkedColor
-        {
-            get => _linkedColor;
-        }
+        public int[] LinkedColor => _linkedColor;
 
         public Player(string name,string myTeamName)
         {
             _name = name;
             _myTeamName = myTeamName;
             _linkedColor = GetRandomColor();
-        }
-
-        private int[] GetRandomColor()
-        {
-            return new int[4] 
-            {
-                Random.Range(0, 255),
-                Random.Range(0, 255),
-                Random.Range(0, 255),
-                255
-            };
         }
 
         public bool IsEqual(Player player)
@@ -52,27 +42,15 @@ public class PermissionsManager : MonoBehaviour
     public class Team
     {
         private string _name;
-        public string Name
-        {
-            get => _name;
-        }
+        public string Name => _name;
         private List<Player> _playerList;
-        public List<Player> PlayerList
-        {
-            get { return _playerList; }
-        }
+        public List<Player> PlayerList =>_playerList;
 
         private int[] _linkedColor;
-        public int[] LinkedColor
-        {
-            get => _linkedColor;
-        }
+        public int[] LinkedColor => _linkedColor;
 
         private Player _leaderTeam;
-        public Player leaderTeam
-        {
-            get { return _leaderTeam; }
-        }
+        public Player leaderTeam =>_leaderTeam;
 
         public Team(string name)
         {
@@ -81,17 +59,6 @@ public class PermissionsManager : MonoBehaviour
             _playerList = new List<Player>();
 
             _linkedColor = GetRandomColor();
-        }
-
-        private int[] GetRandomColor()
-        {
-            return new int[4]
-            {
-                Random.Range(0, 255),
-                Random.Range(0, 255),
-                Random.Range(0, 255),
-                255
-            };
         }
 
         //Messing with list
@@ -155,10 +122,7 @@ public class PermissionsManager : MonoBehaviour
     //Attributes
 
     private List<Team> _teamList;
-    public List<Team> TeamList
-    {
-        get { return _teamList; }
-    }
+    public List<Team> TeamList => _teamList;
 
     //Unity Callbacks
 

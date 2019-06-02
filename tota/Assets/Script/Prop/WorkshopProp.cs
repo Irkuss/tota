@@ -2,16 +2,8 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class WorkshopProp : PropHandler
+public class WorkshopProp : SalvageHandler
 {
-    //Reference
-    private Outline _outline;
-
-    //Enum
-    public enum WorkShopCommand
-    {
-        Usage
-    }
     public enum WorkshopType
     {
         Undecided,
@@ -29,28 +21,44 @@ public class WorkshopProp : PropHandler
 
         { WorkshopType.ForgeWork, 0}, //will probably not be used
     };
+
+
+    //Defining attribute
     [Header("Workshop attribute")]
     public WorkshopType workType = WorkshopType.Undecided;
 
-    //Usage status
+    //Reference
+    private Outline _outline;
+
+    //Private attribute
     private bool _isBeingUsed = false;
     private CharaHead _charaUsing = null;
     private IEnumerator _currentCloseUpdate = null;
 
-    //Init
+    //Command enum
+    public enum WorkShopCommand
+    {
+        Usage
+    }
+
+    //Start
     private void Start()
     {
+        //Call the Init for OrganicOpacity
+        BeginOpacity();
+
+        //Set the references
         _outline = GetComponent<Outline>();
         _outline.enabled = false;
     }
 
-    //Interract override
+    //====================Override Interactable====================
     public override void Interact(CharaHead chara, int actionIndex)
     {
         switch(actionIndex)
         {
             case 0: StartUsage(chara); break; //Use Workshop
-            case 1: break;//Salvage
+            case 1: Salvage(chara); break;//Salvage
         }
     }
 
@@ -63,7 +71,19 @@ public class WorkshopProp : PropHandler
         }
         return false;
     }
-    //Interract Implementation
+
+    public override float GetActionTime(CharaHead chara, int actionIndex = 0)
+    {
+        switch (actionIndex)
+        {
+            case 0: return 0; //Use Workshop
+            case 1: return GetSalvageTime(chara); //Salvage
+        }
+        return base.GetActionTime(chara, actionIndex);
+    }
+
+    //====================Action Method====================
+    //Use Workshop
     private void StartUsage(CharaHead chara)
     {
         if (!CheckAvailability(chara, 0)) return; //Si au moment d'arriver, l'établi est finalement utilisé annule tout
@@ -104,8 +124,8 @@ public class WorkshopProp : PropHandler
         _isBeingUsed = isUsed;
     }
 
-    //command
-    public override void CommandReceive(int[] command, float[] commandFloat)
+    //====================Override PropHandler====================
+    public override void CommandReceive(int[] command, float[] commandFloat, string[] commandString = null)
     {
         switch((WorkShopCommand)command[0])
         {

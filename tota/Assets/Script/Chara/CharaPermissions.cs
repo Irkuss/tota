@@ -8,6 +8,7 @@ public class CharaPermissions : MonoBehaviour
     private PermissionsManager permManager = null;
     private PermissionsManager.Player player = null;
     private PermissionsManager.Team team = null;
+    public PermissionsManager.Team Team => team;
 
     private void Start()
     {
@@ -26,14 +27,10 @@ public class CharaPermissions : MonoBehaviour
     //Nom du Spirit qui controle Chara, null si personne ne la controle
     //NB: on utilise le string et non le Player car passable par RPC
     private string ownerName = null;
+    public bool HasOwner => ownerName != null;
 
 
     //Getters
-    public bool HasTeam()
-    {
-        //return myTeam != null;
-        return team != null;
-    }
     public PermissionsManager.Team GetTeam()
     {
         if (team != null)
@@ -50,57 +47,37 @@ public class CharaPermissions : MonoBehaviour
         
         return team;
     }
-
-    public bool HasOwner()
-    {
-        return (ownerName != null);
-    }
-    public string GetOwnerName()
-    {
-        return ownerName;
-    }
     
 
     //Setters RPC
     public void SetTeam(string teamName)
     {
         GetComponent<CharaConnect>().SendMsg(CharaConnect.CharaCommand.RPC_SetTeam, null, new string[1] { teamName }, null);
-        //GetComponent<PhotonView>().RPC("RPC_SetTeam", PhotonTargets.AllBuffered, teamName);
     }
-    public void SetTeamNull()
-    {
-        GetComponent<CharaConnect>().SendMsg(CharaConnect.CharaCommand.RPC_SetTeamNull, null, null, null);
-        //GetComponent<PhotonView>().RPC("RPC_SetTeamNull", PhotonTargets.AllBuffered);
-    }
-    /*[PunRPC] private*/ public void RPC_SetTeam(string teamName)
-    {
-        Debug.Log("CharaPermissions: Setting Team to: " + teamName);
 
-        if (permManager == null) //Cas ou perManager n'a pas encore été trouvé (Start ne s'est pas lancé)
+    public void RPC_SetTeam(string teamName)
+    {
+        Debug.Log("CharaPermissions: Setting Team to: " + (teamName == "" ? "AI" : teamName));
+
+        if(teamName == "")
         {
-            teamNameRPC = teamName;
+            team = null;
         }
         else
         {
-            //myTeam = permManager.GetTeamWithName(teamName);
-            team = permManager.GetTeamWithName(teamName);
+            team = PermissionsManager.Instance.GetTeamWithName(teamName);
         }
+
+        GetComponent<CharaConnect>().SendMsg(CharaConnect.CharaCommand.UpdateTeamColor, null, null, null);
+        GetComponent<CharaHead>().Deselect();
         
     }
-    /*[PunRPC] private*/
-    public void RPC_SetTeamNull() //Probably useless now
-    {
-        //myTeam = null;
-        team = null;
-    }
-
-    /*[PunRPC]*/
+    
     public void SetOwner(string newOwnerName)
     {
         //Change la personne qui a le controle de Chara
         ownerName = newOwnerName;
     }
-    /*[PunRPC]*/
     public void SetOwnerNull()
     {
         ownerName = null;

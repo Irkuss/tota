@@ -5,7 +5,12 @@ using UnityEngine;
 [CreateAssetMenu(fileName = "NewLootTable", menuName = "Generation/LootTable")]
 public class LootTable : ScriptableObject
 {
+    //Item count
+    [Header("Abundance")]
+    public int minItemCount = 8;
+    public int maxItemCount = 12;
     //List of every possible item
+    [Header("List of every possible item and their chances")]
     public Item[] possibleItem = null;
 
     //Liste des chances sur 100 de chaque item d'etre renvoyé
@@ -31,8 +36,10 @@ public class LootTable : ScriptableObject
         return null;
     }
 
-    public Item[] GetChosenPropsArray(int length)
+    public Item[] GetChosenPropsArray()
     {
+        int length = Random.Range(minItemCount, maxItemCount);
+
         Item[] props = new Item[length];
         for (int i = 0; i < length; i++)
         {

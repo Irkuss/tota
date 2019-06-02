@@ -81,6 +81,11 @@ public class ZombieInteract : Interactable
         Equipable weapon = chara.GetComponent<CharaInventory>().equipments[slot];
         if (weapon != null)
         {
+            _possibleActionNames[isMelee ? slot : 2 + slot] = (isMelee ? "Hit with " : "Shoot with ") + weapon.nickName;
+            Debug.Log("CheckAttackWithSlot: modified actionName at index " + (isMelee ? slot : 2 + slot) + " with '" + (isMelee ? "Hit with " : "Shoot with ") + weapon.nickName + "'");
+
+            if (slot == 1 && weapon.equipSpace == Equipable.EquipSpace.TwoHanded) return false;
+
             if (weapon.equipType == Equipable.EquipType.Melee)
             {
                 //Attack melee

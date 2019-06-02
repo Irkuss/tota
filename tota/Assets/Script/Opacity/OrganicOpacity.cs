@@ -4,6 +4,7 @@ using UnityEngine;
 
 public class OrganicOpacity : GeneralOpacity
 {
+    [Header("Is this object moving or not?")]
     public bool isMoving = false;
     private bool _wasAboveFloorLevel;
 
@@ -14,20 +15,25 @@ public class OrganicOpacity : GeneralOpacity
     private IEnumerator _cor_updateRender;
     private float _previousY;
 
+    private int _spiritFloorLevel;
+
     // Unity Callback
     private void Start()
+    {
+        BeginOpacity();
+    }
+
+    protected void BeginOpacity()
     {
         _renderers = GetComponentsInChildren<Renderer>();
         _collider = GetComponent<Collider>();
         _renderer = GetComponent<Renderer>();
-        if (_renderers.Length > 0 && _collider != null)
-        {
-            FloorManager.onFloorLevelChanged += UpdateFloorLevel;
-        }
+        //if (_renderers.Length > 0 && _collider != null) FloorManager.onFloorLevelChanged += UpdateFloorLevel;
+        FloorManager.onFloorLevelChanged += UpdateFloorLevel;
 
         //Init le floor level (pas ouf mais n'arrive qu'une fois par organic)
-        _currentFloorLevel = GameObject.Find("eCentralManager").GetComponent<FloorManager>().GetFloorLevel();
-        _wasAboveFloorLevel = IsAboveFloorLevel(_currentFloorLevel);
+        _spiritFloorLevel = GameObject.Find("eCentralManager").GetComponent<FloorManager>().FloorLevel;
+        _wasAboveFloorLevel = IsAboveFloorLevel(_spiritFloorLevel);
         UpdateRenderer();
         if (isMoving)
         {
@@ -40,12 +46,10 @@ public class OrganicOpacity : GeneralOpacity
 
     private void OnDestroy()
     {
-        if (_renderers.Length > 0 && _collider != null)
-        {
-            //Unsubscribe to prevent memory leak
-            FloorManager.onFloorLevelChanged -= UpdateFloorLevel;
-        }
-        if(_cor_updateRender != null)
+        //Debug.Log("OrganicOpacity: destroying organic opacity with name " + name);
+        //if (_renderers.Length > 0 && _collider != null) FloorManager.onFloorLevelChanged -= UpdateFloorLevel; //Unsubscribe to prevent memory leak
+        FloorManager.onFloorLevelChanged -= UpdateFloorLevel;
+        if (_cor_updateRender != null)
         {
             StopCoroutine(_cor_updateRender);
         }
@@ -54,8 +58,8 @@ public class OrganicOpacity : GeneralOpacity
     //Updating opacity (by callback)
     private void UpdateFloorLevel(int newFloorLevel)
     {
-        _wasAboveFloorLevel = IsAboveFloorLevel(_currentFloorLevel);
-        _currentFloorLevel = newFloorLevel;
+        _wasAboveFloorLevel = IsAboveFloorLevel(_spiritFloorLevel);
+        _spiritFloorLevel = newFloorLevel;
 
         UpdateRenderer();
     }
@@ -77,7 +81,7 @@ public class OrganicOpacity : GeneralOpacity
     private void UpdateRenderer()
     {
         //Debug.Log("OrganicOpacity: Updating Renderer");
-        bool currentAbove = IsAboveFloorLevel(_currentFloorLevel);
+        bool currentAbove = IsAboveFloorLevel(_spiritFloorLevel);
         if (currentAbove && !_wasAboveFloorLevel)
         {
             //Debug.Log("OrganicOpacity: Setting to invisible");
@@ -114,5 +118,9 @@ public class OrganicOpacity : GeneralOpacity
         return false;
     }
 
-    
+
+    public override bool IsBelowFloor(int floor)
+    {
+        return !IsAboveFloorLevel(floor);
+    }
 }

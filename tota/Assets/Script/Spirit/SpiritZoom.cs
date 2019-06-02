@@ -23,7 +23,7 @@ public class SpiritZoom : Photon.MonoBehaviour
     private float _zoomSpeed = 10.0f;
     private float _zoomValue; //= baseZoomValue at start
 
-    private float _zoomMin = 45.0f;
+    private float _zoomMin = 30.0f;
     private float _zoomMax = 90.0f;
 
     //Init Spirit Environment
@@ -72,11 +72,13 @@ public class SpiritZoom : Photon.MonoBehaviour
 
         ScrollMiddle();
 
+        HardSetZoom();
+
         //Gradually go to desired field of view
         _cameraComp.fieldOfView = Mathf.Lerp(_cameraComp.fieldOfView, _zoomValue, Time.deltaTime * _zoomSpeed);
 
         //Set desired position
-        Vector3 desiredPosition = new Vector3(_transformer.position.x, _floorManager.GetFloorLevel() * FloorManager.c_chunkHeight + _heightOffset , _transformer.position.z);
+        Vector3 desiredPosition = new Vector3(_transformer.position.x, _floorManager.FloorLevel * FloorManager.c_chunkHeight + _heightOffset , _transformer.position.z);
         //Gradually go to desired position
         _transformer.position = Vector3.Lerp(transform.position, desiredPosition, Time.deltaTime * 5.0f);
     }
@@ -114,7 +116,7 @@ public class SpiritZoom : Photon.MonoBehaviour
 
     private IEnumerator ZoomTuto()
     {
-        yield return new WaitForSeconds(3f);
+        yield return new WaitForSeconds(1f);
 
         GameObject tuto = GameObject.Find("eCentralManager").GetComponent<CentralManager>().Tuto;
         tuto.SetActive(true);
@@ -160,5 +162,16 @@ public class SpiritZoom : Photon.MonoBehaviour
         }
     }
 
-    //Public
+    //NumPad Hardset
+    private void HardSetZoom()
+    {
+        for (int i = 0; i <= 8; i++)
+        {
+            if(Input.GetKeyDown("[" + i + "]")) // C PAS BO MAIS PAS ENVI DE FAIRE PLEIN DE IF
+            {
+                _floorManager.TrySet(i);
+                break;
+            }
+        }
+    }
 }

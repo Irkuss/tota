@@ -49,4 +49,11 @@ public class FloorOpacity : GeneralOpacity
             FloorManager.onFloorLevelChanged -= UpdateRenderer;
         }
     }
+
+
+
+    public override bool IsBelowFloor(int floor)
+    {
+        return _currentFloorLevel <= floor;
+    }
 }

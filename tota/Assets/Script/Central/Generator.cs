@@ -1262,9 +1262,11 @@ public class Generator : MonoBehaviour
             yield return null;
             Debug.Log("Generate: Building Navmesh at '" + x + "," + y + "'");
             NavMeshSurface surface = worldNode.GetComponent<NavMeshSurface>();
-            
+
             //https://forum.unity.com/threads/building-navmeshes-in-separate-thread.489430/
 
+
+            surface.buildHeightMesh = true;//Lets try this
             surface.BuildNavMesh();
             Debug.Log("Generate: Ending Navmesh at '" + x + "," + y + "'");
             //Genere prop si master
@@ -1537,7 +1539,17 @@ public class Generator : MonoBehaviour
         int x = Mathf.FloorToInt(pos.x / c_worldChunkLength);
         int y = Mathf.FloorToInt(pos.y / c_worldChunkLength);
         //Recupere le biome a ces coordonnées
-        WorldBiome posBiome = _world[x, y].Biome;
+        WorldBiome posBiome;
+        try
+        {
+            posBiome = _world[x, y].Biome;
+        }
+        catch
+        {
+            Debug.LogWarning("GetPosTempModifier: Out of range exception for x: " + x + " and y: " + y);
+            return 0;
+        }
+        
         //Return le modifier de temperature specifique à ce biome
         return _baseBiomeTemperatureModifier[posBiome];
     }

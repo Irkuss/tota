@@ -24,6 +24,8 @@ public class SpiritHead : Photon.MonoBehaviour
     private GameObject _actions;
     private GameObject _button;
     private GameObject _tuto;
+    private RecipeTable _visuData;
+    private GameObject _charaRef;
 
     private Mode mode;
 
@@ -57,29 +59,36 @@ public class SpiritHead : Photon.MonoBehaviour
         _actions = eManager.Actions;
         _button = eManager.Button;
         _tuto = eManager.Tuto;
+        _visuData = eManager.VisuData;
+        _charaRef = Resources.Load<GameObject>("CharaRef");
         
         mode = Mode.Instance;
+
+        _tuto.transform.GetChild(1).GetComponent<Button>().onClick.RemoveAllListeners();
+        _tuto.transform.GetChild(2).GetComponent<Button>().onClick.RemoveAllListeners();
+
+        _tuto.transform.GetChild(1).GetComponent<Button>().onClick.AddListener(() => _tuto.SetActive(false));
+        _tuto.transform.GetChild(2).GetComponent<Button>().onClick.AddListener(delegate
+        {
+            mode.isSkip = true;
+            _tuto.SetActive(false);
+        });
 
         if (!mode.online && !mode.isSkip)
         {
             StartCoroutine(FirstStepTuto());
         }
-             
-    }
 
-    private IEnumerator WaitForTuto()
-    {
-        yield return new WaitForSeconds(3f);       
+        InitiateBuild();
     }
 
     private IEnumerator FirstStepTuto()
     {
-        yield return StartCoroutine(WaitForTuto());
+        yield return new WaitForSeconds(1f);
 
         _tuto.SetActive(true);
         _tuto.transform.GetChild(0).GetComponent<Text>().text = "Now you can move yourself using the wqsd keys or the directional arrows";
     }
-
     //Unity Callback
     void Start()
     {
@@ -128,7 +137,27 @@ public class SpiritHead : Photon.MonoBehaviour
         {
             //Projection des positions sur le sol
             Vector3 lowPosition = new Vector3(gameObject.transform.position.x, 1, gameObject.transform.position.z);
-            GameObject.Find("eCentralManager").GetComponent<CharaManager>().SpawnChara(lowPosition, _playerOwner.MyTeamName,_playerOwner.Name);
+            
+            if(Input.GetKey(KeyCode.R))
+            {
+                if(PhotonNetwork.offlineMode)
+                {
+                    Instantiate(Resources.Load("Prop/ratProp"), lowPosition, Quaternion.identity);
+                }
+                else
+                {
+                    PhotonNetwork.Instantiate("Prop/ratProp", lowPosition, Quaternion.identity, 0);
+                }
+                return;
+            }
+
+            bool setToAI = (Input.GetKey(KeyCode.LeftShift) || Input.GetKey(KeyCode.RightShift));
+            string teamOfNewChara = setToAI ? "" : _playerOwner.MyTeamName;
+
+            if (setToAI) Debug.Log("TestCharaSpawn: spawning AI chara");
+
+
+            GameObject.Find("eCentralManager").GetComponent<CharaManager>().SpawnChara(lowPosition, teamOfNewChara,_playerOwner.Name);
 
             if(mode.firstTime == 2)
             {
@@ -140,7 +169,7 @@ public class SpiritHead : Photon.MonoBehaviour
 
     private IEnumerator SpawnTuto()
     {
-        yield return StartCoroutine(WaitForTuto());
+        yield return new WaitForSeconds(1f);
 
         _tuto.SetActive(true);
         _tuto.transform.GetChild(0).GetComponent<Text>().text = "Nice, you have created a new character. You can select him by clicking left on him.";
@@ -154,7 +183,7 @@ public class SpiritHead : Photon.MonoBehaviour
 
         if (team.ContainsPlayer(_permission.GetPlayerWithName(playerWhoSent)))
         {
-            GameObject charaLayout = Instantiate(Resources.Load<GameObject>("CharaRef"));
+            GameObject charaLayout = Instantiate(_charaRef);
             charaLayout.transform.SetParent(_charaLayout.transform, false);
             charaLayout.GetComponent<LinkChara>().spirit = this;
             charaLayout.GetComponent<LinkChara>().chara = chara;
@@ -191,10 +220,23 @@ public class SpiritHead : Photon.MonoBehaviour
     private IEnumerator _currentBuildModeCor;
     private GameObject _currentBuild = null;
 
+    private void InitiateBuild()
+    {
+        foreach (ItemRecipe recipe in _visuData.recipes)
+        {
+            if (recipe.visuSprite == null || recipe.visuPath == "") return;
+
+            GameObject visuSlot = Instantiate(Resources.Load<GameObject>("BuildPref"), _build.transform.GetChild(0).GetChild(0));
+            visuSlot.GetComponent<Image>().sprite = recipe.visuSprite;
+            visuSlot.GetComponent<Button>().onClick.AddListener(() => EnterBuildMode(recipe.visuPath));
+        }
+    }
+
     private void TestBuildInput()
     {
         //Entree et sortie du buildMode
-        if (Input.GetKeyDown(KeyCode.B))
+        //if (Input.GetKeyDown(KeyCode.B))
+        if(Input.inputString == mode.build)
         {
             if (_build.activeSelf)
             {
@@ -326,7 +368,7 @@ public class SpiritHead : Photon.MonoBehaviour
     {
         //Debug.Log("==========ClickedOnSomething: Starting new Raycast==========");
         //VER2_iterativeCasting_ClickedOnSomething
-        int currentFloorLevel = GetComponent<SpiritZoom>().FloorManagerRef.FloorLevel;
+        
         
         Ray ray = _spiritCamera.ScreenPointToRay(Input.mousePosition);
 
@@ -340,20 +382,36 @@ public class SpiritHead : Photon.MonoBehaviour
         //Debug.Log("ClickedOnSomething: Starting direction is " + direction + ", starting origin is " + origin);
         while (!hitSomethingValid && step < maxStep)
         {
-            Color debugColor = new Color(Random.Range(0f, 1f), Random.Range(0f, 1f), Random.Range(0f, 1f));
-            Debug.DrawRay(origin, direction * 30, debugColor, 3f);
+            //Color debugColor = new Color(Random.Range(0f, 1f), Random.Range(0f, 1f), Random.Range(0f, 1f));
+            //Debug.DrawRay(origin, direction * 30, debugColor, 3f);
             if (Physics.Raycast(origin, direction, out RaycastHit possibleHit))
             {
-                if(IsHitValid(currentFloorLevel, possibleHit))
+                if(IsHitValid(possibleHit))
                 {
-                    //Debug.Log("ClickedOnSomething: Step done " + step);
+                    //Debug.Log("ClickedOnSomething: clicked on semething valid - Step done " + step);
+                    //Si on a cliqué sur un mur, on vérifie s'il n'y pas une porte plus bas
+                    if(possibleHit.transform.GetComponent<FloorOpacity>() != null)
+                    {
+                        //Debug.Log(("ClickedOnSomething: Clicked on wall, checking below for any possible door"));
+                        //Debug.DrawRay(possibleHit.point, Vector3.down * 3.95f, debugColor, 3);
+                        if (Physics.Raycast(possibleHit.point, Vector3.down, out RaycastHit possibleDoorHit, 3.95f))
+                        {
+                            //Debug.Log(("ClickedOnSomething: found something below"));
+                            if (possibleDoorHit.transform.GetComponent<DoorHandler>() != null)
+                            {
+                                //Debug.Log(("ClickedOnSomething: found a door below! returning the door"));
+                                hit = possibleDoorHit;
+                                return true;
+                            }
+                        }
+                    }
                     hit = possibleHit;
                     return true;
                 }
                 else
                 {
                     //Debug.Log("ClickedOnSomething: Cycling from " + origin + " to " + possibleHit.point);
-                    origin = possibleHit.point + direction * 0.1f;
+                    origin = possibleHit.point + direction * 0.02f;
                 }
             }
             else
@@ -367,18 +425,22 @@ public class SpiritHead : Photon.MonoBehaviour
         hit = new RaycastHit();
         return false;
     }
-    private bool IsHitValid(int currentFloorLevel, RaycastHit hit)
+    private bool IsHitValid(RaycastHit hit)
     {
+        int currentFloorLevel = GetComponent<SpiritZoom>().FloorManagerRef.FloorLevel;
+
+
         GeneralOpacity generalOpacity = hit.transform.GetComponent<GeneralOpacity>();
         if (generalOpacity != null)
         {
-            if (generalOpacity.CurrentFloorLevel <= currentFloorLevel)
+            if(generalOpacity.IsBelowFloor(currentFloorLevel))
+            //if(generalOpacity.CurrentFloorLevel <= currentFloorLevel)
             {
 
-                //Debug.Log("IsHitValid: Returning hit with name " + hit.transform.name);
+                //Debug.Log("IsHitValid: Returning hit with name " + hit.transform.name + " at floor " + currentFloorLevel);
                 return true;
             }
-            //Debug.Log("IsHitValid: Cycled through '" + hit.transform.name + "' with floor " + generalOpacity.CurrentFloorLevel);
+            //Debug.Log("IsHitValid: Cycled through '" + hit.transform.name);
             return false;
         }
         //Debug.Log("IsHitValid: Returning hit wihtout general opacity (" + hit.transform.name + ")");
@@ -429,7 +491,7 @@ public class SpiritHead : Photon.MonoBehaviour
 
     private IEnumerator MoveCharaTuto()
     {
-        yield return StartCoroutine(WaitForTuto());
+        yield return new WaitForSeconds(1f);
 
         _tuto.SetActive(true);
         _tuto.transform.GetChild(0).GetComponent<Text>().text = "You can also move your character. Once you have selected him you can right click on a position and your character will walk until this point";
@@ -473,7 +535,7 @@ public class SpiritHead : Photon.MonoBehaviour
                     ActionMoveAllTo(hit.point, true);
                 }
 
-                if(mode.firstTime == 4 && !mode.isSkip)
+                if(mode.firstTime == 4 && !mode.isSkip && _selectedList.Count != 0)
                 {
                     StartCoroutine(FinalTuto());
                     
@@ -485,7 +547,7 @@ public class SpiritHead : Photon.MonoBehaviour
 
     private IEnumerator FinalTuto()
     {
-        yield return StartCoroutine(WaitForTuto());
+        yield return new WaitForSeconds(1f);
 
         _tuto.SetActive(true);
         _tuto.transform.GetChild(0).GetComponent<Text>().text = "WOW some informations about your character appear on the screen. You can see more details by pressing the E key.\n"
@@ -570,17 +632,17 @@ public class SpiritHead : Photon.MonoBehaviour
     {
         //Deplace tous les charas selectionnés à une position donnée
         float stopDistance = 0.2f + (_selectedList.Count - 1) * 0.4f; //Temporaire
-        foreach (GameObject Chara in _selectedList)
+        foreach (GameObject chara in _selectedList)
         {
-            Chara.GetComponent<CharaHead>().SetDestination(destination, isRunning);
-            Chara.GetComponent<CharaHead>().SetStopDistance(stopDistance);
+            chara.GetComponent<CharaHead>().SetDestination(destination, isRunning);
+            chara.GetComponent<CharaHead>().SetStopDistance(stopDistance);
         }
     }
 
     private void GeneralActionHandler(Interactable inter)
     {
         if (_selectedList.Count == 0) return; //Do nothing if no charas are selected
-        if (inter.PossibleActionNames.Length == 0) return; //Do nothing if no interaction exists
+        if (inter.ActionLength == 0) return; //Do nothing if no interaction exists
         //Processus de décision l'index d'action
         //Ouvre le dropDown Menu
         //Récupére les noms d'actions des strings (l'index du nom correspond à l'index d'action)
@@ -593,11 +655,11 @@ public class SpiritHead : Photon.MonoBehaviour
             Destroy(child.gameObject);
         }
 
-        Vector3 vec = new Vector3(inter.transform.position.x, 3, inter.transform.position.z);
+        Vector3 vec = new Vector3(inter.transform.position.x, inter.transform.position.y + 3, inter.transform.position.z);
         _actions.transform.position = _spiritCamera.GetComponent<Camera>().WorldToScreenPoint(vec);
 
         _actions.SetActive(true);
-        for (int i = 0; i < inter.PossibleActionNames.Length; i++)
+        for (int i = 0; i < inter.ActionLength; i++)
         {
             bool isAvailable = IsActionIndexAvailableByAll(inter, i);
 
@@ -605,7 +667,6 @@ public class SpiritHead : Photon.MonoBehaviour
             {
                 GameObject act = Instantiate(_button, _actions.transform.GetChild(0).GetChild(0));
                 act.transform.GetChild(0).GetComponent<Text>().text = inter.PossibleActionNames[i];
-
                 act.GetComponent<Button>().onClick.AddListener(() => Act(inter, act.transform.GetChild(0).GetComponent<Text>().text));
 
                 if (!isAvailable)
@@ -621,9 +682,9 @@ public class SpiritHead : Photon.MonoBehaviour
     public void Act(Interactable inter,string action)
     {
         List<string> actions = new List<string>();
-        foreach(var s in inter.PossibleActionNames)
+        foreach(string actionName in inter.PossibleActionNames)
         {
-            actions.Add(s);
+            actions.Add(actionName);
         }
         int i = actions.IndexOf(action);
 
@@ -651,7 +712,7 @@ public class SpiritHead : Photon.MonoBehaviour
 
     public void IndexActionHandler(Interactable inter, int actionIndex)
     {
-        Debug.Log("IndexActionHandler: Index chosen, giving order to all charas");
+        //Debug.Log("IndexActionHandler: Index chosen, giving order to all charas");
         if(inter.IsDistanceAction[actionIndex]) //Si l'action en question est une action à distance (on a déjà verifié qu'elle était available)
         {
             SetInteractAll(inter, actionIndex);
@@ -693,7 +754,8 @@ public class SpiritHead : Photon.MonoBehaviour
 
     private void InventoryUpdate()
     {
-        if (Input.GetKeyDown(KeyCode.E))
+        //if (Input.GetKeyDown(KeyCode.E))
+        if (Input.inputString == mode.interfaCe)
         {
             _inventoryList.SetActive(!_inventoryList.activeSelf);            
         }
@@ -733,7 +795,8 @@ public class SpiritHead : Photon.MonoBehaviour
 
     private void DisplayChannel()
     {
-        if (Mode.Instance.online && Input.GetKeyDown(KeyCode.C))
+        //if (Mode.Instance.online && Input.GetKeyDown(KeyCode.C))
+        if (mode.online && Input.inputString == mode.channel)
         {
             _channel.SetActive(!_channel.activeSelf);
         }

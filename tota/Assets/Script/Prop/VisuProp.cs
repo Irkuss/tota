@@ -5,49 +5,61 @@ using UnityEngine;
 public class VisuProp : PropHandler
 {
 
-    //Path for the construction created with this blueprint (from Resources)
+    //Defining attribute
     [Header("Construction created with this blueprint (from Resources)")]
     public ItemRecipe recipe;
-
+    
+    //Private attribute
     private bool hasAllItems = false;
-
+    
+    //Command enum
     public enum VisuCommand
     {
         Completed,
     }
 
-    //Basic prop method
+    //Start
+    private void Start()
+    {
+        //Called the Init for OrganicOpacity
+        BeginOpacity();
+    }
+
+    //====================Override Interactable====================
     public override void Interact(CharaHead chara, int actionIndex)
     {
         switch(actionIndex)
         {
-            case 0: FillNeededItem(chara); break;
-            case 1: Construct(chara); break;
-            case 2: CancelConstruction(chara); break;
+            case 0: FillNeededItem(chara); break; //Fill needed items
+            case 1: Construct(chara); break; //Construct
+            case 2: CancelConstruction(chara); break; //Cancel Construction
         }
     }
+
     public override bool CheckAvailability(CharaHead chara, int actionIndex = 0)
     {
         switch (actionIndex)
         {
-            case 0: return !hasAllItems && recipe.CanBeCraftedWith(chara.GetComponent<CharaInventory>().inventory) && recipe.neededItem.Length != 0;
-            case 1: return (hasAllItems || recipe.neededItem.Length == 0) && recipe.CanBeCraftedBySkill(chara.GetComponent<CharaInventory>());
+            case 0: return !hasAllItems && recipe.CanBeCraftedWith(chara.GetComponent<CharaInventory>().inventory) && recipe.neededItem.Length != 0; //Fill needed items
+            case 1: return (hasAllItems || recipe.neededItem.Length == 0) && recipe.CanBeCraftedBySkill(chara.GetComponent<CharaInventory>()); //Construct
             case 2: return true; //Cancel Construction
         }
         return false;
     }
+
     public override float GetActionTime(CharaHead chara, int actionIndex = 0)
     {
         switch (actionIndex)
         {
-            case 0: return 1f; //FillNeededItem
+            case 0: return 1f; //Fill needed items
             case 1: return recipe.GetCraftTime(chara.GetComponent<CharaInventory>()); //Construct
             case 2: return 1f; //Cancel Construction
         }
         return 0f;
     }
-    //Construction method (Interaction)
 
+    //====================Action Method====================
+    //Fill needed items
     public void FillNeededItem(CharaHead chara)
     {
         if (!CheckAvailability(chara, 0)) return; //Si au moment d'arriver, le blueprint est déjà rempli annule tout
@@ -57,8 +69,15 @@ public class VisuProp : PropHandler
         CommandSend(new int[1] { (int)VisuCommand.Completed });
     }
 
+    private void MarkAsCompleted()
+    {
+        hasAllItems = true;
+    }
+
+    //Construct
     public void Construct(CharaHead chara)
     {
+        recipe.UpdateTraining(chara.GetComponent<CharaRpg>(), GetActionTime(chara, 1));
         Debug.Log("Construct: a visu has been built");
         //Crée un nouveau prop
         GameObject.Find("eCentralManager").
@@ -67,22 +86,20 @@ public class VisuProp : PropHandler
         //Se détruit
         DestroySelf();
     }
+    
+    //Cancel Construction
     public void CancelConstruction(CharaHead chara)
     {
-        if(hasAllItems)
+        if (hasAllItems)
         {
             recipe.Refund(chara.GetComponent<CharaInventory>());
         }
 
         DestroySelf();
     }
-    //Network
-    private void MarkAsCompleted()
-    {
-        hasAllItems = true;
-    }
 
-    public override void CommandReceive(int[] command, float[] commandFloat)
+    //====================Override PropHandler====================
+    public override void CommandReceive(int[] command, float[] commandFloat, string[] commandString = null)
     {
         switch ((VisuCommand)command[0])
         {

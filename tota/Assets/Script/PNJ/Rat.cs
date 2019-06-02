@@ -5,18 +5,27 @@ using UnityEngine.AI;
 
 public class Rat : MonoBehaviour
 {
+    //Defining attribute
+    private float _wanderRadius = 8;
+    private float _viewRadius = 6;
+
+    private float _slowSpeed = 1f;
+    private float _fastSpeed = 5f;
+
+    //Reference
     private NavMeshAgent _agent;
     private PhotonView _photon;
 
-    public float wanderRadius;
-    public float viewRadius;
+    public LayerMask targetMask;
+    public LayerMask obstacleMask;
+
+    //Private Attribute
     private Vector3 _wanderPoint;
 
     private List<Transform> _visibleTargets;
-    [HideInInspector]  public Transform _player;
+    private Transform _closestPlayer;
 
-    public LayerMask targetMask;
-    public LayerMask obstacleMask;
+    private bool isRunningAway = false;
 
     // Start is called before the first frame update
     private void Start()
@@ -29,136 +38,95 @@ public class Rat : MonoBehaviour
             StartCoroutine(UpdateDelay());
         }
     }
+    //ForcePosition
+    private IEnumerator WaitForcePosition()
+    {
+        ForcePosition();
+        yield return new WaitForSeconds(5);
+        ForcePosition();
+        while (true)
+        {
+            yield return new WaitForSeconds(60);
+            ForcePosition();
+        }
+    }
 
     // Update is called once per frame
     private IEnumerator UpdateDelay()
     {
-        int cycleBeforeMoving = 20;
-
-        bool isRunningAway = false;
-        float slowSpeed = 1f;
-        float fastSpeed = 4f;
+        int cycleBeforeMoving = Random.Range(1, 3) * 2;
 
         _wanderPoint = transform.position;
 
-        _agent.speed = slowSpeed;
-
-        ForcePosition();
-        int cycleBeforeForcingPosition = 100;
+        _agent.speed = _slowSpeed;
 
         while (true)
         {
-            yield return new WaitForSeconds(0.5f);
-            if (cycleBeforeForcingPosition <= 0)
+            yield return new WaitForSeconds(0.2f);
+
+            _visibleTargets = CharaAi.FindVisibleTargets(transform, targetMask, obstacleMask, _viewRadius);
+            
+
+            if (_visibleTargets.Count > 0)
             {
-                ForcePosition();
-                cycleBeforeForcingPosition = 100;
+                _closestPlayer = CharaAi.FindClosestTransform(_visibleTargets, transform.position);
+
+                //Si on a détecté une target
+                SetMovementMode(true);
+
+                _wanderPoint = CharaAi.FindFleePositionFromTarget(_closestPlayer.position, transform.position, 5);
+
+                SetDestination(_wanderPoint);
             }
             else
             {
-                cycleBeforeForcingPosition--;
-            }
-
-            if (!isRunningAway)
-            {
                 //Si on n'est pas en train de s'enfuir
-                FindTargets();
-                if (_visibleTargets.Count > 0)
+                if (Vector3.Distance(transform.position, _wanderPoint) <= _agent.stoppingDistance + 0.3f)
                 {
-                    //Si on a détecté une target
-                    isRunningAway = true;
-                    _agent.speed = fastSpeed;
-                    _wanderPoint = RunAway(_player.position);
-                    _agent.SetDestination(_wanderPoint);
-                    SendUpdatedWanderPoint();
-                }
-                else
-                {
-                    //Si on est safe
-                    if (Vector3.Distance(transform.position, _wanderPoint) <= _agent.stoppingDistance + 0.3f)
+                    if (!isRunningAway)
                     {
-
+                        //Si on est safe
                         if (cycleBeforeMoving <= 0)
                         {
-                            _wanderPoint = GetRandomWanderPoint();
-                            _agent.SetDestination(_wanderPoint);
-                            SendUpdatedWanderPoint();
-                            cycleBeforeMoving = Random.Range(2, 6) * 2;
+                            _wanderPoint = CharaAi.FindRandomWanderPoint(_wanderRadius, transform.position);
+
+                            SetDestination(_wanderPoint);
+
+                            cycleBeforeMoving = Random.Range(1, 3) * 2;
                         }
                         else
                         {
                             cycleBeforeMoving--;
                         }
                     }
-                }
-            }
-            else
-            {
-                //Si on est en train de s'enfuir
-                if (Vector3.Distance(transform.position, _wanderPoint) <= _agent.stoppingDistance + 0.3f)
-                {
-                    isRunningAway = false;
-                    _agent.speed = slowSpeed;
+                    else
+                    {
+                        SetMovementMode(false);
+                    }
                 }
             }
         }
     }
-
-    private Vector3 RunAway(Vector3 playerPos)
+    //Destination
+    private void SetDestination(Vector3 position)
     {
-        NavMeshHit Hit;
-        NavMesh.SamplePosition(-playerPos * 1.3f, out Hit, wanderRadius, -1);
-
-        return new Vector3(Hit.position.x, transform.position.y, Hit.position.z);
-    }
- 
-    public Vector3 GetRandomWanderPoint()// new random point
-    {
-        Vector3 randomPoint = (Random.insideUnitSphere * wanderRadius) + transform.position;
-        NavMeshHit Hit;
-        NavMesh.SamplePosition(randomPoint, out Hit, wanderRadius, -1);
-
-        return new Vector3(Hit.position.x, transform.position.y, Hit.position.z);
+        _agent.SetDestination(position);
+        SendUpdatedWanderPoint();
     }
 
-    private Transform GetClosestPlayer()// returns closest player
+    //WalkMode
+    [PunRPC]
+    private void RPC_SetMovementMode(bool setToRun)
     {
-        Transform target = null;
-        float min = 1 / 0f; //infinity
-        foreach (Transform player in _visibleTargets)
-        {
-            float distance = Vector3.Distance(player.position, transform.position);
-            if (distance < min)
-            {
-                min = distance;
-                target = player;
-            }
-        }
-
-        return target;
+        _agent.speed = setToRun ? _fastSpeed : _slowSpeed;
     }
-
-    private void FindTargets()// search for visible targets
+    private void SetMovementMode(bool setToRun)
     {
-        _visibleTargets.Clear();
-        Collider[] targetsInViewRadius = Physics.OverlapSphere(transform.position, viewRadius, targetMask);
-        int count = targetsInViewRadius.Length;
-        for (int i = 0; i < count; i++)
-        {
-            Transform target = targetsInViewRadius[i].transform;
-            Vector3 dirToTarget = (target.position - transform.position).normalized;
-            float dstToTarget = Vector3.Distance(transform.position, target.position);
-            if (!Physics.Raycast(transform.position, dirToTarget, dstToTarget, obstacleMask))
-            {
-                _visibleTargets.Add(target);
-            }
-        }
-        _player = GetClosestPlayer();
+        isRunningAway = setToRun;
+        _agent.speed = setToRun ? _fastSpeed : _slowSpeed;
+
+        if (Mode.Instance.online) _photon.RPC("RPC_SetMovementMode", PhotonTargets.OthersBuffered, setToRun);
     }
-
-
-
-
 
     //Networkig
     public void KillSelf()

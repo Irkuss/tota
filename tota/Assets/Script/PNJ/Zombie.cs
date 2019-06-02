@@ -6,39 +6,41 @@ using UnityStandardAssets.Characters.ThirdPerson;
 
 public class Zombie : MonoBehaviour
 {
-    //Public, modifiable
+    //Defining attribute
     public float fieldOfViewAngle = 140f;
     public float wanderRadius = 10f;
 
-    //LayerMask
+    //reference
     [SerializeField] private LayerMask _targetMask;
     [SerializeField] private LayerMask _obstacleMask;
 
-    //reference
     private NavMeshAgent _agent;
     private PhotonView _photon;
     private ThirdPersonCharacter _character;
 
     //Destination (decided by masterClient)
     private Vector3 _wanderPoint;
-
-    //Targets
+    
     private List<Transform> _visibleTargets;
-    [HideInInspector] public Transform player;
+    private Transform _closestPlayer;
+    public Transform Player => _closestPlayer;
 
     private GameObject alert = null;
-    //depre?
-    private bool _canMove = true;
 
     // Start is called before the first frame update
     private void Start()
     {
         _visibleTargets = new List<Transform>();
         _character = GetComponent<ThirdPersonCharacter>();
+
         //ref
         _agent = GetComponent<NavMeshAgent>();
         _agent.updateRotation = false;
+
+        _agent.speed = 0.5f;
+
         _photon = GetComponent<PhotonView>();
+
         if (PhotonNetwork.isMasterClient)
         {
             StartCoroutine(FindTargetsWithDelay());
@@ -85,68 +87,73 @@ public class Zombie : MonoBehaviour
         }
     }
 
+    //ForcePosition
+    private IEnumerator WaitForcePosition()
+    {
+        ForcePosition();
+        yield return new WaitForSeconds(5);
+        ForcePosition();
+        while (true)
+        {
+            yield return new WaitForSeconds(60);
+            ForcePosition();
+        }
+    }
+
     //Main loop
     private IEnumerator FindTargetsWithDelay()
     {
-        int cycleBeforeMoving = Random.Range(2,4) * 2;
-        float delay = 0.5f;
-        _agent.speed = 0.5f;
-        _wanderPoint = transform.position;
+        int cycleBeforeMoving = Random.Range(1,3) * 2;
 
-        ForcePosition();
-        int cycleBeforeForcingPosition = 100;
+        _wanderPoint = transform.position;
 
         while (true)
         {
-            yield return new WaitForSeconds(delay);
+            yield return new WaitForSeconds(0.2f);
             if(_canTakeDecision)
             {
-                //Debug.Log("FindTargetsWithDelay: taking decision");
-                if (cycleBeforeForcingPosition <= 0)
-                {
-                    ForcePosition();
-                    cycleBeforeForcingPosition = 100;
-                }
-                else
-                {
-                    cycleBeforeForcingPosition--;
-                }
+                _visibleTargets = CharaAi.FindVisibleTargets(transform, _targetMask, _obstacleMask, wanderRadius, fieldOfViewAngle);
 
-                FindVisibleTargets();
                 if (_visibleTargets.Count > 0)
                 {
+                    _closestPlayer = CharaAi.FindClosestTransform(_visibleTargets, transform.position);
+
                     //Zombie is chasing a chara
+<<<<<<< HEAD
                     if (alert == null)
                     {
                         AudioManager.instance.PlayAtPosition("Ping", transform.position);
                         alert = new GameObject("Alert");
                     }
                     _wanderPoint = player.position;
+=======
+                    //if (alert == null){AudioManager.instance.Play("Ping");alert = new GameObject("Alert");}
+                    _wanderPoint = _closestPlayer.position;
+>>>>>>> bfc04a6465382cdfbdd6b1087cca62e2b8803e02
 
-                    _agent.SetDestination(_wanderPoint);
-                    SendUpdatedWanderPoint();
+                    SetDestination(_wanderPoint);
 
-                    if (Vector3.Distance(player.position, transform.position) < 2f)
+                    if (Vector3.Distance(_closestPlayer.position, transform.position) < 2f)
                     {
-                        player.GetComponent<CharaRpg>().TryDeathBite(30);
+                        _closestPlayer.GetComponent<CharaRpg>().TryDeathBite(30);
                         yield return new WaitForSeconds(1f);
                     }
                 }
                 else
                 {
                     //Zombie is wandering
-                    Destroy(alert);
+                    //Destroy(alert);
                     if (Vector3.Distance(transform.position, _wanderPoint) <= _agent.stoppingDistance + 0.3f)
                     {
                         //Zombie is close to destination
                         if (cycleBeforeMoving <= 0)
                         {
                             //Find new wander spot
-                            _wanderPoint = GetRandomWanderPoint();
-                            SendUpdatedWanderPoint();
-                            _agent.SetDestination(_wanderPoint);
+                            _wanderPoint = CharaAi.FindRandomWanderPoint(wanderRadius, transform.position);
 
-                            cycleBeforeMoving = Random.Range(4, 10) * 2;
+                            SetDestination(_wanderPoint);
+
+                            cycleBeforeMoving = Random.Range(4, 8) * 2;
                         }
                         else
                         {
@@ -161,6 +168,7 @@ public class Zombie : MonoBehaviour
         }
     }
 
+    //Animation Update
     private void Update()
     {
         if(_agent.remainingDistance > _agent.stoppingDistance)
@@ -173,53 +181,15 @@ public class Zombie : MonoBehaviour
         }
     }
 
-    
-
-    //Helper functions
-
-    private Vector3 GetRandomWanderPoint()//find a new random point
+    //Destination
+    private void SetDestination(Vector3 position)
     {
-        Vector3 randomPoint = (Random.insideUnitSphere * wanderRadius) + transform.position;
-        NavMeshHit Hit;
-        NavMesh.SamplePosition(randomPoint, out Hit, wanderRadius, -1);
+        _agent.SetDestination(position);
+        SendUpdatedWanderPoint();
+    }
 
-        return new Vector3(Hit.position.x, transform.position.y, Hit.position.z);
-    }
-    private Transform GetClosestPlayer()// returns closest player
-    {
-        Transform target = null;
-        float min = 1 / 0f; //infinity
-        foreach (Transform player in _visibleTargets)
-        {
-            float distance = Vector3.Distance(player.position, transform.position);
-            if (distance < min)
-            {
-                min = distance;
-                target = player;
-            }
-        }
 
-        return target;
-    }
-    private void FindVisibleTargets()// search for visible targets
-    {
-        _visibleTargets.Clear();
-        Collider[] targetsInViewRadius = Physics.OverlapSphere(transform.position, wanderRadius, _targetMask);
-        for (int i = 0; i < targetsInViewRadius.Length; i++)
-        {
-            Transform target = targetsInViewRadius[i].transform;
-            Vector3 dirToTarget = (target.position - transform.position).normalized;
-            if (Vector3.Angle(transform.forward, dirToTarget) < fieldOfViewAngle / 2)
-            {
-                float dstToTarget = Vector3.Distance(transform.position, target.position);
-                if (!Physics.Raycast(transform.position, dirToTarget, dstToTarget, _obstacleMask))
-                {
-                    _visibleTargets.Add(target);
-                }
-            }
-        }
-        player = GetClosestPlayer();
-    }
+    //Helper Methods
     public Vector3 DirFromAngle(float angleInDegrees, bool angleIsGlobal)// Direction of FOV
     {
         if (!angleIsGlobal)
@@ -253,6 +223,9 @@ public class Zombie : MonoBehaviour
     [PunRPC]private void RPC_SendUpdatedWanderPoint(float x, float y, float z)
     {
         _wanderPoint = new Vector3(x, y, z);
+
+        //_wanderPoint = CharaMovement.CorrectDestination(_wanderPoint);
+
         _agent.SetDestination(_wanderPoint);
     }
 

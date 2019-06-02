@@ -29,8 +29,6 @@ public class InterfaceManager : MonoBehaviour
     [SerializeField] private Sprite _fistR = null;
     [SerializeField] private Sprite _leg = null;
 
-    
-
     //public GameObject tooltip => _tooltip;
     public enum SlotIndex
     {
@@ -56,7 +54,6 @@ public class InterfaceManager : MonoBehaviour
             foreach (ItemRecipe recipe in allRecipeTable[i].recipes)
             {
                 craftSlot = Instantiate(_slot, allCraftGo[i].transform.GetChild(0));
-
 
                 //Associe l'action de craft et l'image de l'item crafté
                 craftSlot.transform.GetChild((int)SlotIndex.Item).GetComponent<Image>().sprite = recipe.result.icon;
@@ -135,117 +132,57 @@ public class InterfaceManager : MonoBehaviour
     }
     public void UpdateEquipment(CharaInventory charaInventory)
     {
-        if (charaInventory.wearables[0] != null)
-        {
-            GameObject head = _equipment.transform.GetChild(0).gameObject;
-            head.transform.GetChild((int)SlotIndex.Item).GetComponent<Image>().sprite = charaInventory.wearables[0].icon;
-            head.transform.GetChild((int)SlotIndex.Item).GetComponent<Button>().onClick.AddListener(() => charaInventory.wearables[0].Unequip(charaInventory.gameObject));
-            head.transform.GetChild((int)SlotIndex.ItemDescription).GetChild(0).GetComponent<Text>().text = charaInventory.wearables[0].description;
-            head.transform.GetChild((int)SlotIndex.PopDescription).GetComponent<Button>().onClick.AddListener(() => ToggleActive(head.transform.GetChild((int)SlotIndex.ItemDescription).gameObject));
-        }
-        else
-        {
-            GameObject head = _equipment.transform.GetChild(0).gameObject;
-            head.transform.GetChild((int)SlotIndex.Item).GetComponent<Image>().sprite = _head;
-            head.transform.GetChild((int)SlotIndex.Item).GetComponent<Button>().onClick.RemoveAllListeners();
-            head.transform.GetChild((int)SlotIndex.ItemDescription).GetChild(0).GetComponent<Text>().text = "";
-            head.transform.GetChild((int)SlotIndex.PopDescription).GetComponent<Button>().onClick.RemoveAllListeners();
-        }
+        //Debug.Log("UpdateEquipment: ==================updating equipment==================");
+        //====================Partie Wearable====================
+        if (charaInventory.wearables[0] != null) LinkWearSlot(_equipment.transform.GetChild(0), charaInventory.wearables[0], charaInventory);
+        else UnlinkWearSlot(_equipment.transform.GetChild(0), _head);
 
-        if (charaInventory.wearables[1] != null)
-        {
-            GameObject torso = _equipment.transform.GetChild(1).gameObject;
-            torso.transform.GetChild((int)SlotIndex.Item).GetComponent<Image>().sprite = charaInventory.wearables[1].icon;
-            torso.transform.GetChild((int)SlotIndex.Item).GetComponent<Button>().onClick.AddListener(() => charaInventory.wearables[1].Unequip(charaInventory.gameObject));
-            torso.transform.GetChild((int)SlotIndex.ItemDescription).GetChild(0).GetComponent<Text>().text = charaInventory.wearables[1].description;
-            torso.transform.GetChild((int)SlotIndex.PopDescription).GetComponent<Button>().onClick.AddListener(() => ToggleActive(torso.transform.GetChild((int)SlotIndex.ItemDescription).gameObject));
-        }
-        else
-        {
-            GameObject torso = _equipment.transform.GetChild(1).gameObject;
-            torso.transform.GetChild((int)SlotIndex.Item).GetComponent<Image>().sprite = _torso;
-            torso.transform.GetChild((int)SlotIndex.Item).GetComponent<Button>().onClick.RemoveAllListeners();
-            torso.transform.GetChild((int)SlotIndex.ItemDescription).GetChild(0).GetComponent<Text>().text = "";
-            torso.transform.GetChild((int)SlotIndex.PopDescription).GetComponent<Button>().onClick.RemoveAllListeners();
-        }
+        if (charaInventory.wearables[1] != null) LinkWearSlot(_equipment.transform.GetChild(1), charaInventory.wearables[1], charaInventory);
+        else UnlinkWearSlot(_equipment.transform.GetChild(1), _torso);
 
-        if (charaInventory.wearables[2] != null)
-        {
-            GameObject torso = _equipment.transform.GetChild(2).gameObject;
-            torso.transform.GetChild((int)SlotIndex.Item).GetComponent<Image>().sprite = charaInventory.wearables[2].icon;
-            torso.transform.GetChild((int)SlotIndex.Item).GetComponent<Button>().onClick.AddListener(() => charaInventory.wearables[2].Unequip(charaInventory.gameObject));
-            torso.transform.GetChild((int)SlotIndex.ItemDescription).GetChild(0).GetComponent<Text>().text = charaInventory.wearables[2].description;
-            torso.transform.GetChild((int)SlotIndex.PopDescription).GetComponent<Button>().onClick.AddListener(() => ToggleActive(torso.transform.GetChild((int)SlotIndex.ItemDescription).gameObject));
-        }
-        else
-        {
-            GameObject torso = _equipment.transform.GetChild(2).gameObject;
-            torso.transform.GetChild((int)SlotIndex.Item).GetComponent<Image>().sprite = _torso;
-            torso.transform.GetChild((int)SlotIndex.Item).GetComponent<Button>().onClick.RemoveAllListeners();
-            torso.transform.GetChild((int)SlotIndex.ItemDescription).GetChild(0).GetComponent<Text>().text = "";
-            torso.transform.GetChild((int)SlotIndex.PopDescription).GetComponent<Button>().onClick.RemoveAllListeners();
-        }
+        if (charaInventory.wearables[2] != null) LinkWearSlot(_equipment.transform.GetChild(2), charaInventory.wearables[2], charaInventory);
+        else UnlinkWearSlot(_equipment.transform.GetChild(2), _torso);
 
-        if (charaInventory.wearables[3] != null)
-        {
-            GameObject leg = _equipment.transform.GetChild(5).gameObject;
-            leg.transform.GetChild((int)SlotIndex.Item).GetComponent<Image>().sprite = charaInventory.wearables[3].icon;
-            leg.transform.GetChild((int)SlotIndex.Item).GetComponent<Button>().onClick.AddListener(() => charaInventory.wearables[3].Unequip(charaInventory.gameObject));
-            leg.transform.GetChild((int)SlotIndex.ItemDescription).GetChild(0).GetComponent<Text>().text = charaInventory.wearables[3].description;
-            leg.transform.GetChild((int)SlotIndex.PopDescription).GetComponent<Button>().onClick.AddListener(() => ToggleActive(leg.transform.GetChild((int)SlotIndex.ItemDescription).gameObject));
-        }
-        else
-        {
-            GameObject leg = _equipment.transform.GetChild(5).gameObject;
-            leg.transform.GetChild((int)SlotIndex.Item).GetComponent<Image>().sprite = _leg;
-            leg.transform.GetChild((int)SlotIndex.Item).GetComponent<Button>().onClick.RemoveAllListeners();
-            leg.transform.GetChild((int)SlotIndex.ItemDescription).GetChild(0).GetComponent<Text>().text = "";
-            leg.transform.GetChild((int)SlotIndex.PopDescription).GetComponent<Button>().onClick.RemoveAllListeners();
-        }
+        if (charaInventory.wearables[3] != null) LinkWearSlot(_equipment.transform.GetChild(5), charaInventory.wearables[3], charaInventory);
+        else UnlinkWearSlot(_equipment.transform.GetChild(5), _leg);
 
-        if (charaInventory.equipments[0] != null)
-        {
-            GameObject left = _equipment.transform.GetChild(3).gameObject;
-            left.transform.GetChild((int)SlotIndex.Item).GetComponent<Image>().sprite = charaInventory.equipments[0].icon;
-            left.transform.GetChild((int)SlotIndex.Item).GetComponent<Button>().onClick.AddListener(() => charaInventory.equipments[0].Unequip(charaInventory.gameObject));
-            left.transform.GetChild((int)SlotIndex.ItemDescription).GetChild(0).GetComponent<Text>().text = charaInventory.equipments[0].description;
-            left.transform.GetChild((int)SlotIndex.PopDescription).GetComponent<Button>().onClick.AddListener(() => ToggleActive(left.transform.GetChild((int)SlotIndex.ItemDescription).gameObject));
-        }
-        else
-        {
-            GameObject left = _equipment.transform.GetChild(3).gameObject;
-            left.transform.GetChild((int)SlotIndex.Item).GetComponent<Image>().sprite = _fistL;
-            left.transform.GetChild((int)SlotIndex.Item).GetComponent<Button>().onClick.RemoveAllListeners();
-            left.transform.GetChild((int)SlotIndex.ItemDescription).GetChild(0).GetComponent<Text>().text = "";
-            left.transform.GetChild((int)SlotIndex.PopDescription).GetComponent<Button>().onClick.RemoveAllListeners();
-        }
+        //====================Partie Equipable====================
+        bool leftSlotIsFilled = charaInventory.equipments[0] != null;
+        bool rightSlotIsFilled = charaInventory.equipments[1] != null;
 
-        if (charaInventory.equipments[1] != null)
-        {
-            GameObject right = _equipment.transform.GetChild(4).gameObject;
-            right.transform.GetChild((int)SlotIndex.Item).GetComponent<Image>().sprite = charaInventory.equipments[1].icon;
-            if (charaInventory.equipments[0].equipSpace == Equipable.EquipSpace.TwoHanded)
-            {
-                right.transform.GetChild((int)SlotIndex.Lock).gameObject.SetActive(true);
-                right.transform.GetChild((int)SlotIndex.Item).GetComponent<Button>().interactable = false;
-            }
-            else
-            {
-                right.transform.GetChild((int)SlotIndex.Item).GetComponent<Button>().onClick.AddListener(() => charaInventory.equipments[1].Unequip(charaInventory.gameObject));
-            }
+        //Update le slot de gauche
+        if (leftSlotIsFilled) LinkWearSlot(_equipment.transform.GetChild(3), charaInventory.equipments[0], charaInventory);
+        else UnlinkWearSlot(_equipment.transform.GetChild(3), _fistL);
 
-            right.transform.GetChild((int)SlotIndex.ItemDescription).GetChild(0).GetComponent<Text>().text = charaInventory.equipments[1].description;
-            right.transform.GetChild((int)SlotIndex.PopDescription).GetComponent<Button>().onClick.AddListener(() => ToggleActive(right.transform.GetChild((int)SlotIndex.ItemDescription).gameObject));
+        //Update le slot de droit
+        Transform transRightSlot = _equipment.transform.GetChild(4);
 
-        }
-        else
-        {
-            GameObject right = _equipment.transform.GetChild(4).gameObject;
-            right.transform.GetChild((int)SlotIndex.Item).GetComponent<Image>().sprite = _fistR;
-            right.transform.GetChild((int)SlotIndex.Item).GetComponent<Button>().onClick.RemoveAllListeners();
-            right.transform.GetChild((int)SlotIndex.ItemDescription).GetChild(0).GetComponent<Text>().text = "";
-            right.transform.GetChild((int)SlotIndex.PopDescription).GetComponent<Button>().onClick.RemoveAllListeners();
-        }
+        if (rightSlotIsFilled) LinkWearSlot(transRightSlot, charaInventory.equipments[1], charaInventory);
+        else UnlinkWearSlot(_equipment.transform.GetChild(4).gameObject.transform, _fistR);
+
+        //Desactive le slot de droit si le slot de gauche est une arme à deux mains et si le slot est vide
+        bool deactivateRightSlot = (leftSlotIsFilled && charaInventory.equipments[0].equipSpace == Equipable.EquipSpace.TwoHanded);
+
+        transRightSlot.GetChild((int)SlotIndex.Lock).gameObject.SetActive(deactivateRightSlot);
+        transRightSlot.GetChild((int)SlotIndex.Item).GetComponent<Button>().interactable = !deactivateRightSlot;
+
+        //Debug.Log("UpdateEquipment: ==================ending updating equipment==================");
+    }
+
+    private static void LinkWearSlot(Transform transSlot, Item itemWorn, CharaInventory charaInventory)
+    {
+        transSlot.GetChild((int)SlotIndex.Item).GetComponent<Image>().sprite = itemWorn.icon;
+        transSlot.GetChild((int)SlotIndex.Item).GetComponent<Button>().onClick.RemoveAllListeners();
+        transSlot.GetChild((int)SlotIndex.Item).GetComponent<Button>().onClick.AddListener(() => itemWorn.Unequip(charaInventory));
+        transSlot.GetChild((int)SlotIndex.ItemDescription).GetChild(0).GetComponent<Text>().text = itemWorn.description;
+        transSlot.GetChild((int)SlotIndex.PopDescription).GetComponent<Button>().onClick.AddListener(() => ToggleActive(transSlot.GetChild((int)SlotIndex.ItemDescription).gameObject));
+    }
+    private static void UnlinkWearSlot(Transform transSlot, Sprite newSprite)
+    {
+        transSlot.GetChild((int)SlotIndex.Item).GetComponent<Image>().sprite = newSprite;
+        transSlot.GetChild((int)SlotIndex.Item).GetComponent<Button>().onClick.RemoveAllListeners();
+        transSlot.GetChild((int)SlotIndex.ItemDescription).GetChild(0).GetComponent<Text>().text = "";
+        transSlot.GetChild((int)SlotIndex.PopDescription).GetComponent<Button>().onClick.RemoveAllListeners();
     }
 
     public void UpdateInjuries(string[] injuries)
@@ -286,7 +223,7 @@ public class InterfaceManager : MonoBehaviour
             charaInventory.GetComponent<CharaHead>().CraftItem(recipe);
         }
     }
-    private void ToggleActive(GameObject obj)
+    private static void ToggleActive(GameObject obj)
     {
         obj.SetActive(!obj.activeSelf);
     }

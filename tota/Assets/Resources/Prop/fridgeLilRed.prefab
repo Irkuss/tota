@@ -44,9 +44,9 @@ GameObject:
   - component: {fileID: 1253694451253799440}
   - component: {fileID: 9193223991442777846}
   - component: {fileID: 7658236449047267634}
-  - component: {fileID: 8229308643694774317}
   - component: {fileID: 330569378345211131}
   - component: {fileID: 4199441959054573360}
+  - component: {fileID: 8277145962137439592}
   m_Layer: 0
   m_Name: lil'_firdge
   m_TagString: Untagged
@@ -62,7 +62,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 6973416752288460235}
   m_LocalRotation: {x: 0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 1.29, y: 0, z: -1.65}
+  m_LocalPosition: {x: 1.5, y: 0, z: -1.5}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 2278488263671155947}
@@ -149,19 +149,6 @@ MonoBehaviour:
   lootTable: {fileID: 11400000, guid: a5550496268ef1b4c9796ecb06fd1f1b, type: 2}
   hasToRandAddLoot: 1
   baseTimeFirstLoot: 3
---- !u!114 &8229308643694774317
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 6973416752288460235}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 94f63d646c3f7c04e83b1006e9a5982a, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  isMoving: 0
 --- !u!114 &330569378345211131
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -205,3 +192,19 @@ MonoBehaviour:
   precomputeOutline: 0
   bakeKeys: []
   bakeValues: []
+--- !u!114 &8277145962137439592
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6973416752288460235}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6d07ce676d7afda4dabb3b0f7dd5e654, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_OverrideArea: 0
+  m_Area: 0
+  m_IgnoreFromBuild: 1
+  m_AffectedAgents: ffffffff

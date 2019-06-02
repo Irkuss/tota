@@ -15,13 +15,11 @@ public class CharaConnect : MonoBehaviour
         SetOutlineToSelected,
         SetOutlineToNotSelected,
         RPC_SetTeam,
-        RPC_SetTeamNull,
         SetOwner,
         SetOwnerNull,
-        RemoveWithId,
-        AddWithId,
         ModifyCountWithId,
-        ReceiveAddWound
+        ReceiveAddWound,
+        TrainStat
     }
     // Start is called before the first frame update
     void Awake()
@@ -43,13 +41,11 @@ public class CharaConnect : MonoBehaviour
             case CharaCommand.SetOutlineToSelected: GetComponent<CharaOutline>().SetOutlineToSelected(); break;
             case CharaCommand.SetOutlineToNotSelected: GetComponent<CharaOutline>().SetOutlineToNotSelected(); break;
             case CharaCommand.RPC_SetTeam: GetComponent<CharaPermissions>().RPC_SetTeam(s[0]); break;
-            case CharaCommand.RPC_SetTeamNull: GetComponent<CharaPermissions>().RPC_SetTeamNull(); break;
             case CharaCommand.SetOwner: GetComponent<CharaPermissions>().SetOwner(s[0]); break;
             case CharaCommand.SetOwnerNull: GetComponent<CharaPermissions>().SetOwnerNull(); break;
-            case CharaCommand.RemoveWithId: GetComponent<CharaInventory>().RemoveWithId(i[0]); break;
-            case CharaCommand.AddWithId: GetComponent<CharaInventory>().AddWithId(i[0]); break;
             case CharaCommand.ModifyCountWithId: GetComponent<CharaInventory>().ModifyCountWithId(i[0],i[1]); break;
             case CharaCommand.ReceiveAddWound: GetComponent<CharaRpg>().ReceiveAddWound(i[0], i[1], s[0], s[1], f[0]); break;
+            case CharaCommand.TrainStat: GetComponent<CharaRpg>().RPC_TrainStat((CharaRpg.Stat)i[0], f[0]); break;
         }
     }
 }

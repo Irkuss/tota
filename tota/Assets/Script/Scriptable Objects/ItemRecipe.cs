@@ -5,13 +5,17 @@ using UnityEngine;
 [CreateAssetMenu(fileName = "new Recipe", menuName = "Recipe")]
 public class ItemRecipe : ScriptableObject
 {
+    [Header("Visu attributes")]
+    public string visuPath = "Visu/";
+    public Sprite visuSprite = null;
+
     [Header("Recipe result (if it has one)")]
     //Item donné par le craft
     public Item result = null;
     public int resultCount;
 
     [Header("Recipe path (if it has one)")]
-    public string resultPath = "";
+    public string resultPath = "";    
 
     [Header("Recipe needed items")]
     //A chaque index des deux arrays se trouvent un Item requis et la quantité de cet Item requise
@@ -23,6 +27,7 @@ public class ItemRecipe : ScriptableObject
     public CharaRpg.Stat statUsed = CharaRpg.Stat.sk_carpenter;
     public int neededStatLevel = 0;
     public int maxStatLevelBeforeNotGivingXp = 10;
+    public float trainingModifier = 1f;
     [Header("Recipe needed workshop")]
     public bool recipeNeedWorkshop = false;
     public WorkshopProp.WorkshopType neededWorkshop = WorkshopProp.WorkshopType.Undecided;
@@ -94,7 +99,11 @@ public class ItemRecipe : ScriptableObject
         }
         //Modification par la manipulation (NB: toujours <= 1)
         charaModifier = charaModifier * rpg.Manipulation;
+        Debug.Log("GetCraftTime: manipulation value is " + rpg.Manipulation);
         //Modification par le temps de base (NB: toujours >= 0)
+        Debug.Log("GetCraftTime: returned " +
+            baseRecipeTime * charaModifier +
+            " (" + baseRecipeTime + " * " + charaModifier + ")");
         return baseRecipeTime * charaModifier;
     }
 
@@ -116,6 +125,18 @@ public class ItemRecipe : ScriptableObject
         for (int j = 0; j < resultCount; j++)
         {
             charaInventory.Add(result);
+        }
+    }
+
+    //Training
+    public void UpdateTraining(CharaRpg charaRpg, float craftTime)
+    {
+        if(!useOnlyManipulation)
+        {
+            if(charaRpg.GetCurrentStat(statUsed) < maxStatLevelBeforeNotGivingXp)
+            {
+                charaRpg.TrainStat(statUsed, craftTime * trainingModifier);
+            }
         }
     }
 

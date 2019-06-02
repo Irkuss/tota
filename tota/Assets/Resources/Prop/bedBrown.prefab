@@ -43,8 +43,8 @@ GameObject:
   - component: {fileID: 8365902666072548716}
   - component: {fileID: 6339674357899731336}
   - component: {fileID: 3847051905462293595}
-  - component: {fileID: 3055993082787956035}
-  - component: {fileID: 9068964820679463413}
+  - component: {fileID: 801990117145310846}
+  - component: {fileID: 8678235633512376520}
   m_Layer: 0
   m_Name: brownbed
   m_TagString: Untagged
@@ -124,7 +124,7 @@ BoxCollider:
   serializedVersion: 2
   m_Size: {x: 2.2376246, y: 1.7070246, z: 4.1728854}
   m_Center: {x: -1.2710278, y: 0.8535123, z: -0.29507613}
---- !u!114 &3055993082787956035
+--- !u!114 &801990117145310846
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -133,16 +133,24 @@ MonoBehaviour:
   m_GameObject: {fileID: 6879952739724909876}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 70c9328f7956ec84cbd5ec683cda3a0d, type: 3}
+  m_Script: {fileID: 11500000, guid: 021caf11e95b9264aa8e1b114d4a06f0, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   isMoving: 0
-  _interTransform: {fileID: 0}
-  _radius: 5
-  _possibleActionNames: []
-  _isDistanceAction: 
-  _isDoWhileAction: 
---- !u!114 &9068964820679463413
+  _interTransform: {fileID: 316924674689517915}
+  _radius: 3
+  _possibleActionNames:
+  - Sleep
+  - Salvage
+  _isDistanceAction: 0000
+  _isDoWhileAction: 0000
+  _makesActionNotAppearWhenUnavailable: 0000
+  salvageTime: 6
+  salvagedItem1: {fileID: 11400000, guid: b9a4498b9cf7da748ad2ddd6a0b3bb55, type: 2}
+  salvagedItemCount1: 8
+  salvagedItem2: {fileID: 11400000, guid: 433a409a197ca2243b17007671504644, type: 2}
+  salvagedItemCount2: 2
+--- !u!114 &8678235633512376520
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -151,7 +159,12 @@ MonoBehaviour:
   m_GameObject: {fileID: 6879952739724909876}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 94f63d646c3f7c04e83b1006e9a5982a, type: 3}
+  m_Script: {fileID: 11500000, guid: 5fea29bb7c508c244a1f805a5fd3fc4d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  isMoving: 0
+  outlineMode: 1
+  outlineColor: {r: 0.9811321, g: 0.6966839, b: 0.14346743, a: 1}
+  outlineWidth: 4
+  precomputeOutline: 0
+  bakeKeys: []
+  bakeValues: []

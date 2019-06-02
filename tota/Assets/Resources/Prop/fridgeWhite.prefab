@@ -24,7 +24,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 3653571203082539303}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 1.4, y: 0, z: -2.02}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
   - {fileID: 7123063951452395469}
@@ -44,9 +44,9 @@ GameObject:
   - component: {fileID: 5170191146499934718}
   - component: {fileID: 5851128862786532125}
   - component: {fileID: 1058744440556080355}
-  - component: {fileID: 2438310946414892236}
   - component: {fileID: 5166848391651424630}
   - component: {fileID: 7805460767518152392}
+  - component: {fileID: 2621588837920624534}
   m_Layer: 0
   m_Name: Base_classical_fridge_white
   m_TagString: Untagged
@@ -62,7 +62,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 5858144049590853662}
   m_LocalRotation: {x: 0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: -0.23, y: 0, z: 0.19}
+  m_LocalPosition: {x: 1.6, y: 0, z: -2}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 7832896192892069890}
@@ -149,19 +149,6 @@ MonoBehaviour:
   lootTable: {fileID: 11400000, guid: a5550496268ef1b4c9796ecb06fd1f1b, type: 2}
   hasToRandAddLoot: 1
   baseTimeFirstLoot: 3
---- !u!114 &2438310946414892236
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 5858144049590853662}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 94f63d646c3f7c04e83b1006e9a5982a, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  isMoving: 0
 --- !u!114 &5166848391651424630
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -205,3 +192,19 @@ MonoBehaviour:
   precomputeOutline: 0
   bakeKeys: []
   bakeValues: []
+--- !u!114 &2621588837920624534
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5858144049590853662}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6d07ce676d7afda4dabb3b0f7dd5e654, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_OverrideArea: 0
+  m_Area: 0
+  m_IgnoreFromBuild: 1
+  m_AffectedAgents: ffffffff

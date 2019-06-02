@@ -50,11 +50,19 @@ public class PropManager : MonoBehaviour
 
         public void InstantSelf()
         {
-            Debug.Log("InstantSelf: instantiating " + _propPath);
+            //Debug.Log("InstantSelf: instantiating " + _propPath);
             if (_go != null) return;
             Quaternion rotation = Quaternion.Euler(0, _propRotation, 0);
-            _go = Instantiate(Resources.Load<GameObject>(_propPath), _propPosition, rotation);
-            _go.GetComponentInChildren<PropHandler>().SetId(_id);
+            try
+            {
+                _go = Instantiate(Resources.Load<GameObject>(_propPath), _propPosition, rotation);
+                _go.GetComponentInChildren<PropHandler>().SetId(_id);
+            }
+            catch
+            {
+                Debug.LogError("Failed To Instantiate resources with path " + _propPath);
+            }
+            
         }
 
         public void DestroySelf()
@@ -66,9 +74,9 @@ public class PropManager : MonoBehaviour
         }
 
         //Sending special command
-        public void ReceivePropCommand(int[] command, float[] commandFloat)
+        public void ReceivePropCommand(int[] command, float[] commandFloat, string[] commandString = null)
         {
-            if (_go != null) _go.GetComponentInChildren<PropHandler>().CommandReceive(command, commandFloat);
+            if (_go != null) _go.GetComponentInChildren<PropHandler>().CommandReceive(command, commandFloat, commandString);
         }
     }
 
@@ -135,7 +143,7 @@ public class PropManager : MonoBehaviour
 
     public void PlaceProp(Vector3 pos, float rot, string name)
     {
-        Debug.Log("PlaceProp: placing a new prop with path: " + name);
+        //Debug.Log("PlaceProp: placing a new prop with path: " + name);
         //Make all players place the new prop
         if (Mode.Instance.online)
         {
@@ -207,25 +215,25 @@ public class PropManager : MonoBehaviour
         }
     }
     //Send command
-    public void SendPropCommand(int id, int[] command, float[] commandFloat)
+    public void SendPropCommand(int id, int[] command, float[] commandFloat, string[] commandString)
     {
         if (Mode.Instance.online)
         {
-            GetComponent<PhotonView>().RPC("RPC_SendPropCommand", PhotonTargets.AllBuffered, id, command, commandFloat);
+            GetComponent<PhotonView>().RPC("RPC_SendPropCommand", PhotonTargets.AllBuffered, id, command, commandFloat, commandString);
         }
         else
         {
-            RPC_SendPropCommand(id, command, commandFloat);
+            RPC_SendPropCommand(id, command, commandFloat, commandString);
         }
         
     }
-    [PunRPC] private void RPC_SendPropCommand(int id, int[] command, float[] commandFloat)
+    [PunRPC] private void RPC_SendPropCommand(int id, int[] command, float[] commandFloat, string[] commandString)
     {
         RealProp prop = FindPropWithId(id);
 
         if (prop != null)
         {
-            prop.ReceivePropCommand(command, commandFloat);
+            prop.ReceivePropCommand(command, commandFloat, commandString);
         }
     }
 }

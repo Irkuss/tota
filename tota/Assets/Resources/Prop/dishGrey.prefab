@@ -12,8 +12,7 @@ GameObject:
   - component: {fileID: 7324691584362434801}
   - component: {fileID: 4692832962776144198}
   - component: {fileID: 140556257440260639}
-  - component: {fileID: 3517039071718382529}
-  - component: {fileID: 704305744464689550}
+  - component: {fileID: 1116503838883634595}
   m_Layer: 0
   m_Name: greyclassical
   m_TagString: Untagged
@@ -93,7 +92,7 @@ BoxCollider:
   serializedVersion: 2
   m_Size: {x: 2.0036123, y: 2.1272483, z: 2.0162416}
   m_Center: {x: -1.2084211, y: 1.0636241, z: 1.6857297}
---- !u!114 &3517039071718382529
+--- !u!114 &1116503838883634595
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -102,28 +101,22 @@ MonoBehaviour:
   m_GameObject: {fileID: 1667345895423252338}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 70c9328f7956ec84cbd5ec683cda3a0d, type: 3}
+  m_Script: {fileID: 11500000, guid: bf00aab44ca304b4991250e72be1615b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   isMoving: 0
-  _interTransform: {fileID: 0}
-  _radius: 5
-  _possibleActionNames: []
-  _isDistanceAction: 
-  _isDoWhileAction: 
---- !u!114 &704305744464689550
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1667345895423252338}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 94f63d646c3f7c04e83b1006e9a5982a, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  isMoving: 0
+  _interTransform: {fileID: 2220019323150069283}
+  _radius: 3
+  _possibleActionNames:
+  - Salvage
+  _isDistanceAction: 00
+  _isDoWhileAction: 00
+  _makesActionNotAppearWhenUnavailable: 00
+  salvageTime: 8
+  salvagedItem1: {fileID: 11400000, guid: 4e8b23ecd7c806b44a0c762728a04a3f, type: 2}
+  salvagedItemCount1: 2
+  salvagedItem2: {fileID: 0}
+  salvagedItemCount2: 1
 --- !u!1 &7650422526265412881
 GameObject:
   m_ObjectHideFlags: 0
