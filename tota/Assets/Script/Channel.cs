@@ -12,7 +12,7 @@ public class Channel : MonoBehaviour
     private PermissionsManager _permission;
     private PermissionsManager.Player _player;
     private PermissionsManager.Team _team;
-    private string _teamName = "" ;
+    private string _teamName = "";
 
     public static bool isWriting;
 
@@ -61,7 +61,7 @@ public class Channel : MonoBehaviour
             if (Mode.Instance.online) gameObject.GetComponent<PhotonView>().RPC("SendReceiveM", PhotonTargets.AllBuffered, output, true, _player.Name);
 
         }
-        else if (args[0] == "/" + _teamName)
+        else //if (args[0] == "/" + _teamName)
         {
             for (int i = 1; i < args.Length; i++)
             {

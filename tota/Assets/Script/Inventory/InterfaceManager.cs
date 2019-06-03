@@ -32,13 +32,13 @@ public class InterfaceManager : MonoBehaviour
     //public GameObject tooltip => _tooltip;
     public enum SlotIndex
     {
-        Item = 0,
-        RemoveButton = 1,
-        Stack = 2,
-        Lock = 3,
-        ItemDescription = 4,
-        PopDescription = 5,
-        MissingInfo = 6
+        Item = 1,
+        RemoveButton = 2,
+        Stack = 3,
+        Lock = 4,
+        ItemDescription = 5,
+        PopDescription = 6,
+        MissingInfo = 7
     }
 
     //Instantiation
@@ -55,6 +55,7 @@ public class InterfaceManager : MonoBehaviour
             {
                 craftSlot = Instantiate(_slot, allCraftGo[i].transform.GetChild(0));
 
+                craftSlot.GetComponent<SlotDescription>().description = recipe.result.description;
                 //Associe l'action de craft et l'image de l'item crafté
                 craftSlot.transform.GetChild((int)SlotIndex.Item).GetComponent<Image>().sprite = recipe.result.icon;
                 craftSlot.transform.GetChild((int)SlotIndex.Item).GetComponent<Button>().onClick.AddListener(() => ClickCraft(charaInventory, recipe));
@@ -79,16 +80,16 @@ public class InterfaceManager : MonoBehaviour
     {
         foreach (Transform child in _equipment.transform)
         {
-            child.GetChild(1).gameObject.SetActive(false);
             child.GetChild(2).gameObject.SetActive(false);
+            child.GetChild(3).gameObject.SetActive(false);
         }
 
-        _equipment.transform.GetChild(0).GetChild(0).GetComponent<Image>().sprite = _head;
-        _equipment.transform.GetChild(1).GetChild(0).GetComponent<Image>().sprite = _torso;
-        _equipment.transform.GetChild(2).GetChild(0).GetComponent<Image>().sprite = _torso;
-        _equipment.transform.GetChild(3).GetChild(0).GetComponent<Image>().sprite = _fistL;
-        _equipment.transform.GetChild(4).GetChild(0).GetComponent<Image>().sprite = _fistR;
-        _equipment.transform.GetChild(5).GetChild(0).GetComponent<Image>().sprite = _leg;
+        _equipment.transform.GetChild(0).GetChild(1).GetComponent<Image>().sprite = _head;
+        _equipment.transform.GetChild(1).GetChild(1).GetComponent<Image>().sprite = _torso;
+        _equipment.transform.GetChild(2).GetChild(1).GetComponent<Image>().sprite = _torso;
+        _equipment.transform.GetChild(3).GetChild(1).GetComponent<Image>().sprite = _fistL;
+        _equipment.transform.GetChild(4).GetChild(1).GetComponent<Image>().sprite = _fistR;
+        _equipment.transform.GetChild(5).GetChild(1).GetComponent<Image>().sprite = _leg;
     }
 
     //Updating
@@ -171,6 +172,7 @@ public class InterfaceManager : MonoBehaviour
 
     private static void LinkWearSlot(Transform transSlot, Item itemWorn, CharaInventory charaInventory)
     {
+        transSlot.GetComponent<SlotDescription>().description = itemWorn.description;
         transSlot.GetChild((int)SlotIndex.Item).GetComponent<Image>().sprite = itemWorn.icon;
         transSlot.GetChild((int)SlotIndex.Item).GetComponent<Button>().onClick.RemoveAllListeners();
         transSlot.GetChild((int)SlotIndex.Item).GetComponent<Button>().onClick.AddListener(() => itemWorn.Unequip(charaInventory));
@@ -179,6 +181,7 @@ public class InterfaceManager : MonoBehaviour
     }
     private static void UnlinkWearSlot(Transform transSlot, Sprite newSprite)
     {
+        transSlot.GetComponent<SlotDescription>().description = "";
         transSlot.GetChild((int)SlotIndex.Item).GetComponent<Image>().sprite = newSprite;
         transSlot.GetChild((int)SlotIndex.Item).GetComponent<Button>().onClick.RemoveAllListeners();
         transSlot.GetChild((int)SlotIndex.ItemDescription).GetChild(0).GetComponent<Text>().text = "";
@@ -208,6 +211,7 @@ public class InterfaceManager : MonoBehaviour
         _stats.transform.GetChild(2).GetComponent<Text>().text = "Movement : " + (int)(stats[2] * 100) + " %";
         _stats.transform.GetChild(3).GetComponent<Text>().text = "Manipulation : " + (int)(stats[3] * 100) + " %";
         _stats.transform.GetChild(4).GetComponent<Text>().text = "BloodStock : " + (stats[4] * 100) / stats[5] + " %";
+        _stats.transform.GetChild(5).GetComponent<Text>().text = "Rest : " + (int)(stats[6] /** 100*/) + " %";
     }
 
     //Listener (on button call)
