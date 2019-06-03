@@ -10,23 +10,23 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: a5e57be36f9867544a7ad4dbf3e46789, type: 3}
-  m_Name: chairWhiteWood
+  m_Name: doorMetal
   m_EditorClassIdentifier: 
-  visuPath: Visu/visuChair
-  visuSprite: {fileID: 21300000, guid: eb79b973aca2aab44ac1395094d454f3, type: 3}
+  visuPath: Visu/visuDoorMetal
+  visuSprite: {fileID: 21300000, guid: 9b9f4657f9092de42a4c78af159d5d92, type: 3}
   result: {fileID: 0}
   resultCount: 0
-  resultPath: Prop/chairWhiteWood
-  description: "Wood chair:\nMakes you feel at home.\n  -skill used: carpenter\n  -training
-    modifier: 1,5\n  -construction time: 10\nRecipe:\n  -Wooden planks x2"
+  resultPath: Prop/doorMetal
+  description: "Metal door:\nA solid metal door.\n  -skill used: manipulation only\n
+    \ -construction time: 12\nRecipe:\n  -Metal Parts x2"
   neededItem:
-  - {fileID: 11400000, guid: 433a409a197ca2243b17007671504644, type: 2}
-  neededItemCount: 01000000
-  useOnlyManipulation: 0
+  - {fileID: 11400000, guid: 4e8b23ecd7c806b44a0c762728a04a3f, type: 2}
+  neededItemCount: 02000000
+  useOnlyManipulation: 1
   statUsed: 7
   neededStatLevel: 0
   maxStatLevelBeforeNotGivingXp: 10
-  trainingModifier: 1.5
+  trainingModifier: 1
   recipeNeedWorkshop: 0
   neededWorkshop: 0
-  baseRecipeTime: 10
+  baseRecipeTime: 12

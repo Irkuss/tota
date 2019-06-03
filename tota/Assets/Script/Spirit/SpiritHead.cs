@@ -229,7 +229,7 @@ public class SpiritHead : Photon.MonoBehaviour
             if (recipe.visuSprite == null || recipe.visuPath == "") return;
 
             GameObject visuSlot = Instantiate(Resources.Load<GameObject>("BuildPref"), _build.transform.GetChild(1).GetChild(0).GetChild(0));
-            if (recipe.result != null) visuSlot.GetComponent<SlotDescription>().description = recipe.result.description;
+            if (recipe != null) visuSlot.GetComponent<SlotDescription>().description = recipe.description;
             visuSlot.GetComponent<Image>().sprite = recipe.visuSprite;
             visuSlot.GetComponent<Button>().onClick.AddListener(() => EnterBuildMode(recipe.visuPath));
         }
@@ -428,7 +428,7 @@ public class SpiritHead : Photon.MonoBehaviour
         hit = new RaycastHit();
         return false;
     }
-    public bool IsHitValid(RaycastHit hit)
+    public bool IsHitValid(RaycastHit hit, bool searchForFloorOpacityOnly = false)
     {
         int currentFloorLevel = GetComponent<SpiritZoom>().FloorManagerRef.FloorLevel;
 
@@ -436,6 +436,11 @@ public class SpiritHead : Photon.MonoBehaviour
         GeneralOpacity generalOpacity = hit.transform.GetComponent<GeneralOpacity>();
         if (generalOpacity != null)
         {
+            if(searchForFloorOpacityOnly && generalOpacity.GetComponent<FloorOpacity>() == null)
+            {
+                return false;
+            }
+
             if(generalOpacity.IsBelowFloor(currentFloorLevel))
             //if(generalOpacity.CurrentFloorLevel <= currentFloorLevel)
             {

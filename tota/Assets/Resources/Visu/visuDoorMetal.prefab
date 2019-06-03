@@ -1,6 +1,6 @@
 %YAML 1.1
 %TAG !u! tag:unity3d.com,2011:
---- !u!1 &890196960255309253
+--- !u!1 &295763386825478040
 GameObject:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -8,45 +8,45 @@ GameObject:
   m_PrefabAsset: {fileID: 0}
   serializedVersion: 6
   m_Component:
-  - component: {fileID: 3657749073339898730}
-  - component: {fileID: 3326987749640669480}
-  - component: {fileID: 4363394186316129592}
+  - component: {fileID: 5415173907207921130}
+  - component: {fileID: 200005324217507911}
+  - component: {fileID: 2345791596535598129}
   m_Layer: 0
-  m_Name: commodeMesh
+  m_Name: metal_door
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!4 &3657749073339898730
+--- !u!4 &5415173907207921130
 Transform:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 890196960255309253}
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -1.15, y: 0, z: -1.9}
+  m_GameObject: {fileID: 295763386825478040}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 0.5, y: 0, z: 3}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 237913324299059330}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!33 &3326987749640669480
+--- !u!33 &200005324217507911
 MeshFilter:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 890196960255309253}
-  m_Mesh: {fileID: 4300000, guid: e4a4827d0e1c73f47a4a8f60c8265dcb, type: 3}
---- !u!23 &4363394186316129592
+  m_GameObject: {fileID: 295763386825478040}
+  m_Mesh: {fileID: 4300000, guid: 45644802e067fe142803ce6ba7fd5e2e, type: 3}
+--- !u!23 &2345791596535598129
 MeshRenderer:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 890196960255309253}
+  m_GameObject: {fileID: 295763386825478040}
   m_Enabled: 1
   m_CastShadows: 1
   m_ReceiveShadows: 1
@@ -57,7 +57,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: b083dd07450d1fa4e8e17cbd43b73876, type: 2}
+  - {fileID: 2100000, guid: 44c7c62981638d242affb442c4924c02, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -90,7 +90,7 @@ GameObject:
   - component: {fileID: 6899776054249309064}
   - component: {fileID: 1947228414367317681}
   m_Layer: 0
-  m_Name: visuCommode
+  m_Name: visuDoorMetal
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -107,7 +107,7 @@ Transform:
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
-  - {fileID: 3657749073339898730}
+  - {fileID: 5415173907207921130}
   m_Father: {fileID: 0}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -122,8 +122,8 @@ BoxCollider:
   m_IsTrigger: 0
   m_Enabled: 1
   serializedVersion: 2
-  m_Size: {x: 3, y: 0.2, z: 1.3}
-  m_Center: {x: 0, y: 0.1, z: 0}
+  m_Size: {x: 3, y: 0.2, z: 1}
+  m_Center: {x: 1.4, y: 0.1, z: 0}
 --- !u!114 &6899776054249309064
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -137,9 +137,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _note: 'VisuHandler: has to be placed on a blueprint construction'
-  checkX: 3
+  checkX: 2.5
   checkY: 4
-  checkZ: 2
+  checkZ: 6
   validMat: {fileID: 2100000, guid: 8748854caee328e4da08571125e14451, type: 2}
   fillMat: {fileID: 2100000, guid: 79908966fd134db44a1bbc444ee75980, type: 2}
 --- !u!114 &1947228414367317681
@@ -165,4 +165,4 @@ MonoBehaviour:
   _isDistanceAction: 000000
   _isDoWhileAction: 000000
   _makesActionNotAppearWhenUnavailable: 000100
-  recipe: {fileID: 11400000, guid: 9e603e65b9ccab64e82d59ef2a64f139, type: 2}
+  recipe: {fileID: 11400000, guid: 47ed1197d52db934382ab18a8c0b6771, type: 2}

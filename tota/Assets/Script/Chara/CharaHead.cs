@@ -198,6 +198,8 @@ public class CharaHead : Photon.PunBehaviour
     //Focus on Interactable
     private IEnumerator _cor_interaction = null;
     private IEnumerator _cor_craftingItem = null;
+    public ItemRecipe recipeBeingCrafted = null;
+    public bool isCraftingItem => _cor_craftingItem != null;
     private IEnumerator _cor_useItem = null;
     private IEnumerator _cor_waitAction = null;
 
@@ -276,6 +278,8 @@ public class CharaHead : Photon.PunBehaviour
         {
             StopCoroutine(_cor_craftingItem);
             _cor_craftingItem = null;
+
+            recipeBeingCrafted = null;
         }
     }
     private void ForceEndWaitAction()
@@ -340,6 +344,8 @@ public class CharaHead : Photon.PunBehaviour
     }
     private IEnumerator Cor_CraftingItem(ItemRecipe recipe)
     {
+        recipeBeingCrafted = recipe;
+
         float recipeTime = recipe.GetCraftTime(GetComponent<CharaInventory>());
         Debug.Log("Cor_CraftingItem: starting craft of time " + recipeTime);
         _cor_waitAction = WaitAction(recipeTime);
@@ -348,6 +354,9 @@ public class CharaHead : Photon.PunBehaviour
 
         recipe.CraftWith(GetComponent<CharaInventory>());
         recipe.UpdateTraining(GetComponent<CharaRpg>(), recipeTime);
+
+        recipeBeingCrafted = null;
+        _cor_craftingItem = null;
     }
     private IEnumerator Cor_UseItem(Item item)
     {
