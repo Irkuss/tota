@@ -171,7 +171,7 @@ public class InterfaceManager : MonoBehaviour
 
     private static void LinkWearSlot(Transform transSlot, Item itemWorn, CharaInventory charaInventory)
     {
-        transSlot.GetChild(0).GetComponent<SlotDescription>().description = itemWorn.description;
+        transSlot.GetComponent<SlotDescription>().description = itemWorn.description;
         transSlot.GetChild((int)SlotIndex.Item).GetComponent<Image>().sprite = itemWorn.icon;
         transSlot.GetChild((int)SlotIndex.Item).GetComponent<Button>().onClick.RemoveAllListeners();
         transSlot.GetChild((int)SlotIndex.Item).GetComponent<Button>().onClick.AddListener(() => itemWorn.Unequip(charaInventory));
@@ -180,7 +180,7 @@ public class InterfaceManager : MonoBehaviour
     }
     private static void UnlinkWearSlot(Transform transSlot, Sprite newSprite)
     {
-        transSlot.GetChild(0).GetComponent<SlotDescription>().description = "";
+        transSlot.GetComponent<SlotDescription>().description = "";
         transSlot.GetChild((int)SlotIndex.Item).GetComponent<Image>().sprite = newSprite;
         transSlot.GetChild((int)SlotIndex.Item).GetComponent<Button>().onClick.RemoveAllListeners();
         transSlot.GetChild((int)SlotIndex.ItemDescription).GetChild(0).GetComponent<Text>().text = "";

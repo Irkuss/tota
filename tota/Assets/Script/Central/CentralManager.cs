@@ -268,7 +268,7 @@ public class CentralManager : Photon.MonoBehaviour
 
                 float[] healthStats = head.GetHealthStats();
                 writer.WriteLine(healthStats[0] + "/" + healthStats[1] + "/" + healthStats[2] +
-                    "/" + healthStats[3] + "/" + healthStats[4]);
+                    "/" + healthStats[3] + "/" + healthStats[4] + "/" + healthStats[6]);
 
                 string[] info = head.GetToolTipInfo();
                 string[] skills = head.GetSkillInfo();
@@ -395,6 +395,7 @@ public class CentralManager : Photon.MonoBehaviour
                     setInfo[g + length] = int.Parse(skills[g]);
                 }
                 rpg.ForceStats(setInfo);
+                rpg.UpdateToolTip();
 
                 string[] inv = reader.ReadLine().Split('/');
                 foreach(var iteM in inv)

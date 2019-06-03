@@ -566,6 +566,7 @@ public class CharaRpg : MonoBehaviour
         _movement = float.Parse(stats[2]);
         _manipulation = float.Parse(stats[3]);
         _bloodStock = int.Parse(stats[4]);
+        _rest = (int) (int.Parse(stats[5]) * RestPurcent);
     }
 
 
@@ -1339,7 +1340,7 @@ public class CharaRpg : MonoBehaviour
             _manipulation,
             _bloodStock,
             _maxBloodStock,
-            _rest
+            RestPurcent
         };
     }
 
