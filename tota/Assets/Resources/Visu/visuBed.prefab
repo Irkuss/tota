@@ -12,7 +12,6 @@ GameObject:
   - component: {fileID: 4898411225502251316}
   - component: {fileID: 6899776054249309064}
   - component: {fileID: 1947228414367317681}
-  - component: {fileID: 1659839715134951614}
   m_Layer: 0
   m_Name: visuBed
   m_TagString: Untagged
@@ -79,6 +78,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   isMoving: 0
+  particleGameObject: {fileID: 0}
   _interTransform: {fileID: 237913324299059330}
   _radius: 5
   _possibleActionNames:
@@ -89,19 +89,6 @@ MonoBehaviour:
   _isDoWhileAction: 000000
   _makesActionNotAppearWhenUnavailable: 000100
   recipe: {fileID: 11400000, guid: fdfca0e09ae01ec499d22c6d511c9bd4, type: 2}
---- !u!114 &1659839715134951614
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1307487181388183174}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 94f63d646c3f7c04e83b1006e9a5982a, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  isMoving: 0
 --- !u!1 &1975177808065894659
 GameObject:
   m_ObjectHideFlags: 0

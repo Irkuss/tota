@@ -10,23 +10,23 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: a5e57be36f9867544a7ad4dbf3e46789, type: 3}
-  m_Name: chairWhiteWood
+  m_Name: wallWood
   m_EditorClassIdentifier: 
-  visuPath: Visu/visuChair
-  visuSprite: {fileID: 21300000, guid: eb79b973aca2aab44ac1395094d454f3, type: 3}
+  visuPath: Visu/visuWallWood
+  visuSprite: {fileID: 21300000, guid: e43cc878bc9c28b4abeeb515d78e6c6d, type: 3}
   result: {fileID: 0}
   resultCount: 0
-  resultPath: Prop/chairWhiteWood
-  description: "Wood chair:\nMakes you feel at home.\n  -skill used: carpenter\n  -training
-    modifier: 1,5\n  -construction time: 10\nRecipe:\n  -Wooden planks x2"
+  resultPath: Prop/walls/wallWoodFilled
+  description: "Wood wall:\nA cheap wood wall.\n  -skill used: carpenter\n  -training
+    modifier: 1\n  -construction time: 6\nRecipe:\n  -Wooden planks x2"
   neededItem:
   - {fileID: 11400000, guid: 433a409a197ca2243b17007671504644, type: 2}
-  neededItemCount: 01000000
+  neededItemCount: 02000000
   useOnlyManipulation: 0
   statUsed: 7
   neededStatLevel: 0
   maxStatLevelBeforeNotGivingXp: 10
-  trainingModifier: 1.5
+  trainingModifier: 1
   recipeNeedWorkshop: 0
   neededWorkshop: 0
-  baseRecipeTime: 10
+  baseRecipeTime: 6
