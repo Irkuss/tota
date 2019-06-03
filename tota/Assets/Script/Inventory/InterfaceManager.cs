@@ -55,7 +55,7 @@ public class InterfaceManager : MonoBehaviour
             {
                 craftSlot = Instantiate(_slot, allCraftGo[i].transform.GetChild(0));
 
-                craftSlot.GetComponent<SlotDescription>().description = recipe.result.description;
+                craftSlot.GetComponent<SlotDescription>().description = recipe.description;
                 //Associe l'action de craft et l'image de l'item crafté
                 craftSlot.transform.GetChild((int)SlotIndex.Item).GetComponent<Image>().sprite = recipe.result.icon;
                 craftSlot.transform.GetChild((int)SlotIndex.Item).GetComponent<Button>().onClick.AddListener(() => ClickCraft(charaInventory, recipe));
