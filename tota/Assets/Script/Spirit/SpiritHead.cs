@@ -55,7 +55,7 @@ public class SpiritHead : Photon.MonoBehaviour
         _charaLayout = eManager.CharaLayout;
         _inventoryLayout = eManager.InventoryLayout;
         _inventoryList = eManager.InventoryList;
-        _channel = eManager.Channel;
+        _channel = eManager.Channels;
         _build = eManager.Build;
         _actions = eManager.Actions;
         _button = eManager.Button;
@@ -120,7 +120,7 @@ public class SpiritHead : Photon.MonoBehaviour
     private void TestAll()
     {
         //Space Bar check
-        TestCharaSpawn(false, null);
+        TestCharaSpawn(false);
 
         //Keycode.I check
         TestInventoryAdd();
@@ -128,21 +128,21 @@ public class SpiritHead : Photon.MonoBehaviour
         TestBuildInput();
     }
 
-    public void TryCharaSpawn(bool force, GameObject charaL)
+    public void TryCharaSpawn(bool force)
     {
-        TestCharaSpawn(force, charaL);
+        TestCharaSpawn(force);
     }
 
-    private void TestCharaSpawn(bool force, GameObject charaL)
+    private void TestCharaSpawn(bool force)
     {
         if (Input.GetKeyUp("space") || force)
         {
             //Projection des positions sur le sol
             Vector3 lowPosition = new Vector3(gameObject.transform.position.x, 1, gameObject.transform.position.z);
-            
-            if(Input.GetKey(KeyCode.R))
+
+            if (Input.GetKey(KeyCode.R))
             {
-                if(PhotonNetwork.offlineMode)
+                if (PhotonNetwork.offlineMode)
                 {
                     Instantiate(Resources.Load("Prop/ratProp"), lowPosition, Quaternion.identity);
                 }
@@ -159,12 +159,12 @@ public class SpiritHead : Photon.MonoBehaviour
             if (setToAI) Debug.Log("TestCharaSpawn: spawning AI chara");
 
 
-            GameObject.Find("eCentralManager").GetComponent<CharaManager>().SpawnChara(lowPosition, teamOfNewChara,_playerOwner.Name);
+            GameObject.Find("eCentralManager").GetComponent<CharaManager>().SpawnChara(lowPosition, teamOfNewChara, _playerOwner.Name);
 
-            if(mode.firstTime == 2)
+            if (mode.firstTime == 2)
             {
                 StartCoroutine(SpawnTuto());
-                
+
             }
         }
     }
@@ -176,6 +176,18 @@ public class SpiritHead : Photon.MonoBehaviour
         _tutos.SetActive(true);
         _tuto.transform.GetChild(0).GetComponent<Text>().text = "Nice, you have created a new character. You can select him by clicking left on him.";
         mode.firstTime = 3;
+    }
+
+    public void SpawnRat()
+    {
+        Vector3 lowPosition = new Vector3(gameObject.transform.position.x, 1, gameObject.transform.position.z);
+        Instantiate(Resources.Load("Prop/ratProp"), lowPosition, Quaternion.identity);
+    }
+
+    public void SpawnAI()
+    {
+        Vector3 lowPosition = new Vector3(gameObject.transform.position.x, 1, gameObject.transform.position.z);
+        GameObject.Find("eCentralManager").GetComponent<CharaManager>().SpawnChara(lowPosition, "", _playerOwner.Name);
     }
 
     public void InstantiateCharaRef(string playerWhoSent,GameObject chara)
@@ -803,8 +815,8 @@ public class SpiritHead : Photon.MonoBehaviour
 
     private void DisplayChannel()
     {
-        //if (Mode.Instance.online && Input.GetKeyDown(KeyCode.C))
-        if (mode.online && Input.inputString == mode.channel)
+        //if (Input.GetKeyDown(KeyCode.C))
+        if (Input.inputString == mode.channel)
         {
             _channel.SetActive(!_channel.activeSelf);
         }
