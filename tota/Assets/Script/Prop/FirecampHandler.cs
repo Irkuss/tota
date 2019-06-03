@@ -213,4 +213,11 @@ public class FirecampHandler : PropHandler
             case FireCommand.Unlit: ReceivePutOutFire(); break;
         }
     }
+
+    //====================Override Organic Opacity====================
+
+    protected override bool ShouldParticleGameObjectBeActive()
+    {
+        return _isLit;
+    }
 }

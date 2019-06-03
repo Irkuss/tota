@@ -425,7 +425,7 @@ public class SpiritHead : Photon.MonoBehaviour
         hit = new RaycastHit();
         return false;
     }
-    private bool IsHitValid(RaycastHit hit)
+    public bool IsHitValid(RaycastHit hit)
     {
         int currentFloorLevel = GetComponent<SpiritZoom>().FloorManagerRef.FloorLevel;
 

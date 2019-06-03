@@ -12,7 +12,7 @@ GameObject:
   - component: {fileID: 4177428135879539258}
   - component: {fileID: 6918908494166176192}
   - component: {fileID: 7213166518454711720}
-  - component: {fileID: 93691480610853183}
+  - component: {fileID: 3875724226207161652}
   m_Layer: 0
   m_Name: bidon_bleu
   m_TagString: Untagged
@@ -92,7 +92,7 @@ BoxCollider:
   serializedVersion: 2
   m_Size: {x: 1.55, y: 2.3, z: 1.55}
   m_Center: {x: 0.475, y: 1.15, z: 1.725}
---- !u!114 &93691480610853183
+--- !u!114 &3875724226207161652
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -101,16 +101,22 @@ MonoBehaviour:
   m_GameObject: {fileID: 2503566792534166206}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 70c9328f7956ec84cbd5ec683cda3a0d, type: 3}
+  m_Script: {fileID: 11500000, guid: bf00aab44ca304b4991250e72be1615b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   isMoving: 0
+  particleGameObject: {fileID: 0}
   _interTransform: {fileID: 3003642651732057792}
   _radius: 5
   _possibleActionNames: []
   _isDistanceAction: 
   _isDoWhileAction: 
   _makesActionNotAppearWhenUnavailable: 
+  salvageTime: 2
+  salvagedItem1: {fileID: 0}
+  salvagedItemCount1: 1
+  salvagedItem2: {fileID: 0}
+  salvagedItemCount2: 1
 --- !u!1 &6904992068380478574
 GameObject:
   m_ObjectHideFlags: 0

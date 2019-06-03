@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class PotHandler : PropHandler
+public class PotHandler : SalvageHandler
 {
     //Defining attribute
     [Header("Pot Attribute")]
@@ -43,7 +43,7 @@ public class PotHandler : PropHandler
             case 0: SendPlantSeed(chara); break;//Plant seeds
             case 1: Harvest(chara); break;//Harvest
             case 2: SendReset(); break;//Destroy Plants
-            case 3: return;//Salvage
+            case 3: Salvage(chara); break;//Salvage
         }
     }
 
@@ -54,7 +54,7 @@ public class PotHandler : PropHandler
             case 0: return _currentState == -1 && chara.GetComponent<CharaInventory>().Contains(neededSeeds);//plant seeds
             case 1: return _isReadyToHarvest;//Harvest
             case 2: return _currentState != -1;//Destroy Plants
-            case 3: return false;//Salvage
+            case 3: return true;//Salvage
         }
         return false;
     }
@@ -66,7 +66,7 @@ public class PotHandler : PropHandler
             case 0: return 10 * chara.GetComponent<CharaRpg>().GetTimeModifier(CharaRpg.Stat.sk_farmer);//plant seeds
             case 1: return 10 * chara.GetComponent<CharaRpg>().GetTimeModifier(CharaRpg.Stat.sk_farmer);//Harvest
             case 2: return 5;//Destroy Plants
-            case 3: return 10;//Salvage
+            case 3: return GetSalvageTime(chara);//Salvage
         }
         return 1f;
     }

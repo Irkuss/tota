@@ -109,13 +109,20 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   isMoving: 0
-  _interTransform: {fileID: 7016286278552428369}
-  _radius: 3
+  particleGameObject: {fileID: 0}
+  _interTransform: {fileID: 1790374117171871073}
+  _radius: 1
   _possibleActionNames:
   - Open
-  _isDistanceAction: 00
-  _isDoWhileAction: 00
-  _makesActionNotAppearWhenUnavailable: 
+  - Salvage
+  _isDistanceAction: 0000
+  _isDoWhileAction: 0000
+  _makesActionNotAppearWhenUnavailable: 0000
+  salvageTime: 5
+  salvagedItem1: {fileID: 11400000, guid: 433a409a197ca2243b17007671504644, type: 2}
+  salvagedItemCount1: 2
+  salvagedItem2: {fileID: 0}
+  salvagedItemCount2: 1
   lootTable: {fileID: 11400000, guid: f21d91e5da6913646ae33da840a0ec33, type: 2}
   hasToRandAddLoot: 0
   baseTimeFirstLoot: 0.5
@@ -222,6 +229,37 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
   - {fileID: 7016286278552428369}
+  - {fileID: 1790374117171871073}
   m_Father: {fileID: 0}
   m_RootOrder: 0
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &6566700462789407021
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1790374117171871073}
+  m_Layer: 0
+  m_Name: inter
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1790374117171871073
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6566700462789407021}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 0, y: 0.1, z: -1.5}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_Children: []
+  m_Father: {fileID: 1553372367731002596}
+  m_RootOrder: 1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
