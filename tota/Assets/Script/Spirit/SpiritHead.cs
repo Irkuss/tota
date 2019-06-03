@@ -23,6 +23,7 @@ public class SpiritHead : Photon.MonoBehaviour
     private GameObject _build;
     private GameObject _actions;
     private GameObject _button;
+    private GameObject _tutos;
     private GameObject _tuto;
     private RecipeTable _visuData;
     private GameObject _charaRef;
@@ -59,6 +60,7 @@ public class SpiritHead : Photon.MonoBehaviour
         _actions = eManager.Actions;
         _button = eManager.Button;
         _tuto = eManager.Tuto;
+        _tutos = _tuto.transform.parent.gameObject;
         _visuData = eManager.VisuData;
         _charaRef = Resources.Load<GameObject>("CharaRef");
         
@@ -71,7 +73,7 @@ public class SpiritHead : Photon.MonoBehaviour
         _tuto.transform.GetChild(2).GetComponent<Button>().onClick.AddListener(delegate
         {
             mode.isSkip = true;
-            _tuto.SetActive(false);
+            _tutos.SetActive(false);
         });
 
         if (!mode.online && !mode.isSkip)
@@ -86,7 +88,7 @@ public class SpiritHead : Photon.MonoBehaviour
     {
         yield return new WaitForSeconds(1f);
 
-        _tuto.SetActive(true);
+        _tutos.SetActive(true);
         _tuto.transform.GetChild(0).GetComponent<Text>().text = "Now you can move yourself using the wqsd keys or the directional arrows";
     }
     //Unity Callback
@@ -171,7 +173,7 @@ public class SpiritHead : Photon.MonoBehaviour
     {
         yield return new WaitForSeconds(1f);
 
-        _tuto.SetActive(true);
+        _tutos.SetActive(true);
         _tuto.transform.GetChild(0).GetComponent<Text>().text = "Nice, you have created a new character. You can select him by clicking left on him.";
         mode.firstTime = 3;
     }
@@ -226,7 +228,7 @@ public class SpiritHead : Photon.MonoBehaviour
         {
             if (recipe.visuSprite == null || recipe.visuPath == "") return;
 
-            GameObject visuSlot = Instantiate(Resources.Load<GameObject>("BuildPref"), _build.transform.GetChild(0).GetChild(0));
+            GameObject visuSlot = Instantiate(Resources.Load<GameObject>("BuildPref"), _build.transform.GetChild(1).GetChild(0).GetChild(0));
             visuSlot.GetComponent<Image>().sprite = recipe.visuSprite;
             visuSlot.GetComponent<Button>().onClick.AddListener(() => EnterBuildMode(recipe.visuPath));
         }
@@ -493,7 +495,7 @@ public class SpiritHead : Photon.MonoBehaviour
     {
         yield return new WaitForSeconds(1f);
 
-        _tuto.SetActive(true);
+        _tutos.SetActive(true);
         _tuto.transform.GetChild(0).GetComponent<Text>().text = "You can also move your character. Once you have selected him you can right click on a position and your character will walk until this point";
         mode.firstTime = 4;
     }
@@ -549,7 +551,7 @@ public class SpiritHead : Photon.MonoBehaviour
     {
         yield return new WaitForSeconds(1f);
 
-        _tuto.SetActive(true);
+        _tutos.SetActive(true);
         _tuto.transform.GetChild(0).GetComponent<Text>().text = "WOW some informations about your character appear on the screen. You can see more details by pressing the E key.\n"
             + "Other keys : \n"
             + "Press B to open the build mode.\n"

@@ -383,18 +383,18 @@ public class CentralManager : Photon.MonoBehaviour
                 rpg.SetHealthStats(healthStats);
 
                 string[] info = reader.ReadLine().Split('/');
-                int[] setInfo = new int[info.Length];
-                for(int g = 0; g < info.Length; g++)
+                string[] skills = reader.ReadLine().Split('/');
+                int length = info.Length;
+                int[] setInfo = new int[length + skills.Length];
+                for(int g = 0; g < length; g++)
                 {
                     setInfo[g] = int.Parse(info[g]);
                 }
-
-                string[] skills = reader.ReadLine().Split('/');
-                int[] setSkill = new int[skills.Length];
                 for (int g = 0; g < skills.Length; g++)
                 {
-                    setSkill[g] = int.Parse(skills[g]);
+                    setInfo[g + length] = int.Parse(skills[g]);
                 }
+                rpg.ForceStats(setInfo);
 
                 string[] inv = reader.ReadLine().Split('/');
                 foreach(var iteM in inv)
@@ -484,7 +484,7 @@ public class CentralManager : Photon.MonoBehaviour
         }
         else
         {
-            _tuto.SetActive(true);
+            _tuto.transform.parent.gameObject.SetActive(true);
             _tuto.transform.GetChild(0).GetComponent<Text>().text = "Welcome in the solo mode of Tales of the Apocalypse. This is a short tutorial for you to understand the main commands of the game";
             _tuto.transform.GetChild(1).GetComponent<Button>().onClick.AddListener(SpawnButton);
             _tuto.transform.GetChild(2).GetComponent<Button>().onClick.AddListener(delegate
@@ -498,7 +498,7 @@ public class CentralManager : Photon.MonoBehaviour
     private void SpawnButton()
     {
         tempButton.SetActive(true);
-        _tuto.SetActive(false);
+        _tuto.transform.parent.gameObject.SetActive(false);
     }
 
     //Spawn le joueur (appelé par le bouton spawn)
