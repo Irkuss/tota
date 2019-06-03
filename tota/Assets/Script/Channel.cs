@@ -49,8 +49,7 @@ public class Channel : MonoBehaviour
         string[] args = mes.Split(' ');
         string output = "";
 
-        if (args.Length <= 1) return;
-        if (_team == null && args[0] != "#general") return;
+        if (args.Length < 1) return;        
 
         if (args[0] == "/all")
         {
@@ -59,15 +58,13 @@ public class Channel : MonoBehaviour
                 output += " " + args[i];
             }
             if (Mode.Instance.online) gameObject.GetComponent<PhotonView>().RPC("SendReceiveM", PhotonTargets.AllBuffered, output, true, _player.Name);
+            else SendReceiveM(output, true, _player.Name);
 
         }
-        else //if (args[0] == "/" + _teamName)
-        {
-            for (int i = 1; i < args.Length; i++)
-            {
-                output += " " + args[i];
-            }
-            if (Mode.Instance.online) gameObject.GetComponent<PhotonView>().RPC("SendReceiveM", PhotonTargets.AllBuffered, output, false, _player.Name);
+        else
+        {            
+            if (Mode.Instance.online) gameObject.GetComponent<PhotonView>().RPC("SendReceiveM", PhotonTargets.AllBuffered, mes, false, _player.Name);
+            else SendReceiveM(mes, true, _player.Name);
         }
 
     }
@@ -76,13 +73,32 @@ public class Channel : MonoBehaviour
     private void SendReceiveM(string message, bool general, string player)
     {
         if (general)
-        {
+        {           
             if (_messages.transform.childCount == 7)
             {
                 Destroy(_messages.transform.GetChild(0).gameObject);
+            }            
+            GameObject mes = Instantiate(_textPref, _messages.transform);            
+            
+            if (message == "spawnchara")
+            {
+                _permission.spirit.TryCharaSpawn(true);
+                mes.GetComponent<Text>().text = "A chara was spawned";
             }
-            GameObject mes = Instantiate(_textPref, _messages.transform);
-            mes.GetComponent<Text>().text = player + " : " + message;
+            else if(message == "spawnrat")
+            {
+                _permission.spirit.SpawnRat();
+                mes.GetComponent<Text>().text = "A rat was spawned";
+            }
+            else if (message == "spawnai")
+            {
+                _permission.spirit.SpawnAI();
+                mes.GetComponent<Text>().text = "An AI chara was spawned";
+            }
+            else
+            {
+                mes.GetComponent<Text>().text = player + " : " + message;
+            }
         }
         else
         {
