@@ -132,6 +132,6 @@ public class OrganicOpacity : GeneralOpacity
     //Particle
     protected virtual bool ShouldParticleGameObjectBeActive()
     {
-        return true;
+        return false;
     }
 }

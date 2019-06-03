@@ -57,8 +57,7 @@ public class SpiritPPP : MonoBehaviour
     //Auto DoF
     private bool interpolate = false;
     private Vector3 lastFocusPoint = Vector3.zero;
-
-
+    
     private void FixedUpdate()
     {
         Focus();
@@ -110,7 +109,7 @@ public class SpiritPPP : MonoBehaviour
         {
             if (Physics.Raycast(origin, Vector3.down, out RaycastHit possibleHit))
             {
-                if (_head.IsHitValid(possibleHit))
+                if (_head.IsHitValid(possibleHit, true))
                 {
                     hit = possibleHit;
                     return true;

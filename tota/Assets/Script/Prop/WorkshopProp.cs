@@ -38,7 +38,8 @@ public class WorkshopProp : SalvageHandler
     //Command enum
     public enum WorkShopCommand
     {
-        Usage
+        Usage,
+        SwitchSpark,
     }
 
     //Start
@@ -109,9 +110,15 @@ public class WorkshopProp : SalvageHandler
             }
             else
             {
+                if(particleGameObject != null)
+                {
+                    SendSwitchSpark(IsSparking());
+                }
+
                 yield return new WaitForSeconds(0.1f);
             }
         }
+        SendSwitchSpark(false);
 
         _outline.enabled = false;
     }
@@ -130,6 +137,42 @@ public class WorkshopProp : SalvageHandler
         switch((WorkShopCommand)command[0])
         {
             case WorkShopCommand.Usage: ToggleUsage(command[1] == 1); break;
+            case WorkShopCommand.SwitchSpark: ReceiveSwitchSpark(command[1] == 1); break;
         }
+    }
+
+    //====================Override Organic Opacity====================
+
+    private bool IsSparking()
+    {
+        if(_charaUsing != null)
+        {
+            if (_charaUsing.LastInteractedFocus == this)
+            {
+                if(_charaUsing.isCraftingItem)
+                {
+                    if(_charaUsing.recipeBeingCrafted.neededWorkshop == workType)
+                    {
+                        return true;
+                    }
+                }
+            }
+        }
+        return false;
+    }
+
+    private void SendSwitchSpark(bool setToActive)
+    {
+        CommandSend(new int[2] { (int)WorkShopCommand.SwitchSpark, setToActive ? 1 : 0 });
+    }
+    private void ReceiveSwitchSpark(bool setToActive)
+    {
+        particleGameObject.SetActive(setToActive);
+    }
+    
+
+    protected override bool ShouldParticleGameObjectBeActive()
+    {
+        return IsSparking();
     }
 }

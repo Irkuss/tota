@@ -428,7 +428,7 @@ public class SpiritHead : Photon.MonoBehaviour
         hit = new RaycastHit();
         return false;
     }
-    public bool IsHitValid(RaycastHit hit)
+    public bool IsHitValid(RaycastHit hit, bool searchForFloorOpacityOnly = false)
     {
         int currentFloorLevel = GetComponent<SpiritZoom>().FloorManagerRef.FloorLevel;
 
@@ -436,6 +436,11 @@ public class SpiritHead : Photon.MonoBehaviour
         GeneralOpacity generalOpacity = hit.transform.GetComponent<GeneralOpacity>();
         if (generalOpacity != null)
         {
+            if(searchForFloorOpacityOnly && generalOpacity.GetComponent<FloorOpacity>() == null)
+            {
+                return false;
+            }
+
             if(generalOpacity.IsBelowFloor(currentFloorLevel))
             //if(generalOpacity.CurrentFloorLevel <= currentFloorLevel)
             {
