@@ -229,6 +229,7 @@ public class SpiritHead : Photon.MonoBehaviour
             if (recipe.visuSprite == null || recipe.visuPath == "") return;
 
             GameObject visuSlot = Instantiate(Resources.Load<GameObject>("BuildPref"), _build.transform.GetChild(1).GetChild(0).GetChild(0));
+            if (recipe.result != null) visuSlot.GetComponent<SlotDescription>().description = recipe.result.description;
             visuSlot.GetComponent<Image>().sprite = recipe.visuSprite;
             visuSlot.GetComponent<Button>().onClick.AddListener(() => EnterBuildMode(recipe.visuPath));
         }
