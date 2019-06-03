@@ -66,6 +66,8 @@ public class DayNightCycle : MonoBehaviour
         transform.rotation = Quaternion.Euler(0, 60, 0);
         _sliderProgressStatus = 0.5f;
         AudioManager.instance.StartCoroutine("StartMusic", "Solitude");
+
+        hourBeforeChangingMeteo = Random.Range(2, 10);
     }
 
     //Update
@@ -149,7 +151,7 @@ public class DayNightCycle : MonoBehaviour
     }
 
     //Meteo Update
-    private int hourBeforeChangingMeteo = Random.Range(2, 10);
+    private int hourBeforeChangingMeteo;
 
     private void MeteoUpdate()
     {
