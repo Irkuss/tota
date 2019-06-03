@@ -26,8 +26,8 @@ public class SlotDescription : MonoBehaviour, IPointerEnterHandler, IPointerExit
         GameObject slot = GameObject.Find("eCentralManager").GetComponent<CentralManager>().Description;
         slot.SetActive(true);
         slot.transform.GetChild(0).GetComponent<Text>().text = description;
-        //Vector3 pos = new Vector3(Input.mousePosition.x - 3, Input.mousePosition.y + 3, position.z);
-        Vector3 pos = new Vector3(position.x - 3, position.y + 3, position.z);
+        Vector3 pos = new Vector3(Input.mousePosition.x - 3, Input.mousePosition.y + 3, position.z);
+        //Vector3 pos = new Vector3(position.x - 3, position.y + 3, position.z);
         slot.transform.position = pos;
     }
 }

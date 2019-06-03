@@ -14,6 +14,7 @@ public class PropFurniture : SalvageHandler
     //Reference
     private CharaInventory _furnitureInventory;
     private GameObject _inventoryLayout;
+    private GameObject _interfaces;
     private Outline _outline;
 
     //Private attribute
@@ -39,6 +40,7 @@ public class PropFurniture : SalvageHandler
         //Set the references
         _furnitureInventory = GetComponent<CharaInventory>();
         _inventoryLayout = GameObject.Find("eCentralManager").GetComponent<CentralManager>().InventoryLayout;
+        _interfaces = GameObject.Find("eCentralManager").GetComponent<CentralManager>().InventoryList;
         _outline = GetComponent<Outline>();
 
         _outline.enabled = false;
@@ -119,7 +121,7 @@ public class PropFurniture : SalvageHandler
         StartCoroutine(Cor_UpdateClose());
         
         //ouvre l'inventaire
-        _inventoryLayout.transform.parent.parent.gameObject.SetActive(true);
+       _interfaces.SetActive(true);
 
         CharaInventory inv = chara.GetComponent<CharaInventory>();
 
