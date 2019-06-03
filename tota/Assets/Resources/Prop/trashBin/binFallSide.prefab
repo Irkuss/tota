@@ -12,7 +12,8 @@ GameObject:
   - component: {fileID: 5497649544409538998}
   - component: {fileID: 6017335306151547432}
   - component: {fileID: 4964669252016790459}
-  - component: {fileID: 822932361013917354}
+  - component: {fileID: 4659676778142279629}
+  - component: {fileID: 6947196793841240761}
   - component: {fileID: 4042541703710700793}
   m_Layer: 0
   m_Name: fallenbinonthegroundwall
@@ -93,7 +94,7 @@ BoxCollider:
   serializedVersion: 2
   m_Size: {x: 1.2, y: 1.3000001, z: 2.4}
   m_Center: {x: 1.4, y: 0.65000004, z: -0.8}
---- !u!114 &822932361013917354
+--- !u!114 &4659676778142279629
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -102,16 +103,39 @@ MonoBehaviour:
   m_GameObject: {fileID: 3755109487889356909}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 70c9328f7956ec84cbd5ec683cda3a0d, type: 3}
+  m_Script: {fileID: 11500000, guid: bf00aab44ca304b4991250e72be1615b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   isMoving: 0
-  _interTransform: {fileID: 0}
-  _radius: 5
-  _possibleActionNames: []
-  _isDistanceAction: 
-  _isDoWhileAction: 
-  _makesActionNotAppearWhenUnavailable: 
+  particleGameObject: {fileID: 0}
+  _interTransform: {fileID: 7369842891765875045}
+  _radius: 3
+  _possibleActionNames:
+  - Salvage
+  _isDistanceAction: 00
+  _isDoWhileAction: 00
+  _makesActionNotAppearWhenUnavailable: 00
+  salvageTime: 8
+  salvagedItem1: {fileID: 11400000, guid: 4e8b23ecd7c806b44a0c762728a04a3f, type: 2}
+  salvagedItemCount1: 2
+  salvagedItem2: {fileID: 0}
+  salvagedItemCount2: 1
+--- !u!114 &6947196793841240761
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3755109487889356909}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6d07ce676d7afda4dabb3b0f7dd5e654, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_OverrideArea: 0
+  m_Area: 0
+  m_IgnoreFromBuild: 1
+  m_AffectedAgents: ffffffff
 --- !u!208 &4042541703710700793
 NavMeshObstacle:
   m_ObjectHideFlags: 0
@@ -124,7 +148,7 @@ NavMeshObstacle:
   m_Shape: 1
   m_Extents: {x: 0.6, y: 0.65000004, z: 1.2}
   m_MoveThreshold: 0.1
-  m_Carve: 0
+  m_Carve: 1
   m_CarveOnlyStationary: 1
   m_Center: {x: 1.4000001, y: 0.65000004, z: -0.8}
   m_TimeToStationary: 0.5

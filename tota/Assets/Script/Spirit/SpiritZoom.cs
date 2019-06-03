@@ -30,6 +30,10 @@ public class SpiritZoom : Photon.MonoBehaviour
     private FloorManager _floorManager;
     public FloorManager FloorManagerRef => _floorManager;
 
+    //Desired Positon
+    private Vector3 _desiredPosition;
+    public Vector3 DesiredPosition => _desiredPosition;
+
     // Unity Callbacks
 
     private void Awake()
@@ -78,9 +82,9 @@ public class SpiritZoom : Photon.MonoBehaviour
         _cameraComp.fieldOfView = Mathf.Lerp(_cameraComp.fieldOfView, _zoomValue, Time.deltaTime * _zoomSpeed);
 
         //Set desired position
-        Vector3 desiredPosition = new Vector3(_transformer.position.x, _floorManager.FloorLevel * FloorManager.c_chunkHeight + _heightOffset , _transformer.position.z);
+        _desiredPosition = new Vector3(_transformer.position.x, _floorManager.FloorLevel * FloorManager.c_chunkHeight + _heightOffset , _transformer.position.z);
         //Gradually go to desired position
-        _transformer.position = Vector3.Lerp(transform.position, desiredPosition, Time.deltaTime * 5.0f);
+        _transformer.position = Vector3.Lerp(transform.position, _desiredPosition, Time.deltaTime * 5.0f);
     }
 
     //Scroll Update

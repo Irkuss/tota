@@ -548,14 +548,14 @@ public class CharaRpg : MonoBehaviour
         int[] baseStat = new int[c_statNumber];
         for (int i = 0; i < 5; i++) baseStat[i] = statsForced[i];
 
-        _hunger = statsForced[5];
+        _hunger = statsForced[5];        
 
-        baseStat[(int)Stat.sk_carpenter] = statsForced[6];
-        baseStat[(int)Stat.sk_doctor] = statsForced[7];
-        baseStat[(int)Stat.sk_electrician] = statsForced[8];
-        baseStat[(int)Stat.sk_farmer] = statsForced[9];
-        baseStat[(int)Stat.sk_marksman] = statsForced[10];
-        baseStat[(int)Stat.sk_scavenger] = statsForced[11];
+        baseStat[(int)Stat.sk_carpenter] = statsForced[7];
+        baseStat[(int)Stat.sk_doctor] = statsForced[8];
+        baseStat[(int)Stat.sk_electrician] = statsForced[9];
+        baseStat[(int)Stat.sk_farmer] = statsForced[10];
+        baseStat[(int)Stat.sk_marksman] = statsForced[11];
+        baseStat[(int)Stat.sk_scavenger] = statsForced[12];
 
         //no stamina here
     }
@@ -566,6 +566,7 @@ public class CharaRpg : MonoBehaviour
         _movement = float.Parse(stats[2]);
         _manipulation = float.Parse(stats[3]);
         _bloodStock = int.Parse(stats[4]);
+        _rest = (int) (int.Parse(stats[5]) * RestPurcent);
     }
 
 
@@ -696,7 +697,7 @@ public class CharaRpg : MonoBehaviour
     private float _shockTreshold = 0.1f;
 
     //Rest
-    private const int c_secInHour = 41;
+    public const int c_secInHour = 41;
     private static int maxRest = 18 * c_secInHour; //16 * 41 (41 -> nb de sec en 1h)
     private static int maxSleepDeprivationProgressBeforeNextLevel = 24 * c_secInHour;
 
@@ -1331,14 +1332,15 @@ public class CharaRpg : MonoBehaviour
     }
     public float[] GetHealthStats()
     {
-        return new float[6]
+        return new float[7]
         {
             _pain,
             _consciousness,
             _movement,
             _manipulation,
             _bloodStock,
-            _maxBloodStock
+            _maxBloodStock,
+            RestPurcent
         };
     }
 

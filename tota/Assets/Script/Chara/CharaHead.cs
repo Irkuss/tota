@@ -361,7 +361,6 @@ public class CharaHead : Photon.PunBehaviour
         {
             inv.Remove(item);
         }
-
     }
 
     private IEnumerator WaitAction(float waitingTime)

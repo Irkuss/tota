@@ -29,16 +29,12 @@ public class Equipable : Item
     public int damage = 0;
     public int accuracyModifier = 0;
     public float attackSpeedModifier = 1f;
-    [Header("Melee attribute")]
+    //[Header("Melee attribute")]
     //Attribut au moment d'équipper l'arme
-    public int meleeRequiredStrength = 0;
-    //Atrribut de l'arme
-    public float meleeRange = 0;
+    //public int meleeRequiredStrength = 0;
     [Header("Remote attribute")]
     public float remoteFalloffRange = 0;
     public float remoteMaxRange = 0;
-    public bool useAmmo = false;
-    public Item ammo = null;
     [Header("Break attribute")]
     public float breakModifier = 1f;
     public float BreakDamage => breakModifier * damage;
@@ -154,15 +150,6 @@ public class Equipable : Item
         if (_interface == null) return false;
         _interface.GetComponent<InterfaceManager>().UpdateEquipment(charaInventory);
 
-        return true;
-    }
-    //Should be check before attacking
-    public bool CanAttack(CharaInventory inv)
-    {
-        if(useAmmo && ammo != null)
-        {
-            return inv.inventory.ContainsKey(ammo);
-        }
         return true;
     }
 }

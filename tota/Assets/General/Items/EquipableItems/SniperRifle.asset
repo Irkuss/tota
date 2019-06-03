@@ -13,23 +13,21 @@ MonoBehaviour:
   m_Name: SniperRifle
   m_EditorClassIdentifier: 
   nickName: Sniper Rifle
-  description: Sniper Rifle
+  description: "Sniper Rifle (weapon):\nA slow-paced, long ranged, deadly weapon.\n
+    \ -weight: 1\n  -max stack: 1\n  -equip time: 2\n  -range type: Remote\n  -damage
+    type: Sharp\n  -equip type: Two handed\n  -damage: 250\n  -accuracy modifier:
+    0\n  -attack speed modifier: 4\n  -falloff range: 50\n  -max range: 100"
   icon: {fileID: 21300000, guid: 57a9edce1f057fc4b8114602aeb22a99, type: 3}
   stack: 1
   weight: 1
-  baseMarketValue: 30
   usable: 1
   useTime: 2
   equipType: 1
   dmgType: 0
   equipSpace: 1
-  specificType: 0
   damage: 250
   accuracyModifier: 0
   attackSpeedModifier: 4
-  meleeRequiredStrength: 0
-  meleeRange: 0
-  remoteFalloffRange: 40
-  remoteMaxRange: 60
-  useAmmo: 0
-  ammo: {fileID: 0}
+  remoteFalloffRange: 50
+  remoteMaxRange: 100
+  breakModifier: 1

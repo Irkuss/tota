@@ -171,13 +171,20 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   isMoving: 0
+  particleGameObject: {fileID: 0}
   _interTransform: {fileID: 5919150572577401011}
   _radius: 1
   _possibleActionNames:
   - Open
-  _isDistanceAction: 00
-  _isDoWhileAction: 00
-  _makesActionNotAppearWhenUnavailable: 00
+  - Salvage
+  _isDistanceAction: 0000
+  _isDoWhileAction: 0000
+  _makesActionNotAppearWhenUnavailable: 0000
+  salvageTime: 3
+  salvagedItem1: {fileID: 11400000, guid: 433a409a197ca2243b17007671504644, type: 2}
+  salvagedItemCount1: 1
+  salvagedItem2: {fileID: 0}
+  salvagedItemCount2: 1
   lootTable: {fileID: 11400000, guid: f21d91e5da6913646ae33da840a0ec33, type: 2}
   hasToRandAddLoot: 1
   baseTimeFirstLoot: 3

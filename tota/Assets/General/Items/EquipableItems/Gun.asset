@@ -13,23 +13,21 @@ MonoBehaviour:
   m_Name: Gun
   m_EditorClassIdentifier: 
   nickName: Handgun
-  description: A simple gun, useful to stay alive (uses Handgun ammo)
+  description: "Handgun (weapon):\nA light gun, useful to protect yourself.\n  -weight:
+    0\n  -max stack: 1\n  -equip time: 0,5\n  -range type: Remote\n  -damage type:
+    Sharp\n  -equip type: One handed\n  -damage: 50\n  -accuracy modifier: 0\n  -attack
+    speed modifier: 1,4\n  -falloff range: 24\n  -max range: 36"
   icon: {fileID: 21300000, guid: 3b907014a9236a34f9a2fbaa7b9a92de, type: 3}
   stack: 1
   weight: 0
-  baseMarketValue: 20
   usable: 1
   useTime: 0.5
   equipType: 1
   dmgType: 0
   equipSpace: 0
-  specificType: 0
   damage: 50
   accuracyModifier: 0
   attackSpeedModifier: 1.4
-  meleeRequiredStrength: 0
-  meleeRange: 0
-  remoteFalloffRange: 20
-  remoteMaxRange: 30
-  useAmmo: 1
-  ammo: {fileID: 11400000, guid: 975a6ed749fe87043aa67095ce4215d6, type: 2}
+  remoteFalloffRange: 24
+  remoteMaxRange: 36
+  breakModifier: 1

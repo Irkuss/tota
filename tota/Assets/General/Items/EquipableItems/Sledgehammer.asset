@@ -13,11 +13,13 @@ MonoBehaviour:
   m_Name: Sledgehammer
   m_EditorClassIdentifier: 
   nickName: Sledgehammer
-  description: Sledgehammer
+  description: "Sledgehammer (weapon):\nDeal powerful blow at the cost of time.\n
+    \ -weight: 2\n  -max stack: 1\n  -equip time: 2\n  -range type: Melee\n  -damage
+    type: Mace\n  -equip type: Two handed\n  -damage: 150\n  -accuracy modifier: -10\n
+    \ -attack speed modifier: 0,7\n  -break time modifier: 2"
   icon: {fileID: 21300000, guid: 3ab8f9d2206379e488b598ffd777957d, type: 3}
   stack: 1
   weight: 2
-  baseMarketValue: 20
   usable: 1
   useTime: 2
   equipType: 0
@@ -26,10 +28,6 @@ MonoBehaviour:
   damage: 150
   accuracyModifier: -10
   attackSpeedModifier: 0.7
-  meleeRequiredStrength: 60
-  meleeRange: 5
   remoteFalloffRange: 0
   remoteMaxRange: 0
-  useAmmo: 0
-  ammo: {fileID: 0}
   breakModifier: 2

@@ -140,6 +140,7 @@ public class DoorHandler : WallHandler
     {
         //Desactive le collider le temps de la rotation
         boxColl.enabled = false;
+        navObstacle.enabled = false;
 
         float desiredY = _baseYRotation;
         //Decider la rotation de la porte

@@ -6,6 +6,8 @@ public class OrganicOpacity : GeneralOpacity
 {
     [Header("Is this object moving or not?")]
     public bool isMoving = false;
+    [Header("Particle to hide opacity")]
+    public GameObject particleGameObject = null;
     private bool _wasAboveFloorLevel;
 
     private Renderer[] _renderers;
@@ -28,6 +30,9 @@ public class OrganicOpacity : GeneralOpacity
         _renderers = GetComponentsInChildren<Renderer>();
         _collider = GetComponent<Collider>();
         _renderer = GetComponent<Renderer>();
+
+        if (particleGameObject != null) particleGameObject.SetActive(ShouldParticleGameObjectBeActive());
+
         //if (_renderers.Length > 0 && _collider != null) FloorManager.onFloorLevelChanged += UpdateFloorLevel;
         FloorManager.onFloorLevelChanged += UpdateFloorLevel;
 
@@ -91,7 +96,7 @@ public class OrganicOpacity : GeneralOpacity
             }
             if(_renderer!=null) _renderer.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.ShadowsOnly;
 
-
+            if (particleGameObject != null) particleGameObject.SetActive(false);
             //_collider.enabled = false;
         }
         else if(!currentAbove && _wasAboveFloorLevel)
@@ -103,7 +108,7 @@ public class OrganicOpacity : GeneralOpacity
             }
             if (_renderer != null) _renderer.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.On;
 
-
+            if(particleGameObject != null) particleGameObject.SetActive(ShouldParticleGameObjectBeActive());
             //_collider.enabled = true;
         }
         _wasAboveFloorLevel = currentAbove;
@@ -122,5 +127,11 @@ public class OrganicOpacity : GeneralOpacity
     public override bool IsBelowFloor(int floor)
     {
         return !IsAboveFloorLevel(floor);
+    }
+
+    //Particle
+    protected virtual bool ShouldParticleGameObjectBeActive()
+    {
+        return true;
     }
 }

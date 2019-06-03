@@ -13,11 +13,13 @@ MonoBehaviour:
   m_Name: BaseballBat
   m_EditorClassIdentifier: 
   nickName: Baseball Bat
-  description: Baseball Bat
+  description: "Baseball Bat (weapon):\nCan hit balls as well as heads.\n  -weight:
+    1\n  -max stack: 1\n  -equip time: 1\n  -range type: Melee\n  -damage type: Mace\n
+    \ -equip type: Two handed\n  -damage: 40\n  -accuracy modifier: 10\n  -attack
+    speed modifier: 0,9\n  -break time modifier: 1,2"
   icon: {fileID: 21300000, guid: 53b8e215feed2bd41a432e13d51a4dcd, type: 3}
   stack: 1
   weight: 1
-  baseMarketValue: 10
   usable: 1
   useTime: 1
   equipType: 0
@@ -26,10 +28,6 @@ MonoBehaviour:
   damage: 40
   accuracyModifier: 10
   attackSpeedModifier: 0.9
-  meleeRequiredStrength: 30
-  meleeRange: 4
   remoteFalloffRange: 0
   remoteMaxRange: 0
-  useAmmo: 0
-  ammo: {fileID: 0}
   breakModifier: 1.2

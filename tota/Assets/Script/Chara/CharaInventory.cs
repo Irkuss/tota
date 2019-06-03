@@ -43,9 +43,7 @@ public class CharaInventory : MonoBehaviour
 
         public void AddItem(Item item, int itemCount) //(Item newItem)
         {
-            if (_linkedCharaInventory._interface == null) return;
-
-
+            //if (_linkedCharaInventory._interface == null) return;
 
             _item = item;
             _itemCount = itemCount;
@@ -62,33 +60,40 @@ public class CharaInventory : MonoBehaviour
             }
             
             //Change counter
-            _counter.SetActive(true);
-            _counter.GetComponent<Text>().text = _itemCount.ToString();
+            if(_counter != null)
+            {
+                _counter.SetActive(true);
+                _counter.GetComponent<Text>().text = _itemCount.ToString();
+            }            
             //RemoveButton is now active
-            _removeButton.interactable = true;
+            if (_removeButton != null) _removeButton.interactable = true;
             isEmpty = false;
 
-            _itemButton.transform.parent.GetChild(4).GetChild(0).GetComponent<Text>().text = item.description;
+            //_itemButton.transform.parent.GetChild(5).GetChild(0).GetComponent<Text>().text = item.description;
 
-            _itemButton.transform.parent.GetComponent<SlotDescription>().description = item.description;
+            if(_itemButton != null) _itemButton.transform.parent.GetComponent<SlotDescription>().description = item.description;
         }
 
         public void ClearSlot()
         {
-            if (_linkedCharaInventory._interface == null) return;
+            //if (_linkedCharaInventory._interface == null) return;
 
             _item = null;
 
             //Clear Icon
-            _icon.sprite = null;
-            _icon.enabled = false;
+            if(_icon != null)
+            {
+                _icon.sprite = null;
+                _icon.enabled = false;
+            }
+            
             //Clear counter
-            _counter.SetActive(false);
+            if(_counter != null) _counter.SetActive(false);
             //deactivate RemoveButton=
-            _removeButton.interactable = false;
+            if(_removeButton != null) _removeButton.interactable = false;
             isEmpty = true;
 
-            _itemButton.transform.parent.GetChild(4).GetChild(0).GetComponent<Text>().text = "";
+            //_itemButton.transform.parent.GetChild(5).GetChild(0).GetComponent<Text>().text = "";
         }
 
         public void OnRemoveButton()
@@ -109,7 +114,7 @@ public class CharaInventory : MonoBehaviour
 
         private void Pop()
         {
-            _itemButton.transform.parent.GetChild(4).gameObject.SetActive(!_itemButton.transform.parent.GetChild(4).gameObject.activeSelf);            
+            _itemButton.transform.parent.GetChild(5).gameObject.SetActive(!_itemButton.transform.parent.GetChild(4).gameObject.activeSelf);            
         }
     }
 
@@ -370,8 +375,8 @@ public class CharaInventory : MonoBehaviour
     //Break Getters
     public float GetMaxBreakDamage()
     {
-        float damageLeft = equipments[0] == null ? 5 : equipments[0].BreakDamage;
-        float damageRight = equipments[1] == null ? 5 : equipments[1].BreakDamage;
+        float damageLeft = equipments[0] == null ? 5 : equipments[0].equipType == Equipable.EquipType.Remote ? 5 : equipments[0].BreakDamage;
+        float damageRight = equipments[1] == null ? 5 : equipments[1].equipType == Equipable.EquipType.Remote ? 5 : equipments[1].BreakDamage;
         Debug.Log("GetMaxBreakDamage: returning " + Mathf.Max(damageLeft, damageRight));
         return Mathf.Max(damageLeft, damageRight);
     }

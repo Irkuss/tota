@@ -13,23 +13,21 @@ MonoBehaviour:
   m_Name: Shotgun
   m_EditorClassIdentifier: 
   nickName: Shotgun
-  description: Shotgun
+  description: "Shotgun (weapon):\nPowerful close ranged weapon.\n  -weight: 1\n  -max
+    stack: 1\n  -equip time: 1\n  -range type: Remote\n  -damage type: Sharp\n  -equip
+    type: Two handed\n  -damage: 250\n  -accuracy modifier: -10\n  -attack speed modifier:
+    2\n  -falloff range: 12\n  -max range: 24"
   icon: {fileID: 21300000, guid: 6f40c6a7406b4d94080bb8dd66e8c209, type: 3}
   stack: 1
   weight: 1
-  baseMarketValue: 25
   usable: 1
   useTime: 1
   equipType: 1
   dmgType: 0
   equipSpace: 1
-  specificType: 0
   damage: 250
   accuracyModifier: -10
   attackSpeedModifier: 2
-  meleeRequiredStrength: 0
-  meleeRange: 0
-  remoteFalloffRange: 10
-  remoteMaxRange: 20
-  useAmmo: 0
-  ammo: {fileID: 0}
+  remoteFalloffRange: 12
+  remoteMaxRange: 24
+  breakModifier: 1
