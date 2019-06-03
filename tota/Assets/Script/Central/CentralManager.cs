@@ -42,7 +42,7 @@ public class CentralManager : Photon.MonoBehaviour
     public GameObject CharaLayout { get { return _charaLayout; } }
 
     [SerializeField] private GameObject _channel = null;
-    public GameObject Channel { get { return _channel; } }
+    public GameObject Channels { get { return _channel; } }
 
     [SerializeField] private GameObject _tooltipL = null;
     [SerializeField] private GameObject _background = null;
@@ -125,7 +125,9 @@ public class CentralManager : Photon.MonoBehaviour
 
     private void Update()
     {
-        if(Input.GetKeyDown(KeyCode.Escape) || Input.GetKeyDown(KeyCode.P))
+        if (Channel.isWriting) return;
+
+        if (Input.GetKeyDown(KeyCode.Escape) || Input.GetKeyDown(KeyCode.P))
         {
             if (isPause)
             {
@@ -562,7 +564,7 @@ public class CentralManager : Photon.MonoBehaviour
         {
             for (int i = 0; i < permi.numberChara; i++)
             {
-                spirit.GetComponent<SpiritHead>().TryCharaSpawn(true,_charaLayout);
+                spirit.GetComponent<SpiritHead>().TryCharaSpawn(true);
             }
         }
 
