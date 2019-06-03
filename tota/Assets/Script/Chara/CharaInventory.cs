@@ -370,8 +370,8 @@ public class CharaInventory : MonoBehaviour
     //Break Getters
     public float GetMaxBreakDamage()
     {
-        float damageLeft = equipments[0] == null ? 5 : equipments[0].BreakDamage;
-        float damageRight = equipments[1] == null ? 5 : equipments[1].BreakDamage;
+        float damageLeft = equipments[0] == null ? 5 : equipments[0].equipType == Equipable.EquipType.Remote ? 5 : equipments[0].BreakDamage;
+        float damageRight = equipments[1] == null ? 5 : equipments[1].equipType == Equipable.EquipType.Remote ? 5 : equipments[1].BreakDamage;
         Debug.Log("GetMaxBreakDamage: returning " + Mathf.Max(damageLeft, damageRight));
         return Mathf.Max(damageLeft, damageRight);
     }
