@@ -8,8 +8,10 @@ public class SpiritHead : Photon.MonoBehaviour
 {
     //utilisé pour debugger (à swap avec un scriptable object des que possible)
 
+    [SerializeField] private GameObject _particleRain = null;
+    [SerializeField] private GameObject _particleSnow = null;
+
     private string _charaPath = "CharaMarc";
-    [SerializeField] private ItemRecipe bigAppleRecipe = null;
     [SerializeField] private ItemTable itemTable = null;
 
     //[SerializeField] private GameObject _spiritCamera = null;
@@ -94,7 +96,16 @@ public class SpiritHead : Photon.MonoBehaviour
     //Unity Callback
     void Start()
     {
+        SetToClear();
+
         _spiritCamera = GetComponentInChildren<Camera>();
+
+        DayNightCycle.onNewMeteo += ChangeMeteo;
+    }
+
+    private void OnDestroy()
+    {
+        DayNightCycle.onNewMeteo -= ChangeMeteo;
     }
 
     void Update()
@@ -808,6 +819,36 @@ public class SpiritHead : Photon.MonoBehaviour
         {
             _channel.SetActive(!_channel.activeSelf);
         }
+    }
+
+    //Meteo
+
+    private void ChangeMeteo(DayNightCycle.Meteo newMeteo)
+    {
+        switch(newMeteo)
+        {
+            case DayNightCycle.Meteo.Clear: SetToClear();break;
+            case DayNightCycle.Meteo.Rain: SetToRain(); break;
+            case DayNightCycle.Meteo.Snow: SetToSnow(); break;
+        }
+    }
+
+    public void SetToClear()
+    {
+        _particleSnow.SetActive(false);
+        _particleRain.SetActive(false);
+    }
+    public void SetToSnow()
+    {
+        _particleRain.SetActive(false);
+
+        _particleSnow.SetActive(true);
+    }
+    public void SetToRain()
+    {
+        _particleSnow.SetActive(false);
+
+        _particleRain.SetActive(true);
     }
 
 }

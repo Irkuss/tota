@@ -25,6 +25,9 @@ public class DayNightCycle : MonoBehaviour
     public delegate void NewSeason(Seasons saison);
     public static event NewSeason onNewseason;
 
+    public delegate void NewMeteo(Meteo newMeteo);
+    public static event NewMeteo onNewMeteo;
+
     //day time status
     private bool _isDayTime = true;
     public bool IsDayTime => _isDayTime;
@@ -44,6 +47,13 @@ public class DayNightCycle : MonoBehaviour
         {Seasons.WINTER, -10 },
         {Seasons.SPRING, 20 }
     };
+    //Meteo attribute
+    public enum Meteo
+    {
+        Clear,
+        Rain,
+        Snow,
+    }
     
     
     //Start
@@ -65,6 +75,8 @@ public class DayNightCycle : MonoBehaviour
         
         Cycle();
         CheckNextSeason();
+
+
     }
 
     private void Cycle()
@@ -79,6 +91,7 @@ public class DayNightCycle : MonoBehaviour
         {
             Debug.Log("CallNewHour: starting new hour");
             CallNewHour();
+            MeteoUpdate();
             //Handling daynight changes
             if (heure >= 20f && heure <= 21f)
             {
@@ -135,6 +148,14 @@ public class DayNightCycle : MonoBehaviour
         CallNewSeason();
     }
 
+    //Meteo Update
+    private int hourBeforeChangingMeteo = Random.Range(2, 10);
+
+    private void MeteoUpdate()
+    {
+
+    }
+
     //Getters
     public int GetCurrentTemperature()
     {
@@ -157,6 +178,13 @@ public class DayNightCycle : MonoBehaviour
         if (onNewseason != null) //Si une personne nous écoute
         {
             onNewseason(_currentSeason); //Declenche le callback chez les spectateurs
+        }
+    }
+    private void CallNewMeteo(Meteo newMeteo)
+    {
+        if(onNewMeteo != null)
+        {
+            onNewMeteo(newMeteo);
         }
     }
 

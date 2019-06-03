@@ -1253,7 +1253,7 @@ public class Generator : MonoBehaviour
                     {
                         tempBuilds[xTemp, yTemp].Generate(x, y);
                     }
-                    //yield return null;
+                    yield return new WaitForSeconds(0.05f);
                 }
                 //Generate Streets
                 if (_layout == WorldLayout.City) GenerateStreets(tempRoads, tempBuilds, x, y);
@@ -1298,6 +1298,7 @@ public class Generator : MonoBehaviour
                             //treePositions.Add(position);
                         }
                     }
+                    if (i % 50 == 0) yield return null;
                 }
                 Debug.Log("Generate: Starting tree placement as MasterClient at '" + x + "," + y + "'");
                 MasterMassLightPlaceTree(propManager, treePositions);
