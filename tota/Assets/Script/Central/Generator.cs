@@ -1547,7 +1547,7 @@ public class Generator : MonoBehaviour
         }
         catch
         {
-            Debug.LogWarning("GetPosTempModifier: Out of range exception for x: " + x + " and y: " + y);
+            Debug.LogWarning("GetPosTempModifier: Out of range exception for x: " + x + " (" + pos.x + ")"+ " and y: " + y + " (" + pos.y + ")");
             return 0;
         }
         

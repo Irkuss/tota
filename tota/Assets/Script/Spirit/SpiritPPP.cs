@@ -87,7 +87,7 @@ public class SpiritPPP : MonoBehaviour
 
                     //Set le Dof
                     _depthOfField.focusDistance.value = Vector3.Distance(_currentTarget, _zoom.DesiredPosition);
-                    Debug.Log("Focus: set focus distance to " + _depthOfField.focusDistance.value);
+                    //Debug.Log("Focus: set focus distance to " + _depthOfField.focusDistance.value);
                 }
             }
 
