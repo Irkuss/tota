@@ -64,17 +64,19 @@ public class AudioManager : MonoBehaviour
         AudioSource.PlayClipAtPoint(s.clip, pos, s.volume * (1f + UnityEngine.Random.Range(-s.volumeVariance / 2f, s.volumeVariance / 2f)));
     }
 
-    public IEnumerator EndMusic(string son)
+    public void EndMusic(string son)
     {
         Sound sound = Array.Find(sounds, item => item.name == son);
-        
+        if (sound == null) return;
+        Debug.Log(sound.name);
         AudioSource oldSound = sound.source;
-        while (oldSound.volume > 0)
+        /*while (oldSound.volume > 0)
         {
             oldSound.volume -= 0.01f;
             yield return new WaitForSeconds(.05f);
-        }
+        }*/
         oldSound.Stop();
+        return;
     }
 
     public IEnumerator StartMusic(string son)
