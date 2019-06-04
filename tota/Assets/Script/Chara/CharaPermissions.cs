@@ -62,10 +62,12 @@ public class CharaPermissions : MonoBehaviour
         if(teamName == "")
         {
             team = null;
+            PermissionsManager.Instance.spirit.CharaDie(gameObject);
         }
         else
         {
             team = PermissionsManager.Instance.GetTeamWithName(teamName);
+            PermissionsManager.Instance.spirit.InstantiateCharaRef(PhotonNetwork.player.NickName, gameObject);
         }
 
         GetComponent<CharaConnect>().SendMsg(CharaConnect.CharaCommand.UpdateTeamColor, null, null, null);
