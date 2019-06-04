@@ -590,4 +590,18 @@ public class CentralManager : Photon.MonoBehaviour
         }
                 
     }
+
+    //Meteo
+
+    public void SendMeteo(int forceMeteo)
+    {
+        GetComponent<PhotonView>().RPC("SetMeteo", PhotonTargets.AllBuffered, forceMeteo);
+    }
+
+
+    [PunRPC]
+    public void SetMeteo(int meteo)
+    {
+        dayNightCycle.ReceiveSetMeteo(meteo);
+    }
 }

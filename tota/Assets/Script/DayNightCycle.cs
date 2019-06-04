@@ -8,6 +8,8 @@ public class DayNightCycle : MonoBehaviour
     private Light _sun;
     [SerializeField] private float _rotationSpeedModifier;
 
+    private CentralManager _cm = null;
+
     //Heure
     public float heure;
 
@@ -60,6 +62,8 @@ public class DayNightCycle : MonoBehaviour
     //Start
     private void Start()
     {
+        _cm = GameObject.Find("eCentralManager").GetComponent<CentralManager>();
+
         _currentSeason = Seasons.SUMMER;
         CallNewSeason();
         CallNewHour();
@@ -95,7 +99,11 @@ public class DayNightCycle : MonoBehaviour
         {
             Debug.Log("CallNewHour: starting new hour");
             CallNewHour();
-            MeteoUpdate();
+
+            if(PhotonNetwork.isMasterClient)
+            {
+                MeteoUpdate();
+            }
             //Handling daynight changes
             if (heure >= 20f && heure <= 21f)
             {
@@ -182,9 +190,7 @@ public class DayNightCycle : MonoBehaviour
             }
 
             //Change la meteo
-            _currentMeteo = newMeteo;
-
-            CallNewMeteo();
+            DebugForceMeteo(newMeteo);
 
             //Prepare le prochain changement
             hourBeforeChangingMeteo = Random.Range(0, 1);
@@ -197,7 +203,19 @@ public class DayNightCycle : MonoBehaviour
 
     public void DebugForceMeteo(Meteo forceMeteo)
     {
-        _currentMeteo = forceMeteo;
+        if(PhotonNetwork.offlineMode)
+        {
+            ReceiveSetMeteo((int)forceMeteo);
+        }
+        else
+        {
+            _cm.SendMeteo((int)forceMeteo);
+        }
+    }
+
+    public void ReceiveSetMeteo(int meteo)
+    {
+        _currentMeteo = (Meteo) meteo;
 
         CallNewMeteo();
     }
@@ -207,6 +225,12 @@ public class DayNightCycle : MonoBehaviour
     {
         //Called by all charas every health cycle
         int dayTimeModifier = _isDayTime ? 0 : -4;
+
+        if(Mode.Instance.ShouldTemperatureBeModified)
+        {
+            dayTimeModifier += -25;
+        }
+
 
         return _baseSeasonTemperature[_currentSeason] + dayTimeModifier;
     }
