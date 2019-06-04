@@ -10,19 +10,23 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: a5e57be36f9867544a7ad4dbf3e46789, type: 3}
-  m_Name: BaseBallHRecipe
+  m_Name: seedRecipe
   m_EditorClassIdentifier: 
-  result: {fileID: 11400000, guid: e49e7d764675ac04ba175f2c8a7ab3d3, type: 2}
-  resultCount: 1
+  visuPath: Visu/
+  visuSprite: {fileID: 0}
+  result: {fileID: 11400000, guid: 306fbd5448409364fad84c9a7f032b74, type: 2}
+  resultCount: 2
   resultPath: 
+  description: "Seed bag x2\n  -skill used: manipulation only\n  -craft time: 4\nRecipe:\n
+    \ -Tomatoe x1"
   neededItem:
-  - {fileID: 11400000, guid: 2f36001a1acc1634ea88b41e8a5457a8, type: 2}
-  - {fileID: 11400000, guid: 4e8b23ecd7c806b44a0c762728a04a3f, type: 2}
-  neededItemCount: 0100000001000000
-  useOnlyManipulation: 0
-  statUsed: 8
-  neededStatLevel: 2
+  - {fileID: 11400000, guid: f81a7fc57c61f3c49925a821bd92ac0e, type: 2}
+  neededItemCount: 01000000
+  useOnlyManipulation: 1
+  statUsed: 7
+  neededStatLevel: 0
   maxStatLevelBeforeNotGivingXp: 10
+  trainingModifier: 1
   recipeNeedWorkshop: 0
   neededWorkshop: 0
-  baseRecipeTime: 5
+  baseRecipeTime: 4

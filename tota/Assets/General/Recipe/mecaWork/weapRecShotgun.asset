@@ -10,23 +10,23 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: a5e57be36f9867544a7ad4dbf3e46789, type: 3}
-  m_Name: bedMatress
+  m_Name: weapRecShotgun
   m_EditorClassIdentifier: 
-  visuPath: Visu/visuBed
-  visuSprite: {fileID: 21300000, guid: 3f6a3fc1078814349ae529f76281166c, type: 3}
-  result: {fileID: 0}
-  resultCount: 0
-  resultPath: Prop/bedMattress
-  description: "Mattress:\nUsed to sleep.\n  -skill used: manipulation only\n  -construction
-    time: 15\nRecipe:\n  -feather x10"
+  visuPath: Visu/
+  visuSprite: {fileID: 0}
+  result: {fileID: 11400000, guid: 39cdc743cf222e948bc8591b9e560e15, type: 2}
+  resultCount: 5
+  resultPath: 
+  description: "Weapon parts x5\n  -skill used: manipulation only\n  -craft time:
+    8\n  -requires: mecanician workshop\nRecipe:\n  -Shotgun x1"
   neededItem:
-  - {fileID: 11400000, guid: b9a4498b9cf7da748ad2ddd6a0b3bb55, type: 2}
-  neededItemCount: 0a000000
+  - {fileID: 11400000, guid: e235c6ad0da09684da5ac71eba8120c1, type: 2}
+  neededItemCount: 01000000
   useOnlyManipulation: 1
   statUsed: 7
   neededStatLevel: 0
   maxStatLevelBeforeNotGivingXp: 10
   trainingModifier: 1
-  recipeNeedWorkshop: 0
-  neededWorkshop: 0
-  baseRecipeTime: 15
+  recipeNeedWorkshop: 1
+  neededWorkshop: 3
+  baseRecipeTime: 8

@@ -13,7 +13,7 @@ public class DayNightCycle : MonoBehaviour
 
     //Game status
     private int _dayPassedSinceStart = 1;
-    private Seasons _currentSeason;
+    private static Seasons _currentSeason;
     private bool _changedHour;
 
     private float _sliderProgressStatus;
@@ -26,7 +26,7 @@ public class DayNightCycle : MonoBehaviour
     public static event NewSeason onNewseason;
 
     //day time status
-    private bool _isDayTime = true;
+    private static bool _isDayTime = true;
     public bool IsDayTime => _isDayTime;
 
     //Season Attribute
@@ -37,12 +37,12 @@ public class DayNightCycle : MonoBehaviour
         WINTER,
         SPRING
     }
-    private Dictionary<Seasons, int> _baseSeasonTemperature = new Dictionary<Seasons, int>()
+    private static Dictionary<Seasons, int> _baseSeasonTemperature = new Dictionary<Seasons, int>()
     {
-        {Seasons.SUMMER, 25 },
+        {Seasons.SUMMER, 30 },
         {Seasons.AUTUMM, 15 },
-        {Seasons.WINTER, -10 },
-        {Seasons.SPRING, 20 }
+        {Seasons.WINTER, 0 },
+        {Seasons.SPRING, 15 }
     };
     
     
@@ -136,7 +136,7 @@ public class DayNightCycle : MonoBehaviour
     }
 
     //Getters
-    public int GetCurrentTemperature()
+    public static int GetCurrentTemperature()
     {
         //Called by all charas every health cycle
         int dayTimeModifier = _isDayTime ? 0 : -4;

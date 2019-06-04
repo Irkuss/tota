@@ -18,13 +18,14 @@ MonoBehaviour:
   resultCount: 0
   resultPath: Prop/workWood
   description: "Carpenter workshop:\nUsed to unlock new recipes.\n  -skill used: carpenter\n
-    \ -training modifier: 1\n  -construction time: 25\nRecipe:\n  -Wooden planks x4"
+    \ -skill level needed: 1\n  -training modifier: 1\n  -construction time: 25\nRecipe:\n
+    \ -Wooden planks x4"
   neededItem:
   - {fileID: 11400000, guid: 433a409a197ca2243b17007671504644, type: 2}
   neededItemCount: 04000000
   useOnlyManipulation: 0
   statUsed: 7
-  neededStatLevel: 0
+  neededStatLevel: 1
   maxStatLevelBeforeNotGivingXp: 10
   trainingModifier: 1
   recipeNeedWorkshop: 0

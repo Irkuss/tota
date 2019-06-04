@@ -471,7 +471,7 @@ public class CentralManager : Photon.MonoBehaviour
     public int GetTemperatureAtCoord(Vector3 pos)
     {
         //Called by charaRpg
-        return dayNightCycle.GetCurrentTemperature() + GetComponent<Generator>().GetPosTempModifier(pos);
+        return DayNightCycle.GetCurrentTemperature() + GetComponent<Generator>().GetPosTempModifier(pos);
     }
 
     //Special Callbacks
@@ -510,7 +510,7 @@ public class CentralManager : Photon.MonoBehaviour
         //Instantiate the spirit
         GameObject spirit;
         float spawnValue = (generator.SpawnPoint + 0.5f) * Generator.c_worldChunkLength;
-        Vector3 spawnPosition = new Vector3(spawnValue, c_cameraStartHeight, spawnValue);
+        Vector3 spawnPosition = new Vector3(spawnValue, c_cameraStartHeight, spawnValue - 6.3f * 5);
         if (!online || PhotonNetwork.offlineMode)
         {
             spirit = Instantiate(Resources.Load<GameObject>("Spirit"), spawnPosition, Quaternion.identity);

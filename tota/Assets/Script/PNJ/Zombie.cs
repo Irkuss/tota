@@ -69,7 +69,7 @@ public class Zombie : MonoBehaviour
         //Verifie la distance de chaque activateur
         foreach(CharaHead activatorChara in _activatorCharas)
         {
-            if(Vector3.Distance(transform.position, activatorChara.transform.position) > CharaHead.c_radiusToActivate)
+            if(activatorChara == null || Vector3.Distance(transform.position, activatorChara.transform.position) > CharaHead.c_radiusToActivate)
             {
                 activatorToRemove.Add(activatorChara);
             }
@@ -131,7 +131,7 @@ public class Zombie : MonoBehaviour
 
                     if (Vector3.Distance(_closestPlayer.position, transform.position) < 2f)
                     {
-                        _closestPlayer.GetComponent<CharaRpg>().TryDeathBite(30);
+                        _closestPlayer.GetComponent<CharaRpg>().TryDeathBite(70);
                         yield return new WaitForSeconds(1f);
                     }
                 }

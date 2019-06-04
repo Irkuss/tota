@@ -13,6 +13,9 @@ public class CharaHead : Photon.PunBehaviour
     private CharaOutline _outline = null;
     private CharaAi _aiHead = null;
 
+    [SerializeField] private GameObject _upChara = null;
+    [SerializeField] private GameObject _downChara = null;
+
     //Autre ref
     [SerializeField] private LayerMask _aiActivationLayer;
     private float _baseStoppingDistance;
@@ -44,6 +47,8 @@ public class CharaHead : Photon.PunBehaviour
 
         _eManager = GameObject.Find("eCentralManager"); //pas ouf comm methode, mieux vaux avec un tag
         _permManager = PermissionsManager.Instance;
+
+        SwitchState(true);
 
         if(PhotonNetwork.isMasterClient)
         {
@@ -181,6 +186,8 @@ public class CharaHead : Photon.PunBehaviour
 
     public void SetDestination(Vector3 destination, bool isRunning)
     {
+        SwitchState(true);
+
         _movement.MoveTo(destination, isRunning);
     }
 
@@ -211,6 +218,8 @@ public class CharaHead : Photon.PunBehaviour
 
     public void SetFocus(Interactable inter, int actionIndex)
     {
+        SwitchState(true);
+
         RemoveFocus(true, false);
 
         bool isRunning = _movement.IsRunning;
@@ -481,5 +490,12 @@ public class CharaHead : Photon.PunBehaviour
             yield return null;
         }
         
+    }
+
+    //Up down chara
+    public void SwitchState(bool upState)
+    {
+        _upChara.SetActive(upState);
+        _downChara.SetActive(!upState);
     }
 }

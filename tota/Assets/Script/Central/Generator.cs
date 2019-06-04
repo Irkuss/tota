@@ -1537,7 +1537,7 @@ public class Generator : MonoBehaviour
     {
         //Trouve les coords dans la matrice de world
         int x = Mathf.FloorToInt(pos.x / c_worldChunkLength);
-        int y = Mathf.FloorToInt(pos.y / c_worldChunkLength);
+        int y = Mathf.FloorToInt(pos.z / c_worldChunkLength);
         //Recupere le biome a ces coordonnées
         WorldBiome posBiome;
         try
@@ -1546,7 +1546,7 @@ public class Generator : MonoBehaviour
         }
         catch
         {
-            Debug.LogWarning("GetPosTempModifier: Out of range exception for x: " + x + " and y: " + y);
+            Debug.LogWarning("GetPosTempModifier: Out of range exception for x: " + x + " (" + pos.x + ")"+ " and y: " + y + " (" + pos.z + ")");
             return 0;
         }
         
@@ -2164,8 +2164,21 @@ public class Generator : MonoBehaviour
 
         cm.PlaceCameraAbove(_spawnPoint, _spawnPoint);
         cm.OnGenerationFinished();
+
+        CallEndGeneration();
     }
 
+    //Custom event
+    public delegate void GenerationFinished();
+    public static event GenerationFinished onGenerationFinished;
+
+    private void CallEndGeneration()
+    {
+        if(onGenerationFinished != null)
+        {
+            onGenerationFinished();
+        }
+    }
 
     //Getters for loading
     public float GetCurrentStatus()
