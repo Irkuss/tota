@@ -109,7 +109,26 @@ public class Channel : MonoBehaviour
                     Destroy(_messages.transform.GetChild(0).gameObject);
                 }
                 GameObject mes = Instantiate(_textPref, _messages.transform);
-                mes.GetComponent<Text>().text = player + " : " + message;
+
+                if (message == "spawnchara")
+                {
+                    _permission.spirit.TryCharaSpawn(true);
+                    mes.GetComponent<Text>().text = "A chara was spawned";
+                }
+                else if (message == "spawnrat")
+                {
+                    _permission.spirit.SpawnRat();
+                    mes.GetComponent<Text>().text = "A rat was spawned";
+                }
+                else if (message == "spawnai")
+                {
+                    _permission.spirit.SpawnAI();
+                    mes.GetComponent<Text>().text = "An AI chara was spawned";
+                }
+                else
+                {
+                    mes.GetComponent<Text>().text = player + " : " + message;
+                }
             }
         }
     }

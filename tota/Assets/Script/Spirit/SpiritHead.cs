@@ -61,8 +61,8 @@ public class SpiritHead : Photon.MonoBehaviour
         _build = eManager.Build;
         _actions = eManager.Actions;
         _button = eManager.Button;
-        _tuto = eManager.Tuto;
-        _tutos = _tuto.transform.parent.gameObject;
+        _tutos = eManager.Tuto;
+        _tuto = _tutos.transform.GetChild(1).gameObject;
         _visuData = eManager.VisuData;
         _charaRef = Resources.Load<GameObject>("CharaRef");
         
@@ -71,12 +71,12 @@ public class SpiritHead : Photon.MonoBehaviour
         _tuto.transform.GetChild(1).GetComponent<Button>().onClick.RemoveAllListeners();
         _tuto.transform.GetChild(2).GetComponent<Button>().onClick.RemoveAllListeners();
 
-        _tuto.transform.GetChild(1).GetComponent<Button>().onClick.AddListener(() => _tuto.SetActive(false));
+        _tuto.transform.GetChild(1).GetComponent<Button>().onClick.AddListener(() => _tutos.SetActive(false));
         _tuto.transform.GetChild(2).GetComponent<Button>().onClick.AddListener(delegate
         {
             mode.isSkip = true;
             _tutos.SetActive(false);
-        });
+        });        
 
         if (!mode.online && !mode.isSkip)
         {
@@ -86,13 +86,38 @@ public class SpiritHead : Photon.MonoBehaviour
         InitiateBuild();
     }
 
-    private IEnumerator FirstStepTuto()
+    public IEnumerator FirstStepTuto()
     {
         yield return new WaitForSeconds(1f);
 
         _tutos.SetActive(true);
         _tuto.transform.GetChild(0).GetComponent<Text>().text = "Now you can move yourself using the wqsd keys or the directional arrows";
+        _tuto.transform.GetChild(3).GetComponent<Button>().onClick.RemoveAllListeners();
+        _tuto.transform.GetChild(3).GetComponent<Button>().onClick.AddListener(() => StartCoroutine(MoveTuto()));
     }
+
+    public IEnumerator ZoomTuto()
+    {
+        yield return new WaitForSeconds(1f);
+
+        _tutos.SetActive(true);
+        _tuto.transform.GetChild(0).GetComponent<Text>().text = "Now that you understood the bases of the movements you can really enter into the game : Press space to make spawn a character.";
+        Mode.Instance.firstTime = 2;
+        _tuto.transform.GetChild(3).GetComponent<Button>().onClick.RemoveAllListeners();
+        _tuto.transform.GetChild(3).GetComponent<Button>().onClick.AddListener(() => StartCoroutine(SpawnTuto()));
+    }
+
+    public IEnumerator MoveTuto()
+    {
+        yield return new WaitForSeconds(1f);
+        
+        _tutos.SetActive(true);
+        _tuto.transform.GetChild(0).GetComponent<Text>().text = "You can also zoom the vision of the camera of your current position with a scroll of the mouse button";
+        Mode.Instance.firstTime = 1;
+        _tuto.transform.GetChild(3).GetComponent<Button>().onClick.RemoveAllListeners();
+        _tuto.transform.GetChild(3).GetComponent<Button>().onClick.AddListener(() => StartCoroutine(ZoomTuto()));
+    }
+
     //Unity Callback
     void Start()
     {
@@ -185,8 +210,10 @@ public class SpiritHead : Photon.MonoBehaviour
         yield return new WaitForSeconds(1f);
 
         _tutos.SetActive(true);
-        _tuto.transform.GetChild(0).GetComponent<Text>().text = "Nice, you have created a new character. You can select him by clicking left on him.";
+        _tuto.transform.GetChild(0).GetComponent<Text>().text = "Nice, you have created a new character. You can select him with a left click on him.";
         mode.firstTime = 3;
+        _tuto.transform.GetChild(3).GetComponent<Button>().onClick.RemoveAllListeners();
+        _tuto.transform.GetChild(3).GetComponent<Button>().onClick.AddListener(() => StartCoroutine(MoveCharaTuto()));
     }
 
     public void SpawnRat()
@@ -525,8 +552,10 @@ public class SpiritHead : Photon.MonoBehaviour
         yield return new WaitForSeconds(1f);
 
         _tutos.SetActive(true);
-        _tuto.transform.GetChild(0).GetComponent<Text>().text = "You can also move your character. Once you have selected him you can right click on a position and your character will walk until this point";
+        _tuto.transform.GetChild(0).GetComponent<Text>().text = "You can also move your character. Once you have selected him you can right click on a position and your character will walk to this point";
         mode.firstTime = 4;
+        _tuto.transform.GetChild(3).GetComponent<Button>().onClick.RemoveAllListeners();
+        _tuto.transform.GetChild(3).GetComponent<Button>().onClick.AddListener(() => StartCoroutine(FinalTuto()));
     }
 
     private void RightClickUpdate()
@@ -581,11 +610,13 @@ public class SpiritHead : Photon.MonoBehaviour
         yield return new WaitForSeconds(1f);
 
         _tutos.SetActive(true);
-        _tuto.transform.GetChild(0).GetComponent<Text>().text = "WOW some informations about your character appear on the screen. You can see more details by pressing the E key.\n"
+        _tuto.transform.GetChild(0).GetComponent<Text>().text = "Some information about your character appear on the screen. You can see more details if you press the E key.\n"
             + "Other keys : \n"
             + "Press B to open the build mode.\n"
             + "Press ESCAPE to open the pause menu.";
         mode.firstTime = 5;
+        _tuto.transform.GetChild(3).GetComponent<Button>().onClick.RemoveAllListeners();
+        _tuto.transform.GetChild(3).GetComponent<Button>().onClick.AddListener(() => _tutos.SetActive(false));
     }
 
     //Public methods
