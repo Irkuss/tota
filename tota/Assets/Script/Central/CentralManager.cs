@@ -595,6 +595,7 @@ public class CentralManager : Photon.MonoBehaviour
             {
                 Load(teamName, player.Name);
             }
+            spirit.GetComponent<SpiritHead>().TryCharaSpawn(true);
         }
                 
     }
