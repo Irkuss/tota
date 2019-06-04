@@ -95,6 +95,18 @@ public class Channel : MonoBehaviour
                 _permission.spirit.SpawnAI();
                 mes.GetComponent<Text>().text = "An AI chara was spawned";
             }
+            else if (message == "changemeteo")
+            {
+                DayNightCycle meteo = GameObject.Find("Directional Light").GetComponent<DayNightCycle>();
+                meteo.ForceNextSeason();
+                mes.GetComponent<Text>().text = "The meteo was changed";
+            }
+            else if (message == "forcemeteo")
+            {
+                DayNightCycle meteo = GameObject.Find("Directional Light").GetComponent<DayNightCycle>();
+                meteo.ForceHourBeforeChangingMeteo();
+                mes.GetComponent<Text>().text = "The meteo was forced to 0";
+            }
             else
             {
                 mes.GetComponent<Text>().text = player + " : " + message;
@@ -124,6 +136,18 @@ public class Channel : MonoBehaviour
                 {
                     _permission.spirit.SpawnAI();
                     mes.GetComponent<Text>().text = "An AI chara was spawned";
+                }
+                else if (message == "changemeteo")
+                {
+                    DayNightCycle meteo = GameObject.Find("Directional Light").GetComponent<DayNightCycle>();
+                    meteo.ForceNextSeason();
+                    mes.GetComponent<Text>().text = "The meteo was changed";
+                }
+                else if (message == "forcemeteo")
+                {
+                    DayNightCycle meteo = GameObject.Find("Directional Light").GetComponent<DayNightCycle>();
+                    meteo.ForceHourBeforeChangingMeteo();
+                    mes.GetComponent<Text>().text = "The meteo was forced to 0";
                 }
                 else
                 {
