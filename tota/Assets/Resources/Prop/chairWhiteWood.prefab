@@ -44,6 +44,8 @@ GameObject:
   - component: {fileID: 8764125240151941559}
   - component: {fileID: 4680702856164950331}
   - component: {fileID: 7862363433981805323}
+  - component: {fileID: 1258865114925330912}
+  - component: {fileID: 1242632144769676899}
   m_Layer: 0
   m_Name: whitewood
   m_TagString: Untagged
@@ -136,7 +138,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   isMoving: 0
-  _interTransform: {fileID: 1724517784068387457}
+  particleGameObject: {fileID: 0}
+  _interTransform: {fileID: 2820511607966423838}
   _radius: 4
   _possibleActionNames:
   - Salvage
@@ -144,5 +147,39 @@ MonoBehaviour:
   _isDoWhileAction: 00
   _makesActionNotAppearWhenUnavailable: 00
   salvageTime: 5
-  salvagedItem: {fileID: 11400000, guid: 433a409a197ca2243b17007671504644, type: 2}
-  salvagedItemCount: 1
+  salvagedItem1: {fileID: 11400000, guid: 433a409a197ca2243b17007671504644, type: 2}
+  salvagedItemCount1: 1
+  salvagedItem2: {fileID: 0}
+  salvagedItemCount2: 1
+--- !u!114 &1258865114925330912
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1579193598850417509}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6d07ce676d7afda4dabb3b0f7dd5e654, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_OverrideArea: 0
+  m_Area: 0
+  m_IgnoreFromBuild: 1
+  m_AffectedAgents: ffffffff
+--- !u!208 &1242632144769676899
+NavMeshObstacle:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1579193598850417509}
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Shape: 1
+  m_Extents: {x: 0.55, y: 1.075, z: 0.55}
+  m_MoveThreshold: 0.1
+  m_Carve: 1
+  m_CarveOnlyStationary: 1
+  m_Center: {x: 0.65000004, y: 1.075, z: -1}
+  m_TimeToStationary: 0.5

@@ -13,6 +13,8 @@ GameObject:
   - component: {fileID: 2499778292238034963}
   - component: {fileID: 2995251727501006106}
   - component: {fileID: 5572364175350752931}
+  - component: {fileID: 7220765299373248755}
+  - component: {fileID: 1837420605812454656}
   m_Layer: 0
   m_Name: flower_pot_wood
   m_TagString: Untagged
@@ -131,6 +133,38 @@ MonoBehaviour:
   - {fileID: 6849045935327711866}
   - {fileID: 2060125647338207070}
   - {fileID: 5633262644610143065}
+--- !u!114 &7220765299373248755
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6540518081766924050}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6d07ce676d7afda4dabb3b0f7dd5e654, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_OverrideArea: 0
+  m_Area: 0
+  m_IgnoreFromBuild: 1
+  m_AffectedAgents: ffffffff
+--- !u!208 &1837420605812454656
+NavMeshObstacle:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6540518081766924050}
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Shape: 1
+  m_Extents: {x: 2.0400002, y: 0.88000005, z: 1.2}
+  m_MoveThreshold: 0.1
+  m_Carve: 1
+  m_CarveOnlyStationary: 1
+  m_Center: {x: 0.120000005, y: 0.88000005, z: -0.48000002}
+  m_TimeToStationary: 0.5
 --- !u!1 &7100788506718215726
 GameObject:
   m_ObjectHideFlags: 0

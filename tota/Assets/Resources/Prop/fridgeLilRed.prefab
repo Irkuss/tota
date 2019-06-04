@@ -47,6 +47,7 @@ GameObject:
   - component: {fileID: 330569378345211131}
   - component: {fileID: 4199441959054573360}
   - component: {fileID: 8277145962137439592}
+  - component: {fileID: 8094711198125307067}
   m_Layer: 0
   m_Name: lil'_firdge
   m_TagString: Untagged
@@ -215,3 +216,19 @@ MonoBehaviour:
   m_Area: 0
   m_IgnoreFromBuild: 1
   m_AffectedAgents: ffffffff
+--- !u!208 &8094711198125307067
+NavMeshObstacle:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6973416752288460235}
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Shape: 1
+  m_Extents: {x: 0.9250001, y: 2.125, z: 0.82500005}
+  m_MoveThreshold: 0.1
+  m_Carve: 1
+  m_CarveOnlyStationary: 1
+  m_Center: {x: -1.2750001, y: 2.125, z: 1.6750001}
+  m_TimeToStationary: 0.5

@@ -11,7 +11,7 @@ public class SpiritPPP : MonoBehaviour
     private readonly string tagPPP = "ppp";
     private PostProcessVolume volume = null;
 
-    private ColorGrading _colorgrading = null;
+    private ColorGrading _colorGrading = null;
     private DepthOfField _depthOfField = null;
 
     private readonly float _interpolationTime = 0.7f;
@@ -20,6 +20,7 @@ public class SpiritPPP : MonoBehaviour
     private IEnumerator _cor_focusLerp = null;
 
     private float lastYSpiritPosition;
+
 
     private void Start()
     {
@@ -30,24 +31,10 @@ public class SpiritPPP : MonoBehaviour
 
         GameObject ppp = GameObject.FindGameObjectWithTag(tagPPP);
 
-        if(ppp != null)
-        {
-            volume = ppp.GetComponent<PostProcessVolume>();
+        volume = ppp.GetComponent<PostProcessVolume>();
 
-            if(volume == null)
-            {
-                Debug.LogWarning("SpiritPPP: did not fing postProcessVolume (gameObject with tag '" + tagPPP + "' is missing a PostProcessVolume Component)");
-            }
-            else
-            {
-                volume.profile.TryGetSettings<ColorGrading>(out _colorgrading);
-                volume.profile.TryGetSettings<DepthOfField>(out _depthOfField);
-            }
-        }
-        else
-        {
-            Debug.LogWarning("SpiritPPP: did not fing postProcessVolume (gameObject with tag '" + tagPPP + "')");
-        }
+        volume.profile.TryGetSettings<ColorGrading>(out _colorGrading);
+        volume.profile.TryGetSettings<DepthOfField>(out _depthOfField);
     }
 
     private int coloTest = 0;
@@ -61,13 +48,15 @@ public class SpiritPPP : MonoBehaviour
     private void FixedUpdate()
     {
         Focus();
+
+        UpdateTemperature();
     }
 
     private void Focus()
     {
         if(CustomRaycast(out RaycastHit hit))
         {
-            Debug.DrawLine(_zoom.DesiredPosition, hit.point);
+            //Debug.DrawLine(_zoom.DesiredPosition, hit.point);
 
             Vector3 hitCustomPosition = new Vector3(hit.point.x, hit.transform.position.y, hit.point.z);
             
@@ -87,7 +76,7 @@ public class SpiritPPP : MonoBehaviour
 
                     //Set le Dof
                     _depthOfField.focusDistance.value = Vector3.Distance(_currentTarget, _zoom.DesiredPosition);
-                    Debug.Log("Focus: set focus distance to " + _depthOfField.focusDistance.value);
+                    //Debug.Log("Focus: set focus distance to " + _depthOfField.focusDistance.value);
                 }
             }
 
@@ -147,9 +136,12 @@ public class SpiritPPP : MonoBehaviour
         _depthOfField.focusDistance.value = Vector3.Distance(_currentTarget, _zoom.DesiredPosition);
     }
 
+    private void UpdateTemperature()
+    {
+        int temperature = DayNightCycle.GetCurrentTemperature();
 
-
-
+        _colorGrading.temperature.value = (temperature - 15) * 1.7f;
+    }
 
 
 }

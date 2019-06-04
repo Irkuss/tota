@@ -1,0 +1,34 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a5e57be36f9867544a7ad4dbf3e46789, type: 3}
+  m_Name: ShotgunRecipe 1
+  m_EditorClassIdentifier: 
+  visuPath: Visu/
+  visuSprite: {fileID: 0}
+  result: {fileID: 11400000, guid: e235c6ad0da09684da5ac71eba8120c1, type: 2}
+  resultCount: 1
+  resultPath: 
+  description: "Shotgun x1\n  -skill used: manipulation only\n  -craft time: 16\n
+    \ -requires: mecanician workshop\nRecipe:\n  -Metal parts x4\n  -Weapon parts
+    x8"
+  neededItem:
+  - {fileID: 11400000, guid: 4e8b23ecd7c806b44a0c762728a04a3f, type: 2}
+  - {fileID: 11400000, guid: 39cdc743cf222e948bc8591b9e560e15, type: 2}
+  neededItemCount: 0400000008000000
+  useOnlyManipulation: 1
+  statUsed: 7
+  neededStatLevel: 0
+  maxStatLevelBeforeNotGivingXp: 10
+  trainingModifier: 1
+  recipeNeedWorkshop: 1
+  neededWorkshop: 3
+  baseRecipeTime: 16

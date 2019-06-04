@@ -13,6 +13,8 @@ GameObject:
   - component: {fileID: 6713251535026010875}
   - component: {fileID: 729342399113329132}
   - component: {fileID: 4124535690618589654}
+  - component: {fileID: 6252231330743044653}
+  - component: {fileID: 4509865124657466010}
   m_Layer: 0
   m_Name: greywood+silk
   m_TagString: Untagged
@@ -105,7 +107,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   isMoving: 0
-  _interTransform: {fileID: 1994718211508301586}
+  particleGameObject: {fileID: 0}
+  _interTransform: {fileID: 2417222886093495121}
   _radius: 4
   _possibleActionNames:
   - Salvage
@@ -113,8 +116,42 @@ MonoBehaviour:
   _isDoWhileAction: 00
   _makesActionNotAppearWhenUnavailable: 00
   salvageTime: 5
-  salvagedItem: {fileID: 11400000, guid: 433a409a197ca2243b17007671504644, type: 2}
-  salvagedItemCount: 1
+  salvagedItem1: {fileID: 11400000, guid: 433a409a197ca2243b17007671504644, type: 2}
+  salvagedItemCount1: 1
+  salvagedItem2: {fileID: 0}
+  salvagedItemCount2: 1
+--- !u!114 &6252231330743044653
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5031235712884819654}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6d07ce676d7afda4dabb3b0f7dd5e654, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_OverrideArea: 0
+  m_Area: 0
+  m_IgnoreFromBuild: 1
+  m_AffectedAgents: ffffffff
+--- !u!208 &4509865124657466010
+NavMeshObstacle:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5031235712884819654}
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Shape: 1
+  m_Extents: {x: 0.6, y: 1.125, z: 0.6}
+  m_MoveThreshold: 0.1
+  m_Carve: 1
+  m_CarveOnlyStationary: 1
+  m_Center: {x: -1.4000001, y: 1.125, z: -1.0500001}
+  m_TimeToStationary: 0.5
 --- !u!1 &8515176128066059811
 GameObject:
   m_ObjectHideFlags: 0

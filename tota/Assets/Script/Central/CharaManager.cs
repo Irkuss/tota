@@ -37,12 +37,21 @@ public class CharaManager : MonoBehaviour
         GameObject chara = Instantiate(Resources.Load<GameObject>(_charaPath), pos, Quaternion.identity);
         //Ajoute le chara dans la liste des charas
         _allCharas.Add(chara);
-        //Initialise la team du chara (sur le network)
-        chara.GetComponent<CharaPermissions>().SetTeam(teamName);
+        
         //Initialise les stats du chara
         chara.GetComponent<CharaRpg>().Init(quirks);
 
-        PermissionsManager.Instance.spirit.InstantiateCharaRef(playerName, chara);
+
+        if (teamName != "")
+        {
+            //Initialise la team du chara (sur le network)
+            chara.GetComponent<CharaPermissions>().SetTeam(teamName);
+        }
+
+        if (playerName != "")
+        {
+            PermissionsManager.Instance.spirit.InstantiateCharaRef(playerName, chara);
+        }
 
         return chara;
     }
