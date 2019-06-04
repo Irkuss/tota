@@ -147,7 +147,7 @@ public class FirecampHandler : PropHandler
 
     private void SetFireState(bool setToLit)
     {
-        Debug.Log("SetFireState: setting fire state to " + setToLit);
+        //Debug.Log("SetFireState: setting fire state to " + setToLit);
 
         _isLit = setToLit;
         fireGo.SetActive(setToLit);

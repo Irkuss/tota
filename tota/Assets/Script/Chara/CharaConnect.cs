@@ -19,7 +19,9 @@ public class CharaConnect : MonoBehaviour
         SetOwnerNull,
         ModifyCountWithId,
         ReceiveAddWound,
-        TrainStat
+        TrainStat,
+        ShootSound,
+        MeleeSound,
     }
     // Start is called before the first frame update
     void Awake()
@@ -46,6 +48,8 @@ public class CharaConnect : MonoBehaviour
             case CharaCommand.ModifyCountWithId: GetComponent<CharaInventory>().ModifyCountWithId(i[0],i[1]); break;
             case CharaCommand.ReceiveAddWound: GetComponent<CharaRpg>().ReceiveAddWound(i[0], i[1], s[0], s[1], f[0]); break;
             case CharaCommand.TrainStat: GetComponent<CharaRpg>().RPC_TrainStat((CharaRpg.Stat)i[0], f[0]); break;
+            case CharaCommand.ShootSound: GetComponent<CharaInteract>().MakeSoundShot(); break;
+            case CharaCommand.MeleeSound: GetComponent<CharaInteract>().MakeSoundMelee(); break;
         }
     }
 }

@@ -69,7 +69,11 @@ public class CharaAi : AiDeactivator
         {
             if(_canTakeDecision)
             {
-                MainUpdateAi();
+
+                if(!_rpg.ShouldBeDown())
+                {
+                    MainUpdateAi();
+                }
 
                 CheckDeactivate();
             }
@@ -221,7 +225,7 @@ public class CharaAi : AiDeactivator
 
     private void UpdateRotation()
     {
-        if(_targetToFace != null)
+        if(_targetToFace != null && !_rpg.ShouldBeDown())
         {
             Vector3 direction = (_targetToFace.position - transform.position).normalized;
             //Debug.Log("UpdateRotation: direction is (" + _targetToFace.position + " - " + transform.position + ").normalized = " + direction);

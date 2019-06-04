@@ -305,19 +305,25 @@ public class CharaHead : Photon.PunBehaviour
     {
         if (_focus == null) Debug.LogWarning("CheckDistanceInter: Unexpected null focus");
 
-        //Verification de la distance par rapport au focus
-        while (Vector3.Distance(transform.position, _focus.InterTransform.position) > _focus.Radius * 0.8f)
+        if (actionIndex < 0 || (actionIndex >= 0 && !_focus.IsDistanceAction[actionIndex]))
         {
-            if(_focus.isMoving)
+            //Verification de la distance par rapport au focus
+            while (Vector3.Distance(transform.position, _focus.InterTransform.position) > _focus.Radius * 0.8f)
             {
-                bool isRunning = false;
-                CharaMovement movementCompOfFocus = _focus.transform.GetComponent<CharaMovement>();
-                if (movementCompOfFocus != null) isRunning = movementCompOfFocus.IsRunning;
+                if (_focus.isMoving)
+                {
+                    bool isRunning = false;
+                    CharaMovement movementCompOfFocus = _focus.transform.GetComponent<CharaMovement>();
+                    if (movementCompOfFocus != null) isRunning = movementCompOfFocus.IsRunning;
 
-                _movement.MoveToInter(_focus, isRunning); //Update les positions si on sait qu'il bouge
+                    _movement.MoveToInter(_focus, isRunning); //Update les positions si on sait qu'il bouge
+                }
+                yield return new WaitForSeconds(0.5f);
             }
-            yield return new WaitForSeconds(0.5f);
         }
+
+
+            
         //Debug.Log("CharaHead: reached Inter, starting waiting time of " + _focus.GetActionTime(this, actionIndex));
 
         _movement.StopAgent();

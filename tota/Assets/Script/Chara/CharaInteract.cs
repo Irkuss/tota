@@ -5,12 +5,20 @@ using UnityEngine;
 public class CharaInteract : Interactable
 {
     //Private attribute
+    [SerializeField] private GameObject soundWaveGo = null;
+
+    private ParticleSystem soundWaveParticle = null;
 
     //Start
     private void Start()
     {
         //Call the Init for OrganicOpacity
         BeginOpacity();
+
+        if(soundWaveGo != null)
+        {
+            //soundWaveParticle = soundWaveGo.GetComponent<ParticleSystem>();
+        }
     }
 
     //====================Override Interactable====================
@@ -20,8 +28,8 @@ public class CharaInteract : Interactable
         
         switch (actionIndex)
         {
-            case 0: AttackWithSlot(chara, 0); AudioManager.instance.Play("Coup"); break;//melee 0
-            case 1: AttackWithSlot(chara, 1); AudioManager.instance.Play("Coup"); break;//melee 1
+            case 0: AttackWithSlot(chara, 0); break;//melee 0
+            case 1: AttackWithSlot(chara, 1); break;//melee 1
             case 2: AttackWithSlot(chara, 0); break;//remote 0
             case 3: AttackWithSlot(chara, 1); break;//remote 1
             case 4: break; //Follow target
@@ -83,11 +91,17 @@ public class CharaInteract : Interactable
 
                 if (true)//rpg.GetCheck(CharaRpg.Stat.ms_strength))
                 {
+                    chara.GetComponent<CharaInteract>().SendMeleeSound();
+
                     GetComponent<CharaRpg>().GetAttackedWith(weapon, weapon.damage);
                 }
             }
             else
             {
+                chara.GetComponent<CharaInteract>().SendShootSound();
+
+
+
                 float distance = Vector3.Distance(transform.position, chara.transform.position);
 
                 int damage = 
@@ -224,4 +238,28 @@ public class CharaInteract : Interactable
     {
         return 1;
     }
+
+    //====================Sound wave====================
+    public void SendShootSound()
+    {
+        GetComponent<CharaConnect>().SendMsg(CharaConnect.CharaCommand.ShootSound);
+    }
+    public void SendMeleeSound()
+    {
+        GetComponent<CharaConnect>().SendMsg(CharaConnect.CharaCommand.MeleeSound);
+    }
+
+    public void MakeSoundShot()
+    {
+        //soundWaveParticle.Emit(1);
+        Instantiate(soundWaveGo, transform.position + Vector3.up * 1f, Quaternion.identity);
+
+        AudioManager.instance.PlayAtPosition("Claque", transform.position);
+    }
+    public void MakeSoundMelee()
+    {
+        AudioManager.instance.PlayAtPosition("Coup", transform.position);
+    }
+
+
 }

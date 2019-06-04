@@ -777,15 +777,16 @@ public class SpiritHead : Photon.MonoBehaviour
     public void IndexActionHandler(Interactable inter, int actionIndex)
     {
         //Debug.Log("IndexActionHandler: Index chosen, giving order to all charas");
-        if(inter.IsDistanceAction[actionIndex]) //Si l'action en question est une action à distance (on a déjà verifié qu'elle était available)
+        /*if(inter.IsDistanceAction[actionIndex]) //Si l'action en question est une action à distance (on a déjà verifié qu'elle était available)
         {
             SetInteractAll(inter, actionIndex);
         }
         else
         {
             SetFocusAll(inter, actionIndex);
-        }
+        }*/
 
+        SetFocusAll(inter, actionIndex);
     }
 
     private void SetFocusAll(Interactable inter, int actionIndex)
