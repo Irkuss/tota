@@ -93,7 +93,7 @@ public class CentralManager : Photon.MonoBehaviour
     
     //Unity Callbacks
     private void Awake()
-    {
+    {     
         online = Mode.Instance.online;
         permi = PermissionsManager.Instance;
         if (online)
@@ -111,7 +111,7 @@ public class CentralManager : Photon.MonoBehaviour
     }
 
     private void Start()
-    {
+    {        
         tempButton.SetActive(false);
         dayNightCycle = GameObject.Find("Directional Light").GetComponent<DayNightCycle>();
     }

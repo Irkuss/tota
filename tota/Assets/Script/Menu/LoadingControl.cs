@@ -20,6 +20,7 @@ public class LoadingControl : MonoBehaviour
 
     public void Start()
     {
+        AudioManager.instance.EndMusic("Menu");
         StartCoroutine(LoadAsynchronously(3));
     }
 

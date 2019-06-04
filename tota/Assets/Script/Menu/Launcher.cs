@@ -507,6 +507,7 @@ public class Launcher : Photon.PunBehaviour
         PhotonNetwork.Destroy(PermissionsManager.Instance.gameObject);
         Destroy(Mode.Instance.gameObject);
         PhotonNetwork.Disconnect();
+        AudioManager.instance.EndMusic("Menu");
         SceneManager.LoadScene(0);
     }
 

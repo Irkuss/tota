@@ -10,7 +10,7 @@ public class MainMenu : MonoBehaviour
     [SerializeField] private GameObject _launchButton = null;
     [SerializeField] private GameObject _loadText = null;
 
-    private void Awake()
+    private void Start()
     {
         AudioManager.instance.Play("Menu");
     }

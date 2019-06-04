@@ -48,19 +48,31 @@ public class Mode : MonoBehaviour
     public void Solo()
     {
         _mode = "solo";
-        if (!online) SceneManager.LoadScene(3);
+        if (!online)
+        {
+            AudioManager.instance.EndMusic("Menu");
+            SceneManager.LoadScene(3);
+        }
     }   
 
     public void Cold()
     {
         _mode = "cold";
-        if (!online) SceneManager.LoadScene(3);
+        if (!online)
+        {
+            AudioManager.instance.EndMusic("Menu");
+            SceneManager.LoadScene(3);
+        }
     }
 
     public void Zombie()
     {
         _mode = "zombie";
-        if (!online) SceneManager.LoadScene(3);
+        if (!online)
+        {
+            AudioManager.instance.EndMusic("Menu");
+            SceneManager.LoadScene(3);
+        }
     }
 
     public void Load()
@@ -96,6 +108,7 @@ public class Mode : MonoBehaviour
 
     public void LaunchLoad()
     {
+        AudioManager.instance.EndMusic("Menu");
         SceneManager.LoadScene(3);
     }
 
