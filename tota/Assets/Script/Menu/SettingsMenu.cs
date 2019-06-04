@@ -11,6 +11,7 @@ public class SettingsMenu : MonoBehaviour
 
     Resolution[] resolutions;
     [SerializeField] private Toggle _fullscreen = null;
+    [SerializeField] private Slider _volume = null;
 
     private void Start()
     {
@@ -40,8 +41,9 @@ public class SettingsMenu : MonoBehaviour
         
     }
 
-    public void SetVolume(float volume)
+    public void SetVolume()
     {
+        float volume = _volume.value;
         AudioManager.instance.ChangeVolume("Menu", volume);
     }
 
