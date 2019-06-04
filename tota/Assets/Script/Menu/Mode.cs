@@ -37,6 +37,7 @@ public class Mode : MonoBehaviour
         Instance = this;
         DontDestroyOnLoad(this);
 
+        zqsd = PlayerPrefs.GetString("move") == "z";
     }
 
     public string ModeGame()

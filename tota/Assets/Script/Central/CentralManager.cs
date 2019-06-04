@@ -23,7 +23,8 @@ public class CentralManager : Photon.MonoBehaviour
     [SerializeField] private GameObject _charaRef = null;
     [SerializeField] private GameObject _options = null;
     [SerializeField] private GameObject _save = null;
-    [SerializeField] private GameObject _quit = null;    
+    [SerializeField] private GameObject _quit = null;
+    [SerializeField] private Slider _volume = null;
 
     public static bool isPause = false;
     private bool online;
@@ -102,7 +103,11 @@ public class CentralManager : Photon.MonoBehaviour
             {
                 team = permi.GetTeamWithPlayer(player);
             }
-        }               
+        }
+        _options.transform.GetChild(0).GetChild(0).GetChild(0).GetComponent<Text>().text = PlayerPrefs.GetString("move") != "" ? PlayerPrefs.GetString("move") : "w";
+        _options.transform.GetChild(1).GetChild(0).GetChild(0).GetComponent<Text>().text = PlayerPrefs.GetString("interface") != "" ? PlayerPrefs.GetString("interface") : "e";
+        _options.transform.GetChild(2).GetChild(0).GetChild(0).GetComponent<Text>().text = PlayerPrefs.GetString("channel") != "" ? PlayerPrefs.GetString("channel") : "c";
+        _options.transform.GetChild(3).GetChild(0).GetChild(0).GetComponent<Text>().text = PlayerPrefs.GetString("build") != "" ? PlayerPrefs.GetString("build") : "b";
     }
 
     private void Start()
@@ -188,6 +193,12 @@ public class CentralManager : Photon.MonoBehaviour
         if (_options.transform.GetChild(0).GetChild(0).GetComponent<InputField>().text == "z")
         {
             Mode.Instance.zqsd = true;
+            PlayerPrefs.SetString("move", "z");
+        }
+        else if (_options.transform.GetChild(0).GetChild(0).GetComponent<InputField>().text == "w")
+        {
+            Mode.Instance.zqsd = false;
+            PlayerPrefs.SetString("move", "w");
         }
     }
 
@@ -195,33 +206,52 @@ public class CentralManager : Photon.MonoBehaviour
     {
         if(_options.transform.GetChild(1).GetChild(0).GetComponent<InputField>().text == "")
         {
-            _options.transform.GetChild(1).GetChild(0).GetComponent<InputField>().text = Mode.Instance.interfaCe;
+            //_options.transform.GetChild(1).GetChild(0).GetComponent<InputField>().text = Mode.Instance.interfaCe;
+            _options.transform.GetChild(1).GetChild(0).GetComponent<InputField>().text = PlayerPrefs.GetString("interface");
             return;
         }
 
         Mode.Instance.interfaCe = _options.transform.GetChild(1).GetChild(0).GetComponent<InputField>().text;
+        PlayerPrefs.SetString("interface", _options.transform.GetChild(1).GetChild(0).GetComponent<InputField>().text);
     }
 
     public void ChannelOption()
     {
         if (_options.transform.GetChild(2).GetChild(0).GetComponent<InputField>().text == "")
         {
-            _options.transform.GetChild(2).GetChild(0).GetComponent<InputField>().text = Mode.Instance.channel;
+            //_options.transform.GetChild(2).GetChild(0).GetComponent<InputField>().text = Mode.Instance.channel;
+            _options.transform.GetChild(2).GetChild(0).GetComponent<InputField>().text = PlayerPrefs.GetString("channel");
             return;
         }
 
         Mode.Instance.channel = _options.transform.GetChild(2).GetChild(0).GetComponent<InputField>().text;
+        PlayerPrefs.SetString("channel",_options.transform.GetChild(2).GetChild(0).GetComponent<InputField>().text);
     }
 
     public void BuildOption()
     {
         if (_options.transform.GetChild(3).GetChild(0).GetComponent<InputField>().text == "")
         {
-            _options.transform.GetChild(3).GetChild(0).GetComponent<InputField>().text = Mode.Instance.build;
+            //_options.transform.GetChild(3).GetChild(0).GetComponent<InputField>().text = Mode.Instance.build;
+            _options.transform.GetChild(3).GetChild(0).GetComponent<InputField>().text = PlayerPrefs.GetString("build");
             return;
         }
 
         Mode.Instance.build = _options.transform.GetChild(3).GetChild(0).GetComponent<InputField>().text;
+        PlayerPrefs.SetString("build",_options.transform.GetChild(3).GetChild(0).GetComponent<InputField>().text);
+    }
+
+    public void ChangeVolume()
+    {
+        float volume = _volume.value;
+        if (dayNightCycle.IsDayTime)
+        {
+            AudioManager.instance.ChangeVolume("Solitude", volume);
+        }
+        else
+        {
+            AudioManager.instance.ChangeVolume("Nightwalk", volume);
+        }
     }
 
     public void Quit()
