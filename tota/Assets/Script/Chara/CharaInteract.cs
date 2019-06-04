@@ -200,9 +200,7 @@ public class CharaInteract : Interactable
         else
         {
             GetComponent<CharaPermissions>().SetTeam("");
-        }
-
-        PermissionsManager.Instance.spirit.InstantiateCharaRef(PhotonNetwork.player.NickName, gameObject);
+        }        
 
         GetComponent<CharaMovement>().StopAgent();
     }

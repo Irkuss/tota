@@ -139,7 +139,7 @@ public class DayNightCycle : MonoBehaviour
             ForceNextSeason();
         }
     }
-    private void ForceNextSeason()
+    public void ForceNextSeason()
     {
         int next = ((int)_currentSeason + 1) % 4;
         switch (next)
@@ -154,6 +154,11 @@ public class DayNightCycle : MonoBehaviour
 
     //Meteo Update
     private int hourBeforeChangingMeteo;
+
+    public void ForceHourBeforeChangingMeteo()
+    {
+        hourBeforeChangingMeteo = 0;
+    }
 
     private void MeteoUpdate()
     {

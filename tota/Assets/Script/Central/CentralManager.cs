@@ -230,7 +230,15 @@ public class CentralManager : Photon.MonoBehaviour
             _save.SetActive(true);
             _quit.SetActive(true);
         }
+        else
+        {
+            Application.Quit();
+        }
+        
+    }
 
+    public void LastQuit()
+    {
         Application.Quit();
     }
 
@@ -587,6 +595,7 @@ public class CentralManager : Photon.MonoBehaviour
             {
                 Load(teamName, player.Name);
             }
+            spirit.GetComponent<SpiritHead>().TryCharaSpawn(true);
         }
                 
     }
