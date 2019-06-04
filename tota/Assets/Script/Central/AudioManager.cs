@@ -67,6 +67,7 @@ public class AudioManager : MonoBehaviour
     public IEnumerator EndMusic(string son)
     {
         Sound sound = Array.Find(sounds, item => item.name == son);
+        
         AudioSource oldSound = sound.source;
         while (oldSound.volume > 0)
         {
@@ -86,5 +87,11 @@ public class AudioManager : MonoBehaviour
             sound.source.volume += 0.01f;
             yield return new WaitForSeconds(.1f);
         }
+    }
+
+    public void ChangeVolume(string music, float volume)
+    {
+        Sound sound = Array.Find(sounds, item => item.name == music);
+        sound.source.volume = volume;
     }
 }

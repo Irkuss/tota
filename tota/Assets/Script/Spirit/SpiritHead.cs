@@ -100,11 +100,13 @@ public class SpiritHead : Photon.MonoBehaviour
     {
         yield return new WaitForSeconds(1f);
 
-        _tutos.SetActive(true);
+        /*_tutos.SetActive(true);
         _tuto.transform.GetChild(0).GetComponent<Text>().text = "Now that you understood the bases of the movements you can really enter into the game : Press space to make spawn a character.";
         Mode.Instance.firstTime = 2;
         _tuto.transform.GetChild(3).GetComponent<Button>().onClick.RemoveAllListeners();
-        _tuto.transform.GetChild(3).GetComponent<Button>().onClick.AddListener(() => StartCoroutine(SpawnTuto()));
+        _tuto.transform.GetChild(3).GetComponent<Button>().onClick.AddListener(() => StartCoroutine(SpawnTuto()));*/
+
+        StartCoroutine(SpawnTuto());
     }
 
     public IEnumerator MoveTuto()
@@ -210,7 +212,7 @@ public class SpiritHead : Photon.MonoBehaviour
         yield return new WaitForSeconds(1f);
 
         _tutos.SetActive(true);
-        _tuto.transform.GetChild(0).GetComponent<Text>().text = "Nice, you have created a new character. You can select him with a left click on him.";
+        _tuto.transform.GetChild(0).GetComponent<Text>().text = "You have a character and you can select him with a left click on him.";
         mode.firstTime = 3;
         _tuto.transform.GetChild(3).GetComponent<Button>().onClick.RemoveAllListeners();
         _tuto.transform.GetChild(3).GetComponent<Button>().onClick.AddListener(() => StartCoroutine(MoveCharaTuto()));

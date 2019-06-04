@@ -42,7 +42,7 @@ public class SettingsMenu : MonoBehaviour
 
     public void SetVolume(float volume)
     {
-        audioMixer.SetFloat("Volume", volume);
+        AudioManager.instance.ChangeVolume("Menu", volume);
     }
 
     public void SetQuality(int qualityIndex)

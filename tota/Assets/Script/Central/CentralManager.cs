@@ -158,7 +158,9 @@ public class CentralManager : Photon.MonoBehaviour
         PhotonNetwork.Destroy(PermissionsManager.Instance.gameObject);
         Destroy(Mode.Instance.gameObject);
         PhotonNetwork.Disconnect();
-        SceneManager.LoadScene(0);
+        AudioManager.instance.EndMusic("Nightwalk");
+        AudioManager.instance.EndMusic("Solitude");
+        SceneManager.LoadScene(0);        
     }
 
     public void Options()
@@ -230,7 +232,15 @@ public class CentralManager : Photon.MonoBehaviour
             _save.SetActive(true);
             _quit.SetActive(true);
         }
+        else
+        {
+            Application.Quit();
+        }
+        
+    }
 
+    public void LastQuit()
+    {
         Application.Quit();
     }
 
@@ -587,7 +597,22 @@ public class CentralManager : Photon.MonoBehaviour
             {
                 Load(teamName, player.Name);
             }
+            spirit.GetComponent<SpiritHead>().TryCharaSpawn(true);
         }
                 
+    }
+
+    //Meteo
+
+    public void SendMeteo(int forceMeteo)
+    {
+        GetComponent<PhotonView>().RPC("SetMeteo", PhotonTargets.AllBuffered, forceMeteo);
+    }
+
+
+    [PunRPC]
+    public void SetMeteo(int meteo)
+    {
+        dayNightCycle.ReceiveSetMeteo(meteo);
     }
 }

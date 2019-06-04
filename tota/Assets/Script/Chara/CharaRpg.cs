@@ -1097,7 +1097,6 @@ public class CharaRpg : MonoBehaviour
             DieZombie();
             return;
         }
-        Destroy(gameObject);
         Debug.Log("======================= CharaRpg: " + NameFull + " has died =======================");
     }
     private void DieZombie()
