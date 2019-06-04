@@ -25,6 +25,9 @@ public class DayNightCycle : MonoBehaviour
     public delegate void NewSeason(Seasons saison);
     public static event NewSeason onNewseason;
 
+    public delegate void NewMeteo(Meteo newMeteo);
+    public static event NewMeteo onNewMeteo;
+
     //day time status
     private static bool _isDayTime = true;
     public bool IsDayTime => _isDayTime;
@@ -44,8 +47,16 @@ public class DayNightCycle : MonoBehaviour
         {Seasons.WINTER, 0 },
         {Seasons.SPRING, 15 }
     };
-    
-    
+    //Meteo attribute
+    public enum Meteo
+    {
+        Clear,
+        Rain,
+        Snow,
+    }
+
+    private Meteo _currentMeteo;
+
     //Start
     private void Start()
     {
@@ -56,6 +67,9 @@ public class DayNightCycle : MonoBehaviour
         transform.rotation = Quaternion.Euler(0, 60, 0);
         _sliderProgressStatus = 0.5f;
         AudioManager.instance.StartCoroutine("StartMusic", "Solitude");
+
+
+        hourBeforeChangingMeteo = Random.Range(0, 1);
     }
 
     //Update
@@ -65,6 +79,8 @@ public class DayNightCycle : MonoBehaviour
         
         Cycle();
         CheckNextSeason();
+
+
     }
 
     private void Cycle()
@@ -79,6 +95,7 @@ public class DayNightCycle : MonoBehaviour
         {
             Debug.Log("CallNewHour: starting new hour");
             CallNewHour();
+            MeteoUpdate();
             //Handling daynight changes
             if (heure >= 20f && heure <= 21f)
             {
@@ -135,6 +152,56 @@ public class DayNightCycle : MonoBehaviour
         CallNewSeason();
     }
 
+    //Meteo Update
+    private int hourBeforeChangingMeteo;
+
+    private void MeteoUpdate()
+    {
+        if(hourBeforeChangingMeteo <= 0)
+        {
+            Debug.Log("MeteoUpdate");
+            Meteo newMeteo;
+
+            int rng = Random.Range(0, 2);
+
+            //Decide de la meteo
+            if(rng == 0)
+            {
+                newMeteo = Meteo.Clear;
+            }
+            else
+            {
+                if(_currentSeason == Seasons.WINTER)
+                {
+                    newMeteo = Meteo.Snow;
+                }
+                else
+                {
+                    newMeteo = Meteo.Rain;
+                }
+            }
+
+            //Change la meteo
+            _currentMeteo = newMeteo;
+
+            CallNewMeteo();
+
+            //Prepare le prochain changement
+            hourBeforeChangingMeteo = Random.Range(0, 1);
+        }
+        else
+        {
+            hourBeforeChangingMeteo--;
+        }
+    }
+
+    public void DebugForceMeteo(Meteo forceMeteo)
+    {
+        _currentMeteo = forceMeteo;
+
+        CallNewMeteo();
+    }
+
     //Getters
     public static int GetCurrentTemperature()
     {
@@ -154,9 +221,18 @@ public class DayNightCycle : MonoBehaviour
     }
     private void CallNewSeason()
     {
+        Debug.Log("CallNewSeason: new season");
+
         if (onNewseason != null) //Si une personne nous écoute
         {
             onNewseason(_currentSeason); //Declenche le callback chez les spectateurs
+        }
+    }
+    private void CallNewMeteo()
+    {
+        if(onNewMeteo != null)
+        {
+            onNewMeteo(_currentMeteo);
         }
     }
 

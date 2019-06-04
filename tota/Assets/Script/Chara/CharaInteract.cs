@@ -202,6 +202,8 @@ public class CharaInteract : Interactable
             GetComponent<CharaPermissions>().SetTeam("");
         }
 
+        PermissionsManager.Instance.spirit.InstantiateCharaRef(PhotonNetwork.player.NickName, gameObject);
+
         GetComponent<CharaMovement>().StopAgent();
     }
     private bool CheckConvince(CharaHead chara, int actionIndex)

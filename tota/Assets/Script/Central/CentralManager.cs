@@ -42,7 +42,7 @@ public class CentralManager : Photon.MonoBehaviour
     public GameObject CharaLayout { get { return _charaLayout; } }
 
     [SerializeField] private GameObject _channel = null;
-    public GameObject Channel { get { return _channel; } }
+    public GameObject Channels { get { return _channel; } }
 
     [SerializeField] private GameObject _tooltipL = null;
     [SerializeField] private GameObject _background = null;
@@ -125,7 +125,9 @@ public class CentralManager : Photon.MonoBehaviour
 
     private void Update()
     {
-        if(Input.GetKeyDown(KeyCode.Escape) || Input.GetKeyDown(KeyCode.P))
+        if (Channel.isWriting) return;
+
+        if (Input.GetKeyDown(KeyCode.Escape) || Input.GetKeyDown(KeyCode.P))
         {
             if (isPause)
             {
@@ -154,7 +156,7 @@ public class CentralManager : Photon.MonoBehaviour
     {        
         PhotonNetwork.Destroy(gameObject);
         PhotonNetwork.Destroy(PermissionsManager.Instance.gameObject);
-        PhotonNetwork.Destroy(Mode.Instance.gameObject);
+        Destroy(Mode.Instance.gameObject);
         PhotonNetwork.Disconnect();
         SceneManager.LoadScene(0);
     }
@@ -485,21 +487,34 @@ public class CentralManager : Photon.MonoBehaviour
         }
         else
         {
-            _tuto.transform.parent.gameObject.SetActive(true);
-            _tuto.transform.GetChild(0).GetComponent<Text>().text = "Welcome in the solo mode of Tales of the Apocalypse. This is a short tutorial for you to understand the main commands of the game";
-            _tuto.transform.GetChild(1).GetComponent<Button>().onClick.AddListener(SpawnButton);
-            _tuto.transform.GetChild(2).GetComponent<Button>().onClick.AddListener(delegate
+            _tuto.SetActive(true);
+            _tuto.transform.GetChild(1).GetChild(0).GetComponent<Text>().text = "Welcome in the solo mode of Tales of the Apocalypse. This is a short tutorial for you to understand how to begin in the game";
+            _tuto.transform.GetChild(1).GetChild(1).GetComponent<Button>().onClick.AddListener(SpawnButton);
+            _tuto.transform.GetChild(1).GetChild(2).GetComponent<Button>().onClick.AddListener(delegate
             {
                 Mode.Instance.isSkip = true;
                 SpawnButton();
             });
+            _tuto.transform.GetChild(1).GetChild(3).GetComponent<Button>().onClick.AddListener(() => TestSpiritTuto());
         }       
+    }
+    
+    private void TestSpiritTuto()
+    {
+        if (permi.spirit == null)
+        {
+            SpawnButton();
+        }
+        else
+        {
+            StartCoroutine(permi.spirit.MoveTuto());
+        }
     }
 
     private void SpawnButton()
     {
         tempButton.SetActive(true);
-        _tuto.transform.parent.gameObject.SetActive(false);
+        _tuto.SetActive(false);
     }
 
     //Spawn le joueur (appelé par le bouton spawn)
@@ -562,7 +577,7 @@ public class CentralManager : Photon.MonoBehaviour
         {
             for (int i = 0; i < permi.numberChara; i++)
             {
-                spirit.GetComponent<SpiritHead>().TryCharaSpawn(true,_charaLayout);
+                spirit.GetComponent<SpiritHead>().TryCharaSpawn(true);
             }
         }
 

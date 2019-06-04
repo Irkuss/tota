@@ -59,7 +59,7 @@ public class SpiritMovement : Photon.MonoBehaviour
         {
             if (Mode.Instance.firstTime == 0 && !Mode.Instance.isSkip)
             {
-                StartCoroutine(MoveTuto());
+                MoveTuto();
             }
 
             GameObject _actions = GameObject.Find("eCentralManager").GetComponent<CentralManager>().Actions;
@@ -77,13 +77,8 @@ public class SpiritMovement : Photon.MonoBehaviour
         rb.AddForce(movement * cameraSpeed, fm);
     }
 
-    private IEnumerator MoveTuto()
+    private void MoveTuto()
     {
-        yield return new WaitForSeconds(1f);
-
-        GameObject tuto = GameObject.Find("eCentralManager").GetComponent<CentralManager>().Tuto;
-        tuto.SetActive(true);
-        tuto.transform.GetChild(0).GetComponent<Text>().text = "You can also zoom or dezoom the vision of the camera of your current position";
-        Mode.Instance.firstTime = 1;
+        StartCoroutine(PermissionsManager.Instance.spirit.MoveTuto());
     }
 }

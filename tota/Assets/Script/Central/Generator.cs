@@ -1298,6 +1298,7 @@ public class Generator : MonoBehaviour
                             //treePositions.Add(position);
                         }
                     }
+                    if (i % 50 == 0) yield return null;
                 }
                 Debug.Log("Generate: Starting tree placement as MasterClient at '" + x + "," + y + "'");
                 MasterMassLightPlaceTree(propManager, treePositions);
