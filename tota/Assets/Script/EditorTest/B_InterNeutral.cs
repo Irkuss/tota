@@ -9,13 +9,13 @@ using UnityEngine.AI;
 public class B_InterNeutral : MonoBehaviour
 {
     [Header("Prop context")]
-    public string propFolder = "";
-    public string subPropFolder = "cars";
+    public string propGameobjectFolder = "bathRoom";//propGameobjectFolder
+    public string propScriptableObjectPathFolder = "";//propScriptableObjectPathFolder
     [Header("NavMeshModifier")]
     public bool canChangeLocation = true;
     public bool isAnObstacle = true;
     [Header("Auto-fill Interactable")]
-    public int actionCount = 2;
+    public int actionCount = 0;
     [Header("Auto-fill Furniture")]
     public LootTable lootTable = null;
 
@@ -28,31 +28,31 @@ public class B_InterNeutral : MonoBehaviour
         Debug.Log("BuildInterNeutral: Building PropHandler Components");
         //Verification des input
 
-        if (propFolder != "") 
+        if (propScriptableObjectPathFolder != "") 
         {
             //Rajoute un '/' devant le chemin du folder s'il est oublié
-            if(propFolder[0] != '/')
+            if(propScriptableObjectPathFolder[0] != '/')
             {
-                propFolder = "/" + propFolder;
+                propScriptableObjectPathFolder = "/" + propScriptableObjectPathFolder;
                 Debug.Log("BuildInterNeutral: Unexpected missing '/', added '/' to propFolder");
             }
         }
         else Debug.LogWarning("BuildInterNeutral: Unexpected missing propFolder, this should be normal only when testing!");
-        if (subPropFolder != "")
+        if (propGameobjectFolder != "")
         {
             //Rajoute un '/' devant le chemin du folder s'il est oublié
-            if (subPropFolder[0] != '/')
+            if (propGameobjectFolder[0] != '/')
             {
-                subPropFolder = "/" + subPropFolder;
+                propGameobjectFolder = "/" + propGameobjectFolder;
                 Debug.Log("BuildInterNeutral: Unexpected missing '/', added '/' to subPropFolder");
             }
         }
         //==========Ajoute le prop équivalent==========
         string nickName = transform.parent.name;
-        Prop createdPropSo = CreateProp(nickName, propFolder);
+        Prop createdPropSo = CreateProp(nickName, propScriptableObjectPathFolder);
         createdPropSo.nickName = nickName;
 
-        createdPropSo.path = "Prop" + subPropFolder + "/" + nickName;
+        createdPropSo.path = "Prop" + propGameobjectFolder + "/" + nickName;
 
         Debug.Log("BuildInterNeutral: Successfuly added Prop to " + createdPropSo.path);
 
