@@ -128,6 +128,9 @@ public class PropFurniture : SalvageHandler
     {
         if (!CheckAvailability(chara, 0)) return; //Si au moment d'arriver, le furniture est finalement utilisé annule tout
 
+        //Test Son Open Chest
+        AudioManager.instance.Play("Coffre");
+
         //Marque le furniture comme étant utilisé
         SendToggleUsage(true);
         _charaUsing = chara;

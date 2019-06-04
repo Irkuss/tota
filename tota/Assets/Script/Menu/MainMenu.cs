@@ -10,6 +10,11 @@ public class MainMenu : MonoBehaviour
     [SerializeField] private GameObject _launchButton = null;
     [SerializeField] private GameObject _loadText = null;
 
+    private void Awake()
+    {
+        AudioManager.instance.Play("Menu");
+    }
+
     public void SoloGame()
     {
         PhotonNetwork.offlineMode = true;

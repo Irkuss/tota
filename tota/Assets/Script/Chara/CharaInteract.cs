@@ -20,8 +20,8 @@ public class CharaInteract : Interactable
         
         switch (actionIndex)
         {
-            case 0: AttackWithSlot(chara, 0); break;//melee 0
-            case 1: AttackWithSlot(chara, 1); break;//melee 1
+            case 0: AttackWithSlot(chara, 0); AudioManager.instance.Play("Coup"); break;//melee 0
+            case 1: AttackWithSlot(chara, 1); AudioManager.instance.Play("Coup"); break;//melee 1
             case 2: AttackWithSlot(chara, 0); break;//remote 0
             case 3: AttackWithSlot(chara, 1); break;//remote 1
             case 4: break; //Follow target

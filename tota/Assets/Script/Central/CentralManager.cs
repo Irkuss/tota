@@ -158,7 +158,9 @@ public class CentralManager : Photon.MonoBehaviour
         PhotonNetwork.Destroy(PermissionsManager.Instance.gameObject);
         Destroy(Mode.Instance.gameObject);
         PhotonNetwork.Disconnect();
-        SceneManager.LoadScene(0);
+        AudioManager.instance.EndMusic("Nightwalk");
+        AudioManager.instance.EndMusic("Solitude");
+        SceneManager.LoadScene(0);        
     }
 
     public void Options()
