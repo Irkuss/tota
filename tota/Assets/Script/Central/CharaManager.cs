@@ -42,7 +42,10 @@ public class CharaManager : MonoBehaviour
         //Initialise les stats du chara
         chara.GetComponent<CharaRpg>().Init(quirks);
 
-        PermissionsManager.Instance.spirit.InstantiateCharaRef(playerName, chara);
+        if(playerName != "")
+        {
+            PermissionsManager.Instance.spirit.InstantiateCharaRef(playerName, chara);
+        }
 
         return chara;
     }

@@ -7,34 +7,48 @@ public class zombieProp : MonoBehaviour
     public int chanceToSpawn = 50;
     public string path = "Prop/zombieProp";
 
-    
+    public bool spawningZombie = false;
+    public bool spawningRat = false;
+    public bool spawningAi = false;
+
+
 
     private void Start()
     {
         //StartCoroutine(WaitForNavmeh());
 
-        Generator.onGenerationFinished += InstantiateZombie;
-    }
 
-    private IEnumerator WaitForNavmeh()
-    {
-        yield return new WaitForSeconds(3f);
-
-        InstantiateZombie();
+        if((Mode.Instance.ShouldZombieSpawn && spawningZombie)
+            || (Mode.Instance.ShouldAiSpawn && spawningAi)
+            || spawningRat)
+        {
+            Generator.onGenerationFinished += InstantiateZombie;
+        }
+        else
+        {
+            Destroy(this.gameObject);
+        }
     }
 
     private void InstantiateZombie()
     {
         if (PhotonNetwork.isMasterClient)
         {
-            if (Random.Range(0, 100) < chanceToSpawn)
+            if(spawningAi)
             {
-                Quaternion angle = Quaternion.Euler(0, Random.Range(0, 360), 0);
-
-                if (Mode.Instance.online) PhotonNetwork.Instantiate(path, transform.position, angle, 0);
-                else
+                GameObject.Find("eCentralManager").GetComponent<CharaManager>().SpawnChara(transform.position, "", "");
+            }
+            else
+            {
+                if (Random.Range(0, 100) < chanceToSpawn)
                 {
-                    Instantiate(Resources.Load<GameObject>(path), transform.position, angle);
+                    Quaternion angle = Quaternion.Euler(0, Random.Range(0, 360), 0);
+
+                    if (Mode.Instance.online) PhotonNetwork.Instantiate(path, transform.position, angle, 0);
+                    else
+                    {
+                        Instantiate(Resources.Load<GameObject>(path), transform.position, angle);
+                    }
                 }
             }
         }
@@ -43,6 +57,9 @@ public class zombieProp : MonoBehaviour
 
     private void OnDestroy()
     {
-        Generator.onGenerationFinished -= InstantiateZombie;
+        if (Mode.Instance.ShouldZombieSpawn)
+        {
+            Generator.onGenerationFinished -= InstantiateZombie;
+        }
     }
 }

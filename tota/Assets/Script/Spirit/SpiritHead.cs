@@ -663,7 +663,7 @@ public class SpiritHead : Photon.MonoBehaviour
             Destroy(child.gameObject);
         }
 
-        Vector3 vec = new Vector3(inter.transform.position.x, inter.transform.position.y + 3, inter.transform.position.z);
+        Vector3 vec = new Vector3(inter.InterTransform.position.x, inter.InterTransform.position.y + 3, inter.InterTransform.position.z);
         _actions.transform.position = _spiritCamera.GetComponent<Camera>().WorldToScreenPoint(vec);
 
         _actions.SetActive(true);

@@ -58,7 +58,7 @@ public class CharaHead : Photon.PunBehaviour
     }
 
     //Activer les IA
-    public const float c_radiusToActivate = 80f;
+    public const float c_radiusToActivate = 60f;
     
     private IEnumerator CheckForAi()
     {
@@ -66,18 +66,20 @@ public class CharaHead : Photon.PunBehaviour
         {
             yield return new WaitForSeconds(1f);
 
-            Collider[] allAi = Physics.OverlapSphere(transform.position, c_radiusToActivate, _aiActivationLayer);
-            //Debug.Log("CheckForAi: got " + allAi.Length + " zombies in detection sphere");
-            foreach(Collider aiCollider in allAi)
+            if(_permissions.Team != null)
             {
-                Zombie zombieComp = aiCollider.GetComponent<Zombie>();
-                if(zombieComp != null)
+                Collider[] allAi = Physics.OverlapSphere(transform.position, c_radiusToActivate);
+                //Debug.Log("CheckForAi: got " + allAi.Length + " zombies in detection sphere");
+                foreach (Collider aiCollider in allAi)
                 {
-                    //Debug.Log("CheckForAi: Activating a zombie in range");
-                    zombieComp.ForceActivate(this);
+                    AiDeactivator aiToDeactivate = aiCollider.GetComponent<AiDeactivator>();
+                    if (aiToDeactivate != null)
+                    {
+                        //Debug.Log("CheckForAi: Activating a zombie in range");
+                        aiToDeactivate.ForceActivate(this);
+                    }
                 }
             }
-
         }
     }
     void OnDrawGizmosSelected()
@@ -186,8 +188,6 @@ public class CharaHead : Photon.PunBehaviour
 
     public void SetDestination(Vector3 destination, bool isRunning)
     {
-        SwitchState(true);
-
         _movement.MoveTo(destination, isRunning);
     }
 
@@ -205,7 +205,7 @@ public class CharaHead : Photon.PunBehaviour
     //Focus on Interactable
     private IEnumerator _cor_interaction = null;
     private IEnumerator _cor_craftingItem = null;
-    public ItemRecipe recipeBeingCrafted = null;
+    [HideInInspector] public ItemRecipe recipeBeingCrafted = null;
     public bool isCraftingItem => _cor_craftingItem != null;
     private IEnumerator _cor_useItem = null;
     private IEnumerator _cor_waitAction = null;
@@ -218,9 +218,7 @@ public class CharaHead : Photon.PunBehaviour
 
     public void SetFocus(Interactable inter, int actionIndex)
     {
-        SwitchState(true);
-
-        RemoveFocus(true, false);
+        if (!GetComponent<CharaRpg>().ShouldBeDown()) SwitchState(true);
 
         bool isRunning = _movement.IsRunning;
         _focus = inter;
@@ -404,16 +402,14 @@ public class CharaHead : Photon.PunBehaviour
 
     private IEnumerator LootAtFocus()
     {
-        Debug.Log("LootAtFocus: starting coroutine, " 
-            + transform.position + " to " + _focus.transform.position 
-            + " (" + (_focus.transform.position - transform.position) + ")");
+        //Debug.Log("LootAtFocus: starting coroutine, " + transform.position + " to " + _focus.transform.position + " (" + (_focus.transform.position - transform.position) + ")");
         Vector3 direction = (_focus.InterTransform.position - transform.position).normalized;
 
-        Debug.Log("LootAtFocus: direction " + direction);
+        //Debug.Log("LootAtFocus: direction " + direction);
 
         Quaternion desiredRotation = Quaternion.LookRotation(direction);
         float desiredYRotation = desiredRotation.eulerAngles.y;
-        Debug.Log("LootAtFocus: desired Rotation " + desiredYRotation);
+        //Debug.Log("LootAtFocus: desired Rotation " + desiredYRotation);
 
         float currentRotation = transform.eulerAngles.y;
 
@@ -426,7 +422,7 @@ public class CharaHead : Photon.PunBehaviour
 
             yield return null;
         }
-        Debug.Log("LootAtFocus: ending coroutine with rotation " + transform.eulerAngles.y + " (aiming for " + desiredYRotation + ")");
+        //Debug.Log("LootAtFocus: ending coroutine with rotation " + transform.eulerAngles.y + " (aiming for " + desiredYRotation + ")");
     }
 
     //Special Interact

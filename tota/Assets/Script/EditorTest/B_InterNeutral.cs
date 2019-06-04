@@ -10,12 +10,12 @@ public class B_InterNeutral : MonoBehaviour
 {
     [Header("Prop context")]
     public string propFolder = "";
-    public string subPropFolder = "";
+    public string subPropFolder = "cars";
     [Header("NavMeshModifier")]
-    public bool canChangeLocation = false;
+    public bool canChangeLocation = true;
     public bool isAnObstacle = true;
     [Header("Auto-fill Interactable")]
-    public int actionCount = 0;
+    public int actionCount = 2;
     [Header("Auto-fill Furniture")]
     public LootTable lootTable = null;
 
@@ -88,7 +88,8 @@ public class B_InterNeutral : MonoBehaviour
         }
         if(isAnObstacle)
         {
-            gameObject.AddComponent<NavMeshObstacle>();
+            NavMeshObstacle obs = gameObject.AddComponent<NavMeshObstacle>();
+            obs.carving = true;
         }
         
 
@@ -121,7 +122,7 @@ public class B_InterNeutral : MonoBehaviour
         path += propSoPathFromAssets;
 
         string assetPathAndName = AssetDatabase.GenerateUniqueAssetPath(path + subPathFolder+ "/" + nickName + ".asset");
-
+        Debug.Log("CreateProp: at " + path + subPathFolder + "/" + nickName + ".asset");
         AssetDatabase.CreateAsset(asset, assetPathAndName);
 
         AssetDatabase.SaveAssets();

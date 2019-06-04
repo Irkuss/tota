@@ -108,6 +108,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   isMoving: 0
+  particleGameObject: {fileID: 0}
   _interTransform: {fileID: 7998223397493195710}
   _radius: 1
   _possibleActionNames:
@@ -115,6 +116,11 @@ MonoBehaviour:
   _isDistanceAction: 00
   _isDoWhileAction: 00
   _makesActionNotAppearWhenUnavailable: 00
+  salvageTime: 2
+  salvagedItem1: {fileID: 0}
+  salvagedItemCount1: 1
+  salvagedItem2: {fileID: 0}
+  salvagedItemCount2: 1
   lootTable: {fileID: 11400000, guid: 1ef8132562402b8428fe6fd200f78af6, type: 2}
   hasToRandAddLoot: 1
   baseTimeFirstLoot: 5
@@ -173,7 +179,7 @@ NavMeshObstacle:
   m_Shape: 1
   m_Extents: {x: 0.5, y: 1.0500001, z: 0.4}
   m_MoveThreshold: 0.1
-  m_Carve: 0
+  m_Carve: 1
   m_CarveOnlyStationary: 1
   m_Center: {x: -0.3, y: 1.0500001, z: 0.4}
   m_TimeToStationary: 0.5

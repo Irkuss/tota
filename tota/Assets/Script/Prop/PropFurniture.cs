@@ -95,7 +95,21 @@ public class PropFurniture : SalvageHandler
     //====================AI Interactable====================
     private void InteractAI(CharaHead chara)
     {
-        Debug.Log("InteractAI: an Ai is interacting with a furniture");
+        Debug.Log("InteractAI: an Ai is interacting with a furniture TODO");
+
+        CharaInventory charaInv = chara.GetComponent<CharaInventory>();
+
+        foreach(Item itemToSearch in CharaAi.ItemToSearch)
+        {
+            Debug.Log("InteractAI: searching for " + itemToSearch.nickName);
+
+            while(_furnitureInventory.Contains(itemToSearch))
+            {
+                Debug.Log("InteractAI: found " + itemToSearch.nickName);
+                _furnitureInventory.Remove(itemToSearch);
+                charaInv.Add(itemToSearch);
+            }
+        }
     }
     public bool CheckAvailabilityAI(CharaHead chara)
     {

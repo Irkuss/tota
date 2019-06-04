@@ -44,6 +44,8 @@ GameObject:
   - component: {fileID: 4832890031431449045}
   - component: {fileID: 5834695643751015538}
   - component: {fileID: 883120668255583217}
+  - component: {fileID: 6959882435400799098}
+  - component: {fileID: 1360640202564953907}
   m_Layer: 0
   m_Name: bidon_rouge_jaune
   m_TagString: Untagged
@@ -136,6 +138,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   isMoving: 0
+  particleGameObject: {fileID: 0}
   _interTransform: {fileID: 8509598009951245037}
   _radius: 3
   _possibleActionNames:
@@ -148,3 +151,35 @@ MonoBehaviour:
   salvagedItemCount1: 2
   salvagedItem2: {fileID: 0}
   salvagedItemCount2: 1
+--- !u!114 &6959882435400799098
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8204851313719110512}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6d07ce676d7afda4dabb3b0f7dd5e654, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_OverrideArea: 0
+  m_Area: 0
+  m_IgnoreFromBuild: 1
+  m_AffectedAgents: ffffffff
+--- !u!208 &1360640202564953907
+NavMeshObstacle:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8204851313719110512}
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Shape: 1
+  m_Extents: {x: 0.87500006, y: 1.125, z: 0.87500006}
+  m_MoveThreshold: 0.1
+  m_Carve: 1
+  m_CarveOnlyStationary: 1
+  m_Center: {x: 0.57500005, y: 1.125, z: -0.675}
+  m_TimeToStationary: 0.5

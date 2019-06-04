@@ -8,6 +8,10 @@ public class Mode : MonoBehaviour
 {
     public static Mode Instance;
     private string _mode = "";
+
+    public bool ShouldZombieSpawn => _mode == "zombie";
+    public bool ShouldTemperatureBeModified => _mode == "cold";
+    public bool ShouldAiSpawn => _mode != "solo";
     
     [HideInInspector] public bool online;   
 

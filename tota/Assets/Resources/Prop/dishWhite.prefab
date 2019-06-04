@@ -13,6 +13,8 @@ GameObject:
   - component: {fileID: 2467338654539678496}
   - component: {fileID: 9091650428928742322}
   - component: {fileID: 2933712482976029670}
+  - component: {fileID: 1134047395171734552}
+  - component: {fileID: 4655991223690876515}
   m_Layer: 0
   m_Name: whiteclassical
   m_TagString: Untagged
@@ -118,6 +120,38 @@ MonoBehaviour:
   salvagedItemCount1: 2
   salvagedItem2: {fileID: 11400000, guid: 7d445539b40a82646bd37d865247fe65, type: 2}
   salvagedItemCount2: 1
+--- !u!114 &1134047395171734552
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5605447082096936022}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6d07ce676d7afda4dabb3b0f7dd5e654, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_OverrideArea: 0
+  m_Area: 0
+  m_IgnoreFromBuild: 1
+  m_AffectedAgents: ffffffff
+--- !u!208 &4655991223690876515
+NavMeshObstacle:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5605447082096936022}
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Shape: 1
+  m_Extents: {x: 0.87500006, y: 1.0250001, z: 0.90000004}
+  m_MoveThreshold: 0.1
+  m_Carve: 1
+  m_CarveOnlyStationary: 1
+  m_Center: {x: -1.1750001, y: 1.0250001, z: 1.6}
+  m_TimeToStationary: 0.5
 --- !u!1 &5617870429120391905
 GameObject:
   m_ObjectHideFlags: 0

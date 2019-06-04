@@ -3,10 +3,10 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.AI;
 
-public class Rat : MonoBehaviour
+public class Rat : AiDeactivator
 {
     //Defining attribute
-    private float _wanderRadius = 8;
+    private float _wanderRadius = 6;
     private float _viewRadius = 6;
 
     private float _slowSpeed = 1f;
@@ -64,46 +64,52 @@ public class Rat : MonoBehaviour
         {
             yield return new WaitForSeconds(0.2f);
 
-            _visibleTargets = CharaAi.FindVisibleTargets(transform, targetMask, obstacleMask, _viewRadius);
-            
-
-            if (_visibleTargets.Count > 0)
+            if(_canTakeDecision)
             {
-                _closestPlayer = CharaAi.FindClosestTransform(_visibleTargets, transform.position);
+                _visibleTargets = CharaAi.FindVisibleTargets(transform, targetMask, obstacleMask, _viewRadius);
 
-                //Si on a détecté une target
-                SetMovementMode(true);
 
-                _wanderPoint = CharaAi.FindFleePositionFromTarget(_closestPlayer.position, transform.position, 5);
-
-                SetDestination(_wanderPoint);
-            }
-            else
-            {
-                //Si on n'est pas en train de s'enfuir
-                if (Vector3.Distance(transform.position, _wanderPoint) <= _agent.stoppingDistance + 0.3f)
+                if (_visibleTargets.Count > 0)
                 {
-                    if (!isRunningAway)
+                    _closestPlayer = CharaAi.FindClosestTransform(_visibleTargets, transform.position);
+
+                    //Si on a détecté une target
+                    SetMovementMode(true);
+
+                    _wanderPoint = CharaAi.FindFleePositionFromTarget(_closestPlayer.position, transform.position, 5);
+
+                    SetDestination(_wanderPoint);
+                }
+                else
+                {
+                    //Si on n'est pas en train de s'enfuir
+                    if (Vector3.Distance(transform.position, _wanderPoint) <= _agent.stoppingDistance + 0.3f)
                     {
-                        //Si on est safe
-                        if (cycleBeforeMoving <= 0)
+                        if (!isRunningAway)
                         {
-                            _wanderPoint = CharaAi.FindRandomWanderPoint(_wanderRadius, transform.position);
+                            //Si on est safe
+                            if (cycleBeforeMoving <= 0)
+                            {
+                                _wanderPoint = CharaAi.FindRandomWanderPoint(_wanderRadius, transform.position);
 
-                            SetDestination(_wanderPoint);
+                                SetDestination(_wanderPoint);
 
-                            cycleBeforeMoving = Random.Range(1, 3) * 2;
+                                cycleBeforeMoving = Random.Range(1, 3) * 2;
+                            }
+                            else
+                            {
+                                cycleBeforeMoving--;
+                            }
                         }
                         else
                         {
-                            cycleBeforeMoving--;
+                            SetMovementMode(false);
                         }
                     }
-                    else
-                    {
-                        SetMovementMode(false);
-                    }
                 }
+
+                //Verifie si le rat se desactive
+                CheckDeactivate();
             }
         }
     }

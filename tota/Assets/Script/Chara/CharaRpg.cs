@@ -586,13 +586,13 @@ public class CharaRpg : MonoBehaviour
     public float GetTimeModifier(Stat stat)
     {
         float statValue = GetCurrentStat(stat);
-        Debug.Log("GetTimeModifier: statValue " + statValue);
+        //Debug.Log("GetTimeModifier: statValue " + statValue);
         if (IsMainStat(stat))
         {
-            Debug.Log("GetTimeModifier: returning " + (1.75f - statValue * 0.015f));
+            //Debug.Log("GetTimeModifier: returning " + (1.75f - statValue * 0.015f));
             return 1.75f - statValue * 0.015f; //0 -> 1.75, 50 -> 1, 100 -> 0.25
         }
-        Debug.Log("GetTimeModifier: returning " + (1f - statValue * 0.075f));
+        //Debug.Log("GetTimeModifier: returning " + (1f - statValue * 0.075f));
         return 1f - statValue * 0.075f; //0 -> 1, 10 -> 0.25
     }
 
@@ -704,7 +704,7 @@ public class CharaRpg : MonoBehaviour
     private static int maxSleepDeprivationProgressBeforeNextLevel = 24 * c_secInHour;
 
     private int _rest = 12 * c_secInHour;
-    public float RestPurcent => _rest / maxRest;
+    public float RestPurcent => (_rest * 100f) / maxRest;
 
     private int _sleepDeprivationLevel = 0;
     private int _sleepDeprivationProgress = 0;
@@ -926,6 +926,11 @@ public class CharaRpg : MonoBehaviour
             return focus is BedHandler;
         }
         return false;
+    }
+
+    public bool ShouldBeDown()
+    {
+        return (IsSleeping() || _isInShock || _isDead);
     }
 
     //HealthStatus Update

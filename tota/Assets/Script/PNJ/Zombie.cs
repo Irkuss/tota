@@ -4,11 +4,11 @@ using UnityEngine;
 using UnityEngine.AI;
 using UnityStandardAssets.Characters.ThirdPerson;
 
-public class Zombie : MonoBehaviour
+public class Zombie : AiDeactivator
 {
     //Defining attribute
     public float fieldOfViewAngle = 140f;
-    public float wanderRadius = 10f;
+    public float wanderRadius = 5f;
 
     //reference
     [SerializeField] private LayerMask _targetMask;
@@ -46,46 +46,7 @@ public class Zombie : MonoBehaviour
             StartCoroutine(FindTargetsWithDelay());
         }
     }
-
-    //Activor and deactivator
-    private bool _canTakeDecision = false;
-    private List<CharaHead> _activatorCharas = new List<CharaHead>();
-
-    public void ForceActivate(CharaHead activatorChara)
-    {
-        //if (!_canTakeDecision) Debug.Log("ForceActivate: A zombie has been activated");
-        //Called by CharaHead in CheckForAi
-
-        if(!_activatorCharas.Contains(activatorChara))
-        {
-            //ajoute le chara en tant qu'activator
-            _activatorCharas.Add(activatorChara);
-            _canTakeDecision = true;
-        }
-    }
-    private void CheckDeactivate()
-    {
-        List<CharaHead> activatorToRemove = new List<CharaHead>();
-        //Verifie la distance de chaque activateur
-        foreach(CharaHead activatorChara in _activatorCharas)
-        {
-            if(activatorChara == null || Vector3.Distance(transform.position, activatorChara.transform.position) > CharaHead.c_radiusToActivate)
-            {
-                activatorToRemove.Add(activatorChara);
-            }
-        }
-        //Supprimes les charas eloignées des activateurs
-        foreach(CharaHead deactivator in activatorToRemove)
-        {
-            _activatorCharas.Remove(deactivator);
-        }
-        //End condition
-        if(_activatorCharas.Count == 0)
-        {
-            //Debug.Log("CheckDeactivate: A zombie has been deactivated");
-            _canTakeDecision = false;
-        }
-    }
+    
 
     //ForcePosition
     private IEnumerator WaitForcePosition()

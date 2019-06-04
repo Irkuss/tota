@@ -13,6 +13,8 @@ GameObject:
   - component: {fileID: 8311465369875846583}
   - component: {fileID: 8151807033344179686}
   - component: {fileID: 2976301645800243921}
+  - component: {fileID: 4981673251086379113}
+  - component: {fileID: 6484728289384802206}
   m_Layer: 0
   m_Name: metaltable
   m_TagString: Untagged
@@ -105,6 +107,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   isMoving: 0
+  particleGameObject: {fileID: 0}
   _interTransform: {fileID: 7499098275219338933}
   _radius: 4
   _possibleActionNames:
@@ -117,6 +120,38 @@ MonoBehaviour:
   salvagedItemCount1: 2
   salvagedItem2: {fileID: 0}
   salvagedItemCount2: 1
+--- !u!114 &4981673251086379113
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3394992738980967186}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6d07ce676d7afda4dabb3b0f7dd5e654, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_OverrideArea: 0
+  m_Area: 0
+  m_IgnoreFromBuild: 1
+  m_AffectedAgents: ffffffff
+--- !u!208 &6484728289384802206
+NavMeshObstacle:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3394992738980967186}
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Shape: 1
+  m_Extents: {x: 2.13, y: 0.84000003, z: 1.2900001}
+  m_MoveThreshold: 0.1
+  m_Carve: 1
+  m_CarveOnlyStationary: 1
+  m_Center: {x: 1.47, y: 0.84000003, z: 0.45000002}
+  m_TimeToStationary: 0.5
 --- !u!1 &6179341974949726978
 GameObject:
   m_ObjectHideFlags: 0

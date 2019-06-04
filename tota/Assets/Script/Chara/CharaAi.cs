@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.AI;
 
-public class CharaAi : MonoBehaviour
+public class CharaAi : AiDeactivator
 {
     //Recipe and Item
     [SerializeField] private Item[] _itemToSearch = null;
@@ -16,9 +16,9 @@ public class CharaAi : MonoBehaviour
     [SerializeField] private LayerMask obstacleMask;
 
     //Fix radius
-    private float _wanderRadius = 24;
+    private float _wanderRadius = 20;
     private float _viewRadius = 14;
-    private float _searchRadius = 36;
+    private float _searchRadius = 20;
 
     private float _interRadius; //AUTO SET, DONT SET (used to stop ai when a chara with a team is close)
 
@@ -67,7 +67,13 @@ public class CharaAi : MonoBehaviour
     {
         if(_refreshRateProgress == _aiUpdateRefreshRate)
         {
-            MainUpdateAi();
+            if(_canTakeDecision)
+            {
+                MainUpdateAi();
+
+                CheckDeactivate();
+            }
+            
             _refreshRateProgress = 0;
         }
         else
@@ -117,9 +123,14 @@ public class CharaAi : MonoBehaviour
 
                         lockAction = true;
                     }
-                    else if (_movement.AgentIsIdling)
+                    else 
                     {
-                        _targetToFace = _closestChara;
+                        if (_movement.AgentIsIdling)
+                        {
+                            _targetToFace = _closestChara;
+                        }
+
+                        lockAction = false;
                     }
                 }
                 else

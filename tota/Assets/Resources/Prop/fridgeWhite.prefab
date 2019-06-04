@@ -47,6 +47,7 @@ GameObject:
   - component: {fileID: 5166848391651424630}
   - component: {fileID: 7805460767518152392}
   - component: {fileID: 2621588837920624534}
+  - component: {fileID: 3356124706313334978}
   m_Layer: 0
   m_Name: Base_classical_fridge_white
   m_TagString: Untagged
@@ -215,3 +216,19 @@ MonoBehaviour:
   m_Area: 0
   m_IgnoreFromBuild: 1
   m_AffectedAgents: ffffffff
+--- !u!208 &3356124706313334978
+NavMeshObstacle:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5858144049590853662}
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Shape: 1
+  m_Extents: {x: 1.075, y: 2.025, z: 0.55}
+  m_MoveThreshold: 0.1
+  m_Carve: 1
+  m_CarveOnlyStationary: 1
+  m_Center: {x: -1.4250001, y: 2.025, z: 1.95}
+  m_TimeToStationary: 0.5

@@ -44,6 +44,8 @@ GameObject:
   - component: {fileID: 4506093945516635091}
   - component: {fileID: 2333763761993677278}
   - component: {fileID: 3409265943203163336}
+  - component: {fileID: 4555307880895025756}
+  - component: {fileID: 7710618180966012365}
   m_Layer: 0
   m_Name: flower_pot_metal
   m_TagString: Untagged
@@ -162,6 +164,38 @@ MonoBehaviour:
   - {fileID: 5526493448253834526}
   - {fileID: 2271664135855203922}
   - {fileID: 1101181653039056803}
+--- !u!114 &4555307880895025756
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4066384494148627700}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6d07ce676d7afda4dabb3b0f7dd5e654, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_OverrideArea: 0
+  m_Area: 0
+  m_IgnoreFromBuild: 1
+  m_AffectedAgents: ffffffff
+--- !u!208 &7710618180966012365
+NavMeshObstacle:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4066384494148627700}
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Shape: 1
+  m_Extents: {x: 2.0400002, y: 0.88000005, z: 1.2}
+  m_MoveThreshold: 0.1
+  m_Carve: 1
+  m_CarveOnlyStationary: 1
+  m_Center: {x: 0.120000005, y: 0.88000005, z: -0.48000002}
+  m_TimeToStationary: 0.5
 --- !u!1001 &957318666441267810
 PrefabInstance:
   m_ObjectHideFlags: 0

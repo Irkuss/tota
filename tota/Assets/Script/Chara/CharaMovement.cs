@@ -138,6 +138,9 @@ public class CharaMovement : MonoBehaviour
     {
         _isRunning = runInt == 1 ? true : false;
         UpdateSpeed();
+
+        //if (GetComponent<CharaPermissions>().Team != null) Debug.Log("SetDestination: setting to destination");
+
         _navMeshAgent.SetDestination(new Vector3(x, y, z));
 
         StartCoroutine(WaitForPathCompletion());
@@ -149,6 +152,9 @@ public class CharaMovement : MonoBehaviour
         {
             yield return null;
         }
+        if (!GetComponent<CharaRpg>().ShouldBeDown()) GetComponent<CharaHead>().SwitchState(true);
+
+        //if (GetComponent<CharaPermissions>().Team != null) Debug.Log("SetDestination: updating corners");
         UpdateCorners();
     }
 

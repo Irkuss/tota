@@ -13,6 +13,8 @@ GameObject:
   - component: {fileID: 6918908494166176192}
   - component: {fileID: 7213166518454711720}
   - component: {fileID: 3875724226207161652}
+  - component: {fileID: 8275359314465514522}
+  - component: {fileID: 8777270376338862932}
   m_Layer: 0
   m_Name: bidon_bleu
   m_TagString: Untagged
@@ -117,6 +119,38 @@ MonoBehaviour:
   salvagedItemCount1: 1
   salvagedItem2: {fileID: 0}
   salvagedItemCount2: 1
+--- !u!114 &8275359314465514522
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2503566792534166206}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6d07ce676d7afda4dabb3b0f7dd5e654, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_OverrideArea: 0
+  m_Area: 0
+  m_IgnoreFromBuild: 1
+  m_AffectedAgents: ffffffff
+--- !u!208 &8777270376338862932
+NavMeshObstacle:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2503566792534166206}
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Shape: 1
+  m_Extents: {x: 0.77500004, y: 1.1500001, z: 0.77500004}
+  m_MoveThreshold: 0.1
+  m_Carve: 1
+  m_CarveOnlyStationary: 1
+  m_Center: {x: 0.47500002, y: 1.1500001, z: 1.725}
+  m_TimeToStationary: 0.5
 --- !u!1 &6904992068380478574
 GameObject:
   m_ObjectHideFlags: 0
