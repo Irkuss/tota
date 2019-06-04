@@ -53,7 +53,7 @@ public class InterfaceManager : MonoBehaviour
             
             foreach (ItemRecipe recipe in allRecipeTable[i].recipes)
             {
-                craftSlot = Instantiate(_slot, allCraftGo[i].transform.GetChild(0));
+                craftSlot = Instantiate(_slot, allCraftGo[i].transform.GetChild(0).GetChild(0).GetChild(0));
 
                 craftSlot.GetComponent<SlotDescription>().description = recipe.description;
                 //Associe l'action de craft et l'image de l'item crafté
@@ -107,7 +107,7 @@ public class InterfaceManager : MonoBehaviour
             for (int i = 0; i < allRecipeTable[j].recipes.Length; i++)
             {
                 recipe = allRecipeTable[j].recipes[i];
-                craftSlot = allCraftGo[j].transform.GetChild(0).GetChild(i).gameObject;
+                craftSlot = allCraftGo[j].transform.GetChild(0).GetChild(0).GetChild(0).GetChild(i).gameObject;
 
                 missingMsg = "";
                 if (!recipe.CanBeCraftedWith(charaInventory.inventory)) missingMsg += "Missing Items\n";

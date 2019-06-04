@@ -505,6 +505,8 @@ public class Launcher : Photon.PunBehaviour
     {
         PhotonNetwork.Destroy(gameObject);
         PhotonNetwork.Destroy(PermissionsManager.Instance.gameObject);
+        Destroy(Mode.Instance.gameObject);
+        PhotonNetwork.Disconnect();
         SceneManager.LoadScene(0);
     }
 
