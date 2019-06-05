@@ -27,6 +27,7 @@ public class PropHandler : Interactable
     // !!! THE PARSING SHOULD OVERWRITE THIS FUNCTION !!!
     public virtual void CommandReceive(int[] command, float[] commandFloat, string[] commandString = null)
     {
+        //Debug.Log("CommandReceive: PropHandler");
         //overwrite to parse command
     }
     

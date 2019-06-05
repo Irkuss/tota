@@ -158,7 +158,9 @@ public class PotHandler : SalvageHandler
     //====================Override PropHandler====================
     public override void CommandReceive(int[] command, float[] commandFloat, string[] commandString = null)
     {
-        switch((PotCommand)command[0])
+        //Debug.Log("CommandReceive: PotHandler");
+
+        switch ((PotCommand)command[0])
         {
             case PotCommand.ResetPot: ResetPot(); break;
             case PotCommand.PlantSeed: PlantSeed(); break;

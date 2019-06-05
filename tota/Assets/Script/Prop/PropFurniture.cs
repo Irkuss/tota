@@ -213,6 +213,8 @@ public class PropFurniture : SalvageHandler
     //====================Override PropHandler====================
     public override void CommandReceive(int[] command, float[] commandFloat, string[] commandString = null)
     {
+        //Debug.Log("CommandReceive: PropFurniture");
+
         switch ((FurnitureCommand) command[0])
         {
             case FurnitureCommand.Modify: _furnitureInventory.ModifyCountWithId(command[1], command[2]); break;

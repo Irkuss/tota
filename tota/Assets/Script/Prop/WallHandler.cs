@@ -152,7 +152,7 @@ public class WallHandler : PropHandler
     //====================Override PropHandler====================
     public override void CommandReceive(int[] command, float[] commandFloat, string[] commandString = null)
     {
-        Debug.Log("CommandReceive: command received");
+        //Debug.Log("CommandReceive: WallHandler");
 
         switch((WallCommand) command[0])
         {

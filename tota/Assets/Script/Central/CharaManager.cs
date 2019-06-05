@@ -103,6 +103,8 @@ public class CharaManager : MonoBehaviour
     //Command
     public void SendMsgTo(GameObject chara, int cc, int[] intArgs, string[] stringArgs, float[] floatArgs)
     {
+        //Debug.Log("SendMsgTo: sending msg to");
+
         if (Mode.Instance.online)
         {
             GetComponent<PhotonView>().RPC("RPC_ReceiveMsg", PhotonTargets.AllBuffered, GetIdWithChara(chara), cc, intArgs, stringArgs, floatArgs);

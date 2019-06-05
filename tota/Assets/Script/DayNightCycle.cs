@@ -208,6 +208,8 @@ public class DayNightCycle : MonoBehaviour
 
     public void DebugForceMeteo(Meteo forceMeteo)
     {
+        Debug.Log("DebugForceMeteo: sending new meteo");
+
         if(PhotonNetwork.offlineMode)
         {
             ReceiveSetMeteo((int)forceMeteo);

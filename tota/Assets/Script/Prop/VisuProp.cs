@@ -101,6 +101,8 @@ public class VisuProp : PropHandler
     //====================Override PropHandler====================
     public override void CommandReceive(int[] command, float[] commandFloat, string[] commandString = null)
     {
+        //Debug.Log("CommandReceive: VisuProp");
+
         switch ((VisuCommand)command[0])
         {
             case VisuCommand.Completed: MarkAsCompleted(); break;

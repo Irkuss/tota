@@ -256,7 +256,9 @@ public class DoorHandler : WallHandler
     //====================Override PropHandler====================
     public override void CommandReceive(int[] command, float[] commandFloat, string[] commandString = null)
     {
-        switch((DoorCommand)command[0])
+        Debug.Log("CommandReceive: DoorHandler");
+
+        switch ((DoorCommand)command[0])
         {
             case DoorCommand.ToggleOpen: ToggleOpen(command[1] == 1); break;
             case DoorCommand.SetTeam: SetTeam(commandString[0]); break;

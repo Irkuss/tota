@@ -76,6 +76,7 @@ public class PropManager : MonoBehaviour
         //Sending special command
         public void ReceivePropCommand(int[] command, float[] commandFloat, string[] commandString = null)
         {
+            //Debug.Log("ReceivePropCommand:");
             if (_go != null) _go.GetComponentInChildren<PropHandler>().CommandReceive(command, commandFloat, commandString);
         }
     }

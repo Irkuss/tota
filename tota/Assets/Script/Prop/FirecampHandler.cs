@@ -207,6 +207,8 @@ public class FirecampHandler : PropHandler
     //====================Override PropHandler====================
     public override void CommandReceive(int[] command, float[] commandFloat, string[] commandString = null)
     {
+        Debug.Log("CommandReceive: FirecampHandler");
+
         switch ((FireCommand)command[0])
         {
             case FireCommand.Lit: ReceiveFuel(); break;

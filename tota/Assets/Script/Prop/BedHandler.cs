@@ -104,6 +104,8 @@ public class BedHandler : SalvageHandler
     //====================Override PropHandler====================
     public override void CommandReceive(int[] command, float[] commandFloat, string[] commandString = null)
     {
+        Debug.Log("CommandReceive: BedHandler");
+
         switch ((BedCommand)command[0])
         {
             case BedCommand.Usage: ToggleUsage(command[1] == 1); break;

@@ -128,6 +128,8 @@ public class Rat : AiDeactivator
     }
     private void SetMovementMode(bool setToRun)
     {
+        //Debug.Log("SetMovementMode: sending new movement");
+
         isRunningAway = setToRun;
         _agent.speed = setToRun ? _fastSpeed : _slowSpeed;
 
@@ -142,6 +144,8 @@ public class Rat : AiDeactivator
 
     public void SendUpdatedWanderPoint()
     {
+        //Debug.Log("SendUpdatedWanderPoint: rat new wander point has been sent at " + transform.position );
+
         if (Mode.Instance.online) _photon.RPC("RPC_SendUpdatedWanderPoint", PhotonTargets.OthersBuffered, _wanderPoint.x, _wanderPoint.y, _wanderPoint.z);
     }
     [PunRPC]
@@ -153,6 +157,8 @@ public class Rat : AiDeactivator
 
     public void ForcePosition()
     {
+        //Debug.Log("ForcePosition: rat");
+
         if (Mode.Instance.online) _photon.RPC("RPC_ForceRatPosition", PhotonTargets.OthersBuffered, _wanderPoint.x, _wanderPoint.y, _wanderPoint.z);
     }
     [PunRPC]

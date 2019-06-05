@@ -136,7 +136,9 @@ public class WorkshopProp : SalvageHandler
     //====================Override PropHandler====================
     public override void CommandReceive(int[] command, float[] commandFloat, string[] commandString = null)
     {
-        switch((WorkShopCommand)command[0])
+        //Debug.Log("CommandReceive: WorkshopProp");
+
+        switch ((WorkShopCommand)command[0])
         {
             case WorkShopCommand.Usage: ToggleUsage(command[1] == 1); break;
             case WorkShopCommand.SwitchSpark: ReceiveSwitchSpark(command[1] == 1); break;
