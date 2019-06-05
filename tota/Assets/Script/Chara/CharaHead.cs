@@ -48,9 +48,10 @@ public class CharaHead : Photon.PunBehaviour
         _eManager = GameObject.Find("eCentralManager"); //pas ouf comm methode, mieux vaux avec un tag
         _permManager = PermissionsManager.Instance;
 
-        SwitchState(true);
+        _upChara.SetActive(true);
+        _downChara.SetActive(false);
 
-        if(PhotonNetwork.isMasterClient)
+        if (PhotonNetwork.isMasterClient)
         {
             StartCoroutine(CheckForAi());
             StartCoroutine(UpdateForceOpenDoor());
@@ -101,8 +102,8 @@ public class CharaHead : Photon.PunBehaviour
 
         if (needFill)
         {
-            Vector3 vec = new Vector3(gameObject.transform.position.x, gameObject.transform.position.y + 3, gameObject.transform.position.z);
-            fillObj.transform.position = SpiritZoom.cam.WorldToScreenPoint(vec);
+            Vector3 vec = new Vector3(transform.position.x, transform.position.y + 3, transform.position.z);
+            fillObj.transform.position = SpiritZoom.Cam.WorldToScreenPoint(vec);
         }
     }
     //Clic Gauche
@@ -495,8 +496,20 @@ public class CharaHead : Photon.PunBehaviour
     }
 
     //Up down chara
+    private bool currentStateIsUp = true;
+
     public void SwitchState(bool upState)
     {
+        if(upState != currentStateIsUp)
+        {
+            GetComponent<CharaConnect>().SendMsg(CharaConnect.CharaCommand.SwitchState, new int[1] { upState ? 1 : 0 });
+        }
+    }
+
+    public void RPC_SwitchState(bool upState)
+    {
+        currentStateIsUp = upState;
+
         _upChara.SetActive(upState);
         _downChara.SetActive(!upState);
     }

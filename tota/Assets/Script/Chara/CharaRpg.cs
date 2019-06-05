@@ -413,7 +413,7 @@ public class CharaRpg : MonoBehaviour
         return a > b && a > b + epsilon;
     }
     //Names static Generation
-    private static string GetRandomFirstName()
+    public static string GetRandomFirstName()
     {
         using (StreamReader prenoms = new StreamReader("Assets/Resources/Database/prenoms.txt"))
         {
@@ -425,7 +425,7 @@ public class CharaRpg : MonoBehaviour
             return prenoms.ReadLine();
         }
     }
-    private static string GetRandomLastName()
+    public static string GetRandomLastName()
     {
         using (StreamReader noms = new StreamReader("Assets/Resources/Database/noms.txt"))
         {
@@ -478,8 +478,8 @@ public class CharaRpg : MonoBehaviour
     {
         woundTable = _woundTable;
         quirkTable = _quirkTable;
-        _nameFirst = GetRandomFirstName();
-        _nameLast = GetRandomLastName();
+        //_nameFirst = GetRandomFirstName();
+        //_nameLast = GetRandomLastName();
         _cm = GameObject.Find("eCentralManager").GetComponent<CentralManager>();
 
         _head = GetComponent<CharaHead>();

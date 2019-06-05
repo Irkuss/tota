@@ -487,4 +487,52 @@ public class CharaInventory : MonoBehaviour
         UpdateUI();
     }
 
+
+
+    public void SetEquipments(Item item, int index)
+    {
+        SendSetEquip(item, index, true);
+    }
+    public void SetWearable(Item item, int index)
+    {
+        SendSetEquip(item, index, false);
+    }
+
+    private void SendSetEquip(Item item, int index, bool toEquip)
+    {
+        int id = item == null ? -1: itemTable.GetIdWithItem(item);
+
+        GetComponent<CharaConnect>().SendMsg(CharaConnect.CharaCommand.SetEquip, new int[3] { id, index, toEquip ? 1 : 0});
+    }
+
+    public void RPC_SetEquip(int itemId, int index, bool toEquip)
+    {
+        if(itemId < 0)
+        {
+            if(toEquip)
+            {
+                equipments[index] = null;
+            }
+            else
+            {
+                wearables[index] = null;
+            }
+        }
+        else
+        {
+            Item item = itemTable.GetItemWithId(itemId);
+
+            if (toEquip)
+            {
+                equipments[index] = item as Equipable;
+            }
+            else
+            {
+                wearables[index] = item as Wearable;
+            }
+        }
+        
+        if (_interface == null) return;
+        _interface.GetComponent<InterfaceManager>().UpdateEquipment(this);
+    }
 }

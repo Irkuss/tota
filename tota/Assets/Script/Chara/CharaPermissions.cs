@@ -52,6 +52,7 @@ public class CharaPermissions : MonoBehaviour
     //Setters RPC
     public void SetTeam(string teamName)
     {
+        Debug.Log("SetTeam: Sending set team '" + teamName + "'");
         GetComponent<CharaConnect>().SendMsg(CharaConnect.CharaCommand.RPC_SetTeam, null, new string[1] { teamName }, null);
     }
 
@@ -69,10 +70,9 @@ public class CharaPermissions : MonoBehaviour
             team = PermissionsManager.Instance.GetTeamWithName(teamName);
             PermissionsManager.Instance.spirit.InstantiateCharaRef(PhotonNetwork.player.NickName, gameObject);
         }
+        GetComponent<CharaHead>().Deselect();
 
         GetComponent<CharaConnect>().SendMsg(CharaConnect.CharaCommand.UpdateTeamColor, null, null, null);
-        GetComponent<CharaHead>().Deselect();
-        
     }
     
     public void SetOwner(string newOwnerName)

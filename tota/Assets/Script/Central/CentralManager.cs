@@ -414,12 +414,11 @@ public class CentralManager : Photon.MonoBehaviour
                     }
                 }
 
-                GameObject chara = gameObject.GetComponent<CharaManager>().RPC_SpawnChara(pos.x,pos.y,pos.z,teamName,listQuirk.ToArray(),playerName);
+                string[] name = reader.ReadLine().Split(' ');
+
+                GameObject chara = gameObject.GetComponent<CharaManager>().RPC_SpawnChara(pos.x,pos.y,pos.z,teamName,listQuirk.ToArray(),playerName, name[0], name[1]);
                 CharaRpg rpg = chara.GetComponent<CharaRpg>();
                 CharaInventory inventory = chara.GetComponent<CharaInventory>();
-
-                string[] name = reader.ReadLine().Split(' ');
-                rpg.SetIdentity(name[0], name[1]);
 
                 string[] healthStats = reader.ReadLine().Split('/');
                 rpg.SetHealthStats(healthStats);
@@ -470,7 +469,7 @@ public class CentralManager : Photon.MonoBehaviour
                 {
                     if(wearables[k] == "null")
                     {
-                        inventory.wearables[k] = null;
+                        inventory.SetWearable(null, k);
                     }
                     else
                     {
@@ -478,7 +477,7 @@ public class CentralManager : Photon.MonoBehaviour
 
                         if (item != null && (Wearable) item != null)
                         {
-                            inventory.wearables[k] = (Wearable) item;
+                            inventory.SetWearable(item, k);
                         }
                     }
                     
@@ -489,7 +488,7 @@ public class CentralManager : Photon.MonoBehaviour
                 {
                     if(equipments[m] == "null")
                     {
-                        inventory.equipments[m] = null;
+                        inventory.SetEquipments(null, m);
                     }
                     else
                     {
@@ -497,7 +496,7 @@ public class CentralManager : Photon.MonoBehaviour
 
                         if (item != null && (Equipable) item != null)
                         {
-                            inventory.equipments[m] = (Equipable) item;
+                            inventory.SetEquipments(item, m);
                         }
                     }
                     

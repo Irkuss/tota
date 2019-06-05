@@ -73,7 +73,7 @@ public class BedHandler : SalvageHandler
     }
     private IEnumerator Cor_UpdateClose()
     {
-        _outline.enabled = true;
+        //_outline.enabled = true;
 
         while (_charaUsing != null)
         {
@@ -88,7 +88,7 @@ public class BedHandler : SalvageHandler
             }
         }
 
-        _outline.enabled = false;
+        //_outline.enabled = false;
     }
     private void SendToggleUsage(bool isUsed)
     {
@@ -96,6 +96,8 @@ public class BedHandler : SalvageHandler
     }
     private void ToggleUsage(bool isUsed)
     {
+        _outline.enabled = isUsed;
+
         _isBeingUsed = isUsed;
     }
 

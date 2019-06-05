@@ -22,6 +22,8 @@ public class CharaConnect : MonoBehaviour
         TrainStat,
         ShootSound,
         MeleeSound,
+        SwitchState,
+        SetEquip,
     }
     // Start is called before the first frame update
     void Awake()
@@ -50,6 +52,8 @@ public class CharaConnect : MonoBehaviour
             case CharaCommand.TrainStat: GetComponent<CharaRpg>().RPC_TrainStat((CharaRpg.Stat)i[0], f[0]); break;
             case CharaCommand.ShootSound: GetComponent<CharaInteract>().MakeSoundShot(); break;
             case CharaCommand.MeleeSound: GetComponent<CharaInteract>().MakeSoundMelee(); break;
+            case CharaCommand.SwitchState: GetComponent<CharaHead>().RPC_SwitchState(i[0] == 1); break;
+            case CharaCommand.SetEquip: GetComponent<CharaInventory>().RPC_SetEquip(i[0], i[1], i[2] == 1); break;
         }
     }
 }

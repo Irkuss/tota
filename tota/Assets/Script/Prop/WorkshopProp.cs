@@ -99,7 +99,7 @@ public class WorkshopProp : SalvageHandler
     }
     private IEnumerator Cor_UpdateClose()
     {
-        _outline.enabled = true;
+        //_outline.enabled = true;
 
         while (_charaUsing != null)
         {
@@ -120,7 +120,7 @@ public class WorkshopProp : SalvageHandler
         }
         SendSwitchSpark(false);
 
-        _outline.enabled = false;
+        //_outline.enabled = false;
     }
     private void SendToggleUsage(bool isUsed)
     {
@@ -128,6 +128,8 @@ public class WorkshopProp : SalvageHandler
     }
     private void ToggleUsage(bool isUsed)
     {
+        _outline.enabled = isUsed;
+
         _isBeingUsed = isUsed;
     }
 
@@ -163,7 +165,10 @@ public class WorkshopProp : SalvageHandler
 
     private void SendSwitchSpark(bool setToActive)
     {
-        CommandSend(new int[2] { (int)WorkShopCommand.SwitchSpark, setToActive ? 1 : 0 });
+        if(particleGameObject != null)
+        {
+            CommandSend(new int[2] { (int)WorkShopCommand.SwitchSpark, setToActive ? 1 : 0 });
+        }
     }
     private void ReceiveSwitchSpark(bool setToActive)
     {

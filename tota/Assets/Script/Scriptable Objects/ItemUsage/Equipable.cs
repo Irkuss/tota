@@ -62,7 +62,7 @@ public class Equipable : Item
                     //Si l'emplacement 0 est occupée par une arme à deux mains -> on tente de ranger l'item de l'emplacement 0
                     if (!charaInventory.Add(charaInventory.equipments[0])) return false;
 
-                    charaInventory.equipments[1] = null;
+                    charaInventory.SetEquipments(null, 1);
                 }
                 else
                 {
@@ -73,11 +73,11 @@ public class Equipable : Item
                         if (!charaInventory.Add(charaInventory.equipments[1])) return false;
                     }
                     //On décale l'item de l'emplacement 0 dans l'emplacement 1
-                    charaInventory.equipments[1] = charaInventory.equipments[0];
+                    charaInventory.SetEquipments(charaInventory.equipments[0], 1);
                 }
             }
             //On s'équipe dans l'emplacement 0
-            charaInventory.equipments[0] = this;         
+            charaInventory.SetEquipments(this, 0);
         }
         else
         {
@@ -93,13 +93,13 @@ public class Equipable : Item
                     if (!charaInventory.Add(charaInventory.equipments[1])) return false;
                 }
             }
-            charaInventory.equipments[0] = this;
-            charaInventory.equipments[1] = this;
+            charaInventory.SetEquipments(this, 0);
+            charaInventory.SetEquipments(this, 1);
         }
 
-        GameObject _interface = charaInventory.GetInterface();
-        if (_interface == null) return false;
-        _interface.GetComponent<InterfaceManager>().UpdateEquipment(charaInventory);
+        //GameObject _interface = charaInventory.GetInterface();
+        //if (_interface == null) return false;
+        //_interface.GetComponent<InterfaceManager>().UpdateEquipment(charaInventory);
 
         return true;
     }
@@ -114,21 +114,21 @@ public class Equipable : Item
             Debug.Log("Unequip: unequiping found in slot 0");
             if (equipSpace == EquipSpace.TwoHanded)
             {
-                charaInventory.equipments[0] = null;
+                charaInventory.SetEquipments(null, 0);
             }
             else
             {
-                charaInventory.equipments[0] = charaInventory.equipments[1];
+                charaInventory.SetEquipments(charaInventory.equipments[1], 0);
                 
             }
-            charaInventory.equipments[1] = null;
+            charaInventory.SetEquipments(null, 1);
         }
         else
         {
             if (charaInventory.equipments[1] == this)
             {
                 Debug.Log("Unequip: unequiping found in slot 1, unequiping");
-                charaInventory.equipments[1] = null;
+                charaInventory.SetEquipments(null, 1);
             }
             else
             {
@@ -146,9 +146,9 @@ public class Equipable : Item
             }
         }*/
         Debug.LogWarning("Unequip: ending unequip " + nickName);
-        GameObject _interface = charaInventory.GetInterface();
-        if (_interface == null) return false;
-        _interface.GetComponent<InterfaceManager>().UpdateEquipment(charaInventory);
+        //GameObject _interface = charaInventory.GetInterface();
+        //if (_interface == null) return false;
+        //_interface.GetComponent<InterfaceManager>().UpdateEquipment(charaInventory);
 
         return true;
     }

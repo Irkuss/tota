@@ -38,12 +38,12 @@ public class Wearable : Item
                 {
                     charaInventory.Add(charaInventory.wearables[0]);
                 }
-                charaInventory.wearables[0] = this;
+                charaInventory.SetWearable(this, 0);
                 break;
             case BodyInvSpace.Torso:
                 if (charaInventory.wearables[1] != null && charaInventory.wearables[2] == null)
                 {
-                    charaInventory.wearables[2] = this;
+                    charaInventory.SetWearable(this, 2);
                 }
                 else
                 {
@@ -51,8 +51,8 @@ public class Wearable : Item
                     {
                         charaInventory.Add(charaInventory.wearables[2]);
                     }
-                    charaInventory.wearables[2] = charaInventory.wearables[1];
-                    charaInventory.wearables[1] = this;
+                    charaInventory.SetWearable(charaInventory.wearables[1], 2);
+                    charaInventory.SetWearable(this, 1);
                 }
                 break;
             case BodyInvSpace.Leg:
@@ -60,13 +60,13 @@ public class Wearable : Item
                 {
                     charaInventory.Add(charaInventory.wearables[3]);
                 }
-                charaInventory.wearables[3] = this;
+                charaInventory.SetWearable(this, 3);
                 break;
         }
 
-        GameObject _interface = charaInventory.GetInterface();
-        if (_interface == null) return false;
-        _interface.GetComponent<InterfaceManager>().UpdateEquipment(charaInventory);
+        //GameObject _interface = charaInventory.GetInterface();
+        //if (_interface == null) return false;
+        //_interface.GetComponent<InterfaceManager>().UpdateEquipment(charaInventory);
 
         return true;
     }
@@ -80,14 +80,14 @@ public class Wearable : Item
         {
             if (charaInventory.wearables[i] == this)
             {
-                charaInventory.wearables[i] = null;
+                charaInventory.SetWearable(null, i);
                 break;
             }
         }
         Debug.Log("Unequip: ending unequip " + nickName);
-        GameObject _interface = charaInventory.GetInterface();
-        if (_interface == null) return false;
-        _interface.GetComponent<InterfaceManager>().UpdateEquipment(charaInventory);
+        //GameObject _interface = charaInventory.GetInterface();
+        //if (_interface == null) return false;
+        //_interface.GetComponent<InterfaceManager>().UpdateEquipment(charaInventory);
 
         return true;
     }

@@ -21,37 +21,39 @@ public class CharaManager : MonoBehaviour
     public void SpawnChara(Vector3 pos, string teamName, string playerName)
     {
         int[] quirks = GetNewSerializedQuirks();
+
+        string newFirstName = CharaRpg.GetRandomFirstName();
+        string newLastName = CharaRpg.GetRandomLastName();
+
         if (Mode.Instance.online)
         {
-            GetComponent<PhotonView>().RPC("RPC_SpawnChara", PhotonTargets.AllBuffered, pos.x, pos.y, pos.z, teamName, quirks, playerName);
+            GetComponent<PhotonView>().RPC("RPC_SpawnChara", PhotonTargets.AllBuffered, pos.x, pos.y, pos.z, teamName, quirks, playerName, newFirstName, newLastName);
         }
         else
         {
-            RPC_SpawnChara(pos.x, pos.y, pos.z, teamName, quirks, playerName);
+            RPC_SpawnChara(pos.x, pos.y, pos.z, teamName, quirks, playerName, newFirstName, newLastName);
         }
     }
-    [PunRPC] public GameObject RPC_SpawnChara(float x, float y, float z, string teamName, int[] quirks, string playerName)
+    [PunRPC] public GameObject RPC_SpawnChara(float x, float y, float z, string teamName, int[] quirks, string playerName, string newFirstName, string newLastName)
     {
         //Instancie sur le PhotonNetwork le Chara
         Vector3 pos = new Vector3(x, y, z);
         GameObject chara = Instantiate(Resources.Load<GameObject>(_charaPath), pos, Quaternion.identity);
         //Ajoute le chara dans la liste des charas
         _allCharas.Add(chara);
-        
+
         //Initialise les stats du chara
+        chara.GetComponent<CharaRpg>().SetIdentity(newFirstName, newLastName);
         chara.GetComponent<CharaRpg>().Init(quirks);
 
 
-        if (teamName != "")
+        if (teamName != "" && PhotonNetwork.isMasterClient)
         {
             //Initialise la team du chara (sur le network)
             chara.GetComponent<CharaPermissions>().SetTeam(teamName);
         }
 
-        if (playerName != "")
-        {
-            PermissionsManager.Instance.spirit.InstantiateCharaRef(playerName, chara);
-        }
+        //if (playerName != "") PermissionsManager.Instance.spirit.InstantiateCharaRef(playerName, chara);
 
         return chara;
     }

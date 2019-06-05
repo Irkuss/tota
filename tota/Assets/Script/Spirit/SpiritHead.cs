@@ -196,7 +196,7 @@ public class SpiritHead : Photon.MonoBehaviour
 
             if (setToAI) Debug.Log("TestCharaSpawn: spawning AI chara");
 
-
+            Debug.Log("TestCharaSpawn: spawning chara");
             GameObject.Find("eCentralManager").GetComponent<CharaManager>().SpawnChara(lowPosition, teamOfNewChara, _playerOwner.Name);
 
             if (mode.firstTime == 2)
@@ -232,6 +232,8 @@ public class SpiritHead : Photon.MonoBehaviour
 
     public void InstantiateCharaRef(string playerWhoSent,GameObject chara)
     {
+        Debug.Log("InstantiateCharaRef: adding ref to topbar");
+
         PermissionsManager.Player player = _permission.GetPlayerWithName(PhotonNetwork.player.NickName);
         PermissionsManager.Team team = _permission.GetTeamWithName(player.MyTeamName);
 
