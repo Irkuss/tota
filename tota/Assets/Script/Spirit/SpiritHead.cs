@@ -824,11 +824,18 @@ public class SpiritHead : Photon.MonoBehaviour
         //if (Input.GetKeyDown(KeyCode.E))
         if (Input.inputString == mode.interfaCe)
         {
-            _inventoryList.SetActive(!_inventoryList.activeSelf);            
+            _inventoryList.SetActive(!_inventoryList.activeSelf);
+            if (!_inventoryList.activeSelf)
+            {
+                GameObject slot = GameObject.Find("eCentralManager").GetComponent<CentralManager>().Description;
+                slot.SetActive(false);
+            }
         }
         if(_inventoryLayout.transform.childCount == 0)
         {
             _inventoryList.SetActive(false);
+            GameObject slot = GameObject.Find("eCentralManager").GetComponent<CentralManager>().Description;
+            slot.SetActive(false);
         }
     }
 
