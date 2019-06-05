@@ -93,7 +93,7 @@ public class CharaInventory : MonoBehaviour
             if(_removeButton != null) _removeButton.interactable = false;
             isEmpty = true;
 
-            //_itemButton.transform.parent.GetChild(5).GetChild(0).GetComponent<Text>().text = "";
+            if (_itemButton != null) _itemButton.transform.parent.GetComponent<SlotDescription>().description = "";
         }
 
         public void OnRemoveButton()
@@ -292,6 +292,9 @@ public class CharaInventory : MonoBehaviour
         if (_interface != null)
         {
             Destroy(_interface);
+            GameObject slot = GameObject.Find("eCentralManager").GetComponent<CentralManager>().Description;
+            slot.SetActive(false);
+
         }
         //Debug.Log("CharaInventory: closed Inventory after being deselected");
     }
@@ -300,6 +303,8 @@ public class CharaInventory : MonoBehaviour
         if(_inventory != null)
         {
             Destroy(_inventory);
+            GameObject slot = GameObject.Find("eCentralManager").GetComponent<CentralManager>().Description;
+            slot.SetActive(false);
         }
     }
 
