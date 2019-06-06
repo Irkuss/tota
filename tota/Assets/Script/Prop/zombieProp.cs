@@ -57,6 +57,7 @@ public class zombieProp : MonoBehaviour
 
     private IEnumerator WaitAI()
     {
+        Debug.Log("REACHED WAIT AI");
         yield return new WaitForSeconds(5f);
         GameObject.Find("eCentralManager").GetComponent<CharaManager>().SpawnChara(transform.position, "", "");
     }
