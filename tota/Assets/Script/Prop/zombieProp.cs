@@ -36,7 +36,7 @@ public class zombieProp : MonoBehaviour
         {
             if(spawningAi)
             {
-                GameObject.Find("eCentralManager").GetComponent<CharaManager>().SpawnChara(transform.position, "", "");
+                StartCoroutine(WaitAI());
             }
             else
             {
@@ -53,6 +53,12 @@ public class zombieProp : MonoBehaviour
             }
         }
         Destroy(this.gameObject);
+    }
+
+    private IEnumerator WaitAI()
+    {
+        yield return new WaitForSeconds(5f);
+        GameObject.Find("eCentralManager").GetComponent<CharaManager>().SpawnChara(transform.position, "", "");
     }
 
     private void OnDestroy()
