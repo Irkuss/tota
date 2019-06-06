@@ -110,8 +110,7 @@ public class CharaInteract : Interactable
                     : Mathf.FloorToInt(  ( weapon.damage * (distance - weapon.remoteMaxRange) )  /  (weapon.remoteFalloffRange-weapon.remoteMaxRange)  );
                 
                 //Attack remote
-                GetComponent<CharaRpg>().GetAttackedWith(weapon, damage);
-            }
+                GetComponent<CharaRpg>().GetAttackedWith(weapon, damage);            }
         }
         else
         {
@@ -254,7 +253,7 @@ public class CharaInteract : Interactable
         //soundWaveParticle.Emit(1);
         Instantiate(soundWaveGo, transform.position + Vector3.up * 1f, Quaternion.identity);
 
-        AudioManager.instance.PlayAtPosition("Claque", transform.position);
+        AudioManager.instance.PlayAtPosition("Gunshot", transform.position);
     }
     public void MakeSoundMelee()
     {

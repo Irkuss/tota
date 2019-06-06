@@ -1253,7 +1253,7 @@ public class Generator : MonoBehaviour
                     {
                         tempBuilds[xTemp, yTemp].Generate(x, y);
                     }
-                    yield return new WaitForSeconds(0.05f);
+                    yield return new WaitForSeconds(0.15f);
                 }
                 //Generate Streets
                 if (_layout == WorldLayout.City) GenerateStreets(tempRoads, tempBuilds, x, y);
