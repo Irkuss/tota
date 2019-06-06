@@ -44,7 +44,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 654293b04882d564987b5fb3f2561abd, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  chanceToSpawn: 60
+  chanceToSpawn: 35
   path: Prop/zombiePropMarc
   spawningZombie: 1
   spawningRat: 0
@@ -56,22 +56,6 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 7792188274121211760}
     m_Modifications:
-    - target: {fileID: 100066, guid: 440718d4e458f8342a2f6b6040ef45d2, type: 3}
-      propertyPath: m_Name
-      value: zombi1
-      objectReference: {fileID: 0}
-    - target: {fileID: 100066, guid: 440718d4e458f8342a2f6b6040ef45d2, type: 3}
-      propertyPath: m_Layer
-      value: 12
-      objectReference: {fileID: 0}
-    - target: {fileID: 100004, guid: 440718d4e458f8342a2f6b6040ef45d2, type: 3}
-      propertyPath: m_Layer
-      value: 12
-      objectReference: {fileID: 0}
-    - target: {fileID: 100068, guid: 440718d4e458f8342a2f6b6040ef45d2, type: 3}
-      propertyPath: m_Layer
-      value: 12
-      objectReference: {fileID: 0}
     - target: {fileID: 400066, guid: 440718d4e458f8342a2f6b6040ef45d2, type: 3}
       propertyPath: m_LocalPosition.x
       value: 0
@@ -127,6 +111,22 @@ PrefabInstance:
     - target: {fileID: 400066, guid: 440718d4e458f8342a2f6b6040ef45d2, type: 3}
       propertyPath: m_LocalScale.z
       value: 5.25
+      objectReference: {fileID: 0}
+    - target: {fileID: 100066, guid: 440718d4e458f8342a2f6b6040ef45d2, type: 3}
+      propertyPath: m_Name
+      value: zombi1
+      objectReference: {fileID: 0}
+    - target: {fileID: 100066, guid: 440718d4e458f8342a2f6b6040ef45d2, type: 3}
+      propertyPath: m_Layer
+      value: 12
+      objectReference: {fileID: 0}
+    - target: {fileID: 100004, guid: 440718d4e458f8342a2f6b6040ef45d2, type: 3}
+      propertyPath: m_Layer
+      value: 12
+      objectReference: {fileID: 0}
+    - target: {fileID: 100068, guid: 440718d4e458f8342a2f6b6040ef45d2, type: 3}
+      propertyPath: m_Layer
+      value: 12
       objectReference: {fileID: 0}
     - target: {fileID: 9500000, guid: 440718d4e458f8342a2f6b6040ef45d2, type: 3}
       propertyPath: m_Enabled
