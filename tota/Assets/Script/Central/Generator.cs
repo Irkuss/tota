@@ -1251,9 +1251,19 @@ public class Generator : MonoBehaviour
                 {
                     for (int xTemp = 0; xTemp < c_districtInWorldChunk * 2; xTemp++)
                     {
-                        tempBuilds[xTemp, yTemp].Generate(x, y);
+                        if(tempBuilds[xTemp, yTemp].Generate(x, y))
+                        {
+                            if(!PhotonNetwork.offlineMode)
+                            {
+                                yield return new WaitForSeconds(0.05f);
+                            }
+                            
+                        }
                     }
-                    yield return new WaitForSeconds(0.15f);
+                    if (PhotonNetwork.offlineMode)
+                    {
+                        yield return new WaitForSeconds(0.05f);
+                    }
                 }
                 //Generate Streets
                 if (_layout == WorldLayout.City) GenerateStreets(tempRoads, tempBuilds, x, y);
@@ -1275,10 +1285,10 @@ public class Generator : MonoBehaviour
                 int treeAntiDensity = 200; //The bigger, the lesser tree
                 switch (_biome)
                 {
-                    case WorldBiome.Plain: treeAntiDensity = 60; break;
+                    case WorldBiome.Plain: treeAntiDensity = 300; break;
                     case WorldBiome.Arid: treeAntiDensity = 300; break;
-                    case WorldBiome.Forest: treeAntiDensity = 60; break;
-                    case WorldBiome.DeepForest: treeAntiDensity = 30; break;
+                    case WorldBiome.Forest: treeAntiDensity = 300; break;
+                    case WorldBiome.DeepForest: treeAntiDensity = 300; break;
                     default: treeAntiDensity = 500; break;
                 }
 
