@@ -32,13 +32,17 @@ public class zombieProp : MonoBehaviour
 
     private void InstantiateZombie()
     {
-        if (PhotonNetwork.isMasterClient)
+        if(spawningAi)
         {
-            if(spawningAi)
+            if (PhotonNetwork.isMasterClient)
             {
                 StartCoroutine(WaitAI());
             }
-            else
+            //On ne détruit pas le spawner tout de suite (mais a la fin de la coroutine)
+        }
+        else
+        {
+            if (PhotonNetwork.isMasterClient)
             {
                 if (Random.Range(0, 100) < chanceToSpawn)
                 {
@@ -51,15 +55,19 @@ public class zombieProp : MonoBehaviour
                     }
                 }
             }
+            //On detruit le spawner
+            Destroy(this.gameObject);
         }
-        Destroy(this.gameObject);
     }
 
     private IEnumerator WaitAI()
     {
-        Debug.Log("REACHED WAIT AI");
-        yield return new WaitForSeconds(5f);
+        Debug.Log("zombieProp: starting to wait to spawn ai for whatever reason");
+        yield return new WaitForSeconds(3f);
+        Debug.Log("zombieProp: actually spawning ai at " + transform.position);
         GameObject.Find("eCentralManager").GetComponent<CharaManager>().SpawnChara(transform.position, "", "");
+        //Destruction du spawner une fois l'ai spawned
+        Destroy(this.gameObject);
     }
 
     private void OnDestroy()
