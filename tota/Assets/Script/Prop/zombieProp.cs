@@ -15,14 +15,9 @@ public class zombieProp : MonoBehaviour
 
     private void Start()
     {
-        //StartCoroutine(WaitForNavmeh());
-
-
-        if((Mode.Instance.ShouldZombieSpawn && spawningZombie)
-            || (Mode.Instance.ShouldAiSpawn && spawningAi)
-            || spawningRat)
+        if (PhotonNetwork.isMasterClient && IsSpawningSomething() && Random.Range(0, 100) < chanceToSpawn)
         {
-            Generator.onGenerationFinished += InstantiateZombie;
+            Generator.onGenerationFinished += InstantiateOrgProp;
         }
         else
         {
@@ -30,31 +25,53 @@ public class zombieProp : MonoBehaviour
         }
     }
 
-    private void InstantiateZombie()
+    private bool IsSpawningSomething()
+    {
+        if(spawningRat)
+        {
+            return true;
+        }
+
+        if (Mode.Instance.ShouldAiSpawn && spawningAi)
+        {
+            return true;
+        }
+
+        if (Mode.Instance.ShouldZombieSpawn && spawningZombie)
+        {
+            return true;
+        }
+
+        return false;
+
+        /*
+            return ((Mode.Instance.ShouldZombieSpawn && spawningZombie)
+            || (Mode.Instance.ShouldAiSpawn && spawningAi)
+            || spawningRat);
+        */
+    }
+
+    private void InstantiateOrgProp()
     {
         if(spawningAi)
         {
-            if (PhotonNetwork.isMasterClient)
-            {
-                StartCoroutine(WaitAI());
-            }
+            StartCoroutine(WaitAI());
+            
             //On ne détruit pas le spawner tout de suite (mais a la fin de la coroutine)
         }
         else
         {
-            if (PhotonNetwork.isMasterClient)
-            {
-                if (Random.Range(0, 100) < chanceToSpawn)
-                {
-                    Quaternion angle = Quaternion.Euler(0, Random.Range(0, 360), 0);
+            Quaternion angle = Quaternion.Euler(0, Random.Range(0, 360), 0);
 
-                    if (Mode.Instance.online) PhotonNetwork.Instantiate(path, transform.position, angle, 0);
-                    else
-                    {
-                        Instantiate(Resources.Load<GameObject>(path), transform.position, angle);
-                    }
-                }
+            if(Mode.Instance.online)
+            {
+                PhotonNetwork.Instantiate(path, transform.position, angle, 0);
             }
+            else
+            {
+                Instantiate(Resources.Load<GameObject>(path), transform.position, angle);
+            }
+
             //On detruit le spawner
             Destroy(this.gameObject);
         }
@@ -74,7 +91,7 @@ public class zombieProp : MonoBehaviour
     {
         if (Mode.Instance.ShouldZombieSpawn)
         {
-            Generator.onGenerationFinished -= InstantiateZombie;
+            Generator.onGenerationFinished -= InstantiateOrgProp;
         }
     }
 }
