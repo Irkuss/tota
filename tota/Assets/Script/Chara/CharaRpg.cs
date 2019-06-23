@@ -412,38 +412,12 @@ public class CharaRpg : MonoBehaviour
     {
         return a > b && a > b + epsilon;
     }
-    //Names static Generation
-    public static string GetRandomFirstName()
-    {
-        using (StreamReader prenoms = new StreamReader("Assets/Resources/Database/prenoms.txt"))
-        {
-            int index = Random.Range(1, 12437) + 1;
-            for (int i = 0; i < index; i++)
-            {
-                prenoms.ReadLine();
-            }
-            return prenoms.ReadLine();
-        }
-    }
-    public static string GetRandomLastName()
-    {
-        using (StreamReader noms = new StreamReader("Assets/Resources/Database/noms.txt"))
-        {
-            int index = Random.Range(1, 1000) + 1;
-            for (int i = 0; i < index; i++)
-            {
-                noms.ReadLine();
-            }
-            return noms.ReadLine();
-        }
-    }
-
 
     //====================Attribute====================
     //Reference
-    [SerializeField] private QuirkTable _quirkTable;
+    [SerializeField] private QuirkTable _quirkTable = null;
     private static QuirkTable quirkTable;
-    [SerializeField] private WoundTable _woundTable;
+    [SerializeField] private WoundTable _woundTable = null;
     public static WoundTable woundTable;
     
     private CentralManager _cm = null;
@@ -457,7 +431,7 @@ public class CharaRpg : MonoBehaviour
     private string _nameLast = "McCree";
     public string NameLast => _nameLast;
 
-    public string NameFull => _nameFirst + _nameLast;
+    public string NameFull => _nameFirst + " "+ _nameLast;
 
     public void SetIdentity(string first, string last)
     {

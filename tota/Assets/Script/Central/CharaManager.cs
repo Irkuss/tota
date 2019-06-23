@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -7,6 +8,9 @@ public class CharaManager : MonoBehaviour
     private string _charaPath = "CharSout3"; //TEMP
     //Ref
     [SerializeField] private QuirkTable _quirkTable;
+
+    [SerializeField] private TextAsset _textPrenoms = null;
+    [SerializeField] private TextAsset _textNoms = null;
 
     //List All chara (added when they spawn)
     private List<GameObject> _allCharas;
@@ -22,8 +26,8 @@ public class CharaManager : MonoBehaviour
     {
         int[] quirks = GetNewSerializedQuirks();
 
-        string newFirstName = CharaRpg.GetRandomFirstName();
-        string newLastName = CharaRpg.GetRandomLastName();
+        string newFirstName = GetRandomFirstName();
+        string newLastName = GetRandomLastName();
 
         if (Mode.Instance.online)
         {
@@ -34,7 +38,8 @@ public class CharaManager : MonoBehaviour
             RPC_SpawnChara(pos.x, pos.y, pos.z, teamName, quirks, playerName, newFirstName, newLastName);
         }
     }
-    [PunRPC] public GameObject RPC_SpawnChara(float x, float y, float z, string teamName, int[] quirks, string playerName, string newFirstName, string newLastName)
+    [PunRPC]
+    public GameObject RPC_SpawnChara(float x, float y, float z, string teamName, int[] quirks, string playerName, string newFirstName, string newLastName)
     {
         //Instancie sur le PhotonNetwork le Chara
         Vector3 pos = new Vector3(x, y, z);
@@ -63,10 +68,10 @@ public class CharaManager : MonoBehaviour
     {
         List<Quirk> quirks = new List<Quirk>();
         //Decide quirk number
-        int numberPhysical = Random.Range(1, 4); //1 à 3
-        int numberMental = Random.Range(2, 5);  //2 à 4
-        int numberJob = Random.Range(0, 2);     //0 à 1
-        int numberApocExp = Random.Range(0, 2); //0 à 1
+        int numberPhysical = UnityEngine.Random.Range(1, 4); //1 à 3
+        int numberMental = UnityEngine.Random.Range(2, 5);  //2 à 4
+        int numberJob = UnityEngine.Random.Range(0, 2);     //0 à 1
+        int numberApocExp = UnityEngine.Random.Range(0, 2); //0 à 1
         //add Quirk
         _quirkTable.GetRandomQuirksOfType(Quirk.QuirkType.Physical, numberPhysical, quirks);
         _quirkTable.GetRandomQuirksOfType(Quirk.QuirkType.Mental, numberMental, quirks);
@@ -113,15 +118,65 @@ public class CharaManager : MonoBehaviour
         {
             RPC_ReceiveMsg(GetIdWithChara(chara), cc, intArgs, stringArgs, floatArgs);
         }
-        
+
     }
-    [PunRPC] public void RPC_ReceiveMsg(int id, int cc, int[] intArgs, string[] stringArgs, float[] floatArgs)
+    [PunRPC]
+    public void RPC_ReceiveMsg(int id, int cc, int[] intArgs, string[] stringArgs, float[] floatArgs)
     {
         CharaConnect chara = GetCharaWithId(id).GetComponent<CharaConnect>();
 
-        if(chara != null)
+        if (chara != null)
         {
             chara.ReceiveMsg(cc, intArgs, stringArgs, floatArgs);
         }
     }
+
+    //Names static Generation
+    public string GetRandomFirstName()
+    {
+        return GetRandomStringFromFile(_textPrenoms);
+        //return GetRandomStringFromFile(12437, "Assets/Resources/Database/prenoms.txt");
+    }
+    public string GetRandomLastName()
+    {
+        return GetRandomStringFromFile(_textNoms);
+        //return GetRandomStringFromFile(1000, "Assets/Resources/Database/noms.txt");
+    }
+
+    private string GetRandomStringFromFile(TextAsset textAsset)
+    {
+        Debug.Log("GetRandomStringFromFile: searching");
+
+        string[] splitFile = new string[] { "\r\n", "\r", "\n" };
+
+        //Getting the whole text as string
+        string fileAsString = textAsset.text;
+
+        //Getting the lines
+        string[] fileLines = fileAsString.Split(splitFile, StringSplitOptions.None);
+
+        //Choosing a line
+        int chosenLineIndex = UnityEngine.Random.Range(0, fileLines.Length);
+
+        string chosenLineString = fileLines[chosenLineIndex];
+
+        //Cleaning shitty db ending with ' '
+        if(chosenLineString[chosenLineString.Length - 1] == ' ')
+        {
+            chosenLineString = chosenLineString.Remove(chosenLineString.Length - 1);
+        }
+
+        return chosenLineString;
+        /*
+        using (StreamReader sr = new StreamReader(filePath))
+        {
+            int chosenLine = Random.Range(1, fileLineLength) + 1;
+            for (int currentLine = 0; currentLine < chosenLine; currentLine++)
+            {
+                sr.ReadLine();
+            }
+            return sr.ReadLine();
+        }*/
+    }
 }
+
